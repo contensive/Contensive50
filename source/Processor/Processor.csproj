@@ -67,12 +67,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.2001.19.4, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.2001.19.4\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.2001.19.7, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.2001.19.7\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2001.19.4\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2001.19.7\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -206,11 +206,14 @@
     <Compile Include="Addons\Tools\_empty.cs" />
     <Compile Include="Addons\WhatsRelated\WhatsRelatedClass.cs" />
     <Compile Include="Controllers\Addon\AddonControllerScript.cs" />
-    <Compile Include="Controllers\Collection\CollectionFolderController.cs" />
-    <Compile Include="Controllers\Collection\CollectionInstallLayoutController.cs" />
-    <Compile Include="Controllers\Collection\CollectionInstallAddonController.cs" />
+    <Compile Include="Controllers\Collection\Install\CollectionFolderController.cs" />
+    <Compile Include="Controllers\Collection\Install\CollectionInstallLayoutController.cs" />
+    <Compile Include="Controllers\Collection\Install\CollectionInstallAddonController.cs" />
     <Compile Include="Controllers\Collection\CollectionLibraryController.cs" />
-    <Compile Include="Controllers\Collection\CollectionExportController.cs" />
+    <Compile Include="Controllers\Collection\Export\DataRecordNodeListController.cs" />
+    <Compile Include="Controllers\Collection\Export\ExportController.cs" />
+    <Compile Include="Controllers\Collection\Export\ExportResourceListController.cs" />
+    <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\PermissionController.cs" />
     <Compile Include="Controllers\EmailAmazonSESController.cs" />
     <Compile Include="Controllers\UpgradeController.cs" />
@@ -291,7 +294,7 @@
     <Compile Include="Addons\Tools\ConfigureEditClass.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Controllers\Addon\AddonController.cs" />
-    <Compile Include="Controllers\Collection\CollectionInstallController.cs" />
+    <Compile Include="Controllers\Collection\Install\CollectionInstallController.cs" />
     <Compile Include="Addons\AdminSite\Controllers\AdminUIController.cs" />
     <Compile Include="Controllers\BuildController.cs" />
     <Compile Include="Controllers\CacheController.cs" />
@@ -332,8 +335,6 @@
     <Compile Include="Controllers\TaskRunnerController.cs" />
     <Compile Include="Controllers\TaskSchedulerController.cs" />
     <Compile Include="Controllers\WorkflowController.cs" />
-    <Compile Include="Controllers\Collection\CollectionExportCDefController.cs" />
-    <Compile Include="Controllers\XmlController.cs" />
     <Compile Include="Controllers\QuickEditController.cs" />
     <Compile Include="Controllers\MetadataController.cs" />
     <Compile Include="Controllers\_BlankController.cs" />

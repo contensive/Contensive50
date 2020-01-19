@@ -219,8 +219,22 @@ namespace Contensive.Processor {
             throw new NotImplementedException("InstallCollectionFromLink, methods are not yet implemented");
         }
         //
+        //====================================================================================================
+        //
         public override int InstallCollectionFromLinkAsync(string link) {
             throw new NotImplementedException("InstallCollectionFromLink, methods are not yet implemented");
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool ExportCollection(int collectionId, ref string collectionZipPathFilename, ref string returnUserError) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override bool ExportCollection(string collectionGuid, ref string collectionZipPathFilename, ref string returnUserError) {
+            throw new NotImplementedException();
         }
         //
         //====================================================================================================

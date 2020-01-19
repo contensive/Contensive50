@@ -209,6 +209,22 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Package a collection into a collection zip file and return a cdn path to the zip file.
+        /// </summary>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
+        public abstract bool ExportCollection(int collectionId, ref string collectionZipPathFilename, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Package a collection into a collection zip file and return a cdn path to the zip file
+        /// </summary>
+        /// <param name="collectionGuid"></param>
+        /// <returns></returns>
+        public abstract bool ExportCollection(string collectionGuid, ref string collectionZipPathFilename, ref string returnUserError);
+        //
+        //====================================================================================================
+        /// <summary>
         /// The id of the addon currently executing.
         /// </summary>
         public abstract int ID { get; }
