@@ -15,6 +15,9 @@ namespace Contensive.Processor.Models.Domain {
     public class CollectionLibraryModel {
         public string name;
         public string guid;
+        /// <summary>
+        /// the folder within the addon folder. Ends in folder name, NOT a slash
+        /// </summary>
         public string path;
         public DateTime lastChangeDate;
         public string version;
@@ -29,7 +32,7 @@ namespace Contensive.Processor.Models.Domain {
         public static List<CollectionLibraryModel> getCollectionLibraryList(CoreController core) {
             var result = new List<CollectionLibraryModel>();
             try {
-                var LibCollections = new XmlDocument();
+                var LibCollections = new XmlDocument() { XmlResolver = null };
                 try {
                     LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
                 } catch (Exception) {

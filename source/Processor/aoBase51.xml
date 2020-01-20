@@ -3319,13 +3319,14 @@
   <ImportCollection name="Preferences Settings Page">{AF80F787-40CE-47E0-B339-E798CC88222A}</ImportCollection>
   <ImportCollection name="Primitives">{4D357C85-ABE2-4370-B1D9-2C859BF7762F}</ImportCollection>
   <ImportCollection name="Resource Library">{F36C7051-F382-4558-8DBF-091F74C26C83}</ImportCollection>
-  <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
   <ImportCollection name="Reporting Basics">{d5b7ba7f-6b78-4625-8b23-232ac6574130}</ImportCollection>
   <ImportCollection name="RSS Client">{685E4C5C-6E24-4A1D-8A43-B7F1710500D4}</ImportCollection>
   <ImportCollection name="Theme, Bootstrap Basic">{280F865E-7AB6-4955-99CF-8B930E4ABF53}</ImportCollection>
   <ImportCollection name="Tool Panel">{374E2B8C-B29D-470B-BD1B-41CAA5BCEDCB}</ImportCollection>
   <ImportCollection name="Form Wizard">{B5D1FE5B-71EC-403D-90E8-01AE7F8E18AD}</ImportCollection>
-    <!-- blocked until upgrade
+  <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
+  <ImportCollection name="CodeMirror Editors">{73121366-107D-4C4B-8F89-A4DE518FA316}</ImportCollection>
+  <!-- blocked until upgrade
   <ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>
   <ImportCollection name="Site Explorer">{5426E6D5-05A8-4A87-B535-CD0FABA04F29}</ImportCollection>
   -->

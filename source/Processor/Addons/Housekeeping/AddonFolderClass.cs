@@ -47,7 +47,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 string collectionPath = "";
                                 string localGuid = "";
                                 string localName = "no name found";
-                                DateTime lastChangeDate = default(DateTime);
+                                DateTime lastChangeDate = default;
                                 if (LocalListNode.Name.ToLower(CultureInfo.InvariantCulture).Equals("collection")) {
                                     localGuid = "";
                                     foreach (XmlNode CollectionNode in LocalListNode.ChildNodes) {
@@ -131,7 +131,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                         }
                                     }
                                 }
-                                NodeCnt = NodeCnt + 1;
+                                NodeCnt += 1;
                             }
                         }
                     }

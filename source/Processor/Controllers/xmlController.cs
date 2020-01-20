@@ -10,14 +10,6 @@ using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
     public class XmlController {
-        // 
-        // ========================================================================
-        // This page and its contents are copyright by Kidwell McGowan Associates.
-        // ========================================================================
-        // 
-        // ----- global scope variables
-        // 
-        private bool iAbort;
         private int iBusy;
         private int iTaskCount;
         const string ApplicationNameLocal = "unknown";
@@ -25,7 +17,6 @@ namespace Contensive.Processor.Controllers {
         // 
         // ----- This should match the Lookup List in the NavIconType field in the Navigator Entry content definition
         // 
-        public const string navTypeIDList = "Add-on,Report,Setting,Tool";
         public const int NavTypeIDAddon = 1;
         public const int NavTypeIDReport = 2;
         public const int NavTypeIDSetting = 3;
@@ -259,8 +250,6 @@ namespace Contensive.Processor.Controllers {
                         // 
                         IsBaseContent = (csContent.GetBoolean("isBaseContent"));
                         iContentName = GetRSXMLAttribute(csContent, "Name");
-                        if (Strings.InStr(1, iContentName, "data sources", CompareMethod.Text) == 1)
-                            iContentName = iContentName;
                         ContentID = (csContent.GetInteger("ID"));
                         sb.Append("\r\n" + "\t" + "<CDef");
                         sb.Append(" Name=\"" + iContentName + "\"");
@@ -503,7 +492,6 @@ namespace Contensive.Processor.Controllers {
                 string IndexList = "";
                 string IndexName;
                 string[] ListRows;
-                string ListRow = "";
                 string[] ListRowSplit;
                 string SQL;
                 CPCSBaseClass cs = cp.CSNew();

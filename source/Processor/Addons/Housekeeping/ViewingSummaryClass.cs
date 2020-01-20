@@ -54,12 +54,12 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 XmlDocument Doc = new XmlDocument();
                 {
                     hint = 1;
-                    DateTime PeriodStart = default(DateTime);
+                    DateTime PeriodStart = default;
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {
                         PeriodStart = OldestVisitSummaryWeCareAbout;
                     }
-                    DateTime PeriodDatePtr = default(DateTime);
+                    DateTime PeriodDatePtr = default;
                     PeriodDatePtr = PeriodStart.Date;
                     while (PeriodDatePtr < EndTimeDate) {
                         hint = 2;

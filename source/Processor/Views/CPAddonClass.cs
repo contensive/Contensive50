@@ -228,7 +228,15 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool ExportCollection(int collectionId, ref string collectionZipPathFilename, ref string returnUserError) {
-            throw new NotImplementedException();
+            try {
+                collectionZipPathFilename = ExportController.createCollectionZip_returnCdnPathFilename(cp, collectionId);
+                if(!cp.UserError.OK()) {
+                    returnUserError = string.Join("", cp.UserError.GetList());
+                }
+                return (cp.UserError.OK());
+            } catch (Exception) {
+                throw;
+            }
         }
         //
         //====================================================================================================

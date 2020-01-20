@@ -1332,8 +1332,12 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
+                } catch (ArgumentException ex) {
+                    LogController.logWarn(core, ex, "Argument Exception while collecting classes for assembly [" + assemblyPhysicalPrivatePathname + "]. Typically these are when the assembly has two classes that differ only by the case of the class name or namespace.");
+                    addonFound = false;
+                    return string.Empty;
                 } catch (Exception ex) {
-                    LogController.logError(core, ex);
+                    LogController.logError(core, ex, "Exception while collecting classes for assembly [" + assemblyPhysicalPrivatePathname + "]");
                     addonFound = false;
                     return string.Empty;
                 }

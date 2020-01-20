@@ -11,7 +11,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 // -- Download Updates
-                SoftwareUpdatesClass.DownloadAndInstall(core);
+                SoftwareUpdatesClass.downloadAndInstall(core);
                 //
                 // -- Addons
                 AddonFolderClass.housekeep(core);

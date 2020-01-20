@@ -101,8 +101,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for style array
         /// </summary>
-        // [Obsolete("Shared styles deprecated")]
-        public class StyleType {
+        [System.Serializable]
+        private class StyleType {
             public string name { get; set; }
             public bool overwrite { get; set; }
             public string copy { get; set; }
@@ -113,7 +113,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// count of styles
         /// </summary>
-        // [Obsolete("Shared styles deprecated")]
         public int styleCnt { get; set; }
         //
         // todo
@@ -121,7 +120,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Site style sheet
         /// </summary>
-        // [Obsolete("Shared styles deprecated")]
         public string styleSheet { get; set; }
         //
         //====================================================================================================
@@ -140,7 +138,8 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for page templates
         /// </summary>
-        public class PageTemplateType {
+        [System.Serializable]
+        private class PageTemplateType {
             public string name { get; set; }
             public string copy { get; set; }
             public string guid { get; set; }
@@ -175,7 +174,7 @@ namespace Contensive.Processor.Models.Domain {
                     // -- empty collection is an error
                     throw (new GenericException("Upgrademetadata_LoadDataToCollection, srcCollectionXml is blank or null"));
                 } else {
-                    XmlDocument srcXmlDom = new XmlDocument();
+                    XmlDocument srcXmlDom = new XmlDocument() { XmlResolver = null };
                     try {
                         srcXmlDom.LoadXml(srcCollecionXml);
                     } catch (Exception ex) {

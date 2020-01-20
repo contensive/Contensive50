@@ -8,14 +8,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
     public static class SoftwareUpdatesClass {
         //====================================================================================================
         //
-        public static bool DownloadAndInstall(CoreController core) {
+        public static bool downloadAndInstall(CoreController core) {
             bool loadOK = true;
             try {
                 XmlDocument Doc = null;
                 string URL = null;
                 string Copy = null;
                 //
-                Doc = new XmlDocument();
+                Doc = new XmlDocument() { XmlResolver = null};
                 URL = "http://support.contensive.com/GetUpdates?iv=" + core.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
