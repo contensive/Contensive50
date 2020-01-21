@@ -90,13 +90,6 @@ namespace Contensive.Processor.Controllers {
                     foreach (var layout in DbBaseModel.createList<LayoutModel>(cp, "(installedByCollectionId=" + collection.id + ")")) {
                         collectionXml += ExportLayoutController.get(cp, layout);
                     }
-                    using (CPCSBaseClass CS2 = cp.CSNew()) {
-                        CS2.Open("Add-ons", "collectionid=" + collectionId, "name", true, "id");
-                        while (CS2.OK()) {
-                            collectionXml += ExportAddonController.getAddonNode(cp, CS2.GetInteger("id"), ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
-                            CS2.GoNext();
-                        }
-                    }
                     // 
                     // Data Records
                     string DataRecordList = CS.GetText("DataRecordList");

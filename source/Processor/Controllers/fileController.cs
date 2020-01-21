@@ -1831,11 +1831,15 @@ namespace Contensive.Processor.Controllers {
                 string filename = getFilename(pathFilename);
                 if (string.IsNullOrWhiteSpace(filename)) { return null; }
                 string unixPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
-                string unixPath = getPath(unixPathFilename);
+                string unixPath = convertToUnixSlash(getPath(unixPathFilename));
                 ListObjectsRequest request = new ListObjectsRequest {
                     BucketName = core.serverConfig.awsBucketName,
-                    Prefix = unixPath
+                    Prefix = unixPathFilename
                 };
+                //ListObjectsRequest request = new ListObjectsRequest {
+                //    BucketName = core.serverConfig.awsBucketName,
+                //    Prefix = unixPath
+                //};
                 // Build your call out to S3 and store the response
                 ListObjectsResponse response = s3Client.ListObjects(request);
                 IEnumerable<S3Object> s3fileList = response.S3Objects.Where(x => x.Key == unixPathFilename);
