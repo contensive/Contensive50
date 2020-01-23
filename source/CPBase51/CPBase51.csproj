@@ -48,12 +48,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseClasses\AddonBaseClass.cs" />
+    <Compile Include="BaseClasses\BaseAdminUIClasses\ToolFormBaseClass.cs" />
     <Compile Include="BaseClasses\CPAddonBaseClass.cs" />
     <Compile Include="BaseClasses\CPBaseClass.cs" />
     <Compile Include="BaseClasses\CPBlockBaseClass.cs" />
     <Compile Include="BaseClasses\CPCacheBaseClass.cs" />
     <Compile Include="BaseClasses\CPContentBaseClass.cs" />
     <Compile Include="BaseClasses\CPCSBaseClass.cs" />
+    <Compile Include="BaseClasses\CPAdminUIBaseClass.cs" />
     <Compile Include="BaseClasses\CPJSONBaseClass.cs" />
     <Compile Include="BaseClasses\CPLogBaseClass.cs" />
     <Compile Include="BaseClasses\CPDbBaseClass.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\NameValueBaseModel.cs" />
     <Compile Include="BaseModels\ServerConfigBaseModel.cs" />
     <Compile Include="BaseModels\CaseInsensitiveDictionaryBaseModel.cs" />
     <Compile Include="BaseModels\SimplestDataBaseModel.cs" />

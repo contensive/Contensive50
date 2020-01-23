@@ -109,10 +109,11 @@ rem update models nuget packages
 rem
 
 cd ..\source\Models
-nuget update Models.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update Models.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
 cd ..\ModelTests
-nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
 cd ..\..\scripts
+
 
 rem ==============================================================
 rem
@@ -160,10 +161,13 @@ rem update processor nuget packages
 rem
 
 cd ..\source\Processor
-nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 cd ..\ProcessorTests
-nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 cd ..\..\scripts
+
 
 rem ==============================================================
 rem
@@ -207,9 +211,13 @@ rem update cli, taskservice nuget packages
 rem
 
 cd ..\source\cli
-nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
+nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\taskservice
-nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
+nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
 
 rem ==============================================================
@@ -233,7 +241,9 @@ rem
 rem update aspx site nuget packages 
 rem
 cd ..\source\iisdefaultsite
-nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
+nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
 
 rem ==============================================================
@@ -279,12 +289,16 @@ rem
 
 cd ..\source\Models
 cd ..\ModelTests
-nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
+nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
 
 cd ..\source\Processor
 cd ..\ProcessorTests
-nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder%
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
+nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
 
 rem ==============================================================

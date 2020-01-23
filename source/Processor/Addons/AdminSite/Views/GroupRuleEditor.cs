@@ -5,7 +5,6 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using Nustache.Core;
 using Contensive.Processor.Properties;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {

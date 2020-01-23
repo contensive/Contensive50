@@ -2,7 +2,6 @@
 using System;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 //
 namespace Contensive.Processor.Addons.Tools {
     //
@@ -27,11 +26,11 @@ namespace Contensive.Processor.Addons.Tools {
             try {
                 string ButtonList = ButtonCancel;
                 tempGetForm_LogFiles = AdminUIController.getHeaderTitleDescription("Log File View", "This tool displays the Contensive Log Files.");
-                tempGetForm_LogFiles = tempGetForm_LogFiles + "<P></P>";
+                tempGetForm_LogFiles += "<P></P>";
                 //
                 string QueryOld = ".asp?";
                 string QueryNew = GenericController.modifyQueryString(QueryOld, RequestNameAdminForm, AdminFormToolLogFileView, true);
-                tempGetForm_LogFiles = tempGetForm_LogFiles + GenericController.strReplace(GetForm_LogFiles_Details(core), QueryOld, QueryNew + "&", 1, 99, 1);
+                tempGetForm_LogFiles += GenericController.strReplace(GetForm_LogFiles_Details(core), QueryOld, QueryNew + "&", 1, 99, 1);
                 //
                 tempGetForm_LogFiles = AdminUIController.getToolForm(core, tempGetForm_LogFiles, ButtonList);
             } catch (Exception ex) {
@@ -69,16 +68,16 @@ namespace Contensive.Processor.Addons.Tools {
                 int AdminFormTool = core.docProperties.getInteger(RequestNameAdminForm);
                 //
                 const string GetTableStart = "<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><TD><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr>"
-                    + "<td width=\"23\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"23\"></td>"
-                    + "<td width=\"60%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"23\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/spacer.gif\" height=\"1\" width=\"23\"></td>"
+                    + "<td width=\"60%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
                     + "</tr>";
                 const string GetTableEnd = "</table></td></tr></table>";
                 //
-                const string SpacerImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderOpenImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderClosedImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20191111/Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string SpacerImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderOpenImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderClosedImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
                 //
                 // StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 //

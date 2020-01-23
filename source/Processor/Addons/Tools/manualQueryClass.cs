@@ -7,8 +7,8 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Models.Db;
+using Contensive.BaseModels;
 //
 namespace Contensive.Processor.Addons.Tools {
     //
@@ -173,7 +173,7 @@ namespace Contensive.Processor.Addons.Tools {
                     } else {
                         core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                     }
-                    Stream.add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL"));
+                    Stream.add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL",false));
                     Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 }
                 //

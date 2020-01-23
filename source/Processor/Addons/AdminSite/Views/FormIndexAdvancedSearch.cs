@@ -5,8 +5,6 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Addons.AdminSite {
@@ -79,7 +77,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         // fieldname not found, save if not FindWordMatchEnum.MatchIgnore
                                         //
                                         if (MatchOption != FindWordMatchEnum.MatchIgnore) {
-                                            IndexConfig.findWords.Add(FieldName, new IndexConfigClass.IndexConfigFindWordClass {
+                                            IndexConfig.findWords.Add(FieldName, new IndexConfigFindWordClass {
                                                 Name = FieldName,
                                                 MatchOption = MatchOption,
                                                 Value = SearchValue

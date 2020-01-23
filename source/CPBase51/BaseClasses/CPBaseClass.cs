@@ -32,6 +32,12 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Classes and methods to create forms for the admin user interface
+        /// </summary>
+        public abstract CPAdminUIBaseClass AdminUI { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Return the configuration of the app name specified. Use 
         /// </summary>
         /// <param name="appName"></param>

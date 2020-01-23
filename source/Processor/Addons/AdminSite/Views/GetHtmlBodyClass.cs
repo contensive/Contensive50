@@ -5,9 +5,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using System.Globalization;
@@ -269,15 +267,15 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormToolDbIndex: {
-                                    adminBody = DbIndexToolClass.get( cp.core );
+                                    adminBody = DbIndexToolClass.get(cp.core);
                                     break;
                                 }
                             case AdminformToolFindAndReplace: {
-                                    adminBody = FindAndReplaceToolClass.get( cp.core) ;
+                                    adminBody = FindAndReplaceToolClass.get(cp.core);
                                     break;
                                 }
                             case AdminformToolCreateGUID: {
-                                    adminBody = CreateGUIDToolClass.get( cp.core );
+                                    adminBody = CreateGUIDToolClass.get(cp.core);
                                     break;
                                 }
                             case AdminformToolIISReset: {
@@ -309,8 +307,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormClearCache: {
-                                    adminBody = cp.core.addon.execute("{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}",new CPUtilsBaseClass.addonExecuteContext() { 
-                                         addonType = CPUtilsBaseClass.addonContext.ContextAdmin
+                                    adminBody = cp.core.addon.execute("{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}", new CPUtilsBaseClass.addonExecuteContext() {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextAdmin
                                     });
                                     break;
                                 }
@@ -680,234 +678,234 @@ namespace Contensive.Processor.Addons.AdminSite {
                         using (var db = new DbController(cp.core, adminData.adminContent.dataSourceName)) {
                             switch (adminData.admin_Action) {
                                 case Constants.AdminActionEditRefresh:
-                                //
-                                // Load the record as if it will be saved, but skip the save
-                                //
-                                adminData.loadEditRecord(cp.core);
-                                adminData.loadEditRecord_Request(cp.core);
-                                break;
+                                    //
+                                    // Load the record as if it will be saved, but skip the save
+                                    //
+                                    adminData.loadEditRecord(cp.core);
+                                    adminData.loadEditRecord_Request(cp.core);
+                                    break;
                                 case Constants.AdminActionMarkReviewed:
-                                //
-                                // Mark the record reviewed without making any changes
-                                //
-                                PageContentModel.markReviewed(cp, adminData.editRecord.id);
-                                break;
+                                    //
+                                    // Mark the record reviewed without making any changes
+                                    //
+                                    PageContentModel.markReviewed(cp, adminData.editRecord.id);
+                                    break;
                                 case Constants.AdminActionDelete:
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    db.delete(adminData.editRecord.id, adminData.adminContent.tableName);
-                                    ContentController.processAfterSave(cp.core, true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop;
-                                break;
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        adminData.loadEditRecord(cp.core);
+                                        db.delete(adminData.editRecord.id, adminData.adminContent.tableName);
+                                        ContentController.processAfterSave(cp.core, true, adminData.editRecord.contentControlId_Name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    break;
                                 case Constants.AdminActionSave:
-                                //
-                                // ----- Save Record
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                                                                   //
-                                break;
+                                    //
+                                    // ----- Save Record
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                                                                       //
+                                    break;
                                 case Constants.AdminActionSaveAddNew:
-                                //
-                                // ----- Save and add a new record
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                    adminData.editRecord.id = 0;
-                                    adminData.editRecord.loaded = false;
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                                                                   //
-                                break;
+                                    //
+                                    // ----- Save and add a new record
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                        adminData.editRecord.id = 0;
+                                        adminData.editRecord.loaded = false;
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                                                                       //
+                                    break;
                                 case Constants.AdminActionDuplicate:
-                                //
-                                // ----- Save Record
-                                //
-                                ProcessActionDuplicate(cp, adminData);
-                                adminData.admin_Action = Constants.AdminActionNop;
-                                break;
+                                    //
+                                    // ----- Save Record
+                                    //
+                                    ProcessActionDuplicate(cp, adminData);
+                                    adminData.admin_Action = Constants.AdminActionNop;
+                                    break;
                                 case Constants.AdminActionSendEmail:
-                                //
-                                // ----- Send (Group Email Only)
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                    if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                                        using (var csData = new CsModel(cp.core)) {
-                                            csData.openRecord("Group Email", adminData.editRecord.id);
-                                            if (!csData.ok()) {
-                                            } else if (csData.getText("FromAddress") == "") {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
-                                            } else if (csData.getText("Subject") == "") {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
-                                            } else {
-                                                csData.set("submitted", true);
-                                                csData.set("ConditionID", 0);
-                                                if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                    csData.set("ScheduleDate", cp.core.doc.profileStartTime);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                                                                   //
-                                break;
-                                case Constants.AdminActionDeactivateEmail:
-                                //
-                                // ----- Deactivate (Conditional Email Only)
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    // no save, page was read only - Call ProcessActionSave
-                                    adminData.loadEditRecord(cp.core);
-                                    if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                                        using (var csData = new CsModel(cp.core)) {
-                                            if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
-                                            csData.close();
-                                        }
+                                    //
+                                    // ----- Send (Group Email Only)
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
                                         adminData.loadEditRecord(cp.core);
                                         adminData.loadEditRecord_Request(cp.core);
-                                    }
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                break;
-                                case Constants.AdminActionActivateEmail:
-                                //
-                                // ----- Activate (Conditional Email Only)
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                    if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                                        using (var csData = new CsModel(cp.core)) {
-                                            csData.openRecord("Conditional Email", adminData.editRecord.id);
-                                            if (!csData.ok()) {
-                                            } else if (csData.getInteger("ConditionID") == 0) {
-                                                Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
-                                            } else {
-                                                csData.set("submitted", true);
-                                                if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
-                                                    csData.set("ScheduleDate", cp.core.doc.profileStartTime);
-                                                }
-                                            }
-                                        }
-                                        adminData.loadEditRecord(cp.core);
-                                        adminData.loadEditRecord_Request(cp.core);
-                                    }
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                break;
-                                case Constants.AdminActionSendEmailTest:
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
-                                } else {
-                                    //
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
-                                    //
-                                    if (cp.core.doc.userErrorList.Count.Equals(0)) {
-                                        //
-                                        EmailToConfirmationMemberId = 0;
-                                        if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
-                                            EmailToConfirmationMemberId = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
-                                            EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberId);
-                                            //
-                                            if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
-                                                //
-                                                // -- if there were no errors, and the table supports lastsendtestdate, update it
-                                                adminData.editRecord.fieldsLc["lastsendtestdate"].value = cp.core.doc.profileStartTime;
-                                                db.executeQuery("update ccemail Set lastsendtestdate=" + DbController.encodeSQLDate(cp.core.doc.profileStartTime) + " where id=" + adminData.editRecord.id);
-                                            }
-                                        }
-                                    }
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                                                                   // end case
-                                break;
-                                case Constants.AdminActionDeleteRows:
-                                //
-                                // Delete Multiple Rows
-                                //
-                                RowCnt = cp.core.docProperties.getInteger("rowcnt");
-                                if (RowCnt > 0) {
-                                    for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
-                                        if (cp.core.docProperties.getBoolean("row" + RowPtr)) {
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                                             using (var csData = new CsModel(cp.core)) {
-                                                csData.openRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
-                                                if (csData.ok()) {
-                                                    RecordId = csData.getInteger("ID");
-                                                    csData.deleteRecord();
+                                                csData.openRecord("Group Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
+                                                } else if (csData.getText("FromAddress") == "") {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
+                                                } else if (csData.getText("Subject") == "") {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
+                                                } else {
+                                                    csData.set("submitted", true);
+                                                    csData.set("ConditionID", 0);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                                                                       //
+                                    break;
+                                case Constants.AdminActionDeactivateEmail:
+                                    //
+                                    // ----- Deactivate (Conditional Email Only)
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        // no save, page was read only - Call ProcessActionSave
+                                        adminData.loadEditRecord(cp.core);
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                if (csData.openRecord("Conditional Email", adminData.editRecord.id)) { csData.set("submitted", false); }
+                                                csData.close();
+                                            }
+                                            adminData.loadEditRecord(cp.core);
+                                            adminData.loadEditRecord_Request(cp.core);
+                                        }
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    break;
+                                case Constants.AdminActionActivateEmail:
+                                    //
+                                    // ----- Activate (Conditional Email Only)
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
+                                            using (var csData = new CsModel(cp.core)) {
+                                                csData.openRecord("Conditional Email", adminData.editRecord.id);
+                                                if (!csData.ok()) {
+                                                } else if (csData.getInteger("ConditionID") == 0) {
+                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A condition must be set.");
+                                                } else {
+                                                    csData.set("submitted", true);
+                                                    if (csData.getDate("ScheduleDate") == DateTime.MinValue) {
+                                                        csData.set("ScheduleDate", cp.core.doc.profileStartTime);
+                                                    }
+                                                }
+                                            }
+                                            adminData.loadEditRecord(cp.core);
+                                            adminData.loadEditRecord_Request(cp.core);
+                                        }
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    break;
+                                case Constants.AdminActionSendEmailTest:
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                    } else {
+                                        //
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        ContentController.processAfterSave(cp.core, false, adminData.adminContent.name, adminData.editRecord.id, adminData.editRecord.nameLc, adminData.editRecord.parentId, UseContentWatchLink);
+                                        //
+                                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
+                                            //
+                                            EmailToConfirmationMemberId = 0;
+                                            if (adminData.editRecord.fieldsLc.ContainsKey("testmemberid")) {
+                                                EmailToConfirmationMemberId = GenericController.encodeInteger(adminData.editRecord.fieldsLc["testmemberid"].value);
+                                                EmailController.queueConfirmationTestEmail(cp.core, adminData.editRecord.id, EmailToConfirmationMemberId);
+                                                //
+                                                if (adminData.editRecord.fieldsLc.ContainsKey("lastsendtestdate")) {
                                                     //
-                                                    // non-Workflow Delete
-                                                    //
-                                                    ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
-                                                    cp.core.cache.invalidateDbRecord(RecordId, adminData.adminContent.tableName);
-                                                    ContentController.processAfterSave(cp.core, true, ContentName, RecordId, "", 0, UseContentWatchLink);
-                                                    //
-                                                    // Page Content special cases
-                                                    //
-                                                    if (GenericController.toLCase(adminData.adminContent.tableName) == "ccpagecontent") {
-                                                        if (RecordId == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
-                                                            cp.core.siteProperties.getText("PageNotFoundPageID", "0");
-                                                        }
-                                                        if (RecordId == (cp.core.siteProperties.getInteger("LandingPageID", 0))) {
-                                                            cp.core.siteProperties.getText("LandingPageID", "0");
+                                                    // -- if there were no errors, and the table supports lastsendtestdate, update it
+                                                    adminData.editRecord.fieldsLc["lastsendtestdate"].value = cp.core.doc.profileStartTime;
+                                                    db.executeQuery("update ccemail Set lastsendtestdate=" + DbController.encodeSQLDate(cp.core.doc.profileStartTime) + " where id=" + adminData.editRecord.id);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                                                                       // end case
+                                    break;
+                                case Constants.AdminActionDeleteRows:
+                                    //
+                                    // Delete Multiple Rows
+                                    //
+                                    RowCnt = cp.core.docProperties.getInteger("rowcnt");
+                                    if (RowCnt > 0) {
+                                        for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
+                                            if (cp.core.docProperties.getBoolean("row" + RowPtr)) {
+                                                using (var csData = new CsModel(cp.core)) {
+                                                    csData.openRecord(adminData.adminContent.name, cp.core.docProperties.getInteger("rowid" + RowPtr));
+                                                    if (csData.ok()) {
+                                                        RecordId = csData.getInteger("ID");
+                                                        csData.deleteRecord();
+                                                        //
+                                                        // non-Workflow Delete
+                                                        //
+                                                        ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
+                                                        cp.core.cache.invalidateDbRecord(RecordId, adminData.adminContent.tableName);
+                                                        ContentController.processAfterSave(cp.core, true, ContentName, RecordId, "", 0, UseContentWatchLink);
+                                                        //
+                                                        // Page Content special cases
+                                                        //
+                                                        if (GenericController.toLCase(adminData.adminContent.tableName) == "ccpagecontent") {
+                                                            if (RecordId == (cp.core.siteProperties.getInteger("PageNotFoundPageID", 0))) {
+                                                                cp.core.siteProperties.getText("PageNotFoundPageID", "0");
+                                                            }
+                                                            if (RecordId == (cp.core.siteProperties.getInteger("LandingPageID", 0))) {
+                                                                cp.core.siteProperties.getText("LandingPageID", "0");
+                                                            }
                                                         }
                                                     }
                                                 }
                                             }
                                         }
                                     }
-                                }
-                                break;
+                                    break;
                                 case Constants.AdminActionReloadCDef:
-                                //
-                                // ccContent - save changes and reload content definitions
-                                //
-                                if (adminData.editRecord.userReadOnly) {
-                                    Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified Is now locked by another authcontext.user.");
-                                } else {
-                                    adminData.loadEditRecord(cp.core);
-                                    adminData.loadEditRecord_Request(cp.core);
-                                    ProcessActionSave(cp, adminData, UseContentWatchLink);
-                                    cp.core.cache.invalidateAll();
-                                    cp.core.clearMetaData();
-                                }
-                                adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
-                                break;
+                                    //
+                                    // ccContent - save changes and reload content definitions
+                                    //
+                                    if (adminData.editRecord.userReadOnly) {
+                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified Is now locked by another authcontext.user.");
+                                    } else {
+                                        adminData.loadEditRecord(cp.core);
+                                        adminData.loadEditRecord_Request(cp.core);
+                                        ProcessActionSave(cp, adminData, UseContentWatchLink);
+                                        cp.core.cache.invalidateAll();
+                                        cp.core.clearMetaData();
+                                    }
+                                    adminData.admin_Action = Constants.AdminActionNop; // convert so action can be used in as a refresh
+                                    break;
                                 default:
-                                //
-                                // do nothing action or anything unrecognized - read in database
-                                //
-                                break;
+                                    //
+                                    // do nothing action or anything unrecognized - read in database
+                                    //
+                                    break;
                             }
                         }
                     }
@@ -2157,74 +2155,74 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (cp.core.doc.userErrorList.Count.Equals(0)) {
                     switch (adminData.adminContent.tableName.ToLower(CultureInfo.InvariantCulture)) {
                         case "ccemail":
-                        //
-                        // --- preload array with values that may not come back in response
-                        //
-                        adminData.loadEditRecord(cp.core);
-                        adminData.loadEditRecord_Request(cp.core);
-                        //
-                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                             //
-                            // ----- Convert this to the Duplicate
+                            // --- preload array with values that may not come back in response
                             //
-                            if (adminData.adminContent.fields.ContainsKey("submitted")) {
-                                adminData.editRecord.fieldsLc["submitted"].value = false;
-                            }
-                            if (adminData.adminContent.fields.ContainsKey("sent")) {
-                                adminData.editRecord.fieldsLc["sent"].value = false;
-                            }
-                            if (adminData.adminContent.fields.ContainsKey("lastsendtestdate")) {
-                                adminData.editRecord.fieldsLc["lastsendtestdate"].value = "";
-                            }
+                            adminData.loadEditRecord(cp.core);
+                            adminData.loadEditRecord_Request(cp.core);
                             //
-                            adminData.editRecord.id = 0;
-                            cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
-                        }
-                        break;
+                            if (cp.core.doc.userErrorList.Count.Equals(0)) {
+                                //
+                                // ----- Convert this to the Duplicate
+                                //
+                                if (adminData.adminContent.fields.ContainsKey("submitted")) {
+                                    adminData.editRecord.fieldsLc["submitted"].value = false;
+                                }
+                                if (adminData.adminContent.fields.ContainsKey("sent")) {
+                                    adminData.editRecord.fieldsLc["sent"].value = false;
+                                }
+                                if (adminData.adminContent.fields.ContainsKey("lastsendtestdate")) {
+                                    adminData.editRecord.fieldsLc["lastsendtestdate"].value = "";
+                                }
+                                //
+                                adminData.editRecord.id = 0;
+                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
+                            }
+                            break;
                         default:
-                        //
-                        // --- preload array with values that may not come back in response
-                        adminData.loadEditRecord(cp.core);
-                        adminData.loadEditRecord_Request(cp.core);
-                        //
-                        if (cp.core.doc.userErrorList.Count.Equals(0)) {
                             //
-                            // ----- Convert this to the Duplicate
-                            adminData.editRecord.id = 0;
+                            // --- preload array with values that may not come back in response
+                            adminData.loadEditRecord(cp.core);
+                            adminData.loadEditRecord_Request(cp.core);
                             //
-                            // block fields that should not duplicate
-                            if (adminData.editRecord.fieldsLc.ContainsKey("ccguid")) {
-                                adminData.editRecord.fieldsLc["ccguid"].value = "";
-                            }
-                            //
-                            if (adminData.editRecord.fieldsLc.ContainsKey("dateadded")) {
-                                adminData.editRecord.fieldsLc["dateadded"].value = DateTime.MinValue;
-                            }
-                            //
-                            if (adminData.editRecord.fieldsLc.ContainsKey("modifieddate")) {
-                                adminData.editRecord.fieldsLc["modifieddate"].value = DateTime.MinValue;
-                            }
-                            //
-                            if (adminData.editRecord.fieldsLc.ContainsKey("modifiedby")) {
-                                adminData.editRecord.fieldsLc["modifiedby"].value = 0;
-                            }
-                            //
-                            // block fields that must be unique
-                            foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
-                                ContentFieldMetadataModel field = keyValuePair.Value;
-                                if (GenericController.toLCase(field.nameLc) == "email") {
-                                    if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                            if (cp.core.doc.userErrorList.Count.Equals(0)) {
+                                //
+                                // ----- Convert this to the Duplicate
+                                adminData.editRecord.id = 0;
+                                //
+                                // block fields that should not duplicate
+                                if (adminData.editRecord.fieldsLc.ContainsKey("ccguid")) {
+                                    adminData.editRecord.fieldsLc["ccguid"].value = "";
+                                }
+                                //
+                                if (adminData.editRecord.fieldsLc.ContainsKey("dateadded")) {
+                                    adminData.editRecord.fieldsLc["dateadded"].value = DateTime.MinValue;
+                                }
+                                //
+                                if (adminData.editRecord.fieldsLc.ContainsKey("modifieddate")) {
+                                    adminData.editRecord.fieldsLc["modifieddate"].value = DateTime.MinValue;
+                                }
+                                //
+                                if (adminData.editRecord.fieldsLc.ContainsKey("modifiedby")) {
+                                    adminData.editRecord.fieldsLc["modifiedby"].value = 0;
+                                }
+                                //
+                                // block fields that must be unique
+                                foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
+                                    ContentFieldMetadataModel field = keyValuePair.Value;
+                                    if (GenericController.toLCase(field.nameLc) == "email") {
+                                        if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                                            adminData.editRecord.fieldsLc[field.nameLc].value = "";
+                                        }
+                                    }
+                                    if (field.uniqueName) {
                                         adminData.editRecord.fieldsLc[field.nameLc].value = "";
                                     }
                                 }
-                                if (field.uniqueName) {
-                                    adminData.editRecord.fieldsLc[field.nameLc].value = "";
-                                }
+                                //
+                                cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
                             }
-                            //
-                            cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
-                        }
-                        break;
+                            break;
                     }
                     adminData.adminForm = adminData.adminSourceForm;
                     //
@@ -2382,7 +2380,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             // --Find words
             string SubList = "";
             foreach (var kvp in IndexConfig.findWords) {
-                IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
+                IndexConfigFindWordClass findWord = kvp.Value;
                 if ((!string.IsNullOrEmpty(findWord.Name)) && (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
                     SubList = SubList + Environment.NewLine + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
                 }
@@ -2465,7 +2463,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             //
             SubList = "";
             foreach (var kvp in IndexConfig.sorts) {
-                IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
+                IndexConfigSortClass sort = kvp.Value;
                 if (!string.IsNullOrEmpty(sort.fieldName)) {
                     SubList = SubList + Environment.NewLine + sort.fieldName + "\t" + sort.direction;
                 }

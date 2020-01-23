@@ -6,7 +6,6 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using Contensive.Models.Db;
 //
@@ -87,7 +86,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                 string privateFilesInstallPath = null;
                 List<string> nonCriticalErrorList = new List<string>();
                 string dataBuildVersion = core.siteProperties.dataBuildVersion;
-                string coreVersion = core.codeVersion();
+                string coreVersion = CoreController.codeVersion();
                 var adminMenu = new EditTabModel();
                 DbUpToDate = (dataBuildVersion == coreVersion);
                 //
@@ -302,7 +301,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                         LibCollections = new XmlDocument() { XmlResolver = null };
                         bool parseError = false;
                         try {
-                            LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
+                            LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + CoreController.codeVersion() + "&includeSystem=1&includeNonPublic=1");
                         } catch (Exception ex) {
                             LogController.logError(core, ex);
                             UserError = "There was an error reading the Collection Library. The site may be unavailable.";
@@ -424,7 +423,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                                             Cells3[RowPtr, 1] = Collectionname + "&nbsp;(installed already)";
                                                             Cells3[RowPtr, 2] = CollectionLastChangeDate + "&nbsp;";
                                                             Cells3[RowPtr, 3] = CollectionDescription + "&nbsp;";
-                                                        } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, core.codeVersion()) > 0)) {
+                                                        } else if ((!string.IsNullOrEmpty(CollectionContensiveVersion)) && (string.CompareOrdinal(CollectionContensiveVersion, CoreController.codeVersion()) > 0)) {
                                                             //
                                                             // wrong version
                                                             //

@@ -7,6 +7,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 using Contensive.BaseModels;
 using System.Collections.Generic;
+using Contensive.Processor.AdminUI;
 
 namespace Contensive.Processor {
     public class CPClass : CPBaseClass, IDisposable {
@@ -248,7 +249,7 @@ namespace Contensive.Processor {
         /// </summary>
         public override string Version {
             get {
-                return core.codeVersion();
+                return CoreController.codeVersion();
             }
         }
         //
@@ -606,11 +607,21 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
-        public override BaseModels.ServerConfigBaseModel ServerConfig {
+        public override CPAdminUIBaseClass AdminUI {
             get {
-                return core.serverConfig;
+                if (_AdminUI == null) {
+                    _AdminUI = new CPAdminUIClass(core);
+                }
+                return _AdminUI;
             }
         }
+        private CPAdminUIBaseClass _AdminUI;
+        //
+        //=========================================================================================================
+        /// <summary>
+        /// return the server config object which exposes connectivity information for addons that need it
+        /// </summary>
+        public override ServerConfigBaseModel ServerConfig => core.serverConfig;
         //
         //=========================================================================================================
         //
@@ -622,7 +633,7 @@ namespace Contensive.Processor {
             return result;
         }
         //
-        //=========================================================================================================
+        //=========================================================================================================asdfasdf
         //
         public override AppConfigBaseModel GetAppConfig(string appName) {
             if (!core.serverConfig.apps.ContainsKey(appName)) return null;

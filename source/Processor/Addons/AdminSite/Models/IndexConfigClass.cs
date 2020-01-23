@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 //
 namespace Contensive.Processor.Addons.AdminSite {
     public class IndexConfigClass {
@@ -123,7 +122,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!string.IsNullOrEmpty(ConfigList)) {
                     //
                     // load values
-                    ConfigList = ConfigList + Environment.NewLine;
+                    ConfigList += Environment.NewLine;
                     string[] ConfigListLines = GenericController.splitNewLine(ConfigList);
                     int Ptr = 0;
                     while (Ptr < ConfigListLines.GetUpperBound(0)) {
@@ -133,74 +132,74 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (!string.IsNullOrEmpty(ConfigListLine)) {
                             switch (ConfigListLine) {
                                 case "findwordlist":
-                                Ptr += 1;
-                                while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
-                                    string Line = ConfigListLines[Ptr];
-                                    string[] LineSplit = Line.Split('\t');
-                                    if (LineSplit.GetUpperBound(0) > 1) {
-                                        returnIndexConfig.findWords.Add(LineSplit[0], new IndexConfigFindWordClass {
-                                            Name = LineSplit[0],
-                                            Value = LineSplit[1],
-                                            MatchOption = (FindWordMatchEnum)GenericController.encodeInteger(LineSplit[2])
-                                        });
-                                    }
                                     Ptr += 1;
-                                }
-                                break;
+                                    while (!string.IsNullOrEmpty(ConfigListLines[Ptr])) {
+                                        string Line = ConfigListLines[Ptr];
+                                        string[] LineSplit = Line.Split('\t');
+                                        if (LineSplit.GetUpperBound(0) > 1) {
+                                            returnIndexConfig.findWords.Add(LineSplit[0], new IndexConfigFindWordClass {
+                                                Name = LineSplit[0],
+                                                Value = LineSplit[1],
+                                                MatchOption = (FindWordMatchEnum)GenericController.encodeInteger(LineSplit[2])
+                                            });
+                                        }
+                                        Ptr += 1;
+                                    }
+                                    break;
                                 case "grouplist":
-                                Ptr += 1;
-                                while ((Ptr < ConfigListLines.GetUpperBound(0)) &&  !string.IsNullOrEmpty(ConfigListLines[Ptr])) {
-                                    if (returnIndexConfig.groupListCnt < groupListCntMax) {
-                                        returnIndexConfig.groupList[returnIndexConfig.groupListCnt] = ConfigListLines[Ptr];
-                                        returnIndexConfig.groupListCnt += 1;
-                                    }
                                     Ptr += 1;
-                                }
-                                break;
+                                    while ((Ptr < ConfigListLines.GetUpperBound(0)) && !string.IsNullOrEmpty(ConfigListLines[Ptr])) {
+                                        if (returnIndexConfig.groupListCnt < groupListCntMax) {
+                                            returnIndexConfig.groupList[returnIndexConfig.groupListCnt] = ConfigListLines[Ptr];
+                                            returnIndexConfig.groupListCnt += 1;
+                                        }
+                                        Ptr += 1;
+                                    }
+                                    break;
                                 case "cdeflist":
-                                Ptr += 1;
-                                returnIndexConfig.subCDefID = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                break;
+                                    Ptr += 1;
+                                    returnIndexConfig.subCDefID = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                    break;
                                 case "indexfiltercategoryid":
-                                // -- remove deprecated value
-                                Ptr += 1;
-                                break;
+                                    // -- remove deprecated value
+                                    Ptr += 1;
+                                    break;
                                 case "indexfilteractiveonly":
-                                returnIndexConfig.activeOnly = true;
-                                break;
+                                    returnIndexConfig.activeOnly = true;
+                                    break;
                                 case "indexfilterlasteditedbyme":
-                                returnIndexConfig.lastEditedByMe = true;
-                                break;
+                                    returnIndexConfig.lastEditedByMe = true;
+                                    break;
                                 case "indexfilterlasteditedtoday":
-                                returnIndexConfig.lastEditedToday = true;
-                                break;
+                                    returnIndexConfig.lastEditedToday = true;
+                                    break;
                                 case "indexfilterlasteditedpast7days":
-                                returnIndexConfig.lastEditedPast7Days = true;
-                                break;
+                                    returnIndexConfig.lastEditedPast7Days = true;
+                                    break;
                                 case "indexfilterlasteditedpast30days":
-                                returnIndexConfig.lastEditedPast30Days = true;
-                                break;
+                                    returnIndexConfig.lastEditedPast30Days = true;
+                                    break;
                                 case "indexfilteropen":
-                                returnIndexConfig.open = true;
-                                break;
+                                    returnIndexConfig.open = true;
+                                    break;
                                 case "recordsperpage":
-                                Ptr += 1;
-                                returnIndexConfig.recordsPerPage = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                if (returnIndexConfig.recordsPerPage <= 0) {
-                                    returnIndexConfig.recordsPerPage = 50;
-                                }
-                                returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
-                                break;
+                                    Ptr += 1;
+                                    returnIndexConfig.recordsPerPage = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                    if (returnIndexConfig.recordsPerPage <= 0) {
+                                        returnIndexConfig.recordsPerPage = 50;
+                                    }
+                                    returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
+                                    break;
                                 case "pagenumber":
-                                Ptr += 1;
-                                returnIndexConfig.pageNumber = GenericController.encodeInteger(ConfigListLines[Ptr]);
-                                if (returnIndexConfig.pageNumber <= 0) {
-                                    returnIndexConfig.pageNumber = 1;
-                                }
-                                returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
-                                break;
+                                    Ptr += 1;
+                                    returnIndexConfig.pageNumber = GenericController.encodeInteger(ConfigListLines[Ptr]);
+                                    if (returnIndexConfig.pageNumber <= 0) {
+                                        returnIndexConfig.pageNumber = 1;
+                                    }
+                                    returnIndexConfig.recordTop = ((returnIndexConfig.pageNumber - 1) * returnIndexConfig.recordsPerPage);
+                                    break;
                                 default:
-                                break;
+                                    break;
                             }
                         }
                         Ptr += 1;
@@ -226,27 +225,27 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
             return returnIndexConfig;
         }
-        //
-        public class IndexConfigSortClass {
-            public string fieldName { get; set; }
-            // 1=forward, 2=reverse, 0=ignore/remove this sort
-            public int direction { get; set; }
-            // 1...n, if multiple sorts, the order of the sort
-            public int order { get; set; }
-        }
-        //
-        public class IndexConfigFindWordClass {
-            public string Name { get; set; }
-            public string Value { get; set; }
-            public int Type { get; set; }
-            public FindWordMatchEnum MatchOption { get; set; }
-        }
-        //
-        public class IndexConfigColumnClass {
-            public string Name { get; set; }
-            public int Width { get; set; }
-            public int SortPriority { get; set; }
-            public int SortDirection { get; set; }
-        }
+    }
+    //
+    public class IndexConfigSortClass {
+        public string fieldName { get; set; }
+        // 1=forward, 2=reverse, 0=ignore/remove this sort
+        public int direction { get; set; }
+        // 1...n, if multiple sorts, the order of the sort
+        public int order { get; set; }
+    }
+    //
+    public class IndexConfigFindWordClass {
+        public string Name { get; set; }
+        public string Value { get; set; }
+        public int Type { get; set; }
+        public FindWordMatchEnum MatchOption { get; set; }
+    }
+    //
+    public class IndexConfigColumnClass {
+        public string Name { get; set; }
+        public int Width { get; set; }
+        public int SortPriority { get; set; }
+        public int SortDirection { get; set; }
     }
 }

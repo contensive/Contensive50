@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
+using static Contensive.Processor.Controllers.AdminUIController;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Addons.AdminSite.Controllers;
-using static Contensive.Processor.Addons.AdminSite.Controllers.AdminUIController;
 using Contensive.BaseClasses;
 using System.Text;
 using Contensive.Models.Db;
@@ -498,7 +497,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 filterLine.Append(", last edited" + filterLastEdited);
             }
             foreach (var kvp in IndexConfig.findWords) {
-                IndexConfigClass.IndexConfigFindWordClass findWord = kvp.Value;
+                IndexConfigFindWordClass findWord = kvp.Value;
                 if (!string.IsNullOrEmpty(findWord.Name)) {
                     var fieldMeta = ContentMetadataModel.getField(core, content, findWord.Name);
                     if (fieldMeta != null) {
@@ -580,7 +579,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             //
             string sortLine = "";
             foreach (var kvp in IndexConfig.sorts) {
-                IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
+                IndexConfigSortClass sort = kvp.Value;
                 if (sort.direction > 0) {
                     sortLine = sortLine + ", then " + content.fields[sort.fieldName].caption;
                     if (sort.direction > 1) {
@@ -700,7 +699,7 @@ namespace Contensive.Processor.Addons.AdminSite {
 
                                                 }
                                                 ContentFieldMetadataModel field = adminData.adminContent.fields[FindName.ToLowerInvariant()];
-                                                var findWord = new IndexConfigClass.IndexConfigFindWordClass {
+                                                var findWord = new IndexConfigFindWordClass {
                                                     Name = FindName,
                                                     Value = FindValue
                                                 };
@@ -742,7 +741,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (core.docProperties.getBoolean("IndexFilterRemoveAll")) {
                     //
                     // Remove all filters
-                    IndexConfig.findWords = new Dictionary<string, IndexConfigClass.IndexConfigFindWordClass>();
+                    IndexConfig.findWords = new Dictionary<string, IndexConfigFindWordClass>();
                     IndexConfig.groupListCnt = 0;
                     IndexConfig.subCDefID = 0;
                     IndexConfig.activeOnly = false;
@@ -859,7 +858,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (core.docProperties.getBoolean("IndexSortRemoveAll")) {
                         //
                         // Remove all filters
-                        IndexConfig.sorts = new Dictionary<string, IndexConfigClass.IndexConfigSortClass>();
+                        IndexConfig.sorts = new Dictionary<string, IndexConfigSortClass>();
                     } else {
                         //
                         // SortField
@@ -868,7 +867,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             bool sortFound = IndexConfig.sorts.ContainsKey(setSortField);
                             int sortDirection = core.docProperties.getInteger("SetSortDirection");
                             if (!sortFound) {
-                                IndexConfig.sorts.Add(setSortField, new IndexConfigClass.IndexConfigSortClass {
+                                IndexConfig.sorts.Add(setSortField, new IndexConfigSortClass {
                                     fieldName = setSortField,
                                     direction = 1,
                                     order = IndexConfig.sorts.Count + 1
@@ -1112,7 +1111,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // Where Clause: findwords
                 if (IndexConfig.findWords.Count > 0) {
                     foreach (var kvp in IndexConfig.findWords) {
-                        IndexConfigClass.IndexConfigFindWordClass findword = kvp.Value;
+                        IndexConfigFindWordClass findword = kvp.Value;
                         int FindMatchOption = (int)findword.MatchOption;
                         if (FindMatchOption != (int)FindWordMatchEnum.MatchIgnore) {
                             string FindWordNameLc = GenericController.toLCase(findword.Name);
@@ -1363,7 +1362,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 return_SQLOrderBy = "";
                 string orderByDelim = " ";
                 foreach (var kvp in IndexConfig.sorts) {
-                    IndexConfigClass.IndexConfigSortClass sort = kvp.Value;
+                    IndexConfigSortClass sort = kvp.Value;
                     string SortFieldName = GenericController.toLCase(sort.fieldName);
                     //
                     // Get FieldType
@@ -1497,7 +1496,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // FindWords
                     //
                     foreach (var findWordKvp in IndexConfig.findWords) {
-                        IndexConfigClass.IndexConfigFindWordClass findWord = findWordKvp.Value;
+                        IndexConfigFindWordClass findWord = findWordKvp.Value;
                         string fieldCaption = (!adminData.adminContent.fields.ContainsKey(findWord.Name.ToLower(CultureInfo.InvariantCulture))) ? findWord.Name : adminData.adminContent.fields[findWord.Name.ToLower(CultureInfo.InvariantCulture)].caption;
                         QS = RQS;
                         QS = GenericController.modifyQueryString(QS, "IndexFilterRemoveFind", findWord.Name);

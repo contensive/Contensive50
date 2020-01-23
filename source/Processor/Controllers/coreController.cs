@@ -712,7 +712,7 @@ namespace Contensive.Processor.Controllers {
         /// version for core assembly
         /// </summary>
         /// <remarks></remarks>
-        public string codeVersion()  {
+        public static string codeVersion()  {
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();

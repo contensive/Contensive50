@@ -3,7 +3,6 @@ using System;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Addons.Tools {
@@ -28,34 +27,21 @@ namespace Contensive.Processor.Addons.Tools {
         public static string get(CoreController core) {
             string result = "";
             try {
-                //
-                bool IsDeveloper = false;
-                string QS = null;
-                string RecordName = null;
-                int RowCnt = 0;
-                string TopHalf = "";
-                string BottomHalf = "";
-                int RowPtr = 0;
-                int RecordId = 0;
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                // Dim runAtServer As New runAtServerClass(core)
-                string CDefList = "";
-                string FindText = "";
-                string ReplaceText = "";
-                string Button = null;
-                int ReplaceRows = 0;
-                int FindRows = 0;
-                string lcName = null;
                 //
                 Stream.add(AdminUIController.getHeaderTitleDescription("Find and Replace", "This tool runs a find and replace operation on content throughout the site."));
                 //
                 // Process the form
                 //
-                Button = core.docProperties.getText("button");
-                //
-                IsDeveloper = core.session.isAuthenticatedDeveloper();
+                string Button = core.docProperties.getText("button");
+                bool IsDeveloper = core.session.isAuthenticatedDeveloper();
+                int RowPtr = 0;
+                string CDefList = "";
+                string FindText = "";
+                string ReplaceText = "";
+                string lcName = null;
                 if (Button == ButtonFindAndReplace) {
-                    RowCnt = core.docProperties.getInteger("CDefRowCnt");
+                    int RowCnt = core.docProperties.getInteger("CDefRowCnt");
                     if (RowCnt > 0) {
                         for (RowPtr = 0; RowPtr < RowCnt; RowPtr++) {
                             if (core.docProperties.getBoolean("Cdef" + RowPtr)) {
@@ -70,11 +56,16 @@ namespace Contensive.Processor.Addons.Tools {
                         }
                         FindText = core.docProperties.getText("FindText");
                         ReplaceText = core.docProperties.getText("ReplaceText");
-                        QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
+                        //string QS = "app=" + encodeNvaArgument(core.appConfig.name) + "&FindText=" + encodeNvaArgument(FindText) + "&ReplaceText=" + encodeNvaArgument(ReplaceText) + "&CDefNameList=" + encodeNvaArgument(CDefList);
                         var cmdDetail = new TaskModel.CmdDetailClass {
                             addonId = 0,
                             addonName = "GetForm_FindAndReplace",
-                            args = GenericController.convertQSNVAArgumentstoDocPropertiesList(core, QS)
+                            args = new System.Collections.Generic.Dictionary<string, string> {
+                                { "app", core.appConfig.name },
+                                { "FindText", FindText },
+                                { "ReplaceText", ReplaceText }, 
+                                { "CDefNameList", CDefList } 
+                            }
                         };
                         TaskSchedulerController.addTaskToQueue(core, cmdDetail, false);
                         Stream.add("Find and Replace has been requested for content definitions [" + CDefList + "], finding [" + FindText + "] and replacing with [" + ReplaceText + "]");
@@ -87,13 +78,13 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 // Display form
                 //
-                FindRows = core.docProperties.getInteger("SQLRows");
+                int FindRows = core.docProperties.getInteger("SQLRows");
                 if (FindRows == 0) {
                     FindRows = core.userProperty.getInteger("FindAndReplaceFindRows", 1);
                 } else {
                     core.userProperty.setProperty("FindAndReplaceFindRows", FindRows.ToString());
                 }
-                ReplaceRows = core.docProperties.getInteger("ReplaceRows");
+                int ReplaceRows = core.docProperties.getInteger("ReplaceRows");
                 if (ReplaceRows == 0) {
                     ReplaceRows = core.userProperty.getInteger("FindAndReplaceReplaceRows", 1);
                 } else {
@@ -109,14 +100,16 @@ namespace Contensive.Processor.Addons.Tools {
                 Stream.add("<TEXTAREA NAME=\"ReplaceText\" ROWS=\"" + ReplaceRows + "\" ID=\"ReplaceText\" STYLE=\"width: 800px;\">" + ReplaceText + "</TEXTAREA>");
                 Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"ReplaceTextRows\" SIZE=\"3\" VALUE=\"" + ReplaceRows + "\" ID=\"\"  onchange=\"ReplaceText.rows=ReplaceTextRows.value; return true\"> Rows");
                 Stream.add("<br><br>");
+                string TopHalf = "";
+                string BottomHalf = "";
                 //
                 using (var csData = new CsModel(core)) {
                     csData.open("Content");
                     while (csData.ok()) {
-                        RecordName = csData.getText("Name");
+                        string RecordName = csData.getText("Name");
                         lcName = GenericController.toLCase(RecordName);
                         if (IsDeveloper || (lcName == "page content") || (lcName == "copy content") || (lcName == "page templates")) {
-                            RecordId = csData.getInteger("ID");
+                            int RecordId = csData.getInteger("ID");
                             if (GenericController.strInstr(1, "," + CDefList + ",", "," + RecordName + ",") != 0) {
                                 TopHalf = TopHalf + "<div>" + HtmlController.checkbox("Cdef" + RowPtr, true) + HtmlController.inputHidden("CDefName" + RowPtr, RecordName) + "&nbsp;" + csData.getText("Name") + "</div>";
                             } else {
@@ -124,7 +117,7 @@ namespace Contensive.Processor.Addons.Tools {
                             }
                         }
                         csData.goNext();
-                        RowPtr = RowPtr + 1;
+                        RowPtr += 1;
                     }
                 }
                 Stream.add(TopHalf + BottomHalf + HtmlController.inputHidden("CDefRowCnt", RowPtr));

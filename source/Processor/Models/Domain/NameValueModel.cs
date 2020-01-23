@@ -1,8 +1,7 @@
 ﻿
+using Contensive.BaseModels;
+//
 namespace Contensive.Processor.Models.Domain {
-    [System.Serializable]
-    public class NameValueModel {
-        public string name { get; set; }
-        public string value { get; set; }
+    public class NameValueModel : NameValueBaseModel {
     }
 }

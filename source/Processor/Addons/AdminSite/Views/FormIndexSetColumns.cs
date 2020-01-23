@@ -6,7 +6,6 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Addons.AdminSite {
@@ -131,12 +130,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     // Add a field to the index form
                                     //
                                     if (FieldIDToAdd != 0) {
-                                        IndexConfigClass.IndexConfigColumnClass column = null;
+                                        IndexConfigColumnClass column = null;
                                         foreach (var columnx in IndexConfig.columns) {
                                             columnx.Width = encodeInteger((columnx.Width * 80) / (double)ColumnWidthTotal);
                                         }
                                         {
-                                            column = new IndexConfigClass.IndexConfigColumnClass();
+                                            column = new IndexConfigColumnClass();
                                             using (var csData = new CsModel(core)) {
                                                 if (csData.openRecord("Content Fields", FieldIDToAdd)) {
                                                     column.Name = csData.getText("name");
@@ -154,7 +153,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     //
                                     // Remove a field to the index form
                                     int columnWidthTotal = 0;
-                                    var dstColumns = new List<IndexConfigClass.IndexConfigColumnClass>();
+                                    var dstColumns = new List<IndexConfigColumnClass>();
                                     foreach (var column in IndexConfig.columns) {
                                         if (column.Name != TargetFieldName.ToLowerInvariant()) {
                                             dstColumns.Add(column);

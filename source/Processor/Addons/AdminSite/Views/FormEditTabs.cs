@@ -3,13 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Addons.AdminSite.Controllers;
-using Contensive.BaseClasses;
-using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public static class FormEditTabs {

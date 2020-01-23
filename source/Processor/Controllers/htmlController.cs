@@ -9,9 +9,9 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Models.Db;
 using System.Globalization;
+using Contensive.BaseModels;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -827,7 +827,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText_Legacy(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "") {
+        public static string inputText_Legacy(CoreController core, string htmlName, string defaultValue = "", int heightRows = 1, int widthCharacters = 20, string htmlId = "", bool passwordField = false, bool readOnly = false, string htmlClass = "", int maxLength = -1, bool disabled = false, string placeholder = "", bool required = false) {
             string result = "";
             try {
                 if ((heightRows > 1) && !passwordField) {
@@ -842,6 +842,7 @@ namespace Contensive.Processor.Controllers {
                     attrList += (!disabled) ? "" : " disabled";
                     attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
                     attrList += (string.IsNullOrEmpty(placeholder)) ? "" : " placeholder=\"" + placeholder + "\"";
+                    attrList += (!required) ? "" : " required";
                     if (passwordField) {
                         attrList += (widthCharacters <= 0) ? " size=\"" + core.siteProperties.defaultFormInputWidth.ToString() + "\"" : " size=\"" + widthCharacters.ToString() + "\"";
                         result = "<input type=\"password\" value=\"" + defaultValue + "\"" + attrList + ">";
@@ -859,7 +860,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputText(CoreController core, string htmlName, string defaultValue = "", string htmlClass = "", string htmlId = "", bool readOnly = false, int maxLength = -1, bool disabled = false, string placeholder = "") {
+        public static string inputText(CoreController core, string htmlName, string defaultValue = "", string htmlClass = "", string htmlId = "", bool readOnly = false, int maxLength = -1, bool disabled = false, string placeholder = "", bool required = false) {
             string result = "";
             try {
                 defaultValue = HtmlController.encodeHtml(defaultValue);
@@ -871,6 +872,7 @@ namespace Contensive.Processor.Controllers {
                 attrList += (!disabled) ? "" : " disabled";
                 attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
                 attrList += (string.IsNullOrEmpty(placeholder)) ? "" : " placeholder=\"" + placeholder + "\"";
+                attrList += (!required) ? "" : " required";
                 result = "<input TYPE=\"Text\" value=\"" + defaultValue + "\"" + attrList + ">";
                 core.doc.formInputTextCnt += 1;
             } catch (Exception ex) {
@@ -892,7 +894,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="disabled"></param>
         /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public static string inputTextarea(CoreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0) {
+        public static string inputTextarea(CoreController core, string htmlName, string defaultValue = "", int heightRows = 4, int widthCharacters = -1, string htmlId = "", bool ignore = false, bool readOnly = false, string htmlClass = "", bool disabled = false, int maxLength = 0, bool required = false) {
             string result = "";
             try {
                 defaultValue = HtmlController.encodeHtml(defaultValue);
@@ -904,6 +906,7 @@ namespace Contensive.Processor.Controllers {
                 attrList += (maxLength <= 0) ? "" : " maxlength=" + maxLength.ToString();
                 attrList += (widthCharacters == -1) ? "" : " cols=" + widthCharacters.ToString();
                 attrList += " rows=" + heightRows.ToString();
+                attrList += (!required) ? "" : " required";
                 result = "<textarea" + attrList + ">" + defaultValue + "</textarea>";
                 core.doc.formInputTextCnt += 1;
             } catch (Exception ex) {
@@ -1035,7 +1038,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string checkbox(string htmlName, bool selected = false, string htmlId = "", bool disabled = false, string htmlClass = "", bool readOnly = false, string htmlValue = "1", string label = "") {
+        public static string checkbox(string htmlName, bool selected = false, string htmlId = "", bool disabled = false, string htmlClass = "", bool readOnly = false, string htmlValue = "1", string label = "", bool required = false) {
             string result = "<input type=\"checkbox\" name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
             if (readOnly && !selected) {
                 result += " disabled";
@@ -1050,6 +1053,7 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrWhiteSpace(htmlClass)) {
                 result += " class=\"" + htmlClass + "\"";
             }
+            result += (!required) ? "" : " required";
             result += ">";
             if (!string.IsNullOrWhiteSpace(label)) {
                 result = div("<label>" + result + "&nbsp;" + label + "</label>", "checkbox");
@@ -2555,7 +2559,7 @@ namespace Contensive.Processor.Controllers {
                     // --- Link Panel - used for both Legacy Tools Panel, and without it
                     StringBuilderLegacyController LinkPanel = new StringBuilderLegacyController();
                     LinkPanel.add(SpanClassAdminSmall);
-                    LinkPanel.add("Contensive " + core.codeVersion() + " | ");
+                    LinkPanel.add("Contensive " + CoreController.codeVersion() + " | ");
                     LinkPanel.add(core.doc.profileStartTime.ToString("G") + " | ");
                     LinkPanel.add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
                     LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");
@@ -2713,7 +2717,7 @@ namespace Contensive.Processor.Controllers {
                         // --- Debug Panel Header
                         LinkPanel = new StringBuilderLegacyController();
                         LinkPanel.add(SpanClassAdminSmall);
-                        LinkPanel.add("Contensive " + core.codeVersion() + " | ");
+                        LinkPanel.add("Contensive " + CoreController.codeVersion() + " | ");
                         LinkPanel.add(core.doc.profileStartTime.ToString("G") + " | ");
                         LinkPanel.add("<a class=\"ccAdminLink\" target=\"_blank\" href=\"http://support.Contensive.com/\">Support</A> | ");
                         LinkPanel.add("<a class=\"ccAdminLink\" href=\"" + HtmlController.encodeHtml("/" + core.appConfig.adminRoute) + "\">Admin Home</A> | ");

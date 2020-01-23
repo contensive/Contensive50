@@ -23,7 +23,7 @@ namespace Contensive.CLI {
         /// <param name="appName"></param>
         /// <param name="arg">the argument following the command</param>
         public static void execute(Contensive.Processor.CPClass cpServer) {
-            Console.WriteLine("version " + cpServer.core.codeVersion());
+            Console.WriteLine("version " + cpServer.Version);
         }
     }
 }

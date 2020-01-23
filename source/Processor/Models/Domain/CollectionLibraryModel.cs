@@ -34,7 +34,7 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 var LibCollections = new XmlDocument() { XmlResolver = null };
                 try {
-                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + core.codeVersion() + "&includeSystem=1&includeNonPublic=1");
+                    LibCollections.Load("http://support.contensive.com/GetCollectionList?iv=" + CoreController.codeVersion() + "&includeSystem=1&includeNonPublic=1");
                 } catch (Exception) {
                     string UserError = "There was an error reading the Collection Library. The site may be unavailable.";
                     LogController.logInfo(core, UserError);

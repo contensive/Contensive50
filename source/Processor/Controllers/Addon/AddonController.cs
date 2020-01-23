@@ -10,7 +10,6 @@ using System.IO;
 using System.Data;
 using System.Linq;
 using Contensive.Processor.Exceptions;
-using Contensive.Processor.Addons.AdminSite.Controllers;
 using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
@@ -1548,7 +1547,7 @@ namespace Contensive.Processor.Controllers {
                             Array.Resize(ref ConstructorSelectors, ConstructorCnt + 1);
                             ConstructorNames[ConstructorCnt] = InstanceName;
                             ConstructorValues[ConstructorCnt] = InstanceValue;
-                            ConstructorCnt = ConstructorCnt + 1;
+                            ConstructorCnt += 1;
                         } else {
                             //
                             // found, set the ConstructorValue to the instance value

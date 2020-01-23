@@ -53,7 +53,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Request the Download file for this collection
                 XmlDocument Doc = new XmlDocument();
-                string URL = "http://support.contensive.com/GetCollection?iv=" + core.codeVersion() + "&guid=" + collectionGuid;
+                string URL = "http://support.contensive.com/GetCollection?iv=" + CoreController.codeVersion() + "&guid=" + collectionGuid;
                 string errorPrefix = "DownloadCollectionFiles, Error reading the collection library status file from the server for Collection [" + collectionGuid + "], download URL [" + URL + "]. ";
                 int downloadRetry = 0;
                 int downloadDelay = 2000;

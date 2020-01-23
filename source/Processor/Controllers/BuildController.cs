@@ -128,13 +128,13 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // -- set build version so a scratch build will not go through data conversion
-                        DataBuildVersion = core.codeVersion();
-                        core.siteProperties.dataBuildVersion = core.codeVersion();
+                        DataBuildVersion = CoreController.codeVersion();
+                        core.siteProperties.dataBuildVersion = CoreController.codeVersion();
                     }
-                    if (string.CompareOrdinal(DataBuildVersion, core.codeVersion()) < 0) {
+                    if (string.CompareOrdinal(DataBuildVersion, CoreController.codeVersion()) < 0) {
                         //
                         // -- data updates
-                        LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + core.codeVersion() + "]");
+                        LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + CoreController.codeVersion() + "]");
                         BuildDataMigrationController.migrateData(core, DataBuildVersion, logPrefix);
                     }
                     LogController.logInfo(core, logPrefix + ", verify records required");
@@ -224,8 +224,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- internal upgrade complete
                     {
-                        LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + core.codeVersion());
-                        core.siteProperties.setProperty("BuildVersion", core.codeVersion());
+                        LogController.logInfo(core, logPrefix + ", internal upgrade complete, set Buildversion to " + CoreController.codeVersion());
+                        core.siteProperties.setProperty("BuildVersion", CoreController.codeVersion());
                     }
                     //
                     // ----- Explain, put up a link and exit without continuing

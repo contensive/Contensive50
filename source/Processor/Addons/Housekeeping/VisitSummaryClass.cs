@@ -121,7 +121,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
         private static void summarizePeriod(CoreController core, HouseKeepEnvironmentModel env, DateTime StartTimeDate, DateTime EndTimeDate, int HourDuration, string BuildVersion, DateTime OldestVisitSummaryWeCareAbout) {
             try {
                 //
-                if (string.CompareOrdinal(BuildVersion, core.codeVersion()) >= 0) {
+                if (string.CompareOrdinal(BuildVersion, CoreController.codeVersion()) >= 0) {
                     DateTime PeriodStart = default(DateTime);
                     PeriodStart = StartTimeDate;
                     if (PeriodStart < OldestVisitSummaryWeCareAbout) {

@@ -6,7 +6,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor {
-    public class CPBlockClass : BaseClasses.CPBlockBaseClass, IDisposable {
+    public class CPBlockClass : BaseClasses.CPBlockBaseClass {
         //
         private readonly CPClass cp;
         private string accum { get; set; }

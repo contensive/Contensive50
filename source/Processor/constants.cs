@@ -49,7 +49,7 @@ namespace Contensive.Processor {
         // run the upload script
         // change this const
         // update the URLs in the base5.xml file
-        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20191130/";
+        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/";
         //
         //========================================================================
         // Sql/Db
@@ -1023,8 +1023,8 @@ namespace Contensive.Processor {
         //
         //========================================================================
         //
-        [System.Runtime.InteropServices.DllImport("kernel32", EntryPoint = "GetCurrentProcessId", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
-        public static extern int getCurrentProcessId();
+        //[System.Runtime.InteropServices.DllImport("kernel32", EntryPoint = "GetCurrentProcessId", ExactSpelling = true, CharSet = System.Runtime.InteropServices.CharSet.Ansi, SetLastError = true)]
+        //internal static extern int getCurrentProcessId();
         //
         public static readonly DateTime dateMinValue = new DateTime(1899, 12, 30);
         //
