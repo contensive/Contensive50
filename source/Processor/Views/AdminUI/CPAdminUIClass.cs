@@ -138,37 +138,36 @@ namespace Contensive.Processor {
             return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, "", "", false, "");
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly, bool required) {
+        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly, bool required) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_LookupList(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", required);
+            return Controllers.AdminUIController.getDefaultEditor_lookupList(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", required);
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly) {
+        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly) {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<NameValueBaseModel> lookupList, string htmlId) {
+        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId) {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<NameValueBaseModel> lookupList) {
+        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList) {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly, bool required) {
-            bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_LookupList(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", required);
+        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly, bool required) {
+            return Controllers.AdminUIController.getDefaultEditor_lookupList(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", required);
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly) {
+        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly) {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<NameValueBaseModel> lookupList, string htmlId) {
+        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId) {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<NameValueBaseModel> lookupList) {
+        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList) {
             throw new NotImplementedException();
         }
 

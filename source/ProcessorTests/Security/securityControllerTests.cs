@@ -82,7 +82,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             // arrange
             using (CPClass cp = new CPClass(testAppName)) {
                 int testNumber = 12345;
-                DateTime testDate = new DateTime(1990, 8, 7);
+                DateTime testDate = new DateTime(1990, 8, 7, 8, 8, 8);
                 //
                 // act
                 string token = SecurityController.encodeToken(cp.core, testNumber, testDate);
@@ -90,7 +90,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // assert
                 var result = SecurityController.decodeToken(cp.core, token);
                 Assert.AreEqual(testNumber, result.id);
-                Assert.AreEqual(testDate, result.timeStamp);
+                Assert.AreEqual(testDate, result.expires);
             }
         }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using Contensive.Processor;
+using System.Security.Principal;
 
 namespace Contensive.CLI {
     //
@@ -10,6 +11,12 @@ namespace Contensive.CLI {
         //
         static void Main(string[] args) {
             try {
+                //
+                // -- require elevated process
+                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                    Console.WriteLine("Must be run in elevated Administrator process.");
+                    return;
+                }
                 //
                 // -- configure command executes without processor instance
                 int argPtr = 0;

@@ -125,15 +125,15 @@ namespace Contensive.BaseClasses {
         /// Create an input for a lookup list content field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<NameValueBaseModel> lookupList, string htmlId);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<NameValueBaseModel> lookupList);
+        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly);
+        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId);
+        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList);
         //
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<NameValueBaseModel> lookupList, string htmlId, bool readOnly);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<NameValueBaseModel> lookupList, string htmlId);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<NameValueBaseModel> lookupList);
+        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId, bool readOnly);
+        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId);
+        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList);
         //
         //==========================================================================================
         /// <summary>

@@ -183,14 +183,14 @@ namespace Contensive.Processor.Addons.Tools {
                 {
                     //
                     // -- sql list
-                    var lookupList = new List<NameValueModel> { };
+                    var lookupList = new List<string> { };
                     string[] delimiters = new string[] { Environment.NewLine };
                     List<string> SqlArchiveList = SQLArchive.Split( delimiters,StringSplitOptions.RemoveEmptyEntries).ToList();
                     foreach( string sql in SqlArchiveList) {
-                        lookupList.Add(new NameValueModel { name = sql, value=sql });
+                        lookupList.Add( sql );
                     }
 
-                    string inputSelect = AdminUIController.getDefaultEditor_LookupList(core, "SQLList", "0" , lookupList,false, "SQLList","",false);
+                    string inputSelect = AdminUIController.getDefaultEditor_lookupList(core, "SQLList", "0" , lookupList,false, "SQLList","",false);
                     inputSelect = inputSelect.Replace("<select ", "<select onChange=\"SQL.value=SQLList.value\" ");
                     Stream.add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
                 }

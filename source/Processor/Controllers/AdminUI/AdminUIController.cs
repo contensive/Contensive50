@@ -11,6 +11,7 @@ using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 using Contensive.BaseModels;
+using System.Linq;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -881,48 +882,48 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="htmlName"></param>
-        /// <param name="defaultLookupIndexBaseOne"></param>
-        /// <param name="lookupArray"></param>
+        /// <param name="index"></param>
+        /// <param name="lookupList"></param>
         /// <param name="readOnly"></param>
         /// <param name="htmlId"></param>
         /// <param name="WhyReadOnlyMsg"></param>
         /// <param name="fieldRequired"></param>
         /// <returns></returns>
-        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, int defaultLookupIndexBaseOne, string[] lookupArray, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
+        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, int index, List<string> lookupList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
-                result += (HtmlController.inputHidden(htmlName, defaultLookupIndexBaseOne.ToString()));
-                if (defaultLookupIndexBaseOne < 1) {
+                result += (HtmlController.inputHidden(htmlName, index.ToString()));
+                if (index < 1) {
                     result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
-                } else if (defaultLookupIndexBaseOne > (lookupArray.GetUpperBound(0) + 1)) {
+                } else if (index > (lookupList.Count)) {
                     result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", lookupArray[defaultLookupIndexBaseOne - 1], readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", lookupList[index - 1], readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += HtmlController.selectFromList(core, htmlName, defaultLookupIndexBaseOne, lookupArray, "Select One", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "Select One", "", "select form-control");
                 } else {
-                    result += HtmlController.selectFromList(core, htmlName, defaultLookupIndexBaseOne, lookupArray, "", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "", "", "select form-control");
                 }
 
             }
             return result;
         }
-        public static string getDefaultEditor_LookupList(CoreController core, string htmlName, string currentValue, List<NameValueModel> lookupList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
+        //
+        public static string getDefaultEditor_lookupList(CoreController core, string htmlName, string currentValue, List<string> lookupList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
             string result = "";
             if (readOnly) {
                 //
                 // ----- Lookup ReadOnly
                 result += (HtmlController.inputHidden(htmlName, GenericController.encodeText(currentValue)));
-                NameValueModel nameValue = lookupList.Find(x => x.name.ToLowerInvariant() == htmlName.ToLowerInvariant());
-                if (nameValue == null) {
+                if (currentValue == null) {
                     result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", "None", readOnly, htmlId);
                 } else {
-                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", nameValue.value, readOnly, htmlId);
+                    result += getDefaultEditor_text(core, htmlName + "-readonly-fpo", currentValue, readOnly, htmlId);
                 }
                 result += WhyReadOnlyMsg;
             } else {

@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string encodeToken(CoreController core, int keyInteger, DateTime keyDate) {
             try {
-                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + keyDate.ToString());
+                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + keyDate.ToString("yyyy-MM-dd'T'HH:mm:ss"));
             } catch (Exception ex) {
                 LogController.logError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
                 return "";
@@ -49,7 +49,7 @@ namespace Contensive.Processor.Controllers {
                 string[] parts = decodedString.Split(Convert.ToChar("\t"));
                 if (parts.Length == 2) {
                     result.id = GenericController.encodeInteger(parts[0]);
-                    result.timeStamp = GenericController.encodeDate(parts[1]);
+                    result.expires = GenericController.encodeDate(parts[1]);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex, "DecodeToken failure. Returning blank result for token [" + token + "]");
@@ -61,10 +61,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public class TokenData {
             public int id { get; set; }
-            public DateTime timeStamp { get; set; }
+            public DateTime expires { get; set; }
             public TokenData()  {
                 id = 0;
-                timeStamp = DateTime.MinValue;
+                expires = DateTime.MinValue;
             }
         }
         //

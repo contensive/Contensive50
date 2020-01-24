@@ -12,6 +12,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.BaseModels;
+using System.Linq;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -28,7 +29,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="sourceHtml"></param>
         /// <returns></returns>
-        public static string convertHtmlToText( CoreController core, string sourceHtml ) {
+        public static string convertHtmlToText(CoreController core, string sourceHtml) {
             return NUglify.Uglify.HtmlToText(sourceHtml, NUglify.Html.HtmlToTextOptions.KeepStructure).Code.Trim();
         }
         //
@@ -616,38 +617,47 @@ namespace Contensive.Processor.Controllers {
         /// Create a select list from a comma separated list, returns an index into the list list, starting at 1, if an element is blank (,) no option is created
         /// </summary>
         /// <param name="MenuName"></param>
-        /// <param name="CurrentValue"></param>
+        /// <param name="CurrentOneBaseKey"></param>
         /// <param name="SelectList"></param>
         /// <param name="NoneCaption"></param>
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<NameValueModel> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
-            string result = "";
+        public static string selectFromList(CoreController core, string MenuName, int CurrentOneBaseKey, List<string> lookupList, string NoneCaption, string htmlId, string HtmlClass = "") {
             try {
-                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                FastString.add("<select size=1 ");
-                if (!string.IsNullOrEmpty(htmlId)) FastString.add("id=\"" + htmlId + "\" ");
-                if (!string.IsNullOrEmpty(HtmlClass)) FastString.add("class=\"" + HtmlClass + "\" ");
-                if (!string.IsNullOrEmpty(MenuName)) FastString.add("name=\"" + MenuName + "\" ");
+                var FastString = new StringBuilder();
+                FastString.Append("<select size=1");
+                if (!string.IsNullOrEmpty(htmlId)) FastString.Append(" id=\"" + htmlId + "\"");
+                if (!string.IsNullOrEmpty(HtmlClass)) FastString.Append(" class=\"" + HtmlClass + "\"");
+                if (!string.IsNullOrEmpty(MenuName)) FastString.Append(" name=\"" + MenuName + "\"");
                 if (!string.IsNullOrEmpty(NoneCaption)) {
-                    FastString.add("><option value=\"\">" + NoneCaption + "</option>");
+                    FastString.Append("><option value=\"\">" + NoneCaption + "</option>");
                 } else {
-                    FastString.add("><option value=\"\">Select One</option>");
+                    FastString.Append("><option value=\"\">Select One</option>");
                 }
                 //
+                // ----- sort values
+                var lookupDict = lookupList.Select((s, i) => new { s, i }).ToDictionary(x => x.i+1, x => x.s);
+                var sortedLookupDict = lookupDict.OrderBy(x => x.Value);
+                //
                 // ----- select values
-                string CurrentValueLower = CurrentValue.ToLowerInvariant();
-                foreach (NameValueModel nameValue in lookupList) {
-                    string selected = (nameValue.value.ToLowerInvariant() == CurrentValueLower) ? " selected" : "";
-                    FastString.add("<option value=\"" + nameValue.value + "\" " + selected + ">" + nameValue.name + "</option>");
+                foreach (KeyValuePair<int,string> lookup in sortedLookupDict) {
+                    if(!string.IsNullOrWhiteSpace(lookup.Value)) {
+                        string selected = CurrentOneBaseKey.Equals(lookup.Key) ? " selected" : "";
+                        FastString.Append("<option value=\"" + lookup.Key + "\"" + selected + ">" + lookup.Value + "</option>");
+                    }
                 }
-                FastString.add("</select>");
-                result = FastString.text;
+                FastString.Append("</select>");
+                return FastString.ToString();
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return string.Empty;
             }
-            return result;
+        }
+        //
+        public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<string> lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
+            int zeroBaseIndex = lookups.FindIndex(x => x.Equals(CurrentValue,StringComparison.InvariantCultureIgnoreCase));
+            return selectFromList(core, MenuName, zeroBaseIndex+1, lookups, NoneCaption, htmlId, HtmlClass);
         }
         //
         //====================================================================================================
@@ -656,70 +666,70 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="MenuName"></param>
-        /// <param name="CurrentValue"></param>
+        /// <param name="CurrentIndex"></param>
         /// <param name="lookups"></param>
         /// <param name="NoneCaption"></param>
         /// <param name="htmlId"></param>
         /// <param name="HtmlClass"></param>
         /// <returns></returns>
-        public static string selectFromList(CoreController core, string MenuName, int CurrentValue, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
-            string result = "";
-            try {
-                //
-                StringBuilderLegacyController FastString = new StringBuilderLegacyController();
-                int Ptr = 0;
-                int RecordID = 0;
-                string Copy = null;
-                int SelectFieldWidthLimit;
-                //
-                SelectFieldWidthLimit = core.siteProperties.selectFieldWidthLimit;
-                if (SelectFieldWidthLimit == 0) {
-                    SelectFieldWidthLimit = 256;
-                }
-                //
-                // ----- Start select box
-                //
-                FastString.add("<select id=\"" + htmlId + "\" class=\"" + HtmlClass + "\" size=\"1\" name=\"" + MenuName + "\">");
-                if (!string.IsNullOrEmpty(NoneCaption)) {
-                    FastString.add("<option value=\"\">" + NoneCaption + "</option>");
-                } else {
-                    FastString.add("<option value=\"\">Select One</option>");
-                }
-                //
-                // ----- select values
-                //
-                for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
-                    RecordID = Ptr + 1;
-                    Copy = lookups[Ptr];
-                    if (!string.IsNullOrEmpty(Copy)) {
-                        FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
-                        if (RecordID == CurrentValue) {
-                            FastString.add("selected");
-                        }
-                        if (Copy.Length > SelectFieldWidthLimit) {
-                            Copy = Copy.left(SelectFieldWidthLimit) + "...+";
-                        }
-                        FastString.add(">" + Copy + "</option>");
-                    }
-                }
-                FastString.add("</select>");
-                result = FastString.text;
-                //
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-            return result;
-        }
+        //public static string selectFromList(CoreController core, string MenuName, int CurrentIndex, string[] lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
+        //    string result = "";
+        //    try {
+        //        //
+        //        StringBuilderLegacyController FastString = new StringBuilderLegacyController();
+        //        int Ptr = 0;
+        //        int RecordID = 0;
+        //        string Copy = null;
+        //        int SelectFieldWidthLimit;
+        //        //
+        //        SelectFieldWidthLimit = core.siteProperties.selectFieldWidthLimit;
+        //        if (SelectFieldWidthLimit == 0) {
+        //            SelectFieldWidthLimit = 256;
+        //        }
+        //        //
+        //        // ----- Start select box
+        //        //
+        //        FastString.add("<select id=\"" + htmlId + "\" class=\"" + HtmlClass + "\" size=\"1\" name=\"" + MenuName + "\">");
+        //        if (!string.IsNullOrEmpty(NoneCaption)) {
+        //            FastString.add("<option value=\"\">" + NoneCaption + "</option>");
+        //        } else {
+        //            FastString.add("<option value=\"\">Select One</option>");
+        //        }
+        //        //
+        //        // ----- select values
+        //        //
+        //        for (Ptr = 0; Ptr <= lookups.GetUpperBound(0); Ptr++) {
+        //            RecordID = Ptr + 1;
+        //            Copy = lookups[Ptr];
+        //            if (!string.IsNullOrEmpty(Copy)) {
+        //                FastString.add(Environment.NewLine + "<option value=\"" + RecordID + "\" ");
+        //                if (RecordID == CurrentIndex) {
+        //                    FastString.add("selected");
+        //                }
+        //                if (Copy.Length > SelectFieldWidthLimit) {
+        //                    Copy = Copy.left(SelectFieldWidthLimit) + "...+";
+        //                }
+        //                FastString.add(">" + Copy + "</option>");
+        //            }
+        //        }
+        //        FastString.add("</select>");
+        //        result = FastString.text;
+        //        //
+        //        //
+        //        // ----- Error Trap
+        //        //
+        //    } catch (Exception ex) {
+        //        LogController.logError(core, ex);
+        //    }
+        //    return result;
+        //}
         //
         //====================================================================================================
         /// <summary>
         /// Display an icon with a link to the login form/cclib.net/admin area
         /// </summary>
         /// <returns></returns>
-        public string getLoginLink()  {
+        public string getLoginLink() {
             string result = "";
             try {
                 //
@@ -1234,7 +1244,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // Lookup into LookupList
                                     //
-                                    returnResult = selectFromList(core, fieldName, FieldValueInteger, FieldLookupList.Split(','), "", "");
+                                    returnResult = selectFromList(core, fieldName, FieldValueInteger, FieldLookupList.Split(',').ToList(), "", "");
                                 } else {
                                     //
                                     // Just call it text
@@ -1285,7 +1295,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static string inputHidden(string htmlName, string htmlValue, string htmlClass, string htmlId) {
             string attrList = "<input type=hidden";
-            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + encodeHtml( htmlName ) + "\"";
+            attrList += (string.IsNullOrEmpty(htmlName)) ? "" : " name=\"" + encodeHtml(htmlName) + "\"";
             attrList += (string.IsNullOrEmpty(htmlValue)) ? "" : " value=\"" + encodeHtml(htmlValue) + "\"";
             attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + encodeHtml(htmlId) + "\"";
             attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + encodeHtml(htmlClass) + "\"";
@@ -1860,7 +1870,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void processAddonSettingsEditor()  {
+        public void processAddonSettingsEditor() {
             //
             string constructor = null;
             bool ParseOK = false;
@@ -2071,7 +2081,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 FieldName = csData.getNextFieldName();
                             }
-                            ExitLabel1:;
+                        ExitLabel1:;
                         }
                         //
                         // Parse out the Addon Name
@@ -2195,7 +2205,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void processHelpBubbleEditor()  {
+        public void processHelpBubbleEditor() {
             //
             string SQL = null;
             string HelpBubbleId = null;
@@ -2276,7 +2286,7 @@ namespace Contensive.Processor.Controllers {
                     int PrimaryContentId = ContentMetadataModel.getContentId(core, PrimaryContentName);
                     ContentMetadataModel SecondaryMetaData = ContentMetadataModel.createByUniqueName(core, SecondaryContentName);
                     List<int> ContentControlIdList = new List<int>();
-                    if(SecondaryMetaData.parentId<=0) {
+                    if (SecondaryMetaData.parentId <= 0) {
                         //
                         // -- if content has no parent, include all contentcontrolid==0
                         ContentControlIdList.Add(0);
@@ -2493,7 +2503,7 @@ namespace Contensive.Processor.Controllers {
         //
         public string getPanel(string content) => getPanel(content, "ccPanel", "ccPanelHilite", "ccPanelShadow", "100%", 5, 1);
         //
-        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding) 
+        public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding)
             => getPanel(content, stylePanel, styleHilite, styleShadow, width, padding, 1);
         //
         //====================================================================================================
@@ -2519,7 +2529,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getPanelBottom()  {
+        public string getPanelBottom() {
             return ""
                 + cr6 + "</td>"
                 + cr5 + "</tr>"
@@ -2550,7 +2560,7 @@ namespace Contensive.Processor.Controllers {
         /// standard tool panel at the bottom of every page
         /// </summary>
         /// <returns></returns>
-        public string getToolsPanel()  {
+        public string getToolsPanel() {
             string result = "";
             try {
                 if (core.session.user.allowToolsPanel) {
@@ -2800,7 +2810,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getHtmlHead()  {
+        public string getHtmlHead() {
             List<string> headList = new List<string>();
             try {
                 //
@@ -3493,7 +3503,7 @@ namespace Contensive.Processor.Controllers {
         /// return a row start (tr tag)
         /// </summary>
         /// <returns></returns>
-        public static string tableRowStart()  {
+        public static string tableRowStart() {
             return "<tr>";
         }
         //

@@ -162,6 +162,21 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Authentication token can be used to authenticate the user with the request "eid=token". The default expiration is 24 hours.
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <returns></returns>
+        public abstract string GetAuthenticationToken(int UserId);
+        /// <summary>
+        /// Authentication token can be used to authenticate the user with the request "eid=token".
+        /// </summary>
+        /// <param name="UserId"></param>
+        /// <param name="Expiration"></param>
+        /// <returns></returns>
+        public abstract string GetAuthenticationToken(int UserId, DateTime Expiration);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Create a log entry type "Log"
         /// </summary>
         /// <param name="logText"></param>

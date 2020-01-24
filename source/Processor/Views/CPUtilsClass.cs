@@ -30,6 +30,28 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         /// <summary>
+        /// Authentication token can be used to authenticate the user with the request "eid=token". The default expiration is 24 hours.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public override string GetAuthenticationToken(int userId) {
+            return SecurityController.encodeToken(cp.core, userId, DateTime.Now.AddDays(1));
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Authentication token can be used to authenticate the user with the request "eid=token".
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="expiration"></param>
+        /// <returns></returns>
+        public override string GetAuthenticationToken(int userId, DateTime expiration) {
+            return SecurityController.encodeToken(cp.core, userId, expiration);
+        }
+
+        //
+        // ====================================================================================================
+        /// <summary>
         /// Return a text approximation of an Html document
         /// </summary>
         /// <param name="source"></param>

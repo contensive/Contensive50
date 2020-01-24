@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Linq;
 using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
@@ -259,16 +260,16 @@ namespace Contensive.Processor {
         // ==========================================================================================
         //
         public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass, string htmlId) {
-            return HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( htmlValue ), optionList.Split(','), noneCaption, htmlId, htmlClass);
+            return HtmlController.selectFromList( cp.core, htmlName, GenericController.encodeInteger( htmlValue ), optionList.Split(',').ToList(), noneCaption, htmlId, htmlClass);
         }
         public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption, string htmlClass) {
-            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "", htmlClass);
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(',').ToList(), noneCaption, "", htmlClass);
         }
         public override string SelectList(string htmlName, string htmlValue, string optionList, string noneCaption) {
-            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), noneCaption, "");
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(',').ToList(), noneCaption, "");
         }
         public override string SelectList(string htmlName, string htmlValue, string optionList) {
-            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(','), "", "");
+            return HtmlController.selectFromList(cp.core, htmlName, GenericController.encodeInteger(htmlValue), optionList.Split(',').ToList(), "", "");
         }
         //
         // ====================================================================================================

@@ -200,6 +200,11 @@ namespace Contensive.Processor.Controllers {
                         memberLinkinEid = "";
                     }
                 }
+                //
+                // -- expire linkToken after 15 minutes
+                if (linkToken.expires.CompareTo(DateTime.Now) < 0) { linkToken.id = 0; }
+                //
+                // -- determine visit
                 bool AllowOnNewVisitEvent = false;
                 if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (linkToken.id != 0) || (memberLinkRecognizeId != 0)) {
                     //
@@ -256,8 +261,8 @@ namespace Contensive.Processor.Controllers {
                                     resultSessionContext.user = testUser;
                                 }
                             }
-                            if (((visitToken.timeStamp - encodeDate(resultSessionContext.visit.lastVisitTime)).TotalSeconds) > 2) {
-                                LogController.logTrace(core, "visit cookie timestamp [" + visitToken.timeStamp + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
+                            if (((visitToken.expires - encodeDate(resultSessionContext.visit.lastVisitTime)).TotalSeconds) > 2) {
+                                LogController.logTrace(core, "visit cookie timestamp [" + visitToken.expires + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
                                 resultSessionContext.visitStateOk = false;
                             }
                         }

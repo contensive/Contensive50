@@ -221,7 +221,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required,"");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else if (field.lookupList != "") {
-                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else {
                                     //
@@ -393,7 +393,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     EditorString = AdminUIController.getDefaultEditor_lookupContent(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required,"");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else if (field.lookupList != "") {
-                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(','), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    EditorString = AdminUIController.getDefaultEditor_lookupList(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else {
                                     //

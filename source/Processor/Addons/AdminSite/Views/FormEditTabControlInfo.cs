@@ -96,19 +96,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (GenericController.toUCase(adminData.adminContent.tableName) == GenericController.toUCase("ccMembers")) {
                         string htmlId = "fieldGuid";
                         bool AllowEId = (core.siteProperties.getBoolean("AllowLinkLogin", true)) || (core.siteProperties.getBoolean("AllowLinkRecognize", true));
-                        string fieldHelp = "";
+                        string fieldHelp = "This string is an authentication token that can be used in the URL for the next 15 minutes to log in as this user.";
                         string fieldEditor = "";
                         if (!AllowEId) {
                             fieldEditor = "(link login and link recognize are disabled in security preferences)";
                         } else if (adminData.editRecord.id == 0) {
                             fieldEditor = "(available after save)";
                         } else {
-                            string eidQueryString = "eid=" + WebUtility.UrlEncode(Processor.Controllers.SecurityController.encodeToken(core, adminData.editRecord.id, core.doc.profileStartTime));
+                            string eidQueryString = "eid=" + WebUtility.UrlEncode(SecurityController.encodeToken(core, adminData.editRecord.id, core.doc.profileStartTime.AddMinutes(15)));
                             string sampleUrl = core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + eidQueryString;
                             if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
-                                fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
+                                fieldHelp = " If " + eidQueryString + " is added to a url querystring for this site, the user be logged in as this person.";
                             } else {
-                                fieldHelp = "If " + eidQueryString + " is added to a url querystring for this site, the user be recognized in as this person, but not logged in.";
+                                fieldHelp = " If " + eidQueryString + " is added to a url querystring for this site, the user be recognized in as this person, but not logged in.";
                             }
                             fieldHelp += " To enable, disable or modify this feature, use the security tab on the Preferences page.";
                             fieldHelp += "<br>For example: " + sampleUrl;
