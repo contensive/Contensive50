@@ -12,12 +12,6 @@ namespace Contensive.CLI {
         static void Main(string[] args) {
             try {
                 //
-                // -- require elevated process
-                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
-                    Console.WriteLine("Must be run in elevated Administrator process.");
-                    return;
-                }
-                //
                 // -- configure command executes without processor instance
                 int argPtr = 0;
                 if (getNextCmd(args, ref argPtr).ToLowerInvariant().Equals("--configure")) {
@@ -104,6 +98,12 @@ namespace Contensive.CLI {
                                 break;
                             case "--newapp":
                             case "-n":
+                                //
+                                // -- require elevated permissions
+                                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                                    Console.WriteLine("The command requires elevated Administrator permissions.");
+                                    return;
+                                }
                                 //
                                 // -- start the new app wizard
                                 appName = getNextCmdArg(args, ref argPtr);
@@ -196,10 +196,13 @@ namespace Contensive.CLI {
                                 RunTaskCmd.execute(cpServer, appName, getNextCmdArg(args, ref argPtr));
                                 return;
                             case "--verifybasicwebsite":
-                                using (var cp = new CPClass(appName)) {
-                                    BuildController.verifyBasicWebSiteData(cp.core);
-                                    Console.WriteLine("verified basic website data.");
+                                //
+                                // -- require elevated permissions
+                                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                                    Console.WriteLine("The command requires elevated Administrator permissions.");
+                                    return;
                                 }
+                                VerifyBasicWebsiteCmd.execute(cpServer, appName);
                                 return;
                             case "":
                                 //

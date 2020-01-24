@@ -32,6 +32,7 @@ namespace Contensive.CLI {
             Console.Write(TaskSchedulerCmd.helpText);
             Console.Write(TasksCmd.helpText);
             Console.Write(UpgradeCmd.helpText);
+            Console.Write(VerifyBasicWebsiteCmd.helpText);
             Console.Write(VersionCmd.helpText);
         }
         //

@@ -1368,7 +1368,7 @@ namespace Contensive.Models.Db {
         }
         //
         public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList)
-            => isChildOf<T>(cp, parentRecordId, childRecordId, parentIdList);
+            => isChildOf<T>(cp, parentRecordId, childRecordId, parentIdList, false);
         //
         //====================================================================================================
         /// <summary>

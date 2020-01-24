@@ -573,8 +573,9 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- build list of blocked pages
+                // todo convert to a list, then join when needed (for performance when many blocked pages)
                 string BlockedRecordIDList = "";
-                if ((!string.IsNullOrEmpty(result)) && (core.doc.redirectLink == "")) {
+                if (string.IsNullOrWhiteSpace(core.doc.redirectLink)) {
                     foreach (PageContentModel testPage in core.doc.pageController.pageToRootList) {
                         if (testPage.blockContent || testPage.blockPage) {
                             BlockedRecordIDList = BlockedRecordIDList + "," + testPage.id;
