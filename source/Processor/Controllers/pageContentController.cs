@@ -665,7 +665,7 @@ namespace Contensive.Processor.Controllers {
                             csData.openRecord("Page Content", BlockedPageRecordId, "CustomBlockMessage,BlockSourceID,RegistrationGroupID,ContentPadding");
                             if (csData.ok()) {
                                 BlockSourceId = csData.getInteger("BlockSourceID");
-                                CustomBlockMessageFilename = csData.getText("CustomBlockMessage");
+                                CustomBlockMessageFilename = csData.getFilename("CustomBlockMessage");
                                 RegistrationGroupId = csData.getInteger("RegistrationGroupID");
                                 ContentPadding = csData.getInteger("ContentPadding");
                             }
@@ -678,7 +678,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // ----- Custom Message
                                 //
-                                result = core.cdnFiles.readFileText(CustomBlockMessageFilename);
+                                result = string.IsNullOrWhiteSpace(CustomBlockMessageFilename) ? "" : core.cdnFiles.readFileText(CustomBlockMessageFilename);
                                 break;
                             }
                         case ContentBlockWithLogin: {
@@ -691,7 +691,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // -- not recognized
                                         BlockForm = ""
-                                            + "<p>This content has limited access. If you have an account, please login using this form.</p>"
+                                            + "<p>This page has limited access. If you have an account, please login.</p>"
                                             + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not recognized"
@@ -700,7 +700,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         // -- recognized, not authenticated
                                         BlockForm = ""
-                                            + "<p>This content has limited access. You were recognized as \"<b>" + core.session.user.name + "</b>\", but you need to login to continue. To login to this account or another, please use this form.</p>"
+                                            + "<p>This page has limited access. You were recognized as \"<b>" + core.session.user.name + "</b>\", but for security reasons you need to login to continue.</p>"
                                             + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                                 addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                                 errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user not authenticated"
@@ -711,7 +711,7 @@ namespace Contensive.Processor.Controllers {
                                     // -- authenticated
                                     BlockForm = ""
                                         + "<p>You are currently logged in as \"<b>" + core.session.user.name + "</b>\". If this is not you, please <a href=\"?" + core.doc.refreshQueryString + "&method=logout\" rel=\"nofollow\">Click Here</a>.</p>"
-                                        + "<p>This account does not have access to this content. If you want to login with a different account, please use this form.</p>"
+                                        + "<p>This account does not have access to this page. For security reasons you need to login with a different account to continue.</p>"
                                         + core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginForm), new CPUtilsBaseClass.addonExecuteContext {
                                             addonType = CPUtilsBaseClass.addonContext.ContextPage,
                                             errorContextMessage = "calling login form addon [" + addonGuidLoginPage + "] because content box is blocked and user does not have access to content"

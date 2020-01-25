@@ -329,7 +329,7 @@ namespace Contensive.Processor {
         //
         public override string GetFilename(string fieldName, string originalFilename, string contentName) {
             try {
-                return cs.getFieldFilename(fieldName, originalFilename, contentName, 0);
+                return cs.getFilename(fieldName, originalFilename, contentName, 0);
             } catch (Exception ex) {
                 LogController.logError( cp.core,ex);
                 throw;
@@ -338,7 +338,7 @@ namespace Contensive.Processor {
         //
         public override string GetFilename(string fieldName, string originalFilename) {
             try {
-                return cs.getFieldFilename(fieldName, originalFilename);
+                return cs.getFilename(fieldName, originalFilename);
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
                 throw;
@@ -347,7 +347,7 @@ namespace Contensive.Processor {
 
         public override string GetFilename(string fieldName) {
             try {
-                return cs.getFieldFilename(fieldName, "");
+                return cs.getFilename(fieldName, "");
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
                 throw;

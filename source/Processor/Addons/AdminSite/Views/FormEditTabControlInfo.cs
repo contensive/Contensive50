@@ -68,9 +68,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // -- GUID
                 {
-                    string htmlId = "fieldGuid";
+                    string guidSetHtmlId = "guidSet" + GenericController.getRandomInteger(core).ToString();
+                    string guidInputHtmlId = "guidInput" + GenericController.getRandomInteger(core).ToString();
                     string fieldValue = GenericController.encodeText(adminData.editRecord.fieldsLc["ccguid"].value);
-                    string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
                     string fieldEditor = "";
                     if (adminData.editRecord.userReadOnly) {
                         //
@@ -79,16 +79,24 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else if (string.IsNullOrEmpty(fieldValue)) {
                         //
                         // add a set button
-                        string fieldId = "setGuid" + GenericController.getRandomInteger(core).ToString();
-                        string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + fieldId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
-                        string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_text(core, "ccguid", "", false, htmlId), "col-xs-11");
-                        fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");
+                        string setButton = "<input id=\"" + guidSetHtmlId + "\" type=\"submit\" value=\"Set\" class=\"btn btn-primary btn-sm\">";
+                        string setButtonWrapped = "<div class=\"input-group-append\">" + setButton + "</div>";
+                        string inputCell = AdminUIController.getDefaultEditor_text(core, "ccguid", "", false, guidInputHtmlId);
+                        fieldEditor = HtmlController.div(inputCell + setButtonWrapped, "input-group");
+                        string newGuid = GenericController.getGUID(true);
+                        string onClickFn = "function(e){e.preventDefault();e.stopPropagation();$('#" + guidInputHtmlId + "').val('" + newGuid + "');}";
+                        string script = "$('body').on('click','#" + guidSetHtmlId + "'," + onClickFn + ")";
+                        core.html.addScriptCode(script, "Admin edit control-info-tab guid set button");
+                        //string buttonCell = HtmlController.div(AdminUIController.getButtonPrimary("Set", "var e=document.getElementById('" + htmlId + "');if(e){e.value='" + GenericController.getGUID(true) + "';this.disabled=true;}"), "col-xs-1");
+                        //string inputCell = HtmlController.div(AdminUIController.getDefaultEditor_text(core, "ccguid", "", false, htmlId), "col-xs-11");
+                        //fieldEditor = HtmlController.div(HtmlController.div(buttonCell + inputCell, "row"), "container-fluid");
                     } else {
                         //
                         // field is read-only except for developers
-                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(), htmlId);
+                        fieldEditor = AdminUIController.getDefaultEditor_text(core, "ccguid", fieldValue, !core.session.isAuthenticatedDeveloper(), guidInputHtmlId);
                     }
-                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, htmlId));
+                    string FieldHelp = "This is a unique number that identifies this record globally. A GUID is not required, but when set it should never be changed. GUIDs are used to synchronize records. When empty, you can create a new guid. Only Developers can modify the guid.";
+                    tabPanel.add(AdminUIController.getEditRow(core, fieldEditor, "GUID", FieldHelp, false, false, guidInputHtmlId));
                 }
                 //
                 // ----- EID (Encoded ID)

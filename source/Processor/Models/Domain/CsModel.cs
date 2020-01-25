@@ -161,9 +161,9 @@ namespace Contensive.Processor {
                             case CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
                                     //
                                     // ----- cdn file
-                                    string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
+                                    string SourceFilename = getFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
                                     if (!string.IsNullOrEmpty(SourceFilename)) {
-                                        string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
+                                        string DestFilename = destination.getFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                         destination.set(field.nameLc, DestFilename);
                                         core.cdnFiles.copyFile(SourceFilename, DestFilename);
                                     }
@@ -174,9 +174,9 @@ namespace Contensive.Processor {
                             case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                     //
                                     // ----- private file
-                                    string SourceFilename = getFieldFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
+                                    string SourceFilename = getFilename(field.nameLc, "", contentMeta.name, field.fieldTypeId);
                                     if (!string.IsNullOrEmpty(SourceFilename)) {
-                                        string DestFilename = destination.getFieldFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
+                                        string DestFilename = destination.getFilename(field.nameLc, "", destination.contentName, field.fieldTypeId);
                                         destination.set(field.nameLc, DestFilename);
                                         core.privateFiles.copyFile(SourceFilename, DestFilename);
                                     }
@@ -667,7 +667,7 @@ namespace Contensive.Processor {
         /// <param name="originalFilename"></param>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public string getFieldFilename(string fieldName, string originalFilename, string contentName, CPContentBaseClass.FieldTypeIdEnum fieldTypeId) {
+        public string getFilename(string fieldName, string originalFilename, string contentName, CPContentBaseClass.FieldTypeIdEnum fieldTypeId) {
             string returnFilename = "";
             try {
                 string TableName = null;
@@ -778,8 +778,27 @@ namespace Contensive.Processor {
             }
             return returnFilename;
         }
-        //
-        public string getFieldFilename(string fieldName, string originalFilename) => getFieldFilename(fieldName, originalFilename, "", 0);
+        /// <summary>
+        /// get the filename that backs the field specified.
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="originalFilename"></param>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
+        public string getFilename(string fieldName, string originalFilename, string contentName) =>getFilename(fieldName, originalFilename, contentName, 0);
+        /// <summary>
+        /// get the filename that backs the field specified.
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="originalFilename"></param>
+        /// <returns></returns>
+        public string getFilename(string fieldName, string originalFilename) => getFilename(fieldName, originalFilename, "", 0);
+        /// <summary>
+        /// get the filename that backs the field specified.
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
+        public string getFilename(string fieldName) => getFilename(fieldName, "");
         //
         //====================================================================================================
         /// <summary>
@@ -821,7 +840,7 @@ namespace Contensive.Processor {
                 if (string.IsNullOrEmpty(contentName)) { throw new ArgumentException("content Name cannot be blank"); }
                 if (!createdWithMetaData) { throw new GenericException("Cannot save a data set created by a query."); }
                 string OldFilename = getText(fieldName);
-                string Filename = getFieldFilename(fieldName, "", contentName, CPContentBaseClass.FieldTypeIdEnum.FileText);
+                string Filename = getFilename(fieldName, "", contentName, CPContentBaseClass.FieldTypeIdEnum.FileText);
                 if (OldFilename != Filename) {
                     //
                     // Filename changed, mark record changed
@@ -1093,7 +1112,7 @@ namespace Contensive.Processor {
                                 }
                             } else {
                                 if (string.IsNullOrEmpty(PathFilename)) {
-                                    PathFilename = getFieldFilename(field.nameLc, "", this.contentName, field.fieldTypeId);
+                                    PathFilename = getFilename(field.nameLc, "", this.contentName, field.fieldTypeId);
                                 }
                                 if (PathFilename.left(1) == "/") {
                                     //
@@ -1683,7 +1702,7 @@ namespace Contensive.Processor {
                             // -- upload file
                             string Filename = core.docProperties.getText(LocalRequestName);
                             if (!string.IsNullOrEmpty(Filename)) {
-                                string Path = getFieldFilename(fieldName, Filename, "", getFieldTypeId(fieldName));
+                                string Path = getFilename(fieldName, Filename, "", getFieldTypeId(fieldName));
                                 set(fieldName, Path);
                                 Path = GenericController.strReplace(Path, "\\", "/");
                                 Path = GenericController.strReplace(Path, "/" + Filename, "");

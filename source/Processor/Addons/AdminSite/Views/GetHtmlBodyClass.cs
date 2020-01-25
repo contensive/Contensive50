@@ -1466,7 +1466,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                 string filename = GenericController.encodeText(fieldValueObject);
                                                 if (!string.IsNullOrWhiteSpace(filename)) {
                                                     filename = FileController.encodeDosFilename(filename);
-                                                    string unixPathFilename = csData.getFieldFilename(fieldName, filename);
+                                                    string unixPathFilename = csData.getFilename(fieldName, filename);
                                                     string dosPathFilename = FileController.convertToDosSlash(unixPathFilename);
                                                     string dosPath = FileController.getPath(dosPathFilename);
                                                     cp.core.cdnFiles.upload(fieldName, dosPath, ref filename);
