@@ -230,7 +230,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIController.getDefaultEditor_lookupContent(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList,false,"","",false,"")));
+                    Stream.add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIEditorController.getLookupContentEditor(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList,false,"","",false,"")));
                 } else {
                     //
                     // Configure edit form

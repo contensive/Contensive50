@@ -17,28 +17,28 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIController.getDefaultEditor_bool(core, htmlName, htmlValue, readOnly, htmlId, required);
+            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIController.getDefaultEditor_bool(core, htmlName, htmlValue, readOnly, htmlId);
+            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId)
-            => Controllers.AdminUIController.getDefaultEditor_bool(core, htmlName, htmlValue, false, htmlId, false);
+            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, false, htmlId, false);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue)
-            => Controllers.AdminUIController.getDefaultEditor_bool(core, htmlName, htmlValue, false, "", false);
+            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, false, "", false);
 
-        public override string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIController.getDefaultEditor_dateTime(core, htmlName, htmlValue, readOnly, htmlId, required, "");
+        public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required)
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, required, "");
 
-        public override string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIController.getDefaultEditor_dateTime(core, htmlName, htmlValue, readOnly, htmlId, false, "");
+        public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly)
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, false, "");
 
-        public override string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId)
-            => Controllers.AdminUIController.getDefaultEditor_dateTime(core, htmlName, htmlValue, false, htmlId, false, "");
+        public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId)
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, htmlId, false, "");
 
-        public override string GetDateTimeEditor(string htmlName, DateTime htmlValue)
-            => Controllers.AdminUIController.getDefaultEditor_dateTime(core, htmlName, htmlValue, false, "", false, "");
+        public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue)
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, "", false, "");
 
         public override string GetEditRow(string caption, string editor)
             => Controllers.AdminUIController.getEditRow(core, editor, caption, "");
@@ -53,202 +53,201 @@ namespace Contensive.Processor {
             => Controllers.AdminUIController.getEditRow(core, editor, caption, help, required, false, htmlId);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIController.getDefaultEditor_TextArea(core, htmlName, htmlValue, readOnly, htmlId, required);
+            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIController.getDefaultEditor_TextArea(core, htmlName, htmlValue, readOnly, htmlId, false);
+            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId)
-            => Controllers.AdminUIController.getDefaultEditor_TextArea(core, htmlName, htmlValue, false, htmlId, false);
+            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue)
-            => Controllers.AdminUIController.getDefaultEditor_TextArea(core, htmlName, htmlValue, false, "");
+            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, "");
 
         public override string GetHtmlEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIController.getDefaultEditor_Html(core, htmlName, htmlValue, "", "", "", readOnly, htmlId);
+            => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", readOnly, htmlId);
 
         public override string GetHtmlEditor(string htmlName, string htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIController.getDefaultEditor_Html(core, htmlName, htmlValue, "", "", "", readOnly, htmlId);
+            => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", readOnly, htmlId);
 
         public override string GetHtmlEditor(string htmlName, string htmlValue, string htmlId)
-            => Controllers.AdminUIController.getDefaultEditor_Html(core, htmlName, htmlValue, "", "", "", false);
+            => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", false);
 
         public override string GetHtmlEditor(string htmlName, string htmlValue)
-            => Controllers.AdminUIController.getDefaultEditor_Html(core, htmlName, htmlValue, "", "", "", false, "");
+            => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", false, "");
 
-        public override string GetIntegerEditor(string htmlName, int htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue.ToString(), readOnly, htmlId, required);
+        public override string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required)
+            => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, readOnly, htmlId, required,"");
 
-        public override string GetIntegerEditor(string htmlName, int htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue.ToString(), readOnly, htmlId, false);
+        public override string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly)
+            => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, readOnly, htmlId, false, "");
 
-        public override string GetIntegerEditor(string htmlName, int htmlValue, string htmlId)
-            => Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue.ToString(), false, htmlId, false);
+        public override string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId)
+            => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, false, htmlId, false, "");
 
-        public override string GetIntegerEditor(string htmlName, int htmlValue)
-            => Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue.ToString(), false, "", false);
+        public override string GetIntegerEditor(string htmlName, int? htmlValue)
+            => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, false, "", false, "");
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly, bool required, string sqlFilter) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly, bool required) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required,"");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", false, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, htmlId, "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, htmlId, "", false, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, "", "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, "", "", false, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly, bool required, string sqlFilter) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly, bool required) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", false, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, htmlId, "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, htmlId, "", false, "");
         }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName) {
             bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupContent(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, "", "", false, "");
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, "", "", false, "");
         }
 
         public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly, bool required) {
-            bool isEmptyList = false;
-            return Controllers.AdminUIController.getDefaultEditor_lookupList(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", required);
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", required);
         }
 
         public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", false);
         }
 
         public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, false, htmlId, "", false);
         }
 
         public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, false, "", "", false);
         }
 
         public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly, bool required) {
-            return Controllers.AdminUIController.getDefaultEditor_lookupList(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", required);
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", required);
         }
 
         public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", false);
         }
 
         public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, false, htmlId, "", false);
         }
 
         public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, false, "", "", false);
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, string groupGuid, string htmlId, bool readOnly, bool required) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId, bool readOnly, bool required) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupGuid, "", readOnly, htmlId, required, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, string groupGuid, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId, bool readOnly) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupGuid, "", readOnly, htmlId, false, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, string groupGuid, string htmlId) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupGuid, "", false, htmlId, false, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, string groupGuid) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupGuid, "", false, "", false, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, int groupId, string htmlId, bool readOnly, bool required) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId, bool readOnly, bool required) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupId, "", readOnly, htmlId, required, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, int groupId, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId, bool readOnly) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupId, "", readOnly, htmlId, false, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, int groupId, string htmlId) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupId, "", false, htmlId, false, "");
         }
 
-        public override string GetMemberSelectEditor(string htmlName, int htmlValue, int groupId) {
-            throw new NotImplementedException();
+        public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId) {
+            return Controllers.AdminUIEditorController.getMemberSelectEditor(core, htmlName, lookupPersonId, groupId, "", false, "", false, "");
         }
 
-        public override string GetNumberEditor(string htmlName, double htmlValue, string htmlId, bool readOnly, bool required) {
-            throw new NotImplementedException();
+        public override string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly, bool required) {
+            return Controllers.AdminUIEditorController.getNumberEditor(core, htmlName, htmlValue, readOnly, htmlId, required, "");
         }
 
-        public override string GetNumberEditor(string htmlName, double htmlValue, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+        public override string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly) {
+            return Controllers.AdminUIEditorController.getNumberEditor(core, htmlName, htmlValue, readOnly, htmlId, false, "");
         }
 
-        public override string GetNumberEditor(string htmlName, double htmlValue, string htmlId) {
-            throw new NotImplementedException();
+        public override string GetNumberEditor(string htmlName, double? htmlValue, string htmlId) {
+            return Controllers.AdminUIEditorController.getNumberEditor(core, htmlName, htmlValue, false, htmlId, false, "");
         }
 
-        public override string GetNumberEditor(string htmlName, double htmlValue) {
-            throw new NotImplementedException();
+        public override string GetNumberEditor(string htmlName, double? htmlValue) {
+            return Controllers.AdminUIEditorController.getNumberEditor(core, htmlName, htmlValue, false, "", false, "");
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue) {
-            throw new NotImplementedException();
+            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, "", false);
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
-            return Contensive.Processor.Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue, readOnly, htmlId);
+            return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
-            return Contensive.Processor.Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue, readOnly, htmlId);
+            return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue, readOnly, htmlId);
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue, string htmlId) {
-            return Contensive.Processor.Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue, false, htmlId);
+            return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue, false, htmlId);
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue) {
-            return Contensive.Processor.Controllers.AdminUIController.getDefaultEditor_text(core, htmlName, htmlValue);
+            return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue);
         }
 
         public override ToolFormBaseClass NewToolForm() {

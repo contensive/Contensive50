@@ -229,7 +229,8 @@ namespace Contensive.Processor {
         //
         public override bool ExportCollection(int collectionId, ref string collectionZipPathFilename, ref string returnUserError) {
             try {
-                collectionZipPathFilename = ExportController.createCollectionZip_returnCdnPathFilename(cp, collectionId);
+                AddonCollectionModel collection = DbBaseModel.create<AddonCollectionModel>(cp, collectionId);
+                collectionZipPathFilename = ExportController.createCollectionZip_returnCdnPathFilename(cp, collection);
                 if(!cp.UserError.OK()) {
                     returnUserError = string.Join("", cp.UserError.GetList());
                 }
@@ -242,7 +243,16 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool ExportCollection(string collectionGuid, ref string collectionZipPathFilename, ref string returnUserError) {
-            throw new NotImplementedException();
+            try {
+                AddonCollectionModel collection = DbBaseModel.create<AddonCollectionModel>(cp, collectionGuid);
+                collectionZipPathFilename = ExportController.createCollectionZip_returnCdnPathFilename(cp, collection);
+                if (!cp.UserError.OK()) {
+                    returnUserError = string.Join("", cp.UserError.GetList());
+                }
+                return (cp.UserError.OK());
+            } catch (Exception) {
+                throw;
+            }
         }
         //
         //====================================================================================================

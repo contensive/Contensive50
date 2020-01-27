@@ -369,6 +369,17 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        //==========================================================================================
+        /// <summary>
+        /// Create a unique folder. Return the folder in path form (Path arguments have a trailing slash but no leading slash)
+        /// </summary>
+        /// <returns></returns>
+        public string createUniquePath() {
+            string uniquePath = GenericController.createGuid().Replace("-", "").Replace("{", "").Replace("}", "").ToLowerInvariant();
+            createPath(uniquePath);
+            return uniquePath;
+        }
+        //
         //==============================================================================================================
         /// <summary>
         /// Deletes a file if it exists
@@ -1794,9 +1805,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 if (!isLocal) {
                     return getFileDetails_remote(dosPathFilename);
-                } else {
-                    return getFileDetails_local(dosPathFilename);
                 }
+                return getFileDetails_local(dosPathFilename);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -1838,16 +1848,16 @@ namespace Contensive.Processor.Controllers {
         private FileDetail getFileDetails_remote(string pathFilename) {
             try {
                 if (string.IsNullOrWhiteSpace(pathFilename)) { return null; }
-                pathFilename = normalizeDosPathFilename(pathFilename);
-                string filename = getFilename(pathFilename);
+                string normalPathFilename = normalizeDosPathFilename(pathFilename);
+                string filename = getFilename(normalPathFilename);
                 if (string.IsNullOrWhiteSpace(filename)) { return null; }
-                string unixPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
+                string unixPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, normalPathFilename));
                 string unixPath = convertToUnixSlash(getPath(unixPathFilename));
                 ListObjectsRequest request = new ListObjectsRequest {
                     BucketName = core.serverConfig.awsBucketName,
                     Prefix = unixPathFilename
                 };
-                LogController.logInfo(core, "getFileDetails_remote, s3Client.ListObjects, pathFilename [" + pathFilename + "])");
+                LogController.logInfo(core, "getFileDetails_remote, s3Client.ListObjects, pathFilename [" + normalPathFilename + "])");
                 ListObjectsResponse response = s3Client.ListObjects(request);
                 IEnumerable<S3Object> s3fileList = response.S3Objects.Where(x => x.Key == unixPathFilename);
                 foreach (var s3File in s3fileList) {

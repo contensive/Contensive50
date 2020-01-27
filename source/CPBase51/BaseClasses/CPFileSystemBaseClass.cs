@@ -126,17 +126,24 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
-        /// Copy a file from the remote storate to its local store
+        /// Copy a file from the remote storate to its local store.
         /// </summary>
-        /// <param name="pathFilename"></param>
+        /// <param name="pathFilename">The path followed by the filename. Path arguments have no leading slash, but they include a trailing slash. ex ParentFolder/SubFolder/Filename.ext</param>
         public abstract void CopyRemoteToLocal(string pathFilename);
         //
         //==========================================================================================
         /// <summary>
-        /// Create a folder in a path. Path arguments should have no leading slash. (ex ParentFolder/NewFolder )
+        /// Create a folder in a path. 
         /// </summary>
-        /// <param name="pathFolder"></param>
+        /// <param name="pathFolder">A path followed by a folder name. (ex ParentFolder/SubFolder/NewFolderName ) Path arguments should have no leading slash.</param>
         public abstract void CreateFolder(string pathFolder);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Create a folder with a unique name. Return the path (Path values have no leading slash, and have a trailing slash, ex NewPath/ )
+        /// </summary>
+        /// <returns></returns>
+        public abstract string CreateUniqueFolder();
         //
         //==========================================================================================
         /// <summary>
@@ -186,7 +193,7 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
-        /// Get the details of all files in a folder. Path arguments should have no leading slash. (ex ParentFolder/FolderToDelete )
+        /// Get the details of all files in a folder. Path arguments should have no leading slash. (ex ParentFolder/FolderName )
         /// </summary>
         /// <param name="folderPath"></param>
         /// <param name="pageSize"></param>
@@ -195,6 +202,14 @@ namespace Contensive.BaseClasses {
         public abstract List<FileDetail> FileList(string folderPath, int pageSize, int pageNumber);
         public abstract List<FileDetail> FileList(string folderPath, int pageSize);
         public abstract List<FileDetail> FileList(string folderPath);
+        //
+        //==========================================================================================
+        /// <summary>
+        /// Get the details of a file. Returns null if the file is not found. Path arguments should have no leading slash. (ex ParentFolder/FileName.ext )
+        /// </summary>
+        /// <param name="PathFilename"></param>
+        /// <returns></returns>
+        public abstract FileDetail FileDetails(string PathFilename);
         //
         //==========================================================================================
         /// <summary>

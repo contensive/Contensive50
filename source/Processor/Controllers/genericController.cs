@@ -312,14 +312,14 @@ namespace Contensive.Processor.Controllers {
 
             switch (ApplicationStatus) {
                 case AppConfigModel.AppStatusEnum.ok:
-                tempGetApplicationStatusMessage = "Application OK";
-                break;
+                    tempGetApplicationStatusMessage = "Application OK";
+                    break;
                 case AppConfigModel.AppStatusEnum.maintenance:
-                tempGetApplicationStatusMessage = "Application building";
-                break;
+                    tempGetApplicationStatusMessage = "Application building";
+                    break;
                 default:
-                tempGetApplicationStatusMessage = "Unknown status code [" + ApplicationStatus + "], see trace log for details";
-                break;
+                    tempGetApplicationStatusMessage = "Unknown status code [" + ApplicationStatus + "], see trace log for details";
+                    break;
             }
             return tempGetApplicationStatusMessage;
         }
@@ -1129,6 +1129,18 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         /// <summary>
+        /// Converts the expression to a nullable type
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static int? encodeIntegerNullable(object expression) {
+            if (expression == null) { return null; }
+            if ((expression is string) &&(string.IsNullOrWhiteSpace((string)expression))){ return null; };
+            return encodeInteger(expression);
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
         /// convert an expression from boolean, double, text or date to a double number.
         /// encodeNumber, encodeBoolean, encodeInteger, encodeDate work together with encodeText to be reversable. For example, the outcome matches the input of encodeBolean( encodeText( booleanValue ))
         /// </summary>
@@ -1140,6 +1152,18 @@ namespace Contensive.Processor.Controllers {
             if (double.TryParse(trialString, out double trialDbl)) { return trialDbl; }
             if (bool.TryParse(trialString, out bool trialBool)) { return (trialBool) ? 1 : 0; }
             return 0;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Converts the expression to a nullable type
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
+        public static double? encodeNumberNullable(object expression) {
+            if (expression == null) { return null; }
+            if ((expression is string) && (string.IsNullOrWhiteSpace((string)expression))) { return null; };
+            return encodeNumber(expression);
         }
         //
         //====================================================================================================

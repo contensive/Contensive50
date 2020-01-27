@@ -637,12 +637,12 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // ----- sort values
-                var lookupDict = lookupList.Select((s, i) => new { s, i }).ToDictionary(x => x.i+1, x => x.s);
+                var lookupDict = lookupList.Select((s, i) => new { s, i }).ToDictionary(x => x.i + 1, x => x.s);
                 var sortedLookupDict = lookupDict.OrderBy(x => x.Value);
                 //
                 // ----- select values
-                foreach (KeyValuePair<int,string> lookup in sortedLookupDict) {
-                    if(!string.IsNullOrWhiteSpace(lookup.Value)) {
+                foreach (KeyValuePair<int, string> lookup in sortedLookupDict) {
+                    if (!string.IsNullOrWhiteSpace(lookup.Value)) {
                         string selected = CurrentOneBaseKey.Equals(lookup.Key) ? " selected" : "";
                         FastString.Append("<option value=\"" + lookup.Key + "\"" + selected + ">" + lookup.Value + "</option>");
                     }
@@ -656,8 +656,8 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static string selectFromList(CoreController core, string MenuName, string CurrentValue, List<string> lookups, string NoneCaption, string htmlId, string HtmlClass = "") {
-            int zeroBaseIndex = lookups.FindIndex(x => x.Equals(CurrentValue,StringComparison.InvariantCultureIgnoreCase));
-            return selectFromList(core, MenuName, zeroBaseIndex+1, lookups, NoneCaption, htmlId, HtmlClass);
+            int zeroBaseIndex = lookups.FindIndex(x => x.Equals(CurrentValue, StringComparison.InvariantCultureIgnoreCase));
+            return selectFromList(core, MenuName, zeroBaseIndex + 1, lookups, NoneCaption, htmlId, HtmlClass);
         }
         //
         //====================================================================================================
@@ -927,30 +927,19 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string inputDateTime(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+        public static string inputDate(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
-                // {0:s}
-                // yyyy-MM-dd
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
                 result = "<input type=\"date\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + ((DateTime)htmlValue).ToString("o", CultureInfo.InvariantCulture).Substring(0, 10) + "\"";
                 result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
                 result += (!readOnly) ? "" : " readonly";
                 result += (!disabled) ? "" : " disabled";
                 result += (!required) ? "" : " required";
                 result += ">";
-
-                result += "<input type=\"time\"  name=\"" + HtmlController.encodeHtml(htmlName + "_time") + "\"";
-                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + String.Format("{0:s}", htmlValue) + "\"";
-                result += (!readOnly) ? "" : " readonly";
-                result += (!disabled) ? "" : " disabled";
-                result += ">";
-
-
-
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -958,34 +947,18 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// input for date
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="htmlName"></param>
-        /// <param name="htmlValue"></param>
-        /// <param name="Width"></param>
-        /// <param name="htmlId"></param>
-        /// <param name="htmlClass"></param>
-        /// <param name="readOnly"></param>
-        /// <param name="required"></param>
-        /// <param name="disabled"></param>
-        /// <returns></returns>
-        public static string inputDate(CoreController core, string htmlName, DateTime? htmlValue, string Width = "", string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+        //
+        public static string inputTime(CoreController core, string htmlName, DateTime? htmlValue, string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
-                // {0:s} 
-                // yyyy-MM-dd
-                core.doc.formInputTextCnt += 1;
-                core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
-                string attrList = " type=date name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
-                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) attrList += " value=\"" + encodeDate(htmlValue).ToString("yyyy-MM-dd") + "\"";
-                attrList += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
-                attrList += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
-                attrList += (!readOnly) ? "" : " readonly";
-                attrList += (!disabled) ? "" : " disabled";
-                attrList += (!required) ? "" : " required";
-                return "<input" + attrList + ">";
+                result += "<input type=\"time\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null) && (htmlValue > DateTime.MinValue)) result += " value=\"" + ((DateTime)htmlValue).ToString("o", CultureInfo.InvariantCulture).Substring(11, 12) + "\"";
+                result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += (!required) ? "" : " required";
+                result += ">";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -3668,6 +3641,27 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
+        public static string inputCurrency(CoreController core, string htmlName, Double? htmlValue, string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+            string result = "";
+            try {
+                core.doc.formInputTextCnt += 1;
+                core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
+                result = "<input type=\"number\" step=\"any\" name=\"" + encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null)) result += " value=\"" + encodeNumber(htmlValue).ToString("F2") + "\"";
+                result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += (!required) ? "" : " required";
+                result += ">";
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
         public static string inputNumber(CoreController core, string htmlName, Double? htmlValue, string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
             string result = "";
             try {
@@ -3675,7 +3669,7 @@ namespace Contensive.Processor.Controllers {
                 // yyyy-MM-dd
                 core.doc.formInputTextCnt += 1;
                 core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
-                result = "<input type=\"text\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                result = "<input type=\"number\" step=\"any\"  name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
                 if ((htmlValue != null)) result += " value=\"" + htmlValue + "\"";
                 result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
                 result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
@@ -3688,7 +3682,29 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-
+        //
+        //====================================================================================================
+        //
+        public static string inputInteger(CoreController core, string htmlName, int? htmlValue, string htmlId = "", string htmlClass = "", bool readOnly = false, bool required = false, bool disabled = false) {
+            string result = "";
+            try {
+                // {0:s}
+                // yyyy-MM-dd
+                core.doc.formInputTextCnt += 1;
+                core.doc.inputDateCnt = core.doc.inputDateCnt + 1;
+                result = "<input type=\"number\" step=\"1\" name=\"" + HtmlController.encodeHtml(htmlName) + "\"";
+                if ((htmlValue != null)) result += " value=\"" + htmlValue + "\"";
+                result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+                result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+                result += (!readOnly) ? "" : " readonly";
+                result += (!disabled) ? "" : " disabled";
+                result += (!required) ? "" : " required";
+                result += ">";
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+            }
+            return result;
+        }
         //
         // ====================================================================================================
         //
@@ -3703,6 +3719,33 @@ namespace Contensive.Processor.Controllers {
                     + "</div>";
             }
             return string.Empty;
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string scriptCode(CoreController core, string code) {
+            try {
+                if (string.IsNullOrWhiteSpace(code)) { return string.Empty; }
+                return ""
+                    + "\n<script>"
+                    + "\n" + code
+                    + "\n</script>";
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string script(CoreController core, string src) {
+            try {
+                if (string.IsNullOrWhiteSpace(src)) { return string.Empty; }
+                return "<script src=\"" + src + "\"></script>";
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                return string.Empty;
+            }
         }
     }
 }

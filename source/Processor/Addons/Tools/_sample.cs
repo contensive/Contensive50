@@ -86,8 +86,8 @@ namespace Contensive.Processor.Addons.Tools {
                 //
                 resultForm.Append(HtmlController.inputHidden(rnAdminSourceForm, AdminFormSecurityControl));
                 bool isEmptyList = false;
-                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_lookupContent(core, "countryId", countryId, ContentMetadataModel.getContentId(core, "countries"), ref isEmptyList, false, "", "", false, "")));
-                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
+                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIEditorController.getLookupContentEditor(core, "countryId", countryId, ContentMetadataModel.getContentId(core, "countries"), ref isEmptyList, false, "", "", false, "")));
+                resultForm.Append(AdminUIController.getToolFormInputRow(core, "Caption", AdminUIEditorController.getTextEditor(core, "PageSize", PageSize.ToString())));
                 //
                 // -- assemble form
                 result = AdminUIController.getToolForm(core, resultForm.ToString(), String.Join(",", buttonList));

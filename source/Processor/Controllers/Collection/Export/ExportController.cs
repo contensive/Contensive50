@@ -16,10 +16,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <param name="collectionId"></param>
         /// <returns></returns>
-        public static string createCollectionZip_returnCdnPathFilename(CPBaseClass cp, int collectionId) {
+        public static string createCollectionZip_returnCdnPathFilename(CPBaseClass cp, AddonCollectionModel collection) {
             string cdnExportZip_Filename = "";
             try {
-                AddonCollectionModel collection = DbBaseModel.create<AddonCollectionModel>(cp, collectionId);
                 if ((collection == null)) {
                     // 
                     // -- exit with error
@@ -27,7 +26,7 @@ namespace Contensive.Processor.Controllers {
                     return string.Empty;
                 }
                 using (CPCSBaseClass CS = cp.CSNew()) {
-                    CS.OpenRecord("Add-on Collections", collectionId);
+                    CS.OpenRecord("Add-on Collections", collection.id);
                     if (!CS.OK()) {
                         // 
                         // -- exit with error
@@ -79,7 +78,7 @@ namespace Contensive.Processor.Controllers {
                     string IncludeSharedStyleGuidList = "";
                     string IncludeModuleGuidList = "";
                     using (CPCSBaseClass CS2 = cp.CSNew()) {
-                        CS2.Open("Add-ons", "collectionid=" + collectionId, "name", true, "id");
+                        CS2.Open("Add-ons", "collectionid=" + collection.id, "name", true, "id");
                         while (CS2.OK()) {
                             collectionXml += ExportAddonController.getAddonNode(cp, CS2.GetInteger("id"), ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
                             CS2.GoNext();
@@ -96,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                     collectionXml += ExportDataRecordController.getNodeList(cp, DataRecordList, tempPathFileList, tempExportPath);
                     // 
                     // CDef
-                    foreach (Contensive.Models.Db.ContentModel content in createListFromCollection(cp, collectionId)) {
+                    foreach (Contensive.Models.Db.ContentModel content in createListFromCollection(cp, collection.id)) {
                         if ((string.IsNullOrEmpty(content.ccguid))) {
                             content.ccguid = cp.Utils.CreateGuid();
                             content.save(cp);
@@ -167,7 +166,7 @@ namespace Contensive.Processor.Controllers {
                     if (true) {
                         string Node = "";
                         using (CPCSBaseClass CS3 = cp.CSNew()) {
-                            if (CS3.Open("Add-on Collection Parent Rules", "parentid=" + collectionId)) {
+                            if (CS3.Open("Add-on Collection Parent Rules", "parentid=" + collection.id)) {
                                 do {
                                     using (CPCSBaseClass CS2 = cp.CSNew()) {
                                         if (CS2.OpenRecord("Add-on Collections", CS3.GetInteger("childid"))) {

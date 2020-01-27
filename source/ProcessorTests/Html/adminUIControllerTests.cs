@@ -14,12 +14,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //====================================================================================================
     //
     [TestClass()]
-    public class adminUIControllerTests {
-        [TestMethod]
+    public class AdminUIControllerTests {
         //
         //====================================================================================================
         // todo - write out tests
-        public void Controllers_Addon_blank()  {
+        [TestMethod]
+        public void controllers_Addon_blank()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act

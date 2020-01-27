@@ -93,6 +93,15 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Create a unique folder. Return the folder in path form (Path arguments have a trailing slash but no leading slash)
+        /// </summary>
+        /// <returns></returns>
+        public override string CreateUniqueFolder() {
+            return fileSystemController.createUniquePath();
+        }
+        //
+        //==========================================================================================
         public override void DeleteFile(string filename) {
             fileSystemController.deleteFile(filename);
         }
@@ -125,6 +134,11 @@ namespace Contensive.Processor {
         //==========================================================================================
         public override bool FolderExists(string folderName) {
             return fileSystemController.pathExists(folderName);
+        }
+        //
+        //==========================================================================================
+        public override FileDetail FileDetails(string PathFilename) {
+            return fileSystemController.getFileDetails(PathFilename);
         }
         //
         //==========================================================================================

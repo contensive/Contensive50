@@ -75,9 +75,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                             // ----- Whats New Expiration
                             //
                             if (editRecord.userReadOnly) {
-                                HTMLFieldString = AdminUIController.getDefaultEditor_dateTime(core, "ContentWatchExpires", adminData.contentWatchExpires, true, "", false, "");
+                                HTMLFieldString = AdminUIEditorController.getDateTimeEditor(core, "ContentWatchExpires", adminData.contentWatchExpires, true, "", false, "");
                             } else {
-                                HTMLFieldString = AdminUIController.getDefaultEditor_dateTime(core, "ContentWatchExpires", adminData.contentWatchExpires, false, "", false, "");
+                                HTMLFieldString = AdminUIEditorController.getDateTimeEditor(core, "ContentWatchExpires", adminData.contentWatchExpires, false, "", false, "");
                             }
                             FastString.add(AdminUIController.getEditRowLegacy(core, HTMLFieldString, "Expires", "When this record is included in a What's New list, this record is blocked from the list after this date.", false, false, ""));
                             //

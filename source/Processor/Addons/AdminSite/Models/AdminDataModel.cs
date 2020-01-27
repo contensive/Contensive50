@@ -58,21 +58,9 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// Used within Admin site to create fancyBox popups
-        /// </summary>
-        public bool includeFancyBox { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// 
         /// </summary>
         public int fancyBoxPtr { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// 
-        /// </summary>
-        public string fancyBoxHeadJS { get; set; }
         //
         //====================================================================================================
         /// <summary>

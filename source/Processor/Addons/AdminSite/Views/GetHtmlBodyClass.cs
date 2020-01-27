@@ -421,15 +421,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         adminBody = FormRoot.getForm_Root(cp.core);
                     }
                     //
-                    // include fancybox if it was needed
-                    if (adminData.includeFancyBox) {
-                        cp.core.addon.executeDependency(DbBaseModel.create<AddonModel>(cp, addonGuidjQueryFancyBox), new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
-                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextAdmin,
-                            errorContextMessage = "adding fancybox dependency in Admin"
-                        });
-                        cp.core.html.addScriptCode_onLoad(adminData.fancyBoxHeadJS, "");
-                    }
-                    //
                     // add user errors
                     if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                         adminBody = HtmlController.div(Processor.Controllers.ErrorController.getUserError(cp.core), "ccAdminMsg") + adminBody;

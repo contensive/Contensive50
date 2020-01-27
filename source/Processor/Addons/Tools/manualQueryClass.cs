@@ -173,13 +173,13 @@ namespace Contensive.Processor.Addons.Tools {
                     } else {
                         core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                     }
-                    Stream.add(AdminUIController.getDefaultEditor_TextArea(core, "SQL", SQL, false, "SQL",false));
+                    Stream.add(AdminUIEditorController.GetHtmlCodeEditor(core, "SQL", SQL, false, "SQL",false));
                     Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 }
                 //
                 // -- data source
                 bool isEmptyList = false;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIController.getDefaultEditor_lookupContent(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList, false, "", "", false, "")));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Data Source", AdminUIEditorController.getLookupContentEditor(core, "DataSourceID", datasource.id, ContentMetadataModel.getContentId(core, "data sources"), ref isEmptyList, false, "", "", false, "")));
                 {
                     //
                     // -- sql list
@@ -190,22 +190,22 @@ namespace Contensive.Processor.Addons.Tools {
                         lookupList.Add( sql );
                     }
 
-                    string inputSelect = AdminUIController.getDefaultEditor_lookupList(core, "SQLList", "0" , lookupList,false, "SQLList","",false);
+                    string inputSelect = AdminUIEditorController.getLookupListEditor(core, "SQLList", "0" , lookupList,false, "SQLList","",false);
                     inputSelect = inputSelect.Replace("<select ", "<select onChange=\"SQL.value=SQLList.value\" ");
                     Stream.add(AdminUIController.getToolFormInputRow(core, "Previous Queries", inputSelect));
                 }
                 //
                 // -- page size
                 if (isNull(PageSize)) PageSize = 100;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIController.getDefaultEditor_text(core, "PageSize", PageSize.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIEditorController.getTextEditor(core, "PageSize", PageSize.ToString())));
                 //
                 // -- page number
                 if (isNull(PageNumber)) PageNumber = 1;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIController.getDefaultEditor_text(core, "PageNumber", PageNumber.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIEditorController.getTextEditor(core, "PageNumber", PageNumber.ToString())));
                 //
                 // -- timeout
                 if (isNull(Timeout)) Timeout = 30;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIController.getDefaultEditor_text(core, "Timeout", Timeout.ToString())));
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Timeout (sec)", AdminUIEditorController.getTextEditor(core, "Timeout", Timeout.ToString())));
                 //
                 // -- assemble form
                 returnHtml = AdminUIController.getToolForm(core, Stream.text, ButtonCancel + "," + ButtonRun);

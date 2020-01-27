@@ -58,30 +58,30 @@ namespace Contensive.BaseClasses {
         /// Create an input for an integer field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetIntegerEditor(string htmlName, int htmlValue, string htmlId, bool readOnly, bool required);
-        public abstract string GetIntegerEditor(string htmlName, int htmlValue, string htmlId, bool readOnly);
-        public abstract string GetIntegerEditor(string htmlName, int htmlValue, string htmlId);
-        public abstract string GetIntegerEditor(string htmlName, int htmlValue);
+        public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required);
+        public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly);
+        public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId);
+        public abstract string GetIntegerEditor(string htmlName, int? htmlValue);
         //
         //==========================================================================================
         /// <summary>
         /// Create an input for a number field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetNumberEditor(string htmlName, double htmlValue, string htmlId, bool readOnly, bool required);
-        public abstract string GetNumberEditor(string htmlName, double htmlValue, string htmlId, bool readOnly);
-        public abstract string GetNumberEditor(string htmlName, double htmlValue, string htmlId);
-        public abstract string GetNumberEditor(string htmlName, double htmlValue);
+        public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly, bool required);
+        public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly);
+        public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId);
+        public abstract string GetNumberEditor(string htmlName, double? htmlValue);
         //
         //==========================================================================================
         /// <summary>
         /// Create an input for a datetime field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId, bool readOnly, bool required);
-        public abstract string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId, bool readOnly);
-        public abstract string GetDateTimeEditor(string htmlName, DateTime htmlValue, string htmlId);
-        public abstract string GetDateTimeEditor(string htmlName, DateTime htmlValue);
+        public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required);
+        public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly);
+        public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId);
+        public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue);
         //
         //==========================================================================================
         /// <summary>
