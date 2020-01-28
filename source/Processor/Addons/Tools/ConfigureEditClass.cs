@@ -210,8 +210,17 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 //
                 //   Print Output
+                string description = ""
+                    + HtmlController.p( "Use this tool to add or modify content definition fields and the underlying sql table fields.")
+                    + ((ContentId.Equals(0)) ? "" : ""
+                        + HtmlController.ul(""
+                            + HtmlController.li(HtmlController.a("Edit Content", "?aa=0&cid=3&id=" + ContentId + "&tx=&ad=0&asf=1&af=4", "nav-link btn btn-primary"), "nav-item mr-1")
+                            + HtmlController.li(HtmlController.a("Edit Records", "?cid=" + ContentId, "nav-link btn btn-primary"), "nav-item mr-1")
+                            + HtmlController.li(HtmlController.a("Select Different Fields", "?af=105", "nav-link btn btn-primary"), "nav-item mr-1")
+                            , "nav")
+                    );
                 StringBuilderLegacyController Stream = new StringBuilderLegacyController();
-                Stream.add(AdminUIController.getHeaderTitleDescription("Manage Admin Edit Fields", "Use this tool to add or modify content definition fields. Contensive uses a caching system for content definitions that is not automatically reloaded. Change you make will not take effect until the next time the system is reloaded. When you create a new field, the database field is created automatically when you have saved both a name and a field type. If you change the field type, you may have to manually change the database field."));
+                Stream.add(AdminUIController.getHeaderTitleDescription("Manage Admin Edit Fields", description));
                 //
                 // -- status of last operation
                 if (!string.IsNullOrEmpty(StatusMessage)) {
@@ -230,7 +239,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // content tables that have edit forms to Configure
                     bool isEmptyList = false;
-                    Stream.add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIEditorController.getLookupContentEditor(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList,false,"","",false,"")));
+                    Stream.add(AdminUIController.getToolFormInputRow(core, "Select a Content Definition to Configure", AdminUIEditorController.getLookupContentEditor(core, RequestNameToolContentId, ContentId, ContentMetadataModel.getContentId(core, "Content"), ref isEmptyList, false, "", "", false, "")));
                 } else {
                     //
                     // Configure edit form

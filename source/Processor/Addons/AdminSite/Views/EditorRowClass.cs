@@ -12,7 +12,7 @@ using System.Linq;
 namespace Contensive.Processor.Addons.AdminSite {
     public static class EditorRowClass {
         public static string getEditorRow(CoreController core, ContentFieldMetadataModel field, AdminDataModel adminData, EditorEnvironmentModel editorEnv) {
-            string WhyReadOnlyMsg = "";
+            string whyReadOnlyMsg = "";
             Models.EditRecordModel editRecord = adminData.editRecord;
             object fieldValueObject = editRecord.fieldsLc[field.nameLc].value;
             string fieldValue_text = encodeText(fieldValueObject);
@@ -43,7 +43,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             // if active, it is read only -- if inactive, let them set it active.
                             fieldForceReadOnly = encodeBoolean(fieldValueObject);
                             if (fieldForceReadOnly) {
-                                WhyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
+                                whyReadOnlyMsg = "&nbsp;(disabled because you can not mark the landing page inactive)";
                             }
                             break;
                         }
@@ -56,14 +56,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                             //
                             // These fields are read only on landing pages
                             fieldForceReadOnly = true;
-                            WhyReadOnlyMsg = "&nbsp;(disabled for the landing page)";
+                            whyReadOnlyMsg = "&nbsp;(disabled for the landing page)";
                             break;
                         }
                     case "allowinmenus":
                     case "allowinchildlists": {
                             fieldValueObject = "1";
                             fieldForceReadOnly = true;
-                            WhyReadOnlyMsg = "&nbsp;(disabled for root pages)";
+                            whyReadOnlyMsg = "&nbsp;(disabled for root pages)";
                         }
                         break;
                     default: {
@@ -186,8 +186,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // ----- Display fields as read only
                     //--------------------------------------------------------------------------------------------
                     //
-                    if (!string.IsNullOrEmpty(WhyReadOnlyMsg)) {
-                        WhyReadOnlyMsg = "<span class=\"ccDisabledReason\">" + WhyReadOnlyMsg + "</span>";
+                    if (!string.IsNullOrEmpty(whyReadOnlyMsg)) {
+                        whyReadOnlyMsg = "<span class=\"ccDisabledReason\">" + whyReadOnlyMsg + "</span>";
                     }
                     switch (field.fieldTypeId) {
                         case CPContentBaseClass.FieldTypeIdEnum.Text:
@@ -210,10 +210,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- Lookup, readonly
                                 if (field.lookupContentId != 0) {
-                                    EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, "");
+                                    EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else if (field.lookupList != "") {
-                                    EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), editorReadOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else {
                                     //
@@ -227,21 +227,21 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- date, readonly
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                                 //
                                 // ----- Member Select ReadOnly
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 //
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
                                 //
                                 //   Placeholder
-                                EditorString = AdminUIEditorController.getManyToManyEditor(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getManyToManyEditor(core, field, "field" + field.id, fieldValue_text, editRecord.id, editorReadOnly, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Currency: {
@@ -321,7 +321,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
                                     EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + Processor.Constants.SpanClassAdminSmall + "[" + filename + "]</A>");
                                 }
-                                EditorString += WhyReadOnlyMsg;
+                                EditorString += whyReadOnlyMsg;
                                 //
                                 break;
                             }
@@ -387,10 +387,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- Lookup
                                 if (field.lookupContentId != 0) {
-                                    EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required, "");
+                                    EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else if (field.lookupList != "") {
-                                    EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), field.readOnly, fieldHtmlId, WhyReadOnlyMsg, field.required);
+                                    EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                 } else {
                                     //
@@ -404,41 +404,41 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- Date
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                                 //
                                 // ----- Member Select
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
                                 //
                                 //   Placeholder
-                                EditorString = AdminUIEditorController.getManyToManyEditor(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getManyToManyEditor(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.File:
                         case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
                                 //
                                 // ----- File
-                                EditorString = AdminUIEditorController.getFileEditor(core, field.nameLc, "field" + field.id, field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getFileEditor(core, field.nameLc, fieldValue_text, field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Currency: {
                                 //
                                 // ----- currency
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString += AdminUIEditorController.getCurrencyEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString += AdminUIEditorController.getCurrencyEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Float: {
                                 //
                                 // ----- double/number/float
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString += AdminUIEditorController.getNumberEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, WhyReadOnlyMsg);
+                                EditorString += AdminUIEditorController.getNumberEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
