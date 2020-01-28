@@ -8,6 +8,8 @@ using Contensive.Processor.Models.Domain;
 using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
 using System.Globalization;
+using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -84,21 +86,10 @@ namespace Contensive.Processor.Controllers {
         /// email address must have at least one character before the @, and have a valid email domain
         /// </summary>
         public static bool verifyEmailAddress(CoreController core, string EmailAddress) {
-            bool result = false;
-            try {
-                if (!string.IsNullOrWhiteSpace(EmailAddress)) {
-                    string[] SplitArray = null;
-                    if (EmailAddress.IndexOf("@") > 0) {
-                        SplitArray = EmailAddress.Split('@');
-                        if (SplitArray.GetUpperBound(0) == 1) {
-                            result = verifyEmailDomain(core, SplitArray[1]);
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-            return result;
+            if (string.IsNullOrWhiteSpace(EmailAddress)) { return false;  }
+            var EmailParts = new System.Net.Mail.MailAddress(EmailAddress);
+            var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", RegexOptions.Compiled);
+            return emailRegex.IsMatch(EmailParts.Address);
         }
         //
         //====================================================================================================
@@ -171,7 +162,7 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         }
                     }
-                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "" );
+                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "");
                     string textBody = encodeEmailTextBody(core, isHTML, body, null);
                     queueEmail(core, isImmediate, emailContextMessage, new EmailClass {
                         attempts = 0,
@@ -347,19 +338,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="additionalMemberID"></param>
         /// <returns>Admin message if something went wrong (email addresses checked, etc.</returns>
         public static bool queueSystemEmail(CoreController core, string emailName, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
-            if (!String.IsNullOrEmpty(emailName))
-            {
+            if (!String.IsNullOrEmpty(emailName)) {
                 SystemEmailModel email = DbBaseModel.createByUniqueName<SystemEmailModel>(core.cpParent, emailName);
-                if (email == null)
-                {
-                    if (emailName.isNumeric())
-                    {
+                if (email == null) {
+                    if (emailName.isNumeric()) {
                         //
                         // -- compatibility for really ugly legacy nonsense where old interface has argument "EmailIdOrName".
                         email = DbBaseModel.create<SystemEmailModel>(core.cpParent, GenericController.encodeInteger(emailName));
                     }
-                    if (email == null)
-                    {
+                    if (email == null) {
                         //
                         // -- create new system email with this name - exposure of possible integer used as name
                         email = DbBaseModel.addDefault<SystemEmailModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, SystemEmailModel.tableMetadata.contentName));
@@ -371,9 +358,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 return queueSystemEmail(core, email, appendedCopy, additionalMemberID, ref userErrorMessage);
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
@@ -888,8 +873,8 @@ namespace Contensive.Processor.Controllers {
                     bool sendSuccess = false;
                     int emailDropId = 0;
                     EmailClass emailData = DeserializeObject<EmailClass>(queueRecord.content);
-                    List<EmailDropModel> DropList = DbBaseModel.createList<EmailDropModel>(core.cpParent, "(emailId=" + emailData.emailId + ")","id desc");
-                    if ( DropList.Count>0 ) {
+                    List<EmailDropModel> DropList = DbBaseModel.createList<EmailDropModel>(core.cpParent, "(emailId=" + emailData.emailId + ")", "id desc");
+                    if (DropList.Count > 0) {
                         emailDropId = DropList.First().id;
                     }
                     string reasonForFail = "";
@@ -976,7 +961,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="body"></param>
         /// <returns></returns>
         public static string encodeEmailTextBody(CoreController core, bool isHTML, string body, PersonModel recipient) {
-            int recipientId = ( recipient == null ) ? 0 : recipient.id;
+            int recipientId = (recipient == null) ? 0 : recipient.id;
             //
             // -- body
             if (!string.IsNullOrWhiteSpace(body)) {
@@ -989,7 +974,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- isHtml, if the body includes an html tag, this is the entire body, just send it
                 try {
-                    return HtmlController.convertHtmlToText( core,body);
+                    return HtmlController.convertHtmlToText(core, body);
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text body from full html.");
                     return string.Empty;
@@ -998,7 +983,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- isHtml but no body tag, add an html wrapper
                 try {
-                    return HtmlController.convertHtmlToText( core,"<body>" + body + "</body>");
+                    return HtmlController.convertHtmlToText(core, "<body>" + body + "</body>");
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text body from html body.");
                     return string.Empty;
@@ -1030,12 +1015,12 @@ namespace Contensive.Processor.Controllers {
                 subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
                 subject = GenericController.convertLinksToAbsolute(subject, rootUrl);
                 try {
-                    subject = HtmlController.convertHtmlToText( core,"<body>" + subject + "</body>");
+                    subject = HtmlController.convertHtmlToText(core, "<body>" + subject + "</body>");
                 } catch (Exception ex) {
                     LogController.logError(core, ex, "Nuglify error while creating text subject line.");
                     subject = string.Empty;
                 }
-                if ( subject == null ) { subject = string.Empty; }
+                if (subject == null) { subject = string.Empty; }
                 subject = subject.Trim();
             }
             //
@@ -1048,7 +1033,7 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- encode and merge template
-            if(!string.IsNullOrWhiteSpace(template)) {
+            if (!string.IsNullOrWhiteSpace(template)) {
                 //
                 // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
                 template = ActiveContentController.processWysiwygResponseForSave(core, template);

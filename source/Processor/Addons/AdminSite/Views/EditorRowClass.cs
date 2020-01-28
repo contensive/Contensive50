@@ -105,10 +105,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 core.docProperties.setProperty("editorReadOnly", editorReadOnly);
                 core.docProperties.setProperty("editorWidth", "");
                 core.docProperties.setProperty("editorHeight", "");
-                if (GenericController.encodeBoolean((field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.HTML)
-                    || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.HTMLCode)
-                    || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileHTML)
-                    || (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode))) {
+                if (field.fieldTypeId.isOneOf(CPContentBaseClass.FieldTypeIdEnum.HTML, CPContentBaseClass.FieldTypeIdEnum.HTMLCode, CPContentBaseClass.FieldTypeIdEnum.FileHTML, CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode)) {
                     //
                     // include html related arguments
                     core.docProperties.setProperty("editorAllowActiveContent", "1");
@@ -467,7 +464,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Resource Link (src value)
                                 //
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getLinkEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId,field.required);
+                                EditorString = AdminUIEditorController.getLinkEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId, field.required);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
@@ -479,7 +476,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: { 
+                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
                                 //
                                 // content is html
                                 editorEnv.formFieldList += "," + field.nameLc;

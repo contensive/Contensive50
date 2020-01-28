@@ -3,10 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
 public static class ExtensionMethods {
+    //
+    //====================================================================================================
+    //
+    public static bool isOneOf(this object item, params object[] options) {
+        return options.Contains(item);
+    }
     //
     //====================================================================================================
     //
