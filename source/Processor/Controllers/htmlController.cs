@@ -969,15 +969,20 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// HTML Form file upload input
         /// </summary>
-        /// <param name="TagName"></param>
+        /// <param name="htmlName"></param>
         /// <param name="htmlId"></param>
-        /// <param name="HtmlClass"></param>
+        /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public string inputFile(string TagName, string htmlId = "", string HtmlClass = "") {
-            //
-            return "<input TYPE=\"file\" name=\"" + TagName + "\" id=\"" + htmlId + "\" class=\"" + HtmlClass + "\">";
-            //
+        public static string inputFile(string htmlName, string htmlId, string htmlClass) {
+            string result = "<input type=\"file\" name=\"" + htmlName + "\"";
+            result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
+            result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
+            return result + ">";
         }
+        //
+        public static string inputFile(string htmlName, string htmlId) => inputFile(htmlName, htmlId, "");
+        //
+        public static string inputFile(string htmlName) => inputFile(htmlName, "", "");
         //
         //====================================================================================================
         /// <summary>
@@ -989,7 +994,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="htmlClass"></param>
         /// <returns></returns>
-        public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId, string htmlClass) {
+        public static string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId, string htmlClass) {
             string result = "<input type=radio name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
             result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
             result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
@@ -997,11 +1002,11 @@ namespace Contensive.Processor.Controllers {
             return result + ">";
         }
         //
-        public string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
+        public static string inputRadio(string htmlName, string htmlValue, string CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
         //
-        public string inputRadio(string htmlName, string htmlValue, string CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
+        public static string inputRadio(string htmlName, string htmlValue, string CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
         //
-        public string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId, string htmlClass) {
+        public static string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId, string htmlClass) {
             string result = "<input type=radio name=\"" + htmlName + "\" value=\"" + htmlValue + "\"";
             result += (string.IsNullOrEmpty(htmlId)) ? "" : " id=\"" + htmlId + "\"";
             result += (string.IsNullOrEmpty(htmlClass)) ? "" : " class=\"" + htmlClass + "\"";
@@ -1009,9 +1014,9 @@ namespace Contensive.Processor.Controllers {
             return result + ">";
         }
         //
-        public string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
+        public static string inputRadio(string htmlName, int htmlValue, int CurrentValue, string htmlId) => inputRadio(htmlName, htmlValue, CurrentValue, htmlId, "");
         //
-        public string inputRadio(string htmlName, int htmlValue, int CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
+        public static string inputRadio(string htmlName, int htmlValue, int CurrentValue) => inputRadio(htmlName, htmlValue, CurrentValue, "", "");
         //
         //====================================================================================================
         //
@@ -1311,7 +1316,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentType"></param>
         /// <returns></returns>
-        public string getWysiwygAddonList(BaseClasses.CPHtml5BaseClass.EditorContentType contentType) {
+        public string getWysiwygAddonList(CPHtml5BaseClass.EditorContentType contentType) {
             string result = "";
             try {
                 if (core.doc.wysiwygAddonList.ContainsKey(contentType)) {
@@ -3249,11 +3254,11 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string genericBlockTag(string TagName, string InnerHtml) => genericBlockTag(TagName, InnerHtml, "", "", "");
+        public static string genericBlockTag(string TagName, string InnerHtml) => genericBlockTag(TagName, InnerHtml, "", "", "", "");
         //
-        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass) => genericBlockTag(TagName, InnerHtml, HtmlClass, "", "");
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass) => genericBlockTag(TagName, InnerHtml, HtmlClass, "", "", "");
         //
-        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId) => genericBlockTag(TagName, InnerHtml, HtmlClass, HtmlId, "");
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId) => genericBlockTag(TagName, InnerHtml, HtmlClass, HtmlId, "", "");
         //
         //====================================================================================================
         /// <summary>
@@ -3265,12 +3270,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="HtmlClass"></param>
         /// <param name="HtmlId"></param>
         /// <returns></returns>
-        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId, string HtmlName) {
+        public static string genericBlockTag(string TagName, string InnerHtml, string HtmlClass, string HtmlId, string HtmlName, string inlineStyle) {
             var result = new StringBuilder("<");
             result.Append(TagName.Trim());
             result.Append(!string.IsNullOrEmpty(HtmlName) ? " name=\"" + HtmlName + "\"" : "");
             result.Append(!string.IsNullOrEmpty(HtmlClass) ? " class=\"" + HtmlClass + "\"" : "");
             result.Append(!string.IsNullOrEmpty(HtmlId) ? " id=\"" + HtmlId + "\"" : "");
+            result.Append(!string.IsNullOrEmpty(inlineStyle) ? " style=\"" + inlineStyle + "\"" : "");
             result.Append(">");
             result.Append(InnerHtml);
             result.Append("</");
@@ -3281,99 +3287,111 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string li(string innerHtml) => genericBlockTag("li", innerHtml);
+        public static string li(string innerHtml) => genericBlockTag("li", innerHtml, "", "", "", "");
         //
-        public static string li(string innerHtml, string htmlClass) => genericBlockTag("li", innerHtml, htmlClass, "");
+        public static string li(string innerHtml, string htmlClass) => genericBlockTag("li", innerHtml, htmlClass, "", "", "");
         //
-        public static string li(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("li", innerHtml, htmlClass, htmlId);
+        public static string li(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("li", innerHtml, htmlClass, htmlId, "", "");
         //
-        //====================================================================================================
-        //
-        public static string ol(string innerHtml) => genericBlockTag("ol", innerHtml);
-        //
-        public static string ol(string innerHtml, string htmlClass) => genericBlockTag("ol", innerHtml, htmlClass);
-        //
-        public static string ol(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ol", innerHtml, htmlClass, htmlId);
+        public static string li(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("li", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string ul(string innerHtml) => genericBlockTag("ul", innerHtml, "", "", "");
+        public static string ol(string innerHtml) => genericBlockTag("ol", innerHtml, "", "", "", "");
         //
-        public static string ul(string innerHtml, string htmlClass) => genericBlockTag("ul", innerHtml, htmlClass);
+        public static string ol(string innerHtml, string htmlClass) => genericBlockTag("ol", innerHtml, htmlClass, "", "", "");
         //
-        public static string ul(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ul", innerHtml, htmlClass, htmlId);
+        public static string ol(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ol", innerHtml, htmlClass, htmlId, "", "");
         //
-        //====================================================================================================
-        //
-        public static string section(string innerHtml) => genericBlockTag("section", innerHtml);
-        //
-        public static string section(string innerHtml, string htmlClass) => genericBlockTag("section", innerHtml, htmlClass);
-        //
-        public static string section(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("section", innerHtml, htmlClass, htmlId);
+        public static string ol(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("ol", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string div(string innerHtml) => genericBlockTag("div", innerHtml);
+        public static string ul(string innerHtml) => genericBlockTag("ul", innerHtml, "", "", "", "");
         //
-        public static string div(string innerHtml, string htmlClass) => genericBlockTag("div", innerHtml, htmlClass);
+        public static string ul(string innerHtml, string htmlClass) => genericBlockTag("ul", innerHtml, htmlClass, "", "", "");
         //
-        public static string div(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("div", innerHtml, htmlClass, htmlId);
+        public static string ul(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("ul", innerHtml, htmlClass, htmlId, "", "");
         //
-        //====================================================================================================
-        //
-        public static string p(string innerHtml) => genericBlockTag("p", innerHtml, "", "", "");
-        //
-        public static string p(string innerHtml, string htmlClass) => genericBlockTag("p", innerHtml, htmlClass, "", "");
-        //
-        public static string p(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("p", innerHtml, htmlClass, htmlId, "");
+        public static string ul(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("ul", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string h1(string innerHtml) => genericBlockTag("h1", innerHtml, "", "", "");
+        public static string section(string innerHtml) => genericBlockTag("section", innerHtml, "", "", "", "");
         //
-        public static string h1(string innerHtml, string htmlClass) => genericBlockTag("h1", innerHtml, htmlClass, "", "");
+        public static string section(string innerHtml, string htmlClass) => genericBlockTag("section", innerHtml, htmlClass, "", "", "");
         //
-        public static string h1(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h1", innerHtml, htmlClass, htmlId, "");
+        public static string section(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("section", innerHtml, htmlClass, htmlId, "", "");
         //
-        //====================================================================================================
-        //
-        public static string h2(string innerHtml) => genericBlockTag("h2", innerHtml, "", "", "");
-        //
-        public static string h2(string innerHtml, string htmlClass) => genericBlockTag("h2", innerHtml, htmlClass, "", "");
-        //
-        public static string h2(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h2", innerHtml, htmlClass, htmlId, "");
+        public static string section(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("section", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string h3(string innerHtml) => genericBlockTag("h3", innerHtml, "", "", "");
+        public static string div(string innerHtml) => genericBlockTag("div", innerHtml, "", "", "", "");
         //
-        public static string h3(string innerHtml, string htmlClass) => genericBlockTag("h3", innerHtml, htmlClass, "", "");
+        public static string div(string innerHtml, string htmlClass) => genericBlockTag("div", innerHtml, htmlClass, "", "", "");
         //
-        public static string h3(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h3", innerHtml, htmlClass, htmlId, "");
+        public static string div(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("div", innerHtml, htmlClass, htmlId, "", "");
         //
-        //====================================================================================================
-        //
-        public static string h4(string innerHtml) => genericBlockTag("h4", innerHtml, "", "", "");
-        //
-        public static string h4(string innerHtml, string htmlClass) => genericBlockTag("h4", innerHtml, htmlClass, "", "");
-        //
-        public static string h4(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h4", innerHtml, htmlClass, htmlId, "");
+        public static string div(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("div", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string h5(string innerHtml) => genericBlockTag("h5", innerHtml, "", "", "");
+        public static string p(string innerHtml) => genericBlockTag("p", innerHtml, "", "", "", "");
         //
-        public static string h5(string innerHtml, string htmlClass) => genericBlockTag("h5", innerHtml, htmlClass, "", "");
+        public static string p(string innerHtml, string htmlClass) => genericBlockTag("p", innerHtml, htmlClass, "", "", "");
         //
-        public static string h5(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h5", innerHtml, htmlClass, htmlId, "");
+        public static string p(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("p", innerHtml, htmlClass, htmlId, "", "");
+        //
+        public static string p(string innerHtml, string htmlClass, string htmlId, string style) => genericBlockTag("p", innerHtml, htmlClass, htmlId, "", style);
         //
         //====================================================================================================
         //
-        public static string h6(string innerHtml) => genericBlockTag("h6", innerHtml, "", "", "");
+        public static string h1(string innerHtml) => genericBlockTag("h1", innerHtml, "", "", "", "");
         //
-        public static string h6(string innerHtml, string htmlClass) => genericBlockTag("h6", innerHtml, htmlClass, "", "");
+        public static string h1(string innerHtml, string htmlClass) => genericBlockTag("h1", innerHtml, htmlClass, "", "", "");
         //
-        public static string h6(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h6", innerHtml, htmlClass, htmlId, "");
+        public static string h1(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h1", innerHtml, htmlClass, htmlId, "", "");
+        //
+        //====================================================================================================
+        //
+        public static string h2(string innerHtml) => genericBlockTag("h2", innerHtml, "", "", "", "");
+        //
+        public static string h2(string innerHtml, string htmlClass) => genericBlockTag("h2", innerHtml, htmlClass, "", "", "");
+        //
+        public static string h2(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h2", innerHtml, htmlClass, htmlId, "", "");
+        //
+        //====================================================================================================
+        //
+        public static string h3(string innerHtml) => genericBlockTag("h3", innerHtml, "", "", "", "");
+        //
+        public static string h3(string innerHtml, string htmlClass) => genericBlockTag("h3", innerHtml, htmlClass, "", "", "");
+        //
+        public static string h3(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h3", innerHtml, htmlClass, htmlId, "", "");
+        //
+        //====================================================================================================
+        //
+        public static string h4(string innerHtml) => genericBlockTag("h4", innerHtml, "", "", "", "");
+        //
+        public static string h4(string innerHtml, string htmlClass) => genericBlockTag("h4", innerHtml, htmlClass, "", "", "");
+        //
+        public static string h4(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h4", innerHtml, htmlClass, htmlId, "", "");
+        //
+        //====================================================================================================
+        //
+        public static string h5(string innerHtml) => genericBlockTag("h5", innerHtml, "", "", "", "");
+        //
+        public static string h5(string innerHtml, string htmlClass) => genericBlockTag("h5", innerHtml, htmlClass, "", "", "");
+        //
+        public static string h5(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h5", innerHtml, htmlClass, htmlId, "", "");
+        //
+        //====================================================================================================
+        //
+        public static string h6(string innerHtml) => genericBlockTag("h6", innerHtml, "", "", "", "");
+        //
+        public static string h6(string innerHtml, string htmlClass) => genericBlockTag("h6", innerHtml, htmlClass, "", "", "");
+        //
+        public static string h6(string innerHtml, string htmlClass, string htmlId) => genericBlockTag("h6", innerHtml, htmlClass, htmlId, "", "");
         //
         //====================================================================================================
         //
@@ -3413,21 +3431,24 @@ namespace Contensive.Processor.Controllers {
         /// <param name="widthPx"></param>
         /// <param name="heightPx"></param>
         /// <returns></returns>
-        public static string img(string src, string alt, int widthPx, int heightPx) {
+        public static string img(string src, string alt, int widthPx, int heightPx, string htmlClass) {
             var result = new StringBuilder("<img");
             result.Append(!string.IsNullOrEmpty(src) ? " src=\"" + src + "\"" : "");
             result.Append(!string.IsNullOrEmpty(alt) ? " alt=\"" + alt + "\"" : "");
             result.Append(!widthPx.Equals(0) ? " width=\"" + widthPx.ToString() + "\"" : "");
             result.Append(!heightPx.Equals(0) ? " height=\"" + heightPx.ToString() + "\"" : "");
+            result.Append(!string.IsNullOrEmpty(htmlClass) ? " class=\"" + htmlClass + "\"" : "");
             result.Append(">");
             return result.ToString();
         }
         //
-        public static string img(string src, string alt, int widthPx) => img(src, alt, widthPx, 0);
+        public static string img(string src, string alt, int widthPx, int heightPx) => img(src, alt, widthPx, heightPx, "");
         //
-        public static string img(string src, string alt) => img(src, alt, 0, 0);
+        public static string img(string src, string alt, int widthPx) => img(src, alt, widthPx, 0, "");
         //
-        public static string img(string src) => img(src, "", 0, 0);
+        public static string img(string src, string alt) => img(src, alt, 0, 0, "");
+        //
+        public static string img(string src) => img(src, "", 0, 0, "");
         //
         // ====================================================================================================
         /// <summary>
@@ -3560,15 +3581,17 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "");
-        public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "");
-        public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "");
-        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) {
+        public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "", "");
+        public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "", "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "", "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) => a(innerHtml, href, htmlClass, htmlId, tabIndex, "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex, string target) {
             var tag = new StringBuilder("<a");
             if (!String.IsNullOrWhiteSpace(href)) { tag.Append(" href=\"").Append(href).Append("\""); }
             if (!String.IsNullOrWhiteSpace(htmlClass)) { tag.Append(" class=\"").Append(htmlClass).Append("\""); }
             if (!String.IsNullOrWhiteSpace(htmlId)) { tag.Append(" id=\"").Append(htmlId).Append("\""); }
             if (!String.IsNullOrWhiteSpace(tabIndex)) { tag.Append(" tabindex=\"").Append(tabIndex).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(target)) { tag.Append(" target=\"").Append(target).Append("\""); }
             tag.Append(">").Append(innerHtml).Append("</a>");
             return tag.ToString();
         }

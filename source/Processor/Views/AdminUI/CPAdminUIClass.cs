@@ -17,16 +17,16 @@ namespace Contensive.Processor {
         // ====================================================================================================
         //
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
+            => Controllers.AdminUIEditorController.getBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId);
+            => Controllers.AdminUIEditorController.getBooleanEditor(core, htmlName, htmlValue, readOnly, htmlId);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId)
-            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, false, htmlId, false);
+            => Controllers.AdminUIEditorController.getBooleanEditor(core, htmlName, htmlValue, false, htmlId, false);
 
         public override string GetBooleanEditor(string htmlName, bool htmlValue)
-            => Controllers.AdminUIEditorController.GetBooleanEditor(core, htmlName, htmlValue, false, "", false);
+            => Controllers.AdminUIEditorController.getBooleanEditor(core, htmlName, htmlValue, false, "", false);
 
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required)
             => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, required, "");
@@ -53,16 +53,16 @@ namespace Contensive.Processor {
             => Controllers.AdminUIController.getEditRow(core, editor, caption, help, required, false, htmlId);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
+            => Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
+            => Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId)
-            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
+            => Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue)
-            => Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, "");
+            => Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, "");
 
         public override string GetHtmlEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required)
             => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", readOnly, htmlId);
@@ -219,19 +219,19 @@ namespace Contensive.Processor {
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
-            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
+            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
-            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
+            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId) {
-            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
+            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
         }
 
         public override string GetTextAreaEditor(string htmlName, string htmlValue) {
-            return Controllers.AdminUIEditorController.GetHtmlCodeEditor(core, htmlName, htmlValue, false, "", false);
+            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, "", false);
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {

@@ -179,9 +179,9 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         //
-        public override string InputFile(string htmlName, string htmlClass, string htmlId) => cp.core.html.inputFile(htmlName, htmlId, htmlClass);
-        public override string InputFile(string htmlName, string htmlClass) => cp.core.html.inputFile(htmlName, "", htmlClass);
-        public override string InputFile(string htmlName) => cp.core.html.inputFile(htmlName);
+        public override string InputFile(string htmlName, string htmlClass, string htmlId) => HtmlController.inputFile(htmlName, htmlId, htmlClass);
+        public override string InputFile(string htmlName, string htmlClass) => HtmlController.inputFile(htmlName, "", htmlClass);
+        public override string InputFile(string htmlName) => HtmlController.inputFile(htmlName);
         //
         // ====================================================================================================
         //
@@ -223,13 +223,13 @@ namespace Contensive.Processor {
             cp.core.html.processCheckList(htmlName, PrimaryContentName, PrimaryRecordID, SecondaryContentName, RulesContentName, RulesPrimaryFieldname, RulesSecondaryFieldName);
         }
         public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass, string htmlId) {
-            return cp.core.html.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
+            return HtmlController.inputRadio(htmlName, htmlValue, currentValue, htmlId, htmlClass);
         }
         public override string RadioBox(string htmlName, string htmlValue, string currentValue, string htmlClass) {
-            return cp.core.html.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
+            return HtmlController.inputRadio(htmlName, htmlValue, currentValue, "", htmlClass);
         }
         public override string RadioBox(string htmlName, string htmlValue, string currentValue) {
-            return cp.core.html.inputRadio(htmlName, htmlValue, currentValue);
+            return HtmlController.inputRadio(htmlName, htmlValue, currentValue);
         }
         //
         // ==========================================================================================
@@ -354,7 +354,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Use html5 methods instead", false)]
         public override string RadioBox(string HtmlName, int HtmlValue, int CurrentValue, string HtmlClass = "", string HtmlId = "") {
-            return cp.core.html.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId, HtmlClass);
+            return HtmlController.inputRadio(HtmlName, HtmlValue, CurrentValue, HtmlId, HtmlClass);
         }
         //
         [Obsolete("Use html5 methods instead", false)]

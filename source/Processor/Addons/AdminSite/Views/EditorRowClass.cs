@@ -151,10 +151,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                 }
             }
+            //
+            // -- style for editor wrapper used to limit the width of some editors like integer
+            string editorWrapperSyle = "";
             if (!useEditorAddon) {
                 bool IsEmptyList = false;
-                string NonEncodedLink = null;
-                string EncodedLink = null;
+                //string NonEncodedLink = null;
+                //string EncodedLink = null;
                 //
                 // if custom editor not used or if it failed
                 //
@@ -202,8 +205,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                 //
                                 // ----- Boolean ReadOnly
-                                EditorString += AdminUIEditorController.GetBooleanEditor(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), editorReadOnly, fieldHtmlId);
+                                EditorString += AdminUIEditorController.getBooleanEditor(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), editorReadOnly, fieldHtmlId);
                                 editorEnv.formFieldList += "," + field.nameLc;
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
@@ -212,9 +216,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (field.lookupContentId != 0) {
                                     EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
+                                    editorWrapperSyle = "max-width:400px";
                                 } else if (field.lookupList != "") {
                                     EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
+                                    editorWrapperSyle = "max-width:400px";
                                 } else {
                                     //
                                     // -- log exception but dont throw
@@ -228,6 +234,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- date, readonly
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
@@ -235,7 +242,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Member Select ReadOnly
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), editorReadOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
-                                //
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
@@ -249,6 +256,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Currency ReadOnly
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += (HtmlController.inputCurrency(core, field.nameLc, encodeNumber(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Float: {
@@ -256,6 +264,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- double/number/float
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += (HtmlController.inputNumber(core, field.nameLc, encodeNumber(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
@@ -264,6 +273,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Others that simply print
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += (HtmlController.inputInteger(core, field.nameLc, encodeInteger(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
@@ -305,24 +315,18 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 EditorString += HtmlController.inputTextarea(core, field.nameLc, fieldValue_text, fieldRows, -1, fieldHtmlId, false, editorReadOnly, " form-control");
                                 break;
                             }
-                        case CPContentBaseClass.FieldTypeIdEnum.File:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                        case CPContentBaseClass.FieldTypeIdEnum.File: {
                                 //
                                 // ----- File ReadOnly
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
-                                EncodedLink = System.Net.WebUtility.HtmlEncode(NonEncodedLink);
-                                EditorString += (HtmlController.inputHidden(field.nameLc, ""));
-                                if (string.IsNullOrEmpty(fieldValue_text)) {
-                                    EditorString += ("[no file]");
-                                } else {
-                                    string filename = "";
-                                    string path = "";
-                                    core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
-                                    EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + Processor.Constants.SpanClassAdminSmall + "[" + filename + "]</A>");
-                                }
-                                EditorString += whyReadOnlyMsg;
+                                EditorString = AdminUIEditorController.getFileEditor(core, field.nameLc, fieldValue_text, field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
                                 //
+                                // ----- Image ReadOnly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIEditorController.getImageEditor(core, field.nameLc, fieldValue_text, field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         default: {
@@ -379,8 +383,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                 //
                                 // ----- Boolean
-                                EditorString += AdminUIEditorController.GetBooleanEditor(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), false, fieldHtmlId);
+                                EditorString += AdminUIEditorController.getBooleanEditor(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), false, fieldHtmlId);
                                 editorEnv.formFieldList += "," + field.nameLc;
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
@@ -389,9 +394,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (field.lookupContentId != 0) {
                                     EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
+                                    editorWrapperSyle = "max-width:400px";
                                 } else if (field.lookupList != "") {
                                     EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
+                                    editorWrapperSyle = "max-width:400px";
                                 } else {
                                     //
                                     // -- log exception but dont throw
@@ -405,6 +412,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Date
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
@@ -412,6 +420,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Member Select
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString = AdminUIEditorController.getMemberSelectEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.memberSelectGroupId_get(core), field.memberSelectGroupName_get(core), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
@@ -420,11 +429,18 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 EditorString = AdminUIEditorController.getManyToManyEditor(core, field, "field" + field.id, fieldValue_text, editRecord.id, false, whyReadOnlyMsg);
                                 break;
                             }
-                        case CPContentBaseClass.FieldTypeIdEnum.File:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                        case CPContentBaseClass.FieldTypeIdEnum.File: {
                                 //
                                 // ----- File
+                                editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString = AdminUIEditorController.getFileEditor(core, field.nameLc, fieldValue_text, field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                break;
+                            }
+                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
+                                //
+                                // ----- Image ReadOnly
+                                editorEnv.formFieldList += "," + field.nameLc;
+                                EditorString = AdminUIEditorController.getImageEditor(core, field.nameLc, fieldValue_text, field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Currency: {
@@ -432,6 +448,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- currency
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += AdminUIEditorController.getCurrencyEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Float: {
@@ -439,6 +456,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- double/number/float
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += AdminUIEditorController.getNumberEditor(core, field.nameLc, encodeNumberNullable(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement:
@@ -447,6 +465,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Others that simply print
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 EditorString += (HtmlController.inputInteger(core, field.nameLc, encodeIntegerNullable(fieldValue_text), fieldHtmlId, "text form-control", editorReadOnly, false));
+                                editorWrapperSyle = "max-width:400px";
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.Link: {
@@ -472,7 +491,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // View the content as Html, not wysiwyg
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.GetHtmlCodeEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
+                                EditorString = AdminUIEditorController.getHtmlCodeEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.HTML:
@@ -483,7 +502,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 if (field.htmlContent) {
                                     //
                                     // View the content as Html, not wysiwyg
-                                    EditorString = AdminUIEditorController.GetHtmlCodeEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
+                                    EditorString = AdminUIEditorController.getHtmlCodeEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId);
                                 } else {
                                     //
                                     // wysiwyg editor
@@ -578,7 +597,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
             //
             // assemble the editor row
-            return AdminUIController.getEditRow(core, EditorString, fieldCaption, field.helpDefault, field.required, false, fieldHtmlId);
+            return AdminUIController.getEditRow(core, EditorString, fieldCaption, field.helpDefault, field.required, false, fieldHtmlId, editorWrapperSyle);
         }
     }
     public class EditorEnvironmentModel {

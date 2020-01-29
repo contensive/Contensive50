@@ -173,7 +173,7 @@ namespace Contensive.Processor.Addons.Tools {
                     } else {
                         core.userProperty.setProperty("ManualQueryInputRows", SQLRows.ToString());
                     }
-                    Stream.add(AdminUIEditorController.GetHtmlCodeEditor(core, "SQL", SQL, false, "SQL",false));
+                    Stream.add(AdminUIEditorController.getHtmlCodeEditor(core, "SQL", SQL, false, "SQL",false));
                     Stream.add("&nbsp;<INPUT TYPE=\"Text\" TabIndex=-1 NAME=\"SQLRows\" SIZE=\"3\" VALUE=\"" + SQLRows + "\" ID=\"\"  onchange=\"SQL.rows=SQLRows.value; return true\"> Rows");
                 }
                 //

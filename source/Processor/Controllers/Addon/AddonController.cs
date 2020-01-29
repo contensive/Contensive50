@@ -889,7 +889,7 @@ namespace Contensive.Processor.Controllers {
                                                                                     break;
                                                                                 }
                                                                             case "boolean": {
-                                                                                    Copy = AdminUIEditorController.GetBooleanEditor(core, fieldName, encodeBoolean(fieldValue), fieldReadOnly, "");
+                                                                                    Copy = AdminUIEditorController.getBooleanEditor(core, fieldName, encodeBoolean(fieldValue), fieldReadOnly, "");
                                                                                     break;
                                                                                 }
                                                                             case "double":
@@ -902,9 +902,12 @@ namespace Contensive.Processor.Controllers {
                                                                                     Copy = AdminUIEditorController.getDateTimeEditor(core, fieldName, encodeDate(fieldValue), fieldReadOnly, "", false, "");
                                                                                     break;
                                                                                 }
-                                                                            case "file":
-                                                                            case "imagefile": {
+                                                                            case "file": {
                                                                                     Copy = AdminUIEditorController.getFileEditor(core, fieldName, fieldValue, fieldReadOnly, "", false, "");
+                                                                                    break;
+                                                                                }
+                                                                            case "imagefile": {
+                                                                                    Copy = AdminUIEditorController.getImageEditor(core, fieldName, fieldValue, fieldReadOnly, "", false, "");
                                                                                     break;
                                                                                 }
                                                                             case "currency": {

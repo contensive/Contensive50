@@ -124,6 +124,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addons\AdminSite\Controllers\ProcessActionController.cs" />
     <Compile Include="Addons\AdminSite\Models\ButtonMetadata.cs" />
     <Compile Include="Addons\AdminSite\SortingStateEnum.cs" />
     <Compile Include="Addons\AdminSite\FindWordMatchEnum.cs" />

@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlName"></param>
         /// <param name="htmlValue"></param>
         /// <returns></returns>
-        public static string GetBooleanEditor(CoreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId, bool required = false) {
+        public static string getBooleanEditor(CoreController core, string htmlName, bool htmlValue, bool readOnly, string htmlId, bool required = false) {
             string result = HtmlController.div(HtmlController.checkbox(htmlName, htmlValue, htmlId, false, "", readOnly, "1", "", required), "checkbox");
             if (readOnly) result += HtmlController.inputHidden(htmlName, htmlValue);
             return result;
@@ -45,7 +45,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <param name="isPassword"></param>
         /// <returns></returns>
-        public static string GetHtmlCodeEditor(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId, bool required = false) {
+        public static string getHtmlCodeEditor(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId, bool required = false) {
             //
             // longer text data, or text that contains a CR
             return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 0, required);
@@ -68,10 +68,10 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getDateTimeEditor(CoreController core, string fieldName, DateTime? FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
-            string inputDate = HtmlController.inputDate(core, fieldName + "-date", FieldValueDate,"", "component-" + htmlId + "-date", "form-control", readOnly, fieldRequired, false);
+            string inputDate = HtmlController.inputDate(core, fieldName + "-date", FieldValueDate, "", "component-" + htmlId + "-date", "form-control", readOnly, fieldRequired, false);
             string inputTime = HtmlController.inputTime(core, fieldName + "-time", FieldValueDate, "component-" + htmlId + "-time", "form-control", readOnly, fieldRequired, false);
             string dateTimeString = (FieldValueDate != null) ? ((DateTime)FieldValueDate).ToString("o", CultureInfo.InvariantCulture) : "";
-            string inputDateTime = HtmlController.inputHidden(fieldName, dateTimeString,"",htmlId);
+            string inputDateTime = HtmlController.inputHidden(fieldName, dateTimeString, "", htmlId);
             // todo move to adminUI script
             string js = HtmlController.scriptCode(core, ""
                 + "document.addEventListener('DOMContentLoaded', function(){"
@@ -245,7 +245,7 @@ namespace Contensive.Processor.Controllers {
             string result = "";
             if (readOnly) {
                 result += HtmlController.inputHidden(fieldName, fieldValue);
-                result += AdminUIEditorController.GetHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, false);
+                result += AdminUIEditorController.getHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, false);
                 return result;
             }
             if (string.IsNullOrEmpty(fieldValue)) {
@@ -366,7 +366,7 @@ namespace Contensive.Processor.Controllers {
                 // text field shorter then 40 characters without a CR
                 return HtmlController.inputText_Legacy(core, fieldName, fieldValue, 1, -1, htmlId, false, readOnly, "text form-control", 255, false, "", required);
             }
-            return AdminUIEditorController.GetHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, required);
+            return AdminUIEditorController.getHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, required);
         }
         //
         // ====================================================================================================
@@ -434,39 +434,63 @@ namespace Contensive.Processor.Controllers {
         /// <param name="whyReadOnlyMsg"></param>
         /// <returns></returns>
         public static string getFileEditor(CoreController core, string fieldName, string currentPathFilename, bool readOnly, string htmlId, bool required, string whyReadOnlyMsg) {
-            if (readOnly) {
-                return currentPathFilename + HtmlController.inputHidden(fieldName, currentPathFilename);
-            } else {
-                if (string.IsNullOrEmpty(currentPathFilename)) {
-                    return core.html.inputFile(fieldName);
-                } else {
-                    string NonEncodedLink = GenericController.getCdnFileLink(core, currentPathFilename);
-                    string EncodedLink = encodeURL(NonEncodedLink);
-                    string FieldValuefilename = "";
-                    string FieldValuePath = "";
-                    core.privateFiles.splitDosPathFilename(currentPathFilename, ref FieldValuePath, ref FieldValuefilename);
-                    return ""
-                    + "<a href=\"http://" + EncodedLink + "\" target=\"_blank\">[" + FieldValuefilename + "]</A>"
-                    + "&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(fieldName + ".DeleteFlag", false) + "&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(fieldName);
-                }
+            if (readOnly && string.IsNullOrEmpty(currentPathFilename)) {
+                return HtmlController.div("[no file]") + HtmlController.inputHidden(fieldName, currentPathFilename);
             }
-            //if (fieldName.Equals("anotherVersionofThisCode")) {
-            //    editorEnv.formFieldList += "," + field.nameLc;
-            //    if (string.IsNullOrEmpty(fieldValue_text)) {
-            //        EditorString += (core.html.inputFile(field.nameLc, "", "file form-control"));
-            //    } else {
-            //        NonEncodedLink = GenericController.getCdnFileLink(core, fieldValue_text);
-            //        EncodedLink = HtmlController.encodeHtml(NonEncodedLink);
-            //        string filename = "";
-            //        string path = "";
-            //        core.cdnFiles.splitDosPathFilename(fieldValue_text, ref path, ref filename);
-            //        EditorString += ("&nbsp;<a href=\"" + EncodedLink + "\" target=\"_blank\">" + SpanClassAdminSmall + "[" + filename + "]</A>");
-            //        EditorString += ("&nbsp;&nbsp;&nbsp;Delete:&nbsp;" + HtmlController.checkbox(field.nameLc + ".DeleteFlag", false));
-            //        EditorString += ("&nbsp;&nbsp;&nbsp;Change:&nbsp;" + core.html.inputFile(field.nameLc, fieldHtmlId, "file form-control"));
-            //    }
-            //}        
+            if (string.IsNullOrEmpty(currentPathFilename)) {
+                return HtmlController.inputFile(fieldName, htmlId, "form-control-file");
+            }
+            string nonEncodedLink = getCdnFileLink(core, currentPathFilename);
+            string encodedLink = HtmlController.encodeHtml(nonEncodedLink);
+            string fieldValuefilename = "";
+            string fieldValuePath = "";
+            core.privateFiles.splitDosPathFilename(currentPathFilename, ref fieldValuePath, ref fieldValuefilename);
+            if (readOnly) {
+                return HtmlController.a("[" + fieldValuefilename + "]", encodedLink, "", "", "", "_blank");
+            }
+            string deleteCheckboxId = "deleteCheckbox" + getRandomInteger(core).ToString();
+            string deleteCheckbox = ""
+                + HtmlController.div(
+                    HtmlController.checkbox(fieldName + ".DeleteFlag", false, deleteCheckboxId, false, "form-check-input")
+                    + HtmlController.label("Delete", deleteCheckboxId, "form-check-label"),
+                "form-check");
+            return ""
+                + HtmlController.a("[" + fieldValuefilename + "]", encodedLink, "", "", "", "_blank")
+                + deleteCheckbox
+                + HtmlController.inputFile(fieldName, htmlId, "form-control-file");
         }
         //
+        // ====================================================================================================
+        //
+        public static string getImageEditor(CoreController core, string fieldName, string currentPathFilename, bool readOnly, string htmlId, bool required, string whyReadOnlyMsg) {
+            if (readOnly && string.IsNullOrEmpty(currentPathFilename)) {
+                return HtmlController.div("[no image]") + HtmlController.inputHidden(fieldName, currentPathFilename);
+            }
+            if (string.IsNullOrEmpty(currentPathFilename)) {
+                return HtmlController.inputFile(fieldName, htmlId, "form-control-file");
+            }
+            string nonEncodedLink = getCdnFileLink(core, currentPathFilename);
+            string encodedLink = HtmlController.encodeHtml(nonEncodedLink);
+            string fieldValuefilename = "";
+            string fieldValuePath = "";
+            core.privateFiles.splitDosPathFilename(currentPathFilename, ref fieldValuePath, ref fieldValuefilename);
+            string deleteCheckbox = "";
+            string uploadControl = "";
+            if(!readOnly) {
+                string deleteCheckboxId = "deleteCheckbox" + getRandomInteger(core).ToString();
+                deleteCheckbox = ""
+                    + HtmlController.div(
+                        HtmlController.checkbox(fieldName + ".DeleteFlag", false, deleteCheckboxId, false, "form-check-input")
+                        + HtmlController.label("Delete", deleteCheckboxId, "form-check-label"),
+                    "form-check");
+                uploadControl = HtmlController.inputFile(fieldName, htmlId, "form-control-file");
+            }
+            string resultImage = HtmlController.a(HtmlController.img(encodedLink, "", 0, 0, "w-100"), encodedLink, "", "", "", "_blank");
+            string resultAnchor = HtmlController.a("[" + fieldValuefilename + "]", encodedLink, "", "", "", "_blank");
+            return ""
+                + HtmlController.div(resultImage, "d-table-cell","", "width:100px;max-height:200px;")
+                + HtmlController.div(resultAnchor + deleteCheckbox + uploadControl, "d-table-cell pl-4 align-top");
+        }
         //
         // ====================================================================================================
         /// <summary>

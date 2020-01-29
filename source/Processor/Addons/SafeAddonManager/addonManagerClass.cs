@@ -558,7 +558,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 + "</table>"
                                 + HtmlController.inputHidden("UploadCount", 1, "", "UploadCount") + "";
                             Body.add(AdminUIController.editTable(""
-                                + AdminUIController.getEditRowLegacy(core, core.html.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
+                                + AdminUIController.getEditRowLegacy(core, HtmlController.inputFile("MetaFile"), "Add-on Collection File(s)", "", true, false, "")
                                 + AdminUIController.getEditRowLegacy(core, FormInput, "&nbsp;", "", true, false, "")
                                 ));
                         }
