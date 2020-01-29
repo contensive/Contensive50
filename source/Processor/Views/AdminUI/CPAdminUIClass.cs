@@ -28,6 +28,22 @@ namespace Contensive.Processor {
         public override string GetBooleanEditor(string htmlName, bool htmlValue)
             => Controllers.AdminUIEditorController.getBooleanEditor(core, htmlName, htmlValue, false, "", false);
 
+        public override string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetCurrencyEditor(string htmlName, double? htmlValue) {
+            throw new NotImplementedException();
+        }
+
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required)
             => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, required, "");
 
@@ -47,10 +63,28 @@ namespace Contensive.Processor {
             => Controllers.AdminUIController.getEditRow(core, editor, caption, help);
 
         public override string GetEditRow(string caption, string editor, string help, string htmlId)
-            => Controllers.AdminUIController.getEditRow(core, editor, caption, help, false, false, htmlId);
+            => Controllers.AdminUIController.getEditRow(core, editor, caption, help, false, false, htmlId, "", false);
 
         public override string GetEditRow(string caption, string editor, string help, string htmlId, bool required)
-            => Controllers.AdminUIController.getEditRow(core, editor, caption, help, required, false, htmlId);
+            => Controllers.AdminUIController.getEditRow(core, editor, caption, help, required, false, htmlId, "", false);
+
+        public override string GetEditRow(string caption, string editor, string help, string htmlId, bool required, bool blockBottomRule)
+            => Controllers.AdminUIController.getEditRow(core, editor, caption, help, required, false, htmlId, "", blockBottomRule);
+
+        public override string GetFileEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly, bool required)
+            => Controllers.AdminUIEditorController.getFileEditor(core, htmlName, currentPathFilename, readOnly, htmlId, required, "");
+
+        public override string GetFileEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly)
+            => Controllers.AdminUIEditorController.getFileEditor(core, htmlName, currentPathFilename, readOnly, htmlId, false, "");
+
+        public override string GetFileEditor(string htmlName, string currentPathFilename, string htmlId)
+            => Controllers.AdminUIEditorController.getFileEditor(core, htmlName, currentPathFilename, false, htmlId, false, "");
+
+        public override string GetFileEditor(string htmlName, string currentPathFilename)
+            => Controllers.AdminUIEditorController.getFileEditor(core, htmlName, currentPathFilename, false, "", false, "");
+
+        public override string GetFileEditor(string htmlName)
+            => Controllers.AdminUIEditorController.getFileEditor(core, htmlName, "", false, "", false, "");
 
         public override string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required)
             => Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
@@ -76,6 +110,22 @@ namespace Contensive.Processor {
         public override string GetHtmlEditor(string htmlName, string htmlValue)
             => Controllers.AdminUIEditorController.getHtmlEditor(core, htmlName, htmlValue, "", "", "", false, "");
 
+        public override string GetImageEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetImageEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetImageEditor(string htmlName, string currentPathFilename, string htmlId) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetImageEditor(string htmlName, string currentPathFilename) {
+            throw new NotImplementedException();
+        }
+
         public override string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required)
             => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, readOnly, htmlId, required,"");
 
@@ -87,6 +137,38 @@ namespace Contensive.Processor {
 
         public override string GetIntegerEditor(string htmlName, int? htmlValue)
             => Controllers.AdminUIEditorController.getIntegerEditor(core, htmlName, htmlValue, false, "", false, "");
+
+        public override string GetLinkEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLinkEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLinkEditor(string htmlName, int? htmlValue, string htmlId) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLinkEditor(string htmlName, int? htmlValue) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLongTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLongTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLongTextEditor(string htmlName, string htmlValue, string htmlId) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetLongTextEditor(string htmlName, string htmlValue) {
+            throw new NotImplementedException();
+        }
 
         public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly, bool required, string sqlFilter) {
             bool isEmptyList = false;
@@ -218,20 +300,36 @@ namespace Contensive.Processor {
             return Controllers.AdminUIEditorController.getNumberEditor(core, htmlName, htmlValue, false, "", false, "");
         }
 
-        public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
-            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
+        public override string GetPasswordEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
         }
 
-        public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
-            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
+        public override string GetPasswordEditor(string htmlName, string htmlValue, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
         }
 
-        public override string GetTextAreaEditor(string htmlName, string htmlValue, string htmlId) {
-            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, htmlId, false);
+        public override string GetPasswordEditor(string htmlName, string htmlValue, string htmlId) {
+            throw new NotImplementedException();
         }
 
-        public override string GetTextAreaEditor(string htmlName, string htmlValue) {
-            return Controllers.AdminUIEditorController.getHtmlCodeEditor(core, htmlName, htmlValue, false, "", false);
+        public override string GetPasswordEditor(string htmlName, string htmlValue) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId, bool readOnly, bool required) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId, bool readOnly) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId) {
+            throw new NotImplementedException();
+        }
+
+        public override string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString) {
+            throw new NotImplementedException();
         }
 
         public override string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required) {

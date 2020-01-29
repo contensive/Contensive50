@@ -712,8 +712,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="EditorString"></param>
         /// <param name="editorHelpRow"></param>
         /// <returns></returns>
-        public static string getEditRow(CoreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "", string editorWrapperStyle = "") {
-            return HtmlController.div(HtmlController.label(Caption, fieldHtmlId) + HtmlController.div(EditorString, "ml-5","", editorWrapperStyle) + HtmlController.div(HtmlController.small(editorHelpRow, "form-text text-muted"), "ml-5"), "p-2 ccEditRow");
+        public static string getEditRow(CoreController core, string EditorString, string Caption, string editorHelpRow, bool fieldRequired = false, bool ignore = false, string fieldHtmlId = "", string editorWrapperStyle = "", bool blockBottomRule = false) {
+            return HtmlController.div(HtmlController.label(Caption, fieldHtmlId) + HtmlController.div(EditorString, "ml-5","", editorWrapperStyle) + HtmlController.div(HtmlController.small(editorHelpRow, "form-text text-muted"), "ml-5"), "p-2" + ((blockBottomRule) ? "" : " ccEditRow"));
         }
         //
         // ====================================================================================================

@@ -140,7 +140,7 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
-        /// Create a folder with a unique name. Return the path (Path values have no leading slash, and have a trailing slash, ex NewPath/ )
+        /// Create a folder with a unique name. Return the path to the new folder. (Path values have no leading slash, and have a trailing slash, ex NewPath/ )
         /// </summary>
         /// <returns></returns>
         public abstract string CreateUniqueFolder();

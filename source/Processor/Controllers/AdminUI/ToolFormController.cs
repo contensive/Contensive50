@@ -61,7 +61,8 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- add wrappers
-            string wrapperClass = "border ";
+
+            string wrapperClass = "";
             wrapperClass += (includeBodyPadding) ? " p-4" : " p-0";
             wrapperClass += (includeBodyColor) ? " bg-light" : " bg-white";
             result = cp.Html.div(result, "", wrapperClass, ""); 
