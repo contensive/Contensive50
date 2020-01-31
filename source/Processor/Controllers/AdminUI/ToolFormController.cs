@@ -41,27 +41,17 @@ namespace Contensive.Processor.Controllers {
         //
         public string getHtml(CPBaseClass cp) {
             string userErrors = cp.Utils.EncodeText(cp.UserError.GetList());
-            if (userErrors != "") {
-                warning = userErrors;
+            if (!string.IsNullOrWhiteSpace(userErrors)) {
+                warning += userErrors;
             }
             string result = "";
-            //
-            if (body != "") { result += body; }
-            //
-            // headers
-            //
-            if (description != "") {
-                result = cr + "<p id=\"afwDescription\">" + description + "</p>" + result;
-            }
-            if (warning != "") {
-                result = cr + "<div id=\"afwWarning\">" + warning + "</div>" + result;
-            }
-            if (title != "") {
-                result = cr + "<h2>" + title + "</h2>" + result;
-            }
+            result += (string.IsNullOrWhiteSpace(title) ? "" : cr + "<h2>" + title + "</h2>");
+            result += (string.IsNullOrWhiteSpace(warning) ? "" : cr + "<div class=\"p-3 mb-2 bg-danger text-white\">" + warning + "</div>");
+            result += (string.IsNullOrWhiteSpace(description) ? "" : cr + "<p>" + description + "</p>");
+            result += (string.IsNullOrWhiteSpace(body) ? "" : cr + "<main>" + body + "</main>");
+            result += (string.IsNullOrWhiteSpace(footer) ? "" : cr + "<footer>" + footer + "</footer>");
             //
             // -- add wrappers
-
             string wrapperClass = "";
             wrapperClass += (includeBodyPadding) ? " p-4" : " p-0";
             wrapperClass += (includeBodyColor) ? " bg-light" : " bg-white";
@@ -144,6 +134,10 @@ namespace Contensive.Processor.Controllers {
         //-------------------------------------------------
         // 
         public string body { get; set; } = "";
+        //
+        //-------------------------------------------------
+        // 
+        public string footer { get; set; } = "";
         //
         //-------------------------------------------------
         //

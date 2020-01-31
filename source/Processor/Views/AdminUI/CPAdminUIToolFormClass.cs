@@ -87,6 +87,14 @@ namespace Contensive.Processor.AdminUI {
                 form.body = value;
             }
         }
+        public override string Footer {
+            get {
+                return form.body;
+            }
+            set {
+                form.body = value;
+            }
+        }
 
         public override void AddFormButton(string buttonValue) 
             => form.addFormButton(buttonValue);

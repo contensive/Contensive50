@@ -60,5 +60,9 @@ namespace Contensive.BaseClasses.AdminUI {
         //-------------------------------------------------
         // 
         public abstract string Body { get; set; }
+        //
+        //-------------------------------------------------
+        // 
+        public abstract string Footer { get; set; }
     }
 }
