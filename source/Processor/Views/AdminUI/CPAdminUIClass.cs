@@ -170,86 +170,100 @@ namespace Contensive.Processor {
             throw new NotImplementedException();
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly, bool required, string sqlFilter) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId, int htmlValue, string htmlId, bool readOnly, bool required, string sqlFilter) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly, bool required) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId, int htmlValue, string htmlId, bool readOnly, bool required) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", required, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId, bool readOnly) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId, int htmlValue, string htmlId, bool readOnly) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, readOnly, htmlId, "", false, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId, string htmlId) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId, int htmlValue, string htmlId) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, htmlId, "", false, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, int lookupContentId) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId, int htmlValue) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentId, ref isEmptyList, false, "", "", false, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly, bool required, string sqlFilter) {
+        public override string GetLookupContentEditor(string htmlName, int lookupContentId) {
+            bool isEmptyList = false;
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, 0, lookupContentId, ref isEmptyList, false, "", "", false, "");
+        }
+
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName, int htmlValue, string htmlId, bool readOnly, bool required, string sqlFilter) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, sqlFilter);
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly, bool required) {
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName, int htmlValue, string htmlId, bool readOnly, bool required) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", required, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId, bool readOnly) {
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName, int htmlValue, string htmlId, bool readOnly) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, readOnly, htmlId, "", false, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName, string htmlId) {
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName, int htmlValue, string htmlId) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, htmlId, "", false, "");
         }
 
-        public override string GetLookupContentEditor(string htmlName, int htmlValue, string lookupContentName) {
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName, int htmlValue) {
             bool isEmptyList = false;
             return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, htmlValue, lookupContentName, ref isEmptyList, false, "", "", false, "");
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly, bool required) {
+        public override string GetLookupContentEditor(string htmlName, string lookupContentName) {
+            bool isEmptyList = false;
+            return Controllers.AdminUIEditorController.getLookupContentEditor(core, htmlName, 0, lookupContentName, ref isEmptyList, false, "", "", false, "");
+        }
+
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, string currentLookupName, string htmlId, bool readOnly, bool required) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", required);
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId, bool readOnly) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, string currentLookupName, string htmlId, bool readOnly) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, readOnly, htmlId, "", false);
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList, string htmlId) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, string currentLookupName, string htmlId) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, false, htmlId, "", false);
         }
 
-        public override string GetLookupListEditor(string htmlName, string currentLookupName, List<string> lookupList) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, string currentLookupName) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupName, lookupList, false, "", "", false);
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly, bool required) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, int currentLookupValue, string htmlId, bool readOnly, bool required) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", required);
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId, bool readOnly) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, int currentLookupValue, string htmlId, bool readOnly) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, readOnly, htmlId, "", false);
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList, string htmlId) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, int currentLookupValue, string htmlId) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, false, htmlId, "", false);
         }
 
-        public override string GetLookupListEditor(string htmlName, int currentLookupValue, List<string> lookupList) {
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList, int currentLookupValue) {
             return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, currentLookupValue, lookupList, false, "", "", false);
+        }
+
+        public override string GetLookupListEditor(string htmlName, List<string> lookupList) {
+            return Controllers.AdminUIEditorController.getLookupListEditor(core, htmlName, 0, lookupList, false, "", "", false);
         }
 
         public override string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId, bool readOnly, bool required) {

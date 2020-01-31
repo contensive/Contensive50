@@ -135,220 +135,412 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                     //
-                    // -- this collection has already been installed during this installation process. Skip and return success
+                    // -- EXIT, this collection has already been installed during this installation process. Skip and return success
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", [" + collectionGuid + "] was not installed because it was previously installed during this installation.");
                     return true;
                 }
-                // -- collection needs to be 
-                if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) { collectionsInstalledList.Add(collectionGuid.ToLower(CultureInfo.InvariantCulture)); }
+                // -- collection needs to be installed
+                if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
+                    collectionsInstalledList.Add(collectionGuid.ToLower(CultureInfo.InvariantCulture));
+                }
                 //
                 var collectionFolderConfig = CollectionFolderModel.getCollectionFolderConfig(core, collectionGuid);
                 if ((collectionFolderConfig == null) || string.IsNullOrEmpty(collectionFolderConfig.path)) {
+                    //
+                    // -- ERROR, collection folder not found
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
                     return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
                     return false;
-                } else {
+                }
+                //
+                // Search Local Collection Folder for collection config file (xml file)
+                //
+                string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + collectionFolderConfig.path + "\\";
+                List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
+                if (srcFileInfoArray.Count == 0) {
                     //
-                    // Search Local Collection Folder for collection config file (xml file)
-                    //
-                    string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + collectionFolderConfig.path + "\\";
-                    List<FileDetail> srcFileInfoArray = core.privateFiles.getFileList(CollectionVersionFolder);
-                    if (srcFileInfoArray.Count == 0) {
-                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");
-                        return_ErrorMessage += "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
-                        return false;
-                    } else {
-                        //
-                        // collect list of DLL files and add them to the exec files if they were missed
-                        List<string> assembliesInZip = new List<string>();
-                        foreach (FileDetail file in srcFileInfoArray) {
-                            if (file.Extension.ToLowerInvariant() == "dll") {
-                                if (!assembliesInZip.Contains(file.Name.ToLowerInvariant())) {
-                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], adding DLL from folder[" + file.Name.ToLowerInvariant() + "].");
-                                    assembliesInZip.Add(file.Name.ToLowerInvariant());
-                                }
-                            }
+                    // -- EXIT, ERROR, collection folder was empty
+                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");
+                    return_ErrorMessage += "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
+                    return false;
+                }
+                //
+                // collect list of DLL files and add them to the exec files if they were missed
+                List<string> assembliesInZip = new List<string>();
+                foreach (FileDetail file in srcFileInfoArray) {
+                    if (file.Extension.ToLowerInvariant() == "dll") {
+                        if (!assembliesInZip.Contains(file.Name.ToLowerInvariant())) {
+                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], adding DLL from folder[" + file.Name.ToLowerInvariant() + "].");
+                            assembliesInZip.Add(file.Name.ToLowerInvariant());
                         }
+                    }
+                }
+                //
+                // -- Process the other files
+                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], process xml files.");
+                bool CollectionblockNavigatorNode_fileValueOK = false;
+                foreach (FileDetail file in srcFileInfoArray) {
+                    if (file.Extension == ".xml") {
                         //
-                        // -- Process the other files
-                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], process xml files.");
-                        bool CollectionblockNavigatorNode_fileValueOK = false;
-                        foreach (FileDetail file in srcFileInfoArray) {
-                            if (file.Extension == ".xml") {
+                        // -- XML file -- open it to figure out if it is one we can use
+                        XmlDocument Doc = new XmlDocument();
+                        string CollectionFilename = file.Name;
+                        bool loadOK = true;
+                        string collectionFileContent = core.privateFiles.readFileText(CollectionVersionFolder + file.Name);
+                        try {
+                            Doc.LoadXml(collectionFileContent);
+                        } catch (Exception ex) {
+                            //
+                            // error - Need a way to reach the user that submitted the file
+                            //
+                            LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "]. " + ex);
+                            loadOK = false;
+                        }
+                        if (loadOK) {
+                            if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNodeOld))) {
                                 //
-                                // -- XML file -- open it to figure out if it is one we can use
-                                XmlDocument Doc = new XmlDocument();
-                                string CollectionFilename = file.Name;
-                                bool loadOK = true;
-                                string collectionFileContent = core.privateFiles.readFileText(CollectionVersionFolder + file.Name);
-                                try {
-                                    Doc.LoadXml(collectionFileContent);
-                                } catch (Exception ex) {
+                                //------------------------------------------------------------------------------------------------------
+                                // Collection File - import from sub so it can be re-entrant
+                                //------------------------------------------------------------------------------------------------------
+                                //
+                                bool IsFound = false;
+                                string CollectionName = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "name", "");
+                                if (string.IsNullOrEmpty(CollectionName)) {
                                     //
-                                    // error - Need a way to reach the user that submitted the file
+                                    // ----- Error condition -- it must have a collection name
                                     //
-                                    LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder, skipping xml file, not valid collection metadata, [" + core.privateFiles.localAbsRootPath + CollectionVersionFolder + file.Name + "]. " + ex);
-                                    loadOK = false;
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], collection has no name");
+                                    return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
+                                    return false;
                                 }
-                                if (loadOK) {
-                                    if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNode)) || (Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase(CollectionFileRootNodeOld))) {
-                                        //
-                                        //------------------------------------------------------------------------------------------------------
-                                        // Collection File - import from sub so it can be re-entrant
-                                        //------------------------------------------------------------------------------------------------------
-                                        //
-                                        bool IsFound = false;
-                                        string CollectionName = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "name", "");
-                                        if (string.IsNullOrEmpty(CollectionName)) {
-                                            //
-                                            // ----- Error condition -- it must have a collection name
-                                            //
-                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], collection has no name");
-                                            return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
-                                            return false;
-                                        } else {
-                                            bool CollectionSystem_fileValueOK = false;
-                                            bool CollectionUpdatable_fileValueOK = false;
-                                            //
-                                            bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                            string collectionOninstalladdonGuid = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "onInstallAddonGuid", "");
-                                            string dataRecordList = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "DataRecordList", "");
-                                            int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
-                                                guid = addonGuidManageAddon,
-                                                name = "Manage Add-ons",
-                                                adminOnly = false,
-                                                developerOnly = false,
-                                                newWindow = false,
-                                                active = true,
-                                            }, 0);
-                                            bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
-                                            string onInstallAddonGuid = XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
-                                            bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
-                                            string FileGuid = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "guid", CollectionName);
-                                            if (string.IsNullOrEmpty(FileGuid)) {
-                                                FileGuid = CollectionName;
-                                            }
-                                            if (collectionGuid.ToLowerInvariant() != GenericController.toLCase(FileGuid)) {
+                                bool CollectionSystem_fileValueOK = false;
+                                bool CollectionUpdatable_fileValueOK = false;
+                                //
+                                bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
+                                string collectionOninstalladdonGuid = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "onInstallAddonGuid", "");
+                                string dataRecordList = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "DataRecordList", "");
+                                int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
+                                    guid = addonGuidManageAddon,
+                                    name = "Manage Add-ons",
+                                    adminOnly = false,
+                                    developerOnly = false,
+                                    newWindow = false,
+                                    active = true,
+                                }, 0);
+                                bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                string onInstallAddonGuid = XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
+                                bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
+                                string FileGuid = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "guid", CollectionName);
+                                if (string.IsNullOrEmpty(FileGuid)) {
+                                    FileGuid = CollectionName;
+                                }
+                                if (collectionGuid.ToLowerInvariant() != GenericController.toLCase(FileGuid)) {
+                                    //
+                                    //
+                                    //
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
+                                    return_ErrorMessage += "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
+                                    return false;
+                                }
+                                if (string.IsNullOrEmpty(collectionGuid)) {
+                                    //
+                                    // I hope I do not regret this
+                                    //
+                                    collectionGuid = CollectionName;
+                                }
+                                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, collectionGuid);
+                                if ((collection != null) && !CollectionUpdatable) {
+                                    //
+                                    // -- ERROR, collection is marked not-updateable, but the collection already exists on this site
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
+                                    return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the collection is marked not-updateable and the collection is already installed.</P>";
+                                    return false;
+                                }
+                                //
+                                //-------------------------------------------------------------------------------
+                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-1, save resourses and process collection dependencies");
+                                // Go through all collection nodes
+                                // Process ImportCollection Nodes - so includeaddon nodes will work
+                                // these must be processes regardless of the state of this collection in this app
+                                // Get Resource file list
+                                //-------------------------------------------------------------------------------
+                                //
+                                string wwwFileList = "";
+                                string ContentFileList = "";
+                                string ExecFileList = "";
+                                bool collectionIncludesDiagnosticAddon = false;
+                                foreach (XmlNode MetaDataSection in Doc.DocumentElement.ChildNodes) {
+                                    switch (MetaDataSection.Name.ToLowerInvariant()) {
+                                        case "resource": {
                                                 //
+                                                // set wwwfilelist, contentfilelist, execfilelist
                                                 //
+                                                string resourceType = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "type", "");
+                                                string resourcePath = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "path", "");
+                                                string filename = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "name", "");
                                                 //
-                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
-                                                return_ErrorMessage += "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
-                                                return false;
-                                            } else {
-                                                if (string.IsNullOrEmpty(collectionGuid)) {
+                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
+                                                //
+                                                filename = FileController.convertToDosSlash(filename);
+                                                string SrcPath = "";
+                                                string dstPath = resourcePath;
+                                                int Pos = GenericController.strInstr(1, filename, "\\");
+                                                if (Pos != 0) {
                                                     //
-                                                    // I hope I do not regret this
+                                                    // Source path is in filename
                                                     //
-                                                    collectionGuid = CollectionName;
+                                                    SrcPath = filename.left(Pos - 1);
+                                                    filename = filename.Substring(Pos);
+                                                    if (string.IsNullOrEmpty(resourcePath)) {
+                                                        //
+                                                        // -- No Resource Path give, use the same folder structure from source
+                                                        dstPath = SrcPath;
+                                                    } else {
+                                                        //
+                                                        // -- Copy file to resource path
+                                                        dstPath = resourcePath;
+                                                    }
                                                 }
                                                 //
-                                                //-------------------------------------------------------------------------------
-                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-1, save resourses and process collection dependencies");
-                                                // Go through all collection nodes
-                                                // Process ImportCollection Nodes - so includeaddon nodes will work
-                                                // these must be processes regardless of the state of this collection in this app
-                                                // Get Resource file list
-                                                //-------------------------------------------------------------------------------
+                                                // -- if the filename in the collection file is the wrong case, correct it now
+                                                filename = core.privateFiles.correctFilenameCase(CollectionVersionFolder + SrcPath + filename);
                                                 //
-                                                string wwwFileList = "";
-                                                string ContentFileList = "";
-                                                string ExecFileList = "";
-                                                bool collectionIncludesDiagnosticAddon = false;
-                                                foreach (XmlNode MetaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                    switch (MetaDataSection.Name.ToLowerInvariant()) {
-                                                        case "resource": {
-                                                                //
-                                                                // set wwwfilelist, contentfilelist, execfilelist
-                                                                //
-                                                                string resourceType = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "type", "");
-                                                                string resourcePath = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "path", "");
-                                                                string filename = XmlController.getXMLAttribute(core, ref IsFound, MetaDataSection, "name", "");
-                                                                //
-                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], resource found, name [" + filename + "], type [" + resourceType + "], path [" + resourcePath + "]");
-                                                                //
-                                                                filename = FileController.convertToDosSlash(filename);
-                                                                string SrcPath = "";
-                                                                string dstPath = resourcePath;
-                                                                int Pos = GenericController.strInstr(1, filename, "\\");
-                                                                if (Pos != 0) {
-                                                                    //
-                                                                    // Source path is in filename
-                                                                    //
-                                                                    SrcPath = filename.left(Pos - 1);
-                                                                    filename = filename.Substring(Pos);
-                                                                    if (string.IsNullOrEmpty(resourcePath)) {
-                                                                        //
-                                                                        // -- No Resource Path give, use the same folder structure from source
-                                                                        dstPath = SrcPath;
-                                                                    } else {
-                                                                        //
-                                                                        // -- Copy file to resource path
-                                                                        dstPath = resourcePath;
-                                                                    }
-                                                                }
-                                                                //
-                                                                // -- if the filename in the collection file is the wrong case, correct it now
-                                                                filename = core.privateFiles.correctFilenameCase(CollectionVersionFolder + SrcPath + filename);
-                                                                //
-                                                                // == normalize dst
-                                                                string dstDosPath = FileController.normalizeDosPath(dstPath);
-                                                                //
-                                                                // -- 
-                                                                switch (resourceType.ToLowerInvariant()) {
-                                                                    case "www": {
-                                                                            wwwFileList += Environment.NewLine + dstDosPath + filename;
-                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
-                                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
-                                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
-                                                                                core.wwwFiles.unzipFile(dstDosPath + filename);
-                                                                                core.wwwFiles.deleteFile(dstDosPath + filename);
-                                                                            }
-                                                                            break;
-                                                                        }
-                                                                    case "file":
-                                                                    case "content": {
-                                                                            ContentFileList += Environment.NewLine + dstDosPath + filename;
-                                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
-                                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
-                                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
-                                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
-                                                                                core.cdnFiles.unzipFile(dstDosPath + filename);
-                                                                                core.cdnFiles.deleteFile(dstDosPath + filename);
-                                                                            }
-                                                                            break;
-                                                                        }
-                                                                    default: {
-                                                                            if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
-                                                                                assembliesInZip.Remove(filename.ToLowerInvariant());
-                                                                            }
-                                                                            ExecFileList = ExecFileList + Environment.NewLine + filename;
-                                                                            break;
-                                                                        }
-                                                                }
-                                                                break;
+                                                // == normalize dst
+                                                string dstDosPath = FileController.normalizeDosPath(dstPath);
+                                                //
+                                                // -- 
+                                                switch (resourceType.ToLowerInvariant()) {
+                                                    case "www": {
+                                                            wwwFileList += Environment.NewLine + dstDosPath + filename;
+                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to www, src [" + CollectionVersionFolder + SrcPath + "], dst [" + core.appConfig.localWwwPath + dstDosPath + "].");
+                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.wwwFiles);
+                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping www file [" + core.appConfig.localWwwPath + dstDosPath + filename + "].");
+                                                                core.wwwFiles.unzipFile(dstDosPath + filename);
+                                                                core.wwwFiles.deleteFile(dstDosPath + filename);
                                                             }
-                                                        case "getcollection":
-                                                        case "importcollection": {
+                                                            break;
+                                                        }
+                                                    case "file":
+                                                    case "content": {
+                                                            ContentFileList += Environment.NewLine + dstDosPath + filename;
+                                                            LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, copying file to content, src [" + CollectionVersionFolder + SrcPath + "], dst [" + dstDosPath + "].");
+                                                            core.privateFiles.copyFile(CollectionVersionFolder + SrcPath + filename, dstDosPath + filename, core.cdnFiles);
+                                                            if (GenericController.toLCase(filename.Substring(filename.Length - 4)) == ".zip") {
+                                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", CollectionName [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1, unzipping content file [" + dstDosPath + filename + "].");
+                                                                core.cdnFiles.unzipFile(dstDosPath + filename);
+                                                                core.cdnFiles.deleteFile(dstDosPath + filename);
+                                                            }
+                                                            break;
+                                                        }
+                                                    default: {
+                                                            if (assembliesInZip.Contains(filename.ToLowerInvariant())) {
+                                                                assembliesInZip.Remove(filename.ToLowerInvariant());
+                                                            }
+                                                            ExecFileList = ExecFileList + Environment.NewLine + filename;
+                                                            break;
+                                                        }
+                                                }
+                                                break;
+                                            }
+                                        case "getcollection":
+                                        case "importcollection": {
+                                                //
+                                                // Get path to this collection and call into it
+                                                //
+                                                bool Found = false;
+                                                string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "name", "");
+                                                string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "guid", MetaDataSection.InnerText);
+                                                if (string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                    ChildCollectionGUId = MetaDataSection.InnerText;
+                                                }
+                                                if (collectionsInstalledList.Contains(ChildCollectionGUId.ToLower(CultureInfo.InvariantCulture))) {
+                                                    //
+                                                    // circular import detected, this collection is already imported
+                                                    //
+                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUId + "]");
+                                                } else {
+                                                    //
+                                                    // -- all included collections should already be installed, because buildfolder is called before call
+                                                    installCollectionFromCollectionFolder(core, true, contextLog, ChildCollectionGUId, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
+                                                }
+                                                break;
+                                            }
+                                        default: {
+                                                // do nothing
+                                                break;
+                                            }
+                                    }
+                                }
+                                //
+                                // -- any assemblies found in the zip that were not part of the resources section need to be added
+                                foreach (string filename in assembliesInZip) {
+                                    ExecFileList = ExecFileList + Environment.NewLine + filename;
+                                }
+                                //
+                                //-------------------------------------------------------------------------------
+                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-2, determine if this collection is already installed");
+                                //-------------------------------------------------------------------------------
+                                //
+                                bool OKToInstall = false;
+                                if (collection != null) {
+                                    //
+                                    // Upgrade addon
+                                    //
+                                    if (!isDependency) {
+                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], Install non-dependency collection.");
+                                        OKToInstall = true;
+                                    } else if (reinstallDependencies) {
+                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is up-to-date but installation set to reinstall all collections.");
+                                        OKToInstall = true;
+                                    } else if (collectionFolderConfig.lastChangeDate == DateTime.MinValue) {
+                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection installedDate could not be determined so it will upgrade.");
+                                        OKToInstall = true;
+                                    } else if (collectionFolderConfig.lastChangeDate > collection.modifiedDate) {
+                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is out-of-date and will be upgraded.");
+                                        OKToInstall = true;
+                                    } else {
+                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is up-to-date and will not be upgraded, but all imports in the new version will be checked.");
+                                        OKToInstall = false;
+                                    }
+                                } else {
+                                    //
+                                    // Install new on this application
+                                    //
+                                    collection = AddonCollectionModel.addEmpty<AddonCollectionModel>(core.cpParent);
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App does not have this collection so it will be installed.");
+                                    OKToInstall = true;
+                                }
+                                if (!OKToInstall) {
+                                    //
+                                    // Do not install, but still check all imported collections to see if they need to be installed
+                                    // imported collections moved in front this check
+                                    //
+                                } else {
+                                    //
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-3, prepare to import full collection");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    {
+                                        string CollectionHelpLink = "";
+                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                            if (metaDataSection.Name.ToLowerInvariant() == "helplink") {
+                                                //
+                                                // only save the first
+                                                CollectionHelpLink = metaDataSection.InnerText;
+                                                break;
+                                            }
+                                        }
+                                        //
+                                        // ----- set or clear all fields
+                                        collection.name = CollectionName;
+                                        collection.help = "";
+                                        collection.ccguid = collectionGuid;
+                                        collection.lastChangeDate = collectionFolderConfig.lastChangeDate;
+                                        if (CollectionSystem_fileValueOK) {
+                                            collection.system = CollectionSystem;
+                                        }
+                                        if (CollectionUpdatable_fileValueOK) {
+                                            collection.updatable = CollectionUpdatable;
+                                        }
+                                        if (CollectionblockNavigatorNode_fileValueOK) {
+                                            collection.blockNavigatorNode = CollectionblockNavigatorNode;
+                                        }
+                                        collection.helpLink = CollectionHelpLink;
+                                        //
+                                        MetadataController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
+                                        MetadataController.deleteContentRecords(core, "Add-on Collection Parent Rules", "ParentID=" + collection.id);
+                                        //
+                                        // Store all resource found, new way and compatibility way
+                                        //
+                                        collection.contentFileList = ContentFileList;
+                                        collection.execFileList = ExecFileList;
+                                        collection.wwwFileList = wwwFileList;
+                                        //
+                                        // ----- remove any current navigator nodes installed by the collection previously
+                                        //
+                                        if (collection.id != 0) {
+                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + collection.id);
+                                        }
+                                        collection.save(core.cpParent);
+                                    }
+                                    //
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-4, isolate and process schema-relatednodes (metadata,index,etc)");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == collectionGuid.ToLowerInvariant());
+                                    if (!isBaseCollection || includeBaseMetaDataInstall) {
+                                        string metaDataMiniCollection = "";
+                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                            switch (metaDataSection.Name.ToLowerInvariant()) {
+                                                case "contensivecdef": {
+                                                        //
+                                                        // old metadata section -- take the inner
+                                                        //
+                                                        foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
+                                                            metaDataMiniCollection += Environment.NewLine + ChildNode.OuterXml;
+                                                        }
+                                                        break;
+                                                    }
+                                                case "cdef":
+                                                case "sqlindex":
+                                                case "style":
+                                                case "styles":
+                                                case "stylesheet":
+                                                case "adminmenu":
+                                                case "menuentry":
+                                                case "navigatorentry": {
+                                                        //
+                                                        // handled by Upgrade class
+                                                        metaDataMiniCollection += metaDataSection.OuterXml;
+                                                        break;
+                                                    }
+                                                default: {
+                                                        // do nothing
+                                                        break;
+                                                    }
+                                            }
+                                        }
+                                        //
+                                        // -- install metadataMiniCollection
+                                        if (!string.IsNullOrEmpty(metaDataMiniCollection)) {
+                                            //
+                                            // -- Use the upgrade code to import this part
+                                            metaDataMiniCollection = "<" + CollectionFileRootNode + " name=\"" + CollectionName + "\" guid=\"" + collectionGuid + "\">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
+                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, logPrefix);
+                                            //
+                                            // -- Process nodes to save Collection data
+                                            XmlDocument NavDoc = new XmlDocument();
+                                            loadOK = true;
+                                            try {
+                                                NavDoc.LoadXml(metaDataMiniCollection);
+                                            } catch (Exception ex) {
+                                                //
+                                                // error - Need a way to reach the user that submitted the file
+                                                //
+                                                LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.] " + ex);
+                                                return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
+                                                return false;
+                                            }
+                                            if (loadOK) {
+                                                foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
+                                                    switch (GenericController.toLCase(metaDataNode.Name)) {
+                                                        case "cdef": {
+                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, metaDataNode, "name", "");
                                                                 //
-                                                                // Get path to this collection and call into it
+                                                                // setup metadata rule
                                                                 //
-                                                                bool Found = false;
-                                                                string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "name", "");
-                                                                string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, MetaDataSection, "guid", MetaDataSection.InnerText);
-                                                                if (string.IsNullOrEmpty(ChildCollectionGUId)) {
-                                                                    ChildCollectionGUId = MetaDataSection.InnerText;
-                                                                }
-                                                                if (collectionsInstalledList.Contains(ChildCollectionGUId.ToLower(CultureInfo.InvariantCulture))) {
-                                                                    //
-                                                                    // circular import detected, this collection is already imported
-                                                                    //
-                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Circular import detected. This collection attempts to import a collection that had previously been imported. A collection can not import itself. The collection is [" + CollectionName + "], GUID [" + collectionGuid + "], pass 1. The collection to be imported is [" + ChildCollectionName + "], GUID [" + ChildCollectionGUId + "]");
-                                                                } else {
-                                                                    //
-                                                                    // -- all included collections should already be installed, because buildfolder is called before call
-                                                                    installCollectionFromCollectionFolder(core, true, contextLog, ChildCollectionGUId, ref return_ErrorMessage, IsNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList, false, ref collectionsDownloaded);
+                                                                int ContentId = ContentMetadataModel.getContentId(core, ContentName);
+                                                                if (ContentId > 0) {
+                                                                    using (var csData = new CsModel(core)) {
+                                                                        csData.insert("Add-on Collection CDef Rules");
+                                                                        if (csData.ok()) {
+                                                                            csData.set("Contentid", ContentId);
+                                                                            csData.set("CollectionID", collection.id);
+                                                                        }
+                                                                    }
                                                                 }
                                                                 break;
                                                             }
@@ -358,469 +550,286 @@ namespace Contensive.Processor.Controllers {
                                                             }
                                                     }
                                                 }
-                                                //
-                                                // -- any assemblies found in the zip that were not part of the resources section need to be added
-                                                foreach (string filename in assembliesInZip) {
-                                                    ExecFileList = ExecFileList + Environment.NewLine + filename;
-                                                }
-                                                //
-                                                //-------------------------------------------------------------------------------
-                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-2, determine if this collection is already installed");
-                                                //-------------------------------------------------------------------------------
-                                                //
-                                                bool OKToInstall = false;
-                                                AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, collectionGuid);
-                                                if (collection != null) {
-                                                    //
-                                                    // Upgrade addon
-                                                    //
-                                                    if (!isDependency) {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], Install non-dependency collection.");
-                                                        OKToInstall = true;
-                                                    } else if (reinstallDependencies) {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is up-to-date but installation set to reinstall all collections.");
-                                                        OKToInstall = true;
-                                                    } else if (collectionFolderConfig.lastChangeDate == DateTime.MinValue) {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection installedDate could not be determined so it will upgrade.");
-                                                        OKToInstall = true;
-                                                    } else if (collectionFolderConfig.lastChangeDate > collection.modifiedDate) {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is out-of-date and will be upgraded.");
-                                                        OKToInstall = true;
-                                                    } else {
-                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], dependent collection is up-to-date and will not be upgraded, but all imports in the new version will be checked.");
-                                                        OKToInstall = false;
-                                                    }
-                                                } else {
-                                                    //
-                                                    // Install new on this application
-                                                    //
-                                                    collection = AddonCollectionModel.addEmpty<AddonCollectionModel>(core.cpParent);
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], GUID [" + collectionGuid + "], App does not have this collection so it will be installed.");
-                                                    OKToInstall = true;
-                                                }
-                                                if (!OKToInstall) {
-                                                    //
-                                                    // Do not install, but still check all imported collections to see if they need to be installed
-                                                    // imported collections moved in front this check
-                                                    //
-                                                } else {
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-3, prepare to import full collection");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    {
-                                                        string CollectionHelpLink = "";
-                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            if (metaDataSection.Name.ToLowerInvariant() == "helplink") {
-                                                                //
-                                                                // only save the first
-                                                                CollectionHelpLink = metaDataSection.InnerText;
-                                                                break;
-                                                            }
-                                                        }
-                                                        //
-                                                        // ----- set or clear all fields
-                                                        collection.name = CollectionName;
-                                                        collection.help = "";
-                                                        collection.ccguid = collectionGuid;
-                                                        collection.lastChangeDate = collectionFolderConfig.lastChangeDate;
-                                                        if (CollectionSystem_fileValueOK) {
-                                                            collection.system = CollectionSystem;
-                                                        }
-                                                        if (CollectionUpdatable_fileValueOK) {
-                                                            collection.updatable = CollectionUpdatable;
-                                                        }
-                                                        if (CollectionblockNavigatorNode_fileValueOK) {
-                                                            collection.blockNavigatorNode = CollectionblockNavigatorNode;
-                                                        }
-                                                        collection.helpLink = CollectionHelpLink;
-                                                        //
-                                                        MetadataController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
-                                                        MetadataController.deleteContentRecords(core, "Add-on Collection Parent Rules", "ParentID=" + collection.id);
-                                                        //
-                                                        // Store all resource found, new way and compatibility way
-                                                        //
-                                                        collection.contentFileList = ContentFileList;
-                                                        collection.execFileList = ExecFileList;
-                                                        collection.wwwFileList = wwwFileList;
-                                                        //
-                                                        // ----- remove any current navigator nodes installed by the collection previously
-                                                        //
-                                                        if (collection.id != 0) {
-                                                            MetadataController.deleteContentRecords(core, NavigatorEntryModel.tableMetadata.contentName, "installedbycollectionid=" + collection.id);
-                                                        }
-                                                        collection.save(core.cpParent);
-                                                    }
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-4, isolate and process schema-relatednodes (metadata,index,etc)");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    bool isBaseCollection = (baseCollectionGuid.ToLowerInvariant() == collectionGuid.ToLowerInvariant());
-                                                    if (!isBaseCollection || includeBaseMetaDataInstall) {
-                                                        string metaDataMiniCollection = "";
-                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (metaDataSection.Name.ToLowerInvariant()) {
-                                                                case "contensivecdef": {
-                                                                        //
-                                                                        // old metadata section -- take the inner
-                                                                        //
-                                                                        foreach (XmlNode ChildNode in metaDataSection.ChildNodes) {
-                                                                            metaDataMiniCollection += Environment.NewLine + ChildNode.OuterXml;
-                                                                        }
-                                                                        break;
-                                                                    }
-                                                                case "cdef":
-                                                                case "sqlindex":
-                                                                case "style":
-                                                                case "styles":
-                                                                case "stylesheet":
-                                                                case "adminmenu":
-                                                                case "menuentry":
-                                                                case "navigatorentry": {
-                                                                        //
-                                                                        // handled by Upgrade class
-                                                                        metaDataMiniCollection += metaDataSection.OuterXml;
-                                                                        break;
-                                                                    }
-                                                                default: {
-                                                                        // do nothing
-                                                                        break;
-                                                                    }
-                                                            }
-                                                        }
-                                                        //
-                                                        // -- install metadataMiniCollection
-                                                        if (!string.IsNullOrEmpty(metaDataMiniCollection)) {
-                                                            //
-                                                            // -- Use the upgrade code to import this part
-                                                            metaDataMiniCollection = "<" + CollectionFileRootNode + " name=\"" + CollectionName + "\" guid=\"" + collectionGuid + "\">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
-                                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, logPrefix);
-                                                            //
-                                                            // -- Process nodes to save Collection data
-                                                            XmlDocument NavDoc = new XmlDocument();
-                                                            loadOK = true;
-                                                            try {
-                                                                NavDoc.LoadXml(metaDataMiniCollection);
-                                                            } catch (Exception ex) {
-                                                                //
-                                                                // error - Need a way to reach the user that submitted the file
-                                                                //
-                                                                LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.] " + ex);
-                                                                return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
-                                                                return false;
-                                                            }
-                                                            if (loadOK) {
-                                                                foreach (XmlNode metaDataNode in NavDoc.DocumentElement.ChildNodes) {
-                                                                    switch (GenericController.toLCase(metaDataNode.Name)) {
-                                                                        case "cdef": {
-                                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, metaDataNode, "name", "");
-                                                                                //
-                                                                                // setup metadata rule
-                                                                                //
-                                                                                int ContentId = ContentMetadataModel.getContentId(core, ContentName);
-                                                                                if (ContentId > 0) {
-                                                                                    using (var csData = new CsModel(core)) {
-                                                                                        csData.insert("Add-on Collection CDef Rules");
-                                                                                        if (csData.ok()) {
-                                                                                            csData.set("Contentid", ContentId);
-                                                                                            csData.set("CollectionID", collection.id);
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                                break;
-                                                                            }
-                                                                        default: {
-                                                                                // do nothing
-                                                                                break;
-                                                                            }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-5, create data records from data nodes, ignore fields");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    {
-                                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                            switch (GenericController.toLCase(metaDataSection.Name)) {
-                                                                case "data": {
-                                                                        //
-                                                                        // import content
-                                                                        //   This can only be done with matching guid
-                                                                        //
-                                                                        foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
-                                                                            if (GenericController.toLCase(ContentNode.Name) == "record") {
-                                                                                //
-                                                                                // Data.Record node
-                                                                                //
-                                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "content", "");
-                                                                                if (string.IsNullOrEmpty(ContentName)) {
-                                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
-                                                                                    result = false;
-                                                                                    return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
-                                                                                    return false;
-                                                                                } else {
-                                                                                    string ContentRecordGuid = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "guid", "");
-                                                                                    string ContentRecordName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "name", "");
-                                                                                    if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
-                                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
-                                                                                        result = false;
-                                                                                        return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
-                                                                                        return false;
-                                                                                    } else {
-                                                                                        //
-                                                                                        // create or update the record
-                                                                                        //
-                                                                                        ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                                                                                        using (var csData = new CsModel(core)) {
-                                                                                            if (!string.IsNullOrEmpty(ContentRecordGuid)) {
-                                                                                                csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
-                                                                                            } else {
-                                                                                                csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
-                                                                                            }
-                                                                                            bool recordfound = true;
-                                                                                            if (!csData.ok()) {
-                                                                                                //
-                                                                                                // Insert the new record
-                                                                                                //
-                                                                                                recordfound = false;
-                                                                                                csData.close();
-                                                                                                csData.insert(ContentName);
-                                                                                            }
-                                                                                            if (csData.ok()) {
-                                                                                                //
-                                                                                                // Update the record
-                                                                                                //
-                                                                                                if (recordfound && (!string.IsNullOrEmpty(ContentRecordGuid))) {
-                                                                                                    //
-                                                                                                    // found by guid, use guid in list and save name
-                                                                                                    //
-                                                                                                    csData.set("name", ContentRecordName);
-                                                                                                } else if (recordfound) {
-                                                                                                    //
-                                                                                                    // record found by name, use name is list but do not add guid
-                                                                                                    //
-                                                                                                } else {
-                                                                                                    //
-                                                                                                    // record was created
-                                                                                                    //
-                                                                                                    csData.set("ccguid", ContentRecordGuid);
-                                                                                                    csData.set("name", ContentRecordName);
-                                                                                                }
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                        break;
-                                                                    }
-                                                                default: {
-                                                                        // do nothing
-                                                                        break;
-                                                                    }
-                                                            }
-                                                        }
-                                                    }
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-6, install addon nodes, set importcollection relationships");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                        switch (GenericController.toLCase(metaDataSection.Name)) {
-                                                            case "cdef":
-                                                            case "data":
-                                                            case "help":
-                                                            case "resource":
-                                                            case "helplink": {
-                                                                    //
-                                                                    // ignore - processed in previous passes
-                                                                    break;
-                                                                }
-                                                            case "getcollection":
-                                                            case "importcollection": {
-                                                                    //
-                                                                    // processed, but add rule for collection record
-                                                                    bool Found = false;
-                                                                    string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "name", "");
-                                                                    string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "guid", metaDataSection.InnerText);
-                                                                    if (string.IsNullOrEmpty(ChildCollectionGUId)) {
-                                                                        ChildCollectionGUId = metaDataSection.InnerText;
-                                                                    }
-                                                                    if (!string.IsNullOrEmpty(ChildCollectionGUId)) {
-                                                                        int ChildCollectionId = 0;
-                                                                        using (var csData = new CsModel(core)) {
-                                                                            csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUId));
-                                                                            if (csData.ok()) {
-                                                                                ChildCollectionId = csData.getInteger("id");
-                                                                            }
-                                                                            csData.close();
-                                                                            if (ChildCollectionId != 0) {
-                                                                                csData.insert("Add-on Collection Parent Rules");
-                                                                                if (csData.ok()) {
-                                                                                    csData.set("ParentID", collection.id);
-                                                                                    csData.set("ChildID", ChildCollectionId);
-                                                                                }
-                                                                                csData.close();
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                            case "scriptingmodule":
-                                                            case "scriptingmodules": {
-                                                                    result = false;
-                                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
-                                                                    return false;
-                                                                }
-                                                            case "sharedstyle": {
-                                                                    result = false;
-                                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
-                                                                    return false;
-                                                                }
-                                                            case "addon":
-                                                            case "add-on": {
-                                                                    //
-                                                                    // Add-on Node, do part 1 of 2
-                                                                    //   (include add-on node must be done after all add-ons are installed)
-                                                                    //
-                                                                    CollectionInstallAddonController.installNode(core, metaDataSection, "ccguid", collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
-                                                                    if (!result) { return result; }
-                                                                    break;
-                                                                }
-                                                            case "interfaces": {
-                                                                    //
-                                                                    // Legacy Interface Node
-                                                                    //
-                                                                    foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
-                                                                        CollectionInstallAddonController.installNode(core, metaDataInterfaces, "ccguid", collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
-                                                                        if (!result) { return result; }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                            case "layout": {
-                                                                    //
-                                                                    // -- layouts
-                                                                    CollectionInstallLayoutController.installNode(core, metaDataSection, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
-                                                                    if (!result) { return result; }
-                                                                    break;
-                                                                }
-                                                            default: {
-                                                                    // do nothing
-                                                                    break;
-                                                                }
-                                                        }
-                                                    }
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-7, set addon dependency relationships");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    foreach (XmlNode collectionNode in Doc.DocumentElement.ChildNodes) {
-                                                        switch (collectionNode.Name.ToLowerInvariant()) {
-                                                            case "addon":
-                                                            case "add-on": {
-                                                                    //
-                                                                    // Add-on Node, do part 1, verify the addon in the table with name and guid
-                                                                    setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                    if (!result) { return result; }
-                                                                    break;
-                                                                }
-                                                            case "interfaces": {
-                                                                    //
-                                                                    // Legacy Interface Node
-                                                                    //
-                                                                    foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
-                                                                        setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
-                                                                        if (!result) { return result; }
-                                                                    }
-                                                                    break;
-                                                                }
-                                                            default: {
-                                                                    // do nothing
-                                                                    break;
-                                                                }
-                                                        }
-                                                    }
-                                                    //
-                                                    //-------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-8, process data nodes, set record fields");
-                                                    //-------------------------------------------------------------------------------
-                                                    //
-                                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
-                                                        if (metaDataSection.Name.ToLower().Equals("data")) {
-                                                            installDataNode(core, metaDataSection, ref return_ErrorMessage);
-                                                        }
-                                                    }
-                                                    //
-                                                    //----------------------------------------------------------------------------------------------------------------------
-                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", verify all navigator menu entries for updated addons");
-                                                    //----------------------------------------------------------------------------------------------------------------------
-                                                    //
-                                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
-                                                    foreach (var kvp in Collection.menus) {
-                                                        BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
-                                                    }
-                                                    //
-                                                    // --- end of pass
-                                                }
-                                                //
-                                                // -- setup onInstall if included
-                                                int collectionOninstalladdonid = 0;
-                                                if (!string.IsNullOrWhiteSpace(collectionOninstalladdonGuid)) {
-                                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, collectionOninstalladdonGuid);
-                                                    if (addon != null) {
-                                                        collection.oninstalladdonid = collectionOninstalladdonid;
-                                                        collection.save(core.cpParent);
-                                                    }
-                                                }
-                                                collection.dataRecordList = dataRecordList;
-                                                collection.save(core.cpParent);
-                                                //
-                                                // -- test for diagnostic addon, warn if missing
-                                                if (!collectionIncludesDiagnosticAddon) {
-                                                    //
-                                                    // -- log warning. This collection does not have an install addon
-                                                    LogController.logDebug(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
-                                                }
-                                                //
-                                                // -- execute onInstall addon if found
-                                                if (string.IsNullOrEmpty(onInstallAddonGuid)) {
-                                                    //
-                                                    // -- log warning. This collection does not have an install addon
-                                                    LogController.logDebug(core, "Collection does not include an install addon, [" + collection.name + "]");
-                                                } else {
-                                                    //
-                                                    // -- install the install addon
-                                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
-                                                    if (addon != null) {
-                                                        var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
-                                                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
-                                                            errorContextMessage = "calling onInstall Addon [" + addon.name + "] for collection [" + collection.name + "]"
-                                                        };
-                                                        core.addon.execute(addon, executeContext);
-                                                    }
-                                                }
-                                                //
-                                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], upgrade complete, flush cache");
-                                                //
-                                                // -- import complete, flush caches
-                                                core.cache.invalidateAll();
-                                                result = true;
                                             }
                                         }
                                     }
                                     //
-                                    // -- invalidate cache
-                                    core.cache.invalidateAll();
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-5, create data records from data nodes, ignore fields");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    {
+                                        foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                            switch (GenericController.toLCase(metaDataSection.Name)) {
+                                                case "data": {
+                                                        //
+                                                        // import content
+                                                        //   This can only be done with matching guid
+                                                        //
+                                                        foreach (XmlNode ContentNode in metaDataSection.ChildNodes) {
+                                                            if (GenericController.toLCase(ContentNode.Name) == "record") {
+                                                                //
+                                                                // Data.Record node
+                                                                //
+                                                                string ContentName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "content", "");
+                                                                if (string.IsNullOrEmpty(ContentName)) {
+                                                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
+                                                                    result = false;
+                                                                    return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
+                                                                    return false;
+                                                                } else {
+                                                                    string ContentRecordGuid = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "guid", "");
+                                                                    string ContentRecordName = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "name", "");
+                                                                    if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
+                                                                        LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
+                                                                        result = false;
+                                                                        return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
+                                                                        return false;
+                                                                    } else {
+                                                                        //
+                                                                        // create or update the record
+                                                                        //
+                                                                        ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                                                                        using (var csData = new CsModel(core)) {
+                                                                            if (!string.IsNullOrEmpty(ContentRecordGuid)) {
+                                                                                csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
+                                                                            } else {
+                                                                                csData.open(ContentName, "name=" + DbController.encodeSQLText(ContentRecordName));
+                                                                            }
+                                                                            bool recordfound = true;
+                                                                            if (!csData.ok()) {
+                                                                                //
+                                                                                // Insert the new record
+                                                                                //
+                                                                                recordfound = false;
+                                                                                csData.close();
+                                                                                csData.insert(ContentName);
+                                                                            }
+                                                                            if (csData.ok()) {
+                                                                                //
+                                                                                // Update the record
+                                                                                //
+                                                                                if (recordfound && (!string.IsNullOrEmpty(ContentRecordGuid))) {
+                                                                                    //
+                                                                                    // found by guid, use guid in list and save name
+                                                                                    //
+                                                                                    csData.set("name", ContentRecordName);
+                                                                                } else if (recordfound) {
+                                                                                    //
+                                                                                    // record found by name, use name is list but do not add guid
+                                                                                    //
+                                                                                } else {
+                                                                                    //
+                                                                                    // record was created
+                                                                                    //
+                                                                                    csData.set("ccguid", ContentRecordGuid);
+                                                                                    csData.set("name", ContentRecordName);
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        break;
+                                                    }
+                                                default: {
+                                                        // do nothing
+                                                        break;
+                                                    }
+                                            }
+                                        }
+                                    }
+                                    //
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-6, install addon nodes, set importcollection relationships");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                        switch (GenericController.toLCase(metaDataSection.Name)) {
+                                            case "cdef":
+                                            case "data":
+                                            case "help":
+                                            case "resource":
+                                            case "helplink": {
+                                                    //
+                                                    // ignore - processed in previous passes
+                                                    break;
+                                                }
+                                            case "getcollection":
+                                            case "importcollection": {
+                                                    //
+                                                    // processed, but add rule for collection record
+                                                    bool Found = false;
+                                                    string ChildCollectionName = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "name", "");
+                                                    string ChildCollectionGUId = XmlController.getXMLAttribute(core, ref Found, metaDataSection, "guid", metaDataSection.InnerText);
+                                                    if (string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                        ChildCollectionGUId = metaDataSection.InnerText;
+                                                    }
+                                                    if (!string.IsNullOrEmpty(ChildCollectionGUId)) {
+                                                        int ChildCollectionId = 0;
+                                                        using (var csData = new CsModel(core)) {
+                                                            csData.open("Add-on Collections", "ccguid=" + DbController.encodeSQLText(ChildCollectionGUId));
+                                                            if (csData.ok()) {
+                                                                ChildCollectionId = csData.getInteger("id");
+                                                            }
+                                                            csData.close();
+                                                            if (ChildCollectionId != 0) {
+                                                                csData.insert("Add-on Collection Parent Rules");
+                                                                if (csData.ok()) {
+                                                                    csData.set("ParentID", collection.id);
+                                                                    csData.set("ChildID", ChildCollectionId);
+                                                                }
+                                                                csData.close();
+                                                            }
+                                                        }
+                                                    }
+                                                    break;
+                                                }
+                                            case "scriptingmodule":
+                                            case "scriptingmodules": {
+                                                    result = false;
+                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
+                                                    return false;
+                                                }
+                                            case "sharedstyle": {
+                                                    result = false;
+                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
+                                                    return false;
+                                                }
+                                            case "addon":
+                                            case "add-on": {
+                                                    //
+                                                    // Add-on Node, do part 1 of 2
+                                                    //   (include add-on node must be done after all add-ons are installed)
+                                                    //
+                                                    CollectionInstallAddonController.installNode(core, metaDataSection, "ccguid", collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                    if (!result) { return result; }
+                                                    break;
+                                                }
+                                            case "interfaces": {
+                                                    //
+                                                    // Legacy Interface Node
+                                                    //
+                                                    foreach (XmlNode metaDataInterfaces in metaDataSection.ChildNodes) {
+                                                        CollectionInstallAddonController.installNode(core, metaDataInterfaces, "ccguid", collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                        if (!result) { return result; }
+                                                    }
+                                                    break;
+                                                }
+                                            case "layout": {
+                                                    //
+                                                    // -- layouts
+                                                    CollectionInstallLayoutController.installNode(core, metaDataSection, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                    if (!result) { return result; }
+                                                    break;
+                                                }
+                                            default: {
+                                                    // do nothing
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    //
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-7, set addon dependency relationships");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    foreach (XmlNode collectionNode in Doc.DocumentElement.ChildNodes) {
+                                        switch (collectionNode.Name.ToLowerInvariant()) {
+                                            case "addon":
+                                            case "add-on": {
+                                                    //
+                                                    // Add-on Node, do part 1, verify the addon in the table with name and guid
+                                                    setAddonDependencies(core, collectionNode, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                    if (!result) { return result; }
+                                                    break;
+                                                }
+                                            case "interfaces": {
+                                                    //
+                                                    // Legacy Interface Node
+                                                    //
+                                                    foreach (XmlNode metaDataInterfaces in collectionNode.ChildNodes) {
+                                                        setAddonDependencies(core, metaDataInterfaces, "ccguid", core.siteProperties.dataBuildVersion, collection.id, ref result, ref return_ErrorMessage);
+                                                        if (!result) { return result; }
+                                                    }
+                                                    break;
+                                                }
+                                            default: {
+                                                    // do nothing
+                                                    break;
+                                                }
+                                        }
+                                    }
+                                    //
+                                    //-------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], stage-8, process data nodes, set record fields");
+                                    //-------------------------------------------------------------------------------
+                                    //
+                                    foreach (XmlNode metaDataSection in Doc.DocumentElement.ChildNodes) {
+                                        if (metaDataSection.Name.ToLower().Equals("data")) {
+                                            installDataNode(core, metaDataSection, ref return_ErrorMessage);
+                                        }
+                                    }
+                                    //
+                                    //----------------------------------------------------------------------------------------------------------------------
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", verify all navigator menu entries for updated addons");
+                                    //----------------------------------------------------------------------------------------------------------------------
+                                    //
+                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
+                                    foreach (var kvp in Collection.menus) {
+                                        BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
+                                    }
+                                    //
+                                    // --- end of pass
                                 }
+                                //
+                                // -- setup onInstall if included
+                                int collectionOninstalladdonid = 0;
+                                if (!string.IsNullOrWhiteSpace(collectionOninstalladdonGuid)) {
+                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, collectionOninstalladdonGuid);
+                                    if (addon != null) {
+                                        collection.oninstalladdonid = collectionOninstalladdonid;
+                                        collection.save(core.cpParent);
+                                    }
+                                }
+                                collection.dataRecordList = dataRecordList;
+                                collection.save(core.cpParent);
+                                //
+                                // -- test for diagnostic addon, warn if missing
+                                if (!collectionIncludesDiagnosticAddon) {
+                                    //
+                                    // -- log warning. This collection does not have an install addon
+                                    LogController.logDebug(core, "Collection does not include a Diagnostic addon, [" + collection.name + "]");
+                                }
+                                //
+                                // -- execute onInstall addon if found
+                                if (string.IsNullOrEmpty(onInstallAddonGuid)) {
+                                    //
+                                    // -- log warning. This collection does not have an install addon
+                                    LogController.logDebug(core, "Collection does not include an install addon, [" + collection.name + "]");
+                                } else {
+                                    //
+                                    // -- install the install addon
+                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
+                                    if (addon != null) {
+                                        var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                                            addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,
+                                            errorContextMessage = "calling onInstall Addon [" + addon.name + "] for collection [" + collection.name + "]"
+                                        };
+                                        core.addon.execute(addon, executeContext);
+                                    }
+                                }
+                                //
+                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], upgrade complete, flush cache");
+                                //
+                                // -- import complete, flush caches
+                                core.cache.invalidateAll();
+                                result = true;
                             }
+                            //
+                            // -- invalidate cache
+                            core.cache.invalidateAll();
                         }
                     }
                 }

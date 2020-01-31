@@ -130,32 +130,35 @@ namespace Contensive.BaseClasses {
         /// Create an input for a lookup content field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, int lookupContentId, string htmlId, bool readOnly, bool required, string sqlFilter);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, int lookupContentId, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, int lookupContentId, string htmlId, bool readOnly);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, int lookupContentId, string htmlId);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, int lookupContentId);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly, bool required, string sqlFilter);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId);
+        public abstract string GetLookupContentEditor(string htmlName, int lookupContentId);
         //
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, string lookupContentName, string htmlId, bool readOnly, bool required, string sqlFilter);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, string lookupContentName, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, string lookupContentName, string htmlId, bool readOnly);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, string lookupContentName, string htmlId);
-        public abstract string GetLookupContentEditor(string htmlName, int lookupRecordId, string lookupContentName);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly, bool required, string sqlFilter);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId);
+        public abstract string GetLookupContentEditor(string htmlName, string lookupContentName);
         //
         //==========================================================================================
         /// <summary>
         /// Create an input for a lookup list content field type
         /// </summary>
         /// <returns></returns>
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId);
-        public abstract string GetLookupListEditor(string htmlName, int lookupListIndex, List<string> lookupList);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId, bool readOnly);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList);
         //
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId, bool readOnly, bool required);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId, bool readOnly);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList, string htmlId);
-        public abstract string GetLookupListEditor(string htmlName, string lookupListName, List<string> lookupList);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId, bool readOnly, bool required);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId, bool readOnly);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId);
+        public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName);
         //
         //==========================================================================================
         /// <summary>
