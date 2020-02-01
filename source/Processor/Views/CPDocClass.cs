@@ -191,10 +191,10 @@ namespace Contensive.Processor {
         //
         public override string Body {
             get {
-                return cp.core.doc.docBodyFilter;
+                return cp.core.doc.body;
             }
             set {
-                cp.core.doc.docBodyFilter = value;
+                cp.core.doc.body = value;
             }
         }
         //

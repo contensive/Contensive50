@@ -76,9 +76,10 @@ namespace Contensive.Processor.Controllers {
         //
         // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;
-        //
-        // -- todo
-        public string docBodyFilter { get; set; } = "";
+        /// <summary>
+        /// The accumulated body built as each component adds elements. Available to addons at onBodyEnd. Can be used to create addon filters
+        /// </summary>
+        public string body { get; set; } = "";
         //
         // -- todo
         public bool legacySiteStyles_Loaded { get; set; } = false;

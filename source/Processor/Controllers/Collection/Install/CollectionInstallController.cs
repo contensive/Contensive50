@@ -56,6 +56,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
         public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
             try {
+                int hint = 1;
                 contextLog.Push("installBaseCollection");
                 traceContextLog(core, contextLog);
                 //
@@ -66,11 +67,12 @@ namespace Contensive.Processor.Controllers {
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
                     //
                     // -- base collection notfound
-                    throw new GenericException("Cannot load [" + core.programFiles.localAbsRootPath + "aoBase51.xml]");
+                    throw new GenericException("installBaseCollection, cannot load base collection [" + core.programFiles.localAbsRootPath + "aoBase51.xml]");
                 }
                 {
                     //
                     // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
+                    hint = 2;
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installBaseCollection, install metadata first to verify system requirements");
 
                     MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, reinstallDependencies, true, logPrefix);
@@ -78,6 +80,7 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
+                    hint = 3;
                     string installPrivatePath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
                     try {
                         core.privateFiles.createPath(installPrivatePath);
@@ -87,7 +90,7 @@ namespace Contensive.Processor.Controllers {
                         var collectionsInstalledList = new List<string>();
                         bool isDependency = false;
                         if (!installCollectionFromPrivateFile(core, isDependency, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
-                            throw new GenericException(installErrorMessage);
+                            throw new GenericException("installBaseCollection, call to installCollectionFromPrivateFile failed, message returned [" + installErrorMessage + "]");
                         }
                     } catch (Exception ex) {
                         LogController.logError(core, ex);
@@ -102,7 +105,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError(core, ex);
+                LogController.logError(core, ex, "installBaseCollection, unexpected exception");
                 throw;
             } finally {
                 contextLog.Pop();
@@ -227,7 +230,7 @@ namespace Contensive.Processor.Controllers {
                                     newWindow = false,
                                     active = true,
                                 }, 0);
-                                bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", ""));
+                                bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", "true"));
                                 string onInstallAddonGuid = XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
                                 bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
                                 string FileGuid = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "guid", CollectionName);

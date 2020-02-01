@@ -31,7 +31,19 @@ namespace Contensive.Processor.Controllers {
         //
         //-------------------------------------------------
         // 
-        public string warning { get; set; } = "";
+        public string successMessage { get; set; } = "";
+        //
+        //-------------------------------------------------
+        // 
+        public string infoMessage { get; set; } = "";
+        //
+        //-------------------------------------------------
+        // 
+        public string warningMessage { get; set; } = "";
+        //
+        //-------------------------------------------------
+        // 
+        public string failMessage { get; set; } = "";
         //
         //-------------------------------------------------
         // 
@@ -42,11 +54,14 @@ namespace Contensive.Processor.Controllers {
         public string getHtml(CPBaseClass cp) {
             string userErrors = cp.Utils.EncodeText(cp.UserError.GetList());
             if (!string.IsNullOrWhiteSpace(userErrors)) {
-                warning += userErrors;
+                warningMessage += userErrors;
             }
             string result = "";
             result += (string.IsNullOrWhiteSpace(title) ? "" : cr + "<h2>" + title + "</h2>");
-            result += (string.IsNullOrWhiteSpace(warning) ? "" : cr + "<div class=\"p-3 mb-2 bg-danger text-white\">" + warning + "</div>");
+            result += (string.IsNullOrWhiteSpace(successMessage) ? "" : cr + "<div class=\"p-3 mb-2 bg-success text-white\">" + successMessage + "</div>");
+            result += (string.IsNullOrWhiteSpace(infoMessage) ? "" : cr + "<div class=\"p-3 mb-2 bg-info text-white\">" + infoMessage + "</div>");
+            result += (string.IsNullOrWhiteSpace(warningMessage) ? "" : cr + "<div class=\"p-3 mb-2 bg-warning text-white\">" + warningMessage + "</div>");
+            result += (string.IsNullOrWhiteSpace(failMessage) ? "" : cr + "<div class=\"p-3 mb-2 bg-danger text-white\">" + failMessage + "</div>");
             result += (string.IsNullOrWhiteSpace(description) ? "" : cr + "<p>" + description + "</p>");
             result += (string.IsNullOrWhiteSpace(body) ? "" : cr + "<main>" + body + "</main>");
             result += (string.IsNullOrWhiteSpace(footer) ? "" : cr + "<footer>" + footer + "</footer>");

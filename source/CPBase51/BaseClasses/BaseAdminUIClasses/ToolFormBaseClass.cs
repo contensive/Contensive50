@@ -23,7 +23,19 @@ namespace Contensive.BaseClasses.AdminUI {
         //
         //-------------------------------------------------
         // 
-        public abstract string Warning { get; set; }
+        public abstract string SuccessMessage { get; set; }
+        //
+        //-------------------------------------------------
+        // 
+        public abstract string InfoMessage { get; set; }
+        //
+        //-------------------------------------------------
+        // 
+        public abstract string WarningMessage { get; set; }
+        //
+        //-------------------------------------------------
+        // 
+        public abstract string FailMessage { get; set; }
         //
         //-------------------------------------------------
         // 

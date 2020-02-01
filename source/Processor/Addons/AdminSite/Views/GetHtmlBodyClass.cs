@@ -1,6 +1,5 @@
 ﻿
 using System;
-using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
@@ -8,12 +7,10 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
-using System.Globalization;
-using Contensive.Processor.Addons.AdminSite.Models;
 using Contensive.Processor.Addons.Tools;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class GetHtmlBodyClass : Contensive.BaseClasses.AddonBaseClass {
+    public class GetHtmlBodyClass : AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -21,24 +18,27 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public override object Execute(Contensive.BaseClasses.CPBaseClass cpBase) {
+        public override object Execute(CPBaseClass cpBase) {
             string result = "";
             CPClass cp = (CPClass)cpBase;
             try {
+                //
+                // -- on body start addons
+                result += cp.core.addon.executeOnBodyStart();
                 //
                 // todo - convert admin addon to use cpbase to help understand cp api requirements
                 //
                 if (!cp.core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
-                    result = cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                    result += cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                         errorContextMessage = "get Login Page for Html Body",
-                        addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextPage
+                        addonType = CPUtilsBaseClass.addonContext.ContextPage
                     });
                 } else if (!cp.core.session.isAuthenticatedContentManager()) {
                     //
                     // --- member must have proper access to continue
-                    result = ""
+                    result += ""
                         + "<p>You are attempting to enter an area which your account does not have access.</p>"
                         + "<ul class=\"ccList\">"
                         + "<li class=\"ccListItem\">To return to the public web site, use your back button, or <a href=\"" + "/" + "\">Click Here</A>."
@@ -46,7 +46,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         + "<li class=\"ccListItem\">To have your account access changed to include this area, please contact the <a href=\"mailto:" + cp.core.siteProperties.getText("EmailAdmin") + "\">system administrator</A>. "
                         + "\r</ul>"
                         + "";
-                    result = ""
+                    result += ""
                         + "<div style=\"display:table;padding:100px 0 0 0;margin:0 auto;\">"
                         + cp.core.html.getPanelHeader("Unauthorized Access")
                         + cp.core.html.getPanel(result, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
@@ -57,9 +57,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                 } else {
                     //
                     // get admin content
-                    result = getHtmlBody(cp);
+                    result += getHtmlBody(cp);
                     result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
                 }
+                //
+                // -- on body end addons
+                cp.core.doc.body = result;
+                string addonResult = cp.core.addon.executeOnBodyEnd();
+                result = cp.core.doc.body + addonResult;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }

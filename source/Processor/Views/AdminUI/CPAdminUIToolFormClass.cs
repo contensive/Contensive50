@@ -47,12 +47,36 @@ namespace Contensive.Processor.AdminUI {
                 form.title = value;
             }
         }
-        public override string Warning {
+        public override string SuccessMessage {
             get {
-                return form.warning;
+                return form.successMessage;
             }
             set {
-                form.warning = value;
+                form.successMessage = value;
+            }
+        }
+        public override string InfoMessage {
+            get {
+                return form.infoMessage;
+            }
+            set {
+                form.infoMessage = value;
+            }
+        }
+        public override string WarningMessage {
+            get {
+                return form.warningMessage;
+            }
+            set {
+                form.warningMessage = value;
+            }
+        }
+        public override string FailMessage {
+            get {
+                return form.failMessage;
+            }
+            set {
+                form.failMessage = value;
             }
         }
         public override string Description {

@@ -45,6 +45,44 @@ namespace Contensive.Processor.Controllers {
             this.core = core;
         }
         //
+        // ====================================================================================================
+        /// <summary>
+        /// execute all onBodyStart addons
+        /// </summary>
+        /// <returns></returns>
+        public string executeOnBodyStart() {
+            var result = new StringBuilder();
+            //
+            // -- OnBodyStart add-ons
+            foreach (AddonModel addon in core.addonCache.getOnBodyStartAddonList()) {
+                CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext {
+                    addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart,
+                    errorContextMessage = "calling onBodyStart addon [" + addon.name + "] in HtmlBodyTemplate"
+                };
+                result.Append(execute(addon, bodyStartContext));
+            }
+            return result.ToString();
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// execute all onbodyend addons, return the results
+        /// </summary>
+        /// <returns></returns>
+        public string executeOnBodyEnd() {
+            var result = new StringBuilder();
+            //
+            // -- OnBodyEnd add-ons
+            foreach (var addon in core.addonCache.getOnBodyEndAddonList()) {
+                CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext {
+                    addonType = CPUtilsBaseClass.addonContext.ContextFilter,
+                    errorContextMessage = "calling onBodyEnd addon [" + addon.name + "] in HtmlBodyTemplate"
+                };
+                result.Append(execute(addon, bodyEndContext));
+            }
+            return result.ToString();
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// Execute an addon because it is a dependency of another addon/page/template. A dependancy is only run once in a page.
@@ -912,14 +950,14 @@ namespace Contensive.Processor.Controllers {
                                                                                 }
                                                                             case "currency": {
                                                                                     //
-                                                                                    Copy = AdminUIEditorController.getCurrencyEditor(core, fieldName, encodeNumber( fieldValue ), fieldReadOnly, "", false, "");
+                                                                                    Copy = AdminUIEditorController.getCurrencyEditor(core, fieldName, encodeNumber(fieldValue), fieldReadOnly, "", false, "");
                                                                                     break;
                                                                                 }
                                                                             case "textfile": {
                                                                                     if (fieldReadOnly) {
                                                                                         Copy = fieldValue + HtmlController.inputHidden(fieldName, fieldValue);
                                                                                     } else {
-                                                                                        Copy = AdminUIEditorController.getLongTextEditor(core, fieldName, fieldValue, fieldReadOnly,"",false,"");
+                                                                                        Copy = AdminUIEditorController.getLongTextEditor(core, fieldName, fieldValue, fieldReadOnly, "", false, "");
                                                                                     }
                                                                                     break;
                                                                                 }
@@ -1017,7 +1055,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (FieldHTML) {
                                                                     Copy = AdminUIEditorController.getHtmlEditor(core, fieldName, fieldValue, "", "", "", fieldReadOnly);
                                                                 } else {
-                                                                    Copy = AdminUIEditorController.getLongTextEditor(core, fieldName, fieldValue, fieldReadOnly,"",false,"");
+                                                                    Copy = AdminUIEditorController.getLongTextEditor(core, fieldName, fieldValue, fieldReadOnly, "", false, "");
                                                                 }
                                                                 TabCell.add(AdminUIController.getEditRowLegacy(core, Copy, FieldCaption, FieldDescription, false, false, ""));
                                                                 break;
