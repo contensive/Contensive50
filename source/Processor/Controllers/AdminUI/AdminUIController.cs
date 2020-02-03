@@ -826,7 +826,7 @@ namespace Contensive.Processor.Controllers {
                 };
                 if (allowCut) {
                     string WorkingLink = GenericController.modifyLinkQuery(core.webServer.requestPage + "?" + core.doc.refreshQueryString, RequestNameCut, GenericController.encodeText(contentMetadata.id) + "." + GenericController.encodeText(recordId), true);
-                    editSegmentList.Add("<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">" + iconContentCut.Replace("content cut", getEditSegmentRecordCaption("Cut", contentMetadata.name, recordId, "")) + "</a>");
+                    editSegmentList.Add("<a class=\"ccRecordCutLink\" TabIndex=\"-1\" href=\"" + HtmlController.encodeHtml(WorkingLink) + "\">&nbsp;" + iconContentCut.Replace("content cut", getEditSegmentRecordCaption("Cut", contentMetadata.name, recordId, "")) + "</a>");
                 }
                 return getRecordEditAnchorTag(core, editSegmentList);
             } catch (Exception ex) {
