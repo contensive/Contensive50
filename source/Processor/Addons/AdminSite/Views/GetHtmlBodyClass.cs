@@ -23,19 +23,18 @@ namespace Contensive.Processor.Addons.AdminSite {
             CPClass cp = (CPClass)cpBase;
             try {
                 //
-                // -- on body start addons
-                result += cp.core.addon.executeOnBodyStart();
-                //
-                // todo - convert admin addon to use cpbase to help understand cp api requirements
+                // -- disable PageBuilder
+                cp.Visit.SetProperty("AllowQuickEditor", false);
                 //
                 if (!cp.core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
-                    result += cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
+                    return cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                         errorContextMessage = "get Login Page for Html Body",
                         addonType = CPUtilsBaseClass.addonContext.ContextPage
                     });
-                } else if (!cp.core.session.isAuthenticatedContentManager()) {
+                }
+                if (!cp.core.session.isAuthenticatedContentManager()) {
                     //
                     // --- member must have proper access to continue
                     result += ""
@@ -53,13 +52,18 @@ namespace Contensive.Processor.Addons.AdminSite {
                         + "</div>";
                     cp.core.doc.setMetaContent(0, 0);
                     cp.core.html.addTitle("Unauthorized Access", "adminSite");
-                    result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
-                } else {
+                    return HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
+                }
+                //
+                // -- on body start addons
+                result += cp.core.addon.executeOnBodyStart();
+                //
+                // todo - convert admin addon to use cpbase to help understand cp api requirements
+                //
                     //
                     // get admin content
                     result += getHtmlBody(cp);
                     result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
-                }
                 //
                 // -- on body end addons
                 cp.core.doc.body = result;
