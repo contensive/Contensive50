@@ -47,7 +47,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 } else if (env.visitArchiveAgeDays <= 0) {
                     LogController.logInfo(core, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
                 } else {
-                    DateTime ArchiveDate = env.rightNow.AddDays(-env.visitArchiveAgeDays).Date;
+                    DateTime ArchiveDate = core.rightFrigginNow.AddDays(-env.visitArchiveAgeDays).Date;
                     int DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
                     if (DaystoRemove > 30) {
                         ArchiveDate = OldestVisitDate.AddDays(30);

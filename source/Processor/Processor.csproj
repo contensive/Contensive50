@@ -63,12 +63,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.2002.3.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.2002.3.1\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.2002.5.3, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.2002.5.3\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.3.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.5.3\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -208,6 +208,7 @@
     <Compile Include="Controllers\Collection\Export\ExportLayoutController.cs" />
     <Compile Include="Controllers\Collection\Export\ExportAddonController.cs" />
     <Compile Include="Controllers\Collection\CollectionFolderController.cs" />
+    <Compile Include="Controllers\Collection\Install\CollectionInstallMetadataController.cs" />
     <Compile Include="Controllers\Collection\Install\CollectionInstallLayoutController.cs" />
     <Compile Include="Controllers\Collection\Install\CollectionInstallAddonController.cs" />
     <Compile Include="Controllers\Collection\CollectionLibraryController.cs" />
@@ -422,6 +423,7 @@
     <Content Include="Resources\Icons\IdeaAdminHeaderIconAddonManager.txt" />
     <Content Include="Resources\LogoutButtonFormHtml.txt" />
     <Content Include="Resources\LoginButtonFormHtml.txt" />
+    <Content Include="Resources\sqlConditionalEmail-DaysAfterJoin.txt" />
     <Content Include="Resources\sqlTriggerManyManyRule.txt" />
   </ItemGroup>
   <ItemGroup>

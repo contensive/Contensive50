@@ -61,14 +61,19 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getDateTimeEditor(CoreController core, string fieldName, DateTime? FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
             string inputDate = HtmlController.inputDate(core, fieldName + "-date", FieldValueDate, "", "component-" + htmlId + "-date", "form-control", readOnly, fieldRequired, false);
-            string inputTime = HtmlController.inputTime(core, fieldName + "-time", FieldValueDate, "component-" + htmlId + "-time", "form-control", readOnly, fieldRequired, false);
+            DateTime? FieldValueTime = FieldValueDate;
+            if (FieldValueTime != null) {
+                // if time is 12:00 AM, display a blank in the time field
+                DateTime testTime = (DateTime)FieldValueTime;
+                if(testTime.Hour.Equals(0) && testTime.Minute.Equals(0) && testTime.Second.Equals(0)) { FieldValueTime = null; }
+            }
+            string inputTime = HtmlController.inputTime(core, fieldName + "-time", FieldValueTime, "component-" + htmlId + "-time", "form-control", readOnly, fieldRequired, false);
             string dateTimeString = (FieldValueDate != null) ? ((DateTime)FieldValueDate).ToString("o", CultureInfo.InvariantCulture) : "";
             string inputDateTime = HtmlController.inputHidden(fieldName, dateTimeString, "", htmlId);
             // todo move to adminUI script
             string js = HtmlController.scriptCode(core, ""
                 + "document.addEventListener('DOMContentLoaded', function(){"
-                + "$('body').on('change','#component-" + htmlId + "-date',function(e){console.log('date change');$('#" + htmlId + "').val($('#component-" + htmlId + "-date').val() + 'T' + $('#component-" + htmlId + "-time').val());});"
-                + "$('body').on('change','#component-" + htmlId + "-time',function(e){console.log('time change');});"
+                + "$('body').on('change','#component-" + htmlId + "-date,#component-" + htmlId + "-time',function(e){console.log('date/time change');setDateTimeEditorHidden('" + htmlId + "');});"
                 + "});"
                 + "");
             return HtmlController.div(inputDate + inputTime + inputDateTime + js, "input-group");
@@ -416,7 +421,7 @@ namespace Contensive.Processor.Controllers {
             if ((group == null) && string.IsNullOrWhiteSpace(groupName)) {
                 //
                 // -- groupId invalid and groupname empty
-                return string.Empty;
+                return "No selection can be made because this Member Select field does not have a group assigned." + HtmlController.inputHidden(htmlName, groupId);
             }
             if (group == null) {
                 //

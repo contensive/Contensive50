@@ -113,25 +113,24 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Iterate through all apps, find addosn that need to run and add them to the task queue
         /// </summary>
-        private void scheduleTasks(CoreController coreServer) {
+        private void scheduleTasks(CoreController core) {
             try {
                 //
                 // -- run tasks for each app
-                foreach (var appKvp in coreServer.serverConfig.apps) {
+                foreach (var appKvp in core.serverConfig.apps) {
                     if (appKvp.Value.enabled && appKvp.Value.appStatus.Equals(AppConfigModel.AppStatusEnum.ok)) {
-                        LogController.logTrace(coreServer, "scheduleTasks, app=[" + appKvp.Value.name + "]");
+                        LogController.logTrace(core, "scheduleTasks, app=[" + appKvp.Value.name + "]");
                         using (CPClass cpApp = new CPClass(appKvp.Value.name)) {
                             //
                             // Execute Processes
                             try {
-                                DateTime RightNow = DateTime.Now;
                                 string sqlAddonsCriteria = ""
                                     + "(active<>0)"
                                     + " and(name<>'')"
                                     + " and("
                                     + "  ((ProcessRunOnce is not null)and(ProcessRunOnce<>0))"
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
-                                    + "  or(ProcessNextRun<" + DbController.encodeSQLDate(RightNow) + ")"
+                                    + "  or(ProcessNextRun<" + DbController.encodeSQLDate(core.rightFrigginNow) + ")"
                                     + " )";
                                 var addonList = DbBaseModel.createList<AddonModel>(cpApp, sqlAddonsCriteria);
                                 foreach (var addon in addonList) {
@@ -140,14 +139,14 @@ namespace Contensive.Processor.Controllers {
                                     if (addon.processRunOnce)  {
                                         //
                                         // -- run once checked 
-                                        addon.processNextRun = RightNow;
+                                        addon.processNextRun = core.rightFrigginNow;
                                         addon.processRunOnce = false;
                                     } else if ((addon.processNextRun == null) && (addonProcessInterval > 0)) {
                                         //
                                         // -- processInterval set but everything else blank )
-                                        addon.processNextRun = RightNow.AddMinutes(addonProcessInterval);
+                                        addon.processNextRun = core.rightFrigginNow.AddMinutes(addonProcessInterval);
                                     }
-                                    if (addon.processNextRun <= RightNow) {
+                                    if (addon.processNextRun <= core.rightFrigginNow) {
                                         //
                                         LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], add task, addonProcessRunOnce [" + addon.processRunOnce + "], addonProcessNextRun [" + addon.processNextRun + "]");
                                         //
@@ -160,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                                         if (addonProcessInterval > 0) {
                                             //
                                             // -- interval set, update the next run
-                                            addon.processNextRun = RightNow.AddMinutes(addonProcessInterval);
+                                            addon.processNextRun = core.rightFrigginNow.AddMinutes(addonProcessInterval);
                                         } else {
                                             //
                                             // -- no interval, no next run
@@ -177,8 +176,8 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logTrace(coreServer, "scheduleTasks, exeception [" + ex + "]");
-                LogController.logError(coreServer, ex);
+                LogController.logTrace(core, "scheduleTasks, exeception [" + ex + "]");
+                LogController.logError(core, ex);
             }
         }
         //
@@ -200,7 +199,7 @@ namespace Contensive.Processor.Controllers {
                     Dictionary<string, string> defaultValues = ContentMetadataModel.getDefaultValueDict(core, DownloadModel.tableMetadata.contentName);
                     var download = DbBaseModel.addDefault<DownloadModel>(core.cpParent, defaultValues);
                     download.name = downloadName;
-                    download.dateRequested = DateTime.Now;
+                    download.dateRequested = core.rightFrigginNow;
                     download.requestedBy = core.session.user.id;
                     if (!string.IsNullOrEmpty(downloadFilename)) {
                         //

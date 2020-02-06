@@ -21,6 +21,10 @@ namespace Contensive.Processor.Controllers {
         //
         private const string emailBlockListFilename = "Config\\SMTPBlockList.txt";
         //
+        public static string getBounceAddress( CoreController core, string backupBounceAddress ) {
+            return core.siteProperties.getText("EmailBounceAddress", backupBounceAddress);
+        }
+        //
         //====================================================================================================
         //
         public static string getBlockList(CoreController core) {
@@ -86,10 +90,19 @@ namespace Contensive.Processor.Controllers {
         /// email address must have at least one character before the @, and have a valid email domain
         /// </summary>
         public static bool verifyEmailAddress(CoreController core, string EmailAddress) {
-            if (string.IsNullOrWhiteSpace(EmailAddress)) { return false;  }
-            var EmailParts = new System.Net.Mail.MailAddress(EmailAddress);
-            var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", RegexOptions.Compiled);
-            return emailRegex.IsMatch(EmailParts.Address);
+            try {
+                if (string.IsNullOrWhiteSpace(EmailAddress)) { return false; }
+                var EmailParts = new System.Net.Mail.MailAddress(EmailAddress);
+                if (string.IsNullOrWhiteSpace(EmailParts.Host)) { return false; }
+                if (!EmailParts.Host.Contains(".")) { return false; }
+                if (EmailParts.Host.right(1).Equals(".")) { return false; }
+                if (EmailParts.Host.left(1).Equals(".")) { return false; }
+                if (string.IsNullOrWhiteSpace(EmailParts.Address)) { return false; }
+                var emailRegex = new Regex(@"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$", RegexOptions.Compiled);
+                return emailRegex.IsMatch(EmailParts.Address);
+            } catch (Exception) {
+                return false;
+            }
         }
         //
         //====================================================================================================
@@ -414,10 +427,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns>Admin message if something went wrong (email addresses checked, etc.</returns>
         public static bool queueSystemEmail(CoreController core, SystemEmailModel email, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
             try {
-                string BounceAddress = core.siteProperties.getText("EmailBounceAddress", "");
-                if (string.IsNullOrEmpty(BounceAddress)) {
-                    BounceAddress = email.fromAddress;
-                }
+                string BounceAddress = getBounceAddress(core, email.fromAddress);
                 EmailTemplateModel emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, email.emailTemplateId);
                 string EmailTemplateSource = "";
                 if (emailTemplate != null) {
@@ -1093,6 +1103,344 @@ namespace Contensive.Processor.Controllers {
             public string htmlBody { get; set; }
             public int attempts { get; set; }
             public int emailId { get; set; }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// process group email, adding each to the email queue
+        /// </summary>
+        /// <param name="core"></param>
+        public static void processGroupEmail(CoreController core) {
+            try {
+                //
+                // Open the email records
+                string Criteria = "(ccemail.active<>0)"
+                    + " and ((ccemail.Sent is null)or(ccemail.Sent=0))"
+                    + " and (ccemail.submitted<>0)"
+                    + " and ((ccemail.scheduledate is null)or(ccemail.scheduledate<" + core.sqlRightFrigginNow + "))"
+                    + " and ((ccemail.ConditionID is null)OR(ccemail.ConditionID=0))"
+                    + "";
+                using (var CSEmail = new CsModel(core)) {
+                    CSEmail.open("Email", Criteria);
+                    if (CSEmail.ok()) {
+                        string SQLTablePeople = MetadataController.getContentTablename(core, "People");
+                        string SQLTableMemberRules = MetadataController.getContentTablename(core, "Member Rules");
+                        string SQLTableGroups = MetadataController.getContentTablename(core, "Groups");
+                        string BounceAddress = getBounceAddress(core, "");
+                        string PrimaryLink = "http://" + core.appConfig.domainList[0];
+                        while (CSEmail.ok()) {
+                            int emailId = CSEmail.getInteger("ID");
+                            int EmailMemberId = CSEmail.getInteger("ModifiedBy");
+                            int EmailTemplateId = CSEmail.getInteger("EmailTemplateID");
+                            string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
+                            bool EmailAddLinkEid = CSEmail.getBoolean("AddLinkEID");
+                            string EmailFrom = CSEmail.getText("FromAddress");
+                            string EmailSubject = CSEmail.getText("Subject");
+                            //
+                            // Mark this email sent and go to the next
+                            CSEmail.set("sent", true);
+                            CSEmail.save();
+                            //
+                            // Create Drop Record
+                            int EmailDropId = 0;
+                            using (var csDrop = new CsModel(core)) {
+                                csDrop.insert("Email Drops");
+                                if (csDrop.ok()) {
+                                    EmailDropId = csDrop.getInteger("ID");
+                                    DateTime ScheduleDate = CSEmail.getDate("ScheduleDate");
+                                    if (ScheduleDate < DateTime.Parse("1/1/2000")) {
+                                        ScheduleDate = DateTime.Parse("1/1/2000");
+                                    }
+                                    csDrop.set("Name", "Drop " + EmailDropId + " - Scheduled for " + ScheduleDate.ToString("") + " " + ScheduleDate.ToString(""));
+                                    csDrop.set("EmailID", emailId);
+                                }
+                                csDrop.close();
+                            }
+                            string EmailStatusList = "";
+                            string EmailCopy = CSEmail.getText("copyfilename");
+                            using (var csPerson = new CsModel(core)) {
+                                //
+                                // Select all people in the groups for this email
+                                string SQL = "select Distinct ccMembers.id,ccMembers.email, ccMembers.name"
+                                    + " From ((((ccemail"
+                                    + " left join ccEmailGroups on ccEmailGroups.EmailID=ccEmail.ID)"
+                                    + " left join ccGroups on ccGroups.Id = ccEmailGroups.GroupID)"
+                                    + " left join ccMemberRules on ccGroups.Id = ccMemberRules.GroupID)"
+                                    + " left join ccMembers on ccMembers.Id = ccMemberRules.memberId)"
+                                    + " Where (ccEmail.ID=" + emailId + ")"
+                                    + " and (ccGroups.active<>0)"
+                                    + " and (ccGroups.AllowBulkEmail<>0)"
+                                    + " and (ccMembers.active<>0)"
+                                    + " and (ccMembers.AllowBulkEmail<>0)"
+                                    + " and (ccMembers.email<>'')"
+                                    + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + core.sqlRightFrigginNow + "))"
+                                    + " order by ccMembers.email,ccMembers.id";
+                                csPerson.openSql(SQL);
+                                //
+                                // Send the email to all selected people
+                                //
+                                string LastEmail = null;
+                                LastEmail = "empty";
+                                while (csPerson.ok()) {
+                                    int sendToPersonId = csPerson.getInteger("id");
+                                    string sendToPersonEmail = csPerson.getText("Email");
+                                    string sendToPersonName = csPerson.getText("name");
+                                    if (sendToPersonEmail == LastEmail) {
+                                        if (string.IsNullOrEmpty(sendToPersonName)) { sendToPersonName = "user #" + sendToPersonId; }
+                                        EmailStatusList = EmailStatusList + "Not Sent to " + sendToPersonName + ", duplicate email address (" + sendToPersonEmail + ")" + BR;
+                                    } else {
+                                        EmailStatusList = EmailStatusList + queueEmailRecord(core, "Group Email", sendToPersonId, emailId, DateTime.MinValue, EmailDropId, BounceAddress, EmailFrom, EmailTemplate, EmailFrom, EmailSubject, EmailCopy, CSEmail.getBoolean("AllowSpamFooter"), CSEmail.getBoolean("AddLinkEID"), "") + BR;
+                                    }
+                                    LastEmail = sendToPersonEmail;
+                                    csPerson.goNext();
+                                }
+                                csPerson.close();
+                            }
+                            //
+                            // Send the confirmation
+                            //
+                            int ConfirmationMemberId = CSEmail.getInteger("testmemberid");
+                            queueConfirmationEmail(core, ConfirmationMemberId, EmailDropId, EmailTemplate, EmailAddLinkEid, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
+                            CSEmail.goNext();
+                        }
+                    }
+                    CSEmail.close();
+                }
+                return;
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw (new GenericException("Unexpected exception"));
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Send conditional email based on days after joining a group
+        ///  sends email between the condition period date and date +1. if a conditional email is setup and there are already
+        ///  peope in the group, they do not get the email if they are past the one day threshhold.
+        ///  To keep them from only getting one, the log is used for the one day.
+        ///  Housekeep logs far > 1 day
+        /// </summary>
+        /// <param name="core"></param>
+        public static void processConditional_DaysAfterjoining(CoreController core) {
+            using (var csEmailList = new CsModel(core)) {
+                string sql = Properties.Resources.sqlConditionalEmail_DaysAfterJoin;
+                string bounceAddress = getBounceAddress(core, "");
+                sql = sql.Replace("{{sqldatenow}}", core.sqlRightFrigginNow);
+                csEmailList.openSql(sql);
+                while (csEmailList.ok()) {
+                    int emailId = csEmailList.getInteger("EmailID");
+                    int EmailMemberId = csEmailList.getInteger("MemberID");
+                    DateTime EmailDateExpires = csEmailList.getDate("DateExpires");
+                    //
+                    using (var csEmail = new CsModel(core)) {
+                        csEmail.openRecord("Conditional Email", emailId);
+                        if (csEmail.ok()) {
+                            int EmailTemplateId = csEmail.getInteger("EmailTemplateID");
+                            string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
+                            string FromAddress = csEmail.getText("FromAddress");
+                            int ConfirmationMemberId = csEmail.getInteger("testmemberid");
+                            bool EmailAddLinkEid = csEmail.getBoolean("AddLinkEID");
+                            string EmailSubject = csEmail.getText("Subject");
+                            string EmailCopy = csEmail.getText("CopyFilename");
+                            string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEid, "");
+                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                        }
+                        csEmail.close();
+                    }
+                    //
+                    csEmailList.goNext();
+                }
+                csEmailList.close();
+            }
+        }
+        //
+        //====================================================================================================
+        public static void processConditional_DaysBeforeExpiration(CoreController core) {
+            string bounceAddress = getBounceAddress(core, "");
+            using (var csList = new CsModel(core)) {
+                string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
+                string sqlDateTest = "";
+                sqlDateTest = ""
+                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod > " + core.sqlRightFrigginNow + ")"
+                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + core.sqlRightFrigginNow + ")"
+                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod < ccemail.lastProcessDate)"
+                    + "";
+                string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
+                    + " LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)"
+                    + " LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)"
+                    + " LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)"
+                    + " LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)"
+                    + " Where (ccEmail.id Is Not Null)"
+                    + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + core.sqlRightFrigginNow + ")" // dont send before
+                    + " and(DATEADD(day, -ccEmail.ConditionPeriod-1.0, ccMemberRules.DateExpires) > " + core.sqlRightFrigginNow + ")" // don't send after 1-day
+                    + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.DateExpires) > ccemail.lastProcessDate )" // don't send if condition occured before last proces date
+                    + " AND (ccEmail.ConditionExpireDate > " + core.sqlRightFrigginNow + " OR ccEmail.ConditionExpireDate IS NULL)"
+                    + " AND (ccEmail.ScheduleDate < " + core.sqlRightFrigginNow + " OR ccEmail.ScheduleDate IS NULL)"
+                    + " AND (ccEmail.Submitted <> 0)"
+                    + " AND (ccEmail.ConditionId = 1)"
+                    + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
+                    + " AND (ccGroups.Active <> 0)"
+                    + " AND (ccGroups.AllowBulkEmail <> 0)"
+                    + " AND (ccMembers.ID IS NOT NULL)"
+                    + " AND (ccMembers.Active <> 0)"
+                    + " AND (ccMembers.AllowBulkEmail <> 0)"
+                    + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.memberId=ccMembers.ID))";
+                csList.openSql(SQL);
+                while (csList.ok()) {
+                    int emailId = csList.getInteger("EmailID");
+                    int EmailMemberId = csList.getInteger("MemberID");
+                    DateTime EmailDateExpires = csList.getDate("DateExpires");
+                    //
+                    using (var csEmail = new CsModel(core)) {
+                        csEmail.openRecord("Conditional Email", emailId);
+                        if (csEmail.ok()) {
+                            int EmailTemplateId = csEmail.getInteger("EmailTemplateID");
+                            string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
+                            string FromAddress = csEmail.getText("FromAddress");
+                            int ConfirmationMemberId = csEmail.getInteger("testmemberid");
+                            bool EmailAddLinkEid = csEmail.getBoolean("AddLinkEID");
+                            string EmailSubject = csEmail.getText("Subject");
+                            string EmailCopy = csEmail.getText("CopyFilename");
+                            string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
+                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                        }
+                        csEmail.close();
+                    }
+                    //
+                    csList.goNext();
+                }
+                csList.close();
+            }
+            //
+            // -- save this processing date to all email records to document last process, and as a way to block re-process of conditional email
+            core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlRightFrigginNow);
+        }
+
+        //
+        //====================================================================================================
+        /// <summary>
+        /// process conditional email, adding each to the email queue
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="IsNewHour"></param>
+        /// <param name="IsNewDay"></param>
+        public static void processConditionalEmail(CoreController core) {
+            try {
+                //
+                // -- prepopulate new emails with processDate to prevent new emails from past triggering group joins
+                core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlRightFrigginNow + " where (lastProcessDate is null)");
+                //
+                // Send Conditional Email - Offset days after Joining
+                //
+                processConditional_DaysAfterjoining(core);
+                //
+                // Send Conditional Email - Offset days Before Expiration
+                //
+                processConditional_DaysBeforeExpiration(core);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Send email to a memberid
+        /// </summary>
+        /// <param name="sendToPersonId"></param>
+        /// <param name="emailID"></param>
+        /// <param name="DateBlockExpires"></param>
+        /// <param name="emailDropID"></param>
+        /// <param name="BounceAddress"></param>
+        /// <param name="ReplyToAddress"></param>
+        /// <param name="EmailTemplate"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="EmailSubject"></param>
+        /// <param name="EmailBody"></param>
+        /// <param name="AllowSpamFooter"></param>
+        /// <param name="EmailAllowLinkEID"></param>
+        /// <param name="emailStyles"></param>
+        /// <returns>OK if successful, else returns user error.</returns>
+        public static string queueEmailRecord(CoreController core, string emailContextMessage, int sendToPersonId, int emailID, DateTime DateBlockExpires, int emailDropID, string BounceAddress, string ReplyToAddress, string EmailTemplate, string FromAddress, string EmailSubject, string EmailBody, bool AllowSpamFooter, bool EmailAllowLinkEID, string emailStyles) {
+            PersonModel recipient = DbBaseModel.create<PersonModel>(core.cpParent, sendToPersonId);
+            string returnStatus = "";
+            //
+            // -- open detect
+            if (emailDropID != 0) {
+                string protocolHostLink = "http://" + core.appConfig.domainList[0];
+                string urlProtocolDomainSlash = protocolHostLink + "/";
+                string defaultPage = core.siteProperties.serverPageDefault;
+                switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
+                    case 1:
+                        EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        break;
+                    default:
+                        EmailBody += "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        break;
+                }
+            }
+            //
+            // -- click detect
+            string queryStringForLinkAppend = rnEmailClickFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId;
+            //
+            if (EmailController.queuePersonEmail(core, recipient, FromAddress, EmailSubject, EmailBody, BounceAddress, ReplyToAddress, false, true, emailID, EmailTemplate, EmailAllowLinkEID, ref returnStatus, queryStringForLinkAppend, emailContextMessage)) {
+                returnStatus = "Added to queue, email for " + recipient.name + " at " + recipient.email;
+            }
+            return returnStatus;
+        }
+        //
+        //====================================================================================================
+        //
+        public static string getEmailTemplate(CoreController core, int EmailTemplateID) {
+            var emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, EmailTemplateID);
+            if (emailTemplate != null) {
+                return emailTemplate.bodyHTML;
+            }
+            return "";
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Send confirmation email 
+        /// </summary>
+        /// <param name="ConfirmationMemberID"></param>
+        /// <param name="EmailDropID"></param>
+        /// <param name="EmailTemplate"></param>
+        /// <param name="EmailAllowLinkEID"></param>
+        /// <param name="PrimaryLink"></param>
+        /// <param name="EmailSubject"></param>
+        /// <param name="emailBody"></param>
+        /// <param name="emailStyles"></param>
+        /// <param name="EmailFrom"></param>
+        /// <param name="EmailStatusList"></param>
+        public static void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList, string emailContextMessage) {
+            try {
+                PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ConfirmationMemberID);
+                if (person != null) {
+                    string ConfirmBody = ""
+                        + "The follow email has been sent."
+                        + BR
+                        + BR + "If this email includes personalization, each email sent was personalized to its recipient. This confirmation has been personalized to you."
+                        + BR
+                        + BR + "Subject: " + EmailSubject
+                        + BR + "From: "
+                        + EmailFrom
+                        + BR + "Body"
+                        + BR + "----------------------------------------------------------------------"
+                        + BR + emailBody
+                        + BR + "----------------------------------------------------------------------"
+                        + BR + "--- recipient list ---"
+                        + BR + EmailStatusList
+                        + "--- end of list ---"
+                        + BR;
+                    string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberId + "=" + person.id;
+                    string sendStatus = "";
+                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
         }
     }
 }

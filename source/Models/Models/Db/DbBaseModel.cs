@@ -232,9 +232,6 @@ namespace Contensive.Models.Db {
             return tableMetadata.nameFieldIsUnique;
         }
         //
-        public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp) where T : DbBaseModel
-            => getDefaultValues<T>(cp, 0);
-        //
         //====================================================================================================
         /// <summary>
         /// Determine if the record can be cached.
@@ -272,6 +269,76 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
+        /// Return the default values set in the content fields, and the appropriate values for control fields
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="createdModifiedById"></param>
+        /// <param name="contentSqlSelect">An sql to find the content id and parentid for a record (ex, select id,parentid from cccontent where id=1, or select id,parentid from cccontent where ccguid='{1234-1234-1234-1234}')</param>
+        /// <param name="childIdList">List of content child ids. used to exit recursive call</param>
+        /// <param name="defaultValues">Empty if child not included. If default value is found, it is ignored if the key is already in this list</param>
+        public static void getDefaultValues<T>(CPBaseClass cp, int createdModifiedById, string contentSqlSelect, List<int> childIdList, Dictionary<string, string> defaultValues) where T : DbBaseModel {
+            //
+            // -- determine contentid and parentid
+            int contentId = 0;
+            int parentId = 0;
+            using (var dt = cp.Db.ExecuteQuery(contentSqlSelect)) {
+                if (dt.Rows.Count.Equals(0)) {
+                    //
+                    // -- no content found, return without adding to defaults
+                    return;
+                }
+                DataRow row = dt.Rows[0];
+                contentId = cp.Utils.EncodeInteger(row[0]);
+                parentId = cp.Utils.EncodeInteger(row[1]);
+            }
+            //
+            // -- populate content controlid as contentid of table initially called, blocking the id from possible parent tables
+            if (!defaultValues.ContainsKey("contentcontrolid")) {
+                //
+                // -- values set in the initial content call and blocked in parentid calls
+                defaultValues.Add("contentcontrolid", contentId.ToString());
+                defaultValues.Add("createdby", createdModifiedById.ToString());
+                defaultValues.Add("modifiedby", createdModifiedById.ToString());
+                defaultValues.Add("dateadded", DateTime.Now.ToString());
+                defaultValues.Add("modifieddate", DateTime.Now.ToString());
+                defaultValues.Add("ccguid", cp.Utils.CreateGuid());
+            }
+            //
+            // -- populate default values from content field
+            var sqlFields = "select f.name,f.defaultValue,f.contentid from cccontent c left join ccfields f on f.contentid=c.id where c.id='" + contentId + "'";
+            using (var dt = cp.Db.ExecuteQuery(sqlFields)) {
+                foreach (DataRow row in dt.Rows) {
+                    if (!string.IsNullOrWhiteSpace(row[1].ToString())) {
+                        string fieldName = row[0].ToString().ToLower();
+                        string[] arrayOfPossibilities = { "id", "contentcontrolid", "createdby", "modifiedby", "dateadded", "modifieddate", "ccguid" };
+                        if (!Array.Exists(arrayOfPossibilities, e => e == fieldName)) {
+                            //
+                            // -- add default value if not empty, and if it was not previously added by a child content (because this is the parent loading)
+                            if (!defaultValues.ContainsKey(fieldName)) {
+                                defaultValues.Add(fieldName, row[1].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            //
+            // -- after content defaults, add parent content defaults
+            if (!parentId.Equals(0)) {
+                //
+                // -- parentId found, add parent defaults
+                childIdList.Add(contentId);
+                getDefaultValues<T>(cp, createdModifiedById, "select id,parentid from cccontent where id=" + parentId, childIdList, defaultValues);
+            }
+            //
+            // -- control field active. If not set by content defaults, set it true
+            if (!defaultValues.ContainsKey("active")) {
+                defaultValues.Add("active", "1");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// Return a dictionary of the non-empty default field values for the derived content
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -279,45 +346,12 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp, int createdModifiedById) where T : DbBaseModel {
             var defaultValues = new Dictionary<string, string>();
-            var sql = "select f.name,f.defaultValue,f.contentid from cccontent c left join ccfields f on f.contentid=c.id where c.name='" + derivedContentName(typeof(T)) + "'";
-            using (var dt = cp.Db.ExecuteQuery(sql)) {
-                foreach (DataRow row in dt.Rows) {
-                    string fieldName = row[0].ToString().ToLower();
-                    string defaultValue = string.Empty;
-                    string defaultNow = DateTime.Now.ToString();
-                    if (!string.IsNullOrWhiteSpace(fieldName) && !defaultValues.ContainsKey(fieldName)) {
-                        switch (fieldName) {
-                            case ("contentcontrolid"): {
-                                    defaultValue = row[2].ToString();
-                                    break;
-                                }
-                            case "createdby":
-                            case "modifiedby": {
-                                    defaultValue = createdModifiedById.ToString();
-                                    break;
-                                }
-                            case "dateadded":
-                            case "modifieddate": {
-                                    defaultValue = defaultNow;
-                                    break;
-                                }
-                            case "ccguid": {
-                                    defaultValue = cp.Utils.CreateGuid();
-                                    break;
-                                }
-                            default: {
-                                    defaultValue = row[1].ToString();
-                                    break;
-                                }
-                        }
-                        if (!string.IsNullOrWhiteSpace(defaultValue)) {
-                            defaultValues.Add(fieldName, defaultValue);
-                        }
-                    }
-                }
-            }
+            getDefaultValues<T>(cp, createdModifiedById, "select id,parentid from cccontent where name=" + cp.Db.EncodeSQLText(derivedContentName(typeof(T))), new List<int>(), defaultValues);
             return defaultValues;
         }
+        //
+        public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp) where T : DbBaseModel
+            => getDefaultValues<T>(cp, cp.User.Id);
         //
         //====================================================================================================
         /// <summary>
@@ -1349,7 +1383,7 @@ namespace Contensive.Models.Db {
         /// <param name="parentIdList"></param>
         public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList, bool parentIdFieldVerified) {
             if ((!parentIdFieldVerified) && (!containsField<T>("parentid"))) { return false; }
-            if ((childRecordId < 1) || (parentRecordId<1)) { return false; }
+            if ((childRecordId < 1) || (parentRecordId < 1)) { return false; }
             if (parentIdList.Contains(childRecordId)) { return false; }
             if (parentRecordId == childRecordId) return true;
             using (DataTable dt = cp.Db.ExecuteQuery("select id from " + derivedTableName(typeof(T)) + " where parentId=" + parentRecordId)) {
@@ -1357,7 +1391,7 @@ namespace Contensive.Models.Db {
                     if (dt.Rows.Count > 0) {
                         parentIdList.Add(parentRecordId);
                         foreach (DataRow row in dt.Rows) {
-                            if(isChildOf<T>(cp, cp.Utils.EncodeInteger(row["id"]), childRecordId, parentIdList,true)) {
+                            if (isChildOf<T>(cp, cp.Utils.EncodeInteger(row["id"]), childRecordId, parentIdList, true)) {
                                 return true;
                             }
                         }

@@ -29,7 +29,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 }
                 //
                 // -- Remove old guest records
-                DateTime ArchiveDate = env.rightNow.AddDays(-env.guestArchiveAgeDays).Date;
+                DateTime ArchiveDate = core.rightFrigginNow.AddDays(-env.guestArchiveAgeDays).Date;
                 string SQLTablePeople = MetadataController.getContentTablename(core, "People");
                 string DeleteBeforeDateSQL = DbController.encodeSQLDate(ArchiveDate);
                 //

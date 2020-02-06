@@ -20,7 +20,6 @@ namespace Contensive.Processor.Addons.NewApp {
             try {
                 string appName = cpRootApp.Doc.GetText("appName");
                 string domainName = cpRootApp.Doc.GetText("domainName");
-                DateTime rightNow = DateTime.Now;
                 //
                 using (CPClass cpServer = new CPClass()) {
                     AppConfigModel appConfig = new AppConfigModel {

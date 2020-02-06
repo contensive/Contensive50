@@ -12,12 +12,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
     public class HouseKeepEnvironmentModel {
         public bool force { get; set; }
         public bool runDailyTasks { get; set; }
-        public DateTime rightNow { get; set; }
         public DateTime lastCheckDateTime { get; set; }
         public int serverHousekeepHour { get; set; }
         public DateTime yesterday { get; set; }
         public DateTime aLittleWhileAgo { get; set; }
-        public string sQLNow { get; set; }
         public DateTime oldestVisitSummaryWeCareAbout { get; set; }
         public int visitArchiveAgeDays { get; set; }
         public DateTime visitArchiveDate { get; set; }
@@ -40,21 +38,20 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public HouseKeepEnvironmentModel(CoreController core) {
             try {
                 archiveAlarm = false;
-                rightNow = DateTime.Now;
-                lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default(DateTime));
-                core.siteProperties.setProperty("housekeep, last check", rightNow);
+                lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default);
+                core.siteProperties.setProperty("housekeep, last check", core.rightFrigginNow);
                 force = core.docProperties.getBoolean("force");
                 serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
-                runDailyTasks = ((rightNow.Date > lastCheckDateTime.Date) && (serverHousekeepHour < rightNow.Hour));
-                yesterday = rightNow.AddDays(-1).Date;
-                aLittleWhileAgo = rightNow.AddDays(-90).Date;
-                sQLNow = DbController.encodeSQLDate(rightNow);
+                runDailyTasks = ((core.rightFrigginNow.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.rightFrigginNow.Hour));
+                yesterday = core.rightFrigginNow.AddDays(-1).Date;
+                aLittleWhileAgo = core.rightFrigginNow.AddDays(-90).Date;
+                //sQLNow = DbController.encodeSQLDate(core.rightFrigginNow);
                 defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 archiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
                 sqlDateMidnightTwoDaysAgo = DbController.encodeSQLDate(midnightTwoDaysAgo);
-                yesterday = rightNow.AddDays(-1).Date;
-                midnightTwoDaysAgo = rightNow.AddDays(-2).Date;
-                thirtyDaysAgo = rightNow.AddDays(-30).Date;
+                yesterday = core.rightFrigginNow.AddDays(-1).Date;
+                midnightTwoDaysAgo = core.rightFrigginNow.AddDays(-2).Date;
+                thirtyDaysAgo = core.rightFrigginNow.AddDays(-30).Date;
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
                 visitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
@@ -62,8 +59,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     visitArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
                 }
-                visitArchiveDate = rightNow.AddDays(-visitArchiveAgeDays).Date;
-                oldestVisitSummaryWeCareAbout = DateTime.Now.Date.AddDays(-120);
+                visitArchiveDate = core.rightFrigginNow.AddDays(-visitArchiveAgeDays).Date;
+                oldestVisitSummaryWeCareAbout = core.rightFrigginNow.Date.AddDays(-120);
                 if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
                     oldestVisitSummaryWeCareAbout = visitArchiveDate;
                 }
@@ -98,7 +95,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     AlarmTimeString = "12:00:00 AM";
                     core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }
-                double minutesSinceMidnight = rightNow.TimeOfDay.TotalMinutes;
+                double minutesSinceMidnight = core.rightFrigginNow.TimeOfDay.TotalMinutes;
                 double LastCheckMinutesFromMidnight = lastCheckDateTime.TimeOfDay.TotalMinutes;
                 if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
                     //

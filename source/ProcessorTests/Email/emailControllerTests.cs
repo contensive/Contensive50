@@ -13,6 +13,53 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     public class EmailControllerTests {
         //
         [TestMethod]
+        public void processConditional_DaysAfterjoining_Test_DontSendBefore() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                //
+                // arrange
+                cp.core.mockEmail = true;
+                cp.core.mockNow = new DateTime(1990, 8, 7,12,0,0);
+                //
+                // -- group
+                GroupModel group = DbBaseModel.addDefault<GroupModel>(cp);
+                group.name = "DaysAfterJoiningGroup";
+                group.caption = "DaysAfterJoiningGroup";
+                group.ccguid = "{1234-1243-1234-1234}";
+                group.save(cp);
+                //
+                // -- person
+                PersonModel person = DbBaseModel.addDefault<PersonModel>(cp);
+                person.name = "user";
+                person.email = "test@test.com";
+                person.save(cp);
+                //
+                // -- join now, expires 3 days later, 8/10/1990
+                cp.Group.AddUser(group.id, person.id, cp.core.mockNow.AddDays(3));
+                //
+                // -- setup conditional email, send 4 days before group expiration - should not send
+                ConditionalEmailModel emailDoesntSend = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
+                emailDoesntSend.name = "emailDoesntSend-name";
+                emailDoesntSend.subject = "emailDoesntSend-subject";
+                emailDoesntSend.testMemberId = 0;
+                emailDoesntSend.conditionExpireDate = cp.core.rightFrigginNow.AddDays(4);
+                emailDoesntSend.fromAddress = "a@b.c";
+                emailDoesntSend.conditionId = 1;
+                emailDoesntSend.save(cp);
+                //
+                // -- toSend conditional email 2.5 before expiration - should not send
+                ConditionalEmailModel testEmail = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
+                testEmail.conditionExpireDate = cp.core.rightFrigginNow.AddDays(2.5);
+                testEmail.save(cp);
+                //
+                // act
+                EmailController.processConditionalEmail(cp.core);
+                //
+                // assert
+                Assert.AreEqual(0, cp.core.mockEmailList.Count);
+            }
+        }
+        //
+        [TestMethod]
         public void controllers_Email_GetBlockedList_test1() {
             using (CPClass cp = new CPClass(testAppName)) {
                 cp.core.mockEmail = true;

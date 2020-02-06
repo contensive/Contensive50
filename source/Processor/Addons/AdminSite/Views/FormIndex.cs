@@ -990,8 +990,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 // Return_sqlFrom and Where Clause for Groups filter
-                DateTime rightNow = DateTime.Now;
-                string sqlRightNow = DbController.encodeSQLDate(rightNow);
                 int Ptr = 0;
                 if (adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") {
                     if (IndexConfig.groupListCnt > 0) {
@@ -1003,7 +1001,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     GroupID = GenericController.encodeInteger(GroupName);
                                 }
                                 string groupTableAlias = "GroupFilter" + Ptr;
-                                sqlWhere.Append("AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + sqlRightNow + "))");
+                                sqlWhere.Append("AND(" + groupTableAlias + ".GroupID=" + GroupID + ")and((" + groupTableAlias + ".dateExpires is null)or(" + groupTableAlias + ".dateExpires>" + core.sqlRightFrigginNow + "))");
                                 return_sqlFrom = "(" + return_sqlFrom + " INNER JOIN ccMemberRules AS GroupFilter" + Ptr + " ON GroupFilter" + Ptr + ".memberId=ccMembers.ID)";
                             }
                         }

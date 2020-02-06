@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
                     hint = 2;
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installBaseCollection, install metadata first to verify system requirements");
 
-                    MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, reinstallDependencies, true, logPrefix);
+                    CollectionInstallMetadataController.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, reinstallDependencies, true, logPrefix);
                 }
                 {
                     //
@@ -512,7 +512,7 @@ namespace Contensive.Processor.Controllers {
                                             //
                                             // -- Use the upgrade code to import this part
                                             metaDataMiniCollection = "<" + CollectionFileRootNode + " name=\"" + CollectionName + "\" guid=\"" + collectionGuid + "\">" + metaDataMiniCollection + "</" + CollectionFileRootNode + ">";
-                                            MetadataMiniCollectionModel.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, logPrefix);
+                                            CollectionInstallMetadataController.installMetaDataMiniCollectionFromXml(false, core, metaDataMiniCollection, IsNewBuild, reinstallDependencies, isBaseCollection, logPrefix);
                                             //
                                             // -- Process nodes to save Collection data
                                             XmlDocument NavDoc = new XmlDocument();
@@ -779,7 +779,7 @@ namespace Contensive.Processor.Controllers {
                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", verify all navigator menu entries for updated addons");
                                     //----------------------------------------------------------------------------------------------------------------------
                                     //
-                                    MetadataMiniCollectionModel Collection = MetadataMiniCollectionModel.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
+                                    MetadataMiniCollectionModel Collection = CollectionInstallMetadataController.loadXML(core, collectionFileContent, isBaseCollection, false, IsNewBuild, "");
                                     foreach (var kvp in Collection.menus) {
                                         BuildController.verifyNavigatorEntry(core, kvp.Value, 0);
                                     }

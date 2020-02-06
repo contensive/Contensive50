@@ -17,7 +17,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     bool NeedToClearCache = false;
                     LogController.logInfo(core, "Archive update for pages on [" + core.appConfig.name + "]");
-                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + env.sQLNow + "))and(active<>0)";
+                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + core.sqlRightFrigginNow + "))and(active<>0)";
                     using (var csData = new CsModel(core)) {
                         csData.openSql(SQL);
                         while (csData.ok()) {

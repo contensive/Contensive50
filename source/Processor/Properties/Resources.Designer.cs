@@ -19,7 +19,7 @@ namespace Contensive.Processor.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -79,9 +79,13 @@ namespace Contensive.Processor.Properties {
         ///  {
         ///    &quot;designBlockTypeGuid&quot;: &quot;{4F7FADCB-7B0B-4E4B-BBE4-CFAF4E49D548}&quot;,
         ///    &quot;designBlockTypeName&quot;: &quot;Text Block&quot;,
-        ///    &quot;instanceGuid&quot;: &quot;{instanceGuid}&quot;,
+        ///    &quot;instanceGuid&quot;: &quot;{textBlockInstanceGuid}&quot;,
         ///    &quot;columns&quot;: null
-        ///  }
+        ///  },{
+        ///	&quot;designBlockTypeGuid&quot;:&quot;{D291F133-AB50-4640-9A9A-18DB68FF363B}&quot;,
+        ///	&quot;designBlockTypeName&quot;:&quot;Child Page List&quot;,
+        ///	&quot;instanceGuid&quot;:&quot;{childListInstanceGuid}&quot;,
+        ///	&quot;columns&quot;:null}
         ///].
         /// </summary>
         public static string defaultAddonListJson {
@@ -272,6 +276,27 @@ namespace Contensive.Processor.Properties {
         public static string LogoutButtonFormHtml {
             get {
                 return ResourceManager.GetString("LogoutButtonFormHtml", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 
+        ///
+        ///SELECT Distinct 
+        /// ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID,ccEmail.BlockSiteStyles,ccEmail.stylesFilename
+        /// ,ccMembers.ID AS MemberID
+        /// ,ccMemberRules.DateExpires AS DateExpires
+        /// from ((((ccEmail
+        /// LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)
+        /// LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)
+        /// LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)
+        /// LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)
+        /// Where (ccEmail.id Is Not Null)
+        /// a [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string sqlConditionalEmail_DaysAfterJoin {
+            get {
+                return ResourceManager.GetString("sqlConditionalEmail_DaysAfterJoin", resourceCulture);
             }
         }
         

@@ -31,6 +31,5 @@ namespace Contensive.Models.Db {
         public bool submitted { get; set; }
         public int testMemberId { get; set; }
         public bool toAll { get; set; }
-        public string addonList { get; set; }
     }
 }

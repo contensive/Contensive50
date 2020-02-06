@@ -58,6 +58,43 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         /// <summary>
+        /// The current datetime. Same as DateTime.now except it can be mocked for unit tests
+        /// </summary>
+        public DateTime mockNow { get; set; }
+        //
+        //===================================================================================================
+        /// <summary>
+        /// Use as the current DAteTime (now) sitewide. If true, this method returns that value.
+        /// </summary>
+        public DateTime rightFrigginNow {
+            get {
+                if(mockNow!=null) {
+                    return mockNow;
+                }
+                return DateTime.Now;
+            }
+        }
+        //
+        public DateTime rightFrigginNowDate {
+            get {
+                return rightFrigginNow.Date;
+            }
+        }
+        //
+        public string sqlRightFrigginNow {
+            get {
+                return DbController.encodeSQLDate(rightFrigginNow);
+            }
+        }
+        //
+        public string sqlRightFrigginNowDate {
+            get {
+                return DbController.encodeSQLDate(rightFrigginNowDate);
+            }
+        }
+        //
+        //===================================================================================================
+        /// <summary>
         /// Set true and email send adds all email to mockEmailList
         /// </summary>
         public bool mockEmail { get; set; }
@@ -127,7 +164,7 @@ namespace Contensive.Processor.Controllers {
                 if (_assemblyFileDict != null) { return _assemblyFileDict; }
                 //
                 // -- if remote-mode collections.xml file is updated, invalidate cache
-                if (!privateFiles.localFileStale(AddonController.getPrivateFilesAddonPath() + "Collections.xml")){
+                if (!privateFiles.localFileStale(AddonController.getPrivateFilesAddonPath() + "Collections.xml")) {
                     _assemblyFileDict = cache.getObject<Dictionary<string, AssemblyFileDetails>>(AssemblyFileDictCacheName);
                 }
                 if (_assemblyFileDict == null) {
@@ -136,7 +173,7 @@ namespace Contensive.Processor.Controllers {
                 return _assemblyFileDict;
             }
         }
-        public void assemblyList_AddonsFound_save()  {
+        public void assemblyList_AddonsFound_save() {
             var dependentKeyList = new List<string> {
                 CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.tableMetadata.tableNameLower),
                 CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.tableMetadata.tableNameLower)
@@ -356,10 +393,10 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- not found
-                if ( driveNameList.Contains("D:\\")) {
+                if (driveNameList.Contains("D:\\")) {
                     //
                     // -- d-drive exists, create a new folder in d:\contensive
-                    _programDataFiles = new FileController(this,  FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\");
+                    _programDataFiles = new FileController(this, FileController.normalizeDosPath(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData)) + "Contensive\\");
                     return _programDataFiles;
                 }
                 //
@@ -439,13 +476,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
-        public void addonCacheClearNonPersistent()  {
+        public void addonCacheClearNonPersistent() {
             _addonCacheNonPersistent = null;
         }
         /// <summary>
         /// method to clear the core instance of routeMap. Explained in routeMap.
         /// </summary>
-        public void addonCacheClear()  {
+        public void addonCacheClear() {
             cache.invalidate(cacheName_addonCachePersistent);
             _addonCacheNonPersistent = null;
         }
@@ -587,7 +624,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
         /// </summary>
-        public void routeMapCacheClear()  {
+        public void routeMapCacheClear() {
             // 
             addonCacheClear();
             Models.Domain.RouteMapModel.invalidateCache(this);
@@ -679,7 +716,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 doc.docGuid = GenericController.getGUID();
                 doc.allowDebugLog = true;
-                doc.profileStartTime = DateTime.Now;
+                doc.profileStartTime = rightFrigginNow;
                 doc.visitPropertyAllowDebugging = true;
                 //
                 // -- attempt auth load
@@ -712,7 +749,7 @@ namespace Contensive.Processor.Controllers {
         /// version for core assembly
         /// </summary>
         /// <remarks></remarks>
-        public static string codeVersion()  {
+        public static string codeVersion() {
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
@@ -724,7 +761,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Clear all data from the metaData current instance. Next request will load from cache.
         /// </summary>
-        public void clearMetaData()  {
+        public void clearMetaData() {
             if (metaDataDictionary != null) {
                 metaDataDictionary.Clear();
             }
@@ -736,8 +773,8 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        internal void contentNameIdDictionaryClear()  {
-            _contentNameIdDictionary = null; 
+        internal void contentNameIdDictionaryClear() {
+            _contentNameIdDictionary = null;
         }
         //
         //====================================================================================================
@@ -884,13 +921,13 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CoreController()  {
+        ~CoreController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }
