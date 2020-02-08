@@ -377,7 +377,7 @@ namespace Contensive.Processor.Controllers {
                         Criteria = ""
                             + "(" + Criteria + ")"
                             + " and(r.id is not null)"
-                            + " and((r.DateExpires is null)or(r.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
+                            + " and((r.DateExpires is null)or(r.DateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))"
                             + " ";
                         if (adminReturnsTrue) {
                             Criteria = "(" + Criteria + ")or(m.admin<>0)or(m.developer<>0)";

@@ -909,7 +909,7 @@ namespace Contensive.Processor.Models.Domain {
                     var sqlList = new NameValueCollection {
                             { "ACTIVE", DbController.encodeSQLBoolean(fieldMetadata.active) },
                             { "MODIFIEDBY", DbController.encodeSQLNumber(SystemMemberId) },
-                            { "MODIFIEDDATE", DbController.encodeSQLDate(DateTime.Now) },
+                            { "MODIFIEDDATE", DbController.encodeSQLDate(core.dateTimeNowMockable) },
                             { "TYPE", DbController.encodeSQLNumber((int)fieldMetadata.fieldTypeId) },
                             { "CAPTION", DbController.encodeSQLText(fieldMetadata.caption) },
                             { "ReadOnly", DbController.encodeSQLBoolean(fieldMetadata.readOnly) },
@@ -999,7 +999,7 @@ namespace Contensive.Processor.Models.Domain {
                         sqlList.Add("NAME", DbController.encodeSQLText(fieldMetadata.nameLc));
                         sqlList.Add("CONTENTID", DbController.encodeSQLNumber(id));
                         sqlList.Add("CREATEKEY", "0");
-                        sqlList.Add("DATEADDED", DbController.encodeSQLDate(DateTime.Now));
+                        sqlList.Add("DATEADDED", DbController.encodeSQLDate(core.dateTimeNowMockable));
                         sqlList.Add("CREATEDBY", DbController.encodeSQLNumber(SystemMemberId));
                         fieldMetadata.id = db.insertGetId("ccFields");
                         //
@@ -1127,7 +1127,7 @@ namespace Contensive.Processor.Models.Domain {
                         { "DropDownFieldList", DbController.encodeSQLText(encodeEmpty(contentMetadata.dropDownFieldList, "Name")) },
                         { "ContentTableID", DbController.encodeSQLNumber(table.id) },
                         { "AuthoringTableID", DbController.encodeSQLNumber(table.id) },
-                        { "ModifiedDate", DbController.encodeSQLDate(DateTime.Now) },
+                        { "ModifiedDate", DbController.encodeSQLDate(core.dateTimeNowMockable) },
                         { "CreatedBy", DbController.encodeSQLNumber(SystemMemberId) },
                         { "ModifiedBy", DbController.encodeSQLNumber(SystemMemberId) },
                         { "AllowCalendarEvents", DbController.encodeSQLBoolean(contentMetadata.allowCalendarEvents) },
@@ -1542,7 +1542,7 @@ namespace Contensive.Processor.Models.Domain {
                 childContent.parentId = childContent.id;
                 childContent.name = childContentName;
                 childContent.createdBy = childContent.modifiedBy = memberID;
-                childContent.dateAdded = childContent.modifiedDate = DateTime.Now;
+                childContent.dateAdded = childContent.modifiedDate = core.dateTimeNowMockable;
                 childContent.ccguid = createGuid();
                 childContent.id = 0;
                 childContent.save(core.cpParent);

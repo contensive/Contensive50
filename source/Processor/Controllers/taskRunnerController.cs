@@ -255,7 +255,7 @@ namespace Contensive.Processor.Controllers {
                             // -- trace log without core
                             LogController.log(cp.core, "taskRunner.runTask, runTask, task [" + task.name + "], cmdDetail [" + task.cmdDetail + "]", BaseClasses.CPLogBaseClass.LogLevel.Info);
                             //
-                            DateTime dateStarted = DateTime.Now;
+                            DateTime dateStarted = cp.core.dateTimeNowMockable;
                             var cmdDetail = DeserializeObject<TaskModel.CmdDetailClass>(task.cmdDetail);
                             if (cmdDetail != null) {
                                 var addon = DbBaseModel.create<AddonModel>(cp, cmdDetail.addonId);
@@ -284,14 +284,14 @@ namespace Contensive.Processor.Controllers {
                                                 download.resultMessage = "Completed";
                                                 download.filename.content = result;
                                                 download.dateRequested = dateStarted;
-                                                download.dateCompleted = DateTime.Now;
+                                                download.dateCompleted = cp.core.dateTimeNowMockable;
                                                 download.save(cp);
                                             }
                                         }
                                     }
                                 }
                             }
-                            task.dateCompleted = DateTime.Now;
+                            task.dateCompleted = cp.core.dateTimeNowMockable;
                             DbBaseModel.delete<TaskModel>(cp, task.id);
                             //
                             // -- info log the task running - so info state will log for memory leaks

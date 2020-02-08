@@ -528,7 +528,7 @@ namespace Contensive.Processor.Controllers {
                                 SQL = "select " + SelectFields + " from ccMemberRules R"
                                     + " inner join ccMembers P on R.memberId=P.ID"
                                     + " where (R.GroupID=" + GroupID + ")"
-                                    + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))"
+                                    + " and((R.DateExpires is null)or(R.DateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))"
                                     + " and(P.active<>0)"
                                     + " order by P." + SortFieldList;
                                 if (csData.openSql(SQL)) {

@@ -116,7 +116,7 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             // ----- no result
                             //
-                            Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                            Copy += core.dateTimeNowMockable + " A schema was returned, but it contains no indexs.";
                             result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
                         } else {
 
@@ -146,7 +146,7 @@ namespace Contensive.Processor.Addons.Tools {
                             //
                             // ----- no result
                             //
-                            Copy += DateTime.Now + " A schema was returned, but it contains no indexs.";
+                            Copy += core.dateTimeNowMockable + " A schema was returned, but it contains no indexs.";
                             result += HtmlController.tableRow(Copy, TableColSpan, TableRowEven);
                         } else {
 

@@ -171,7 +171,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- create a menu-page rule to attach this page to the menu in the current order
                                         var menuPageRule = DbBaseModel.addEmpty<MenuPageRuleModel>(cp);
                                         if (menuPageRule != null) {
-                                            menuPageRule.name = "Created from v4.1 menu sections " + DateTime.Now.ToString();
+                                            menuPageRule.name = "Created from v4.1 menu sections " + core.dateTimeNowMockable.ToString();
                                             menuPageRule.pageId = page.id;
                                             menuPageRule.menuId = menu.id;
                                             menuPageRule.active = true;

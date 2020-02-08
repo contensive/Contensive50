@@ -489,6 +489,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        ///Returns current DateTime.Now if cp.Mock.DateTime is not set, else returns Mock.DateTime
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public abstract DateTime GetDateTimeMockable();
+        //
+        //====================================================================================================
+        /// <summary>
         /// wrapped dotnet namespace for use in scripting
         /// </summary>
         /// <param name="source"></param>

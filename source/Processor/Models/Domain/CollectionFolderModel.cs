@@ -46,7 +46,7 @@ namespace Contensive.Processor.Models.Domain {
                             name = string.Empty,
                             guid = string.Empty,
                             path = string.Empty,
-                            lastChangeDate = DateTime.Now
+                            lastChangeDate = core.dateTimeNowMockable
                         };
                         foreach (XmlNode collectionNode in configNode.ChildNodes) {
                             switch (GenericController.toLCase(collectionNode.Name)) {

@@ -58,38 +58,31 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         /// <summary>
-        /// The current datetime. Same as DateTime.now except it can be mocked for unit tests
+        /// set the datetime to be used for dateTimeNowMockable. set to null to use the actual datetime.now.
         /// </summary>
-        public DateTime mockNow { get; set; }
+        public void mockDateTimeNow( DateTime? mockNow) {
+            _mockNow = mockNow;
+        }
+        private DateTime? _mockNow;
         //
         //===================================================================================================
         /// <summary>
         /// Use as the current DAteTime (now) sitewide. If true, this method returns that value.
         /// </summary>
-        public DateTime rightFrigginNow {
+        public DateTime dateTimeNowMockable {
             get {
-                if(mockNow!=null) {
-                    return mockNow;
+                if(_mockNow!=null) {
+                    return (DateTime)_mockNow;
                 }
                 return DateTime.Now;
             }
         }
         //
-        public DateTime rightFrigginNowDate {
-            get {
-                return rightFrigginNow.Date;
-            }
-        }
+        //===================================================================================================
         //
-        public string sqlRightFrigginNow {
+        public string sqlDateTimeMockable {
             get {
-                return DbController.encodeSQLDate(rightFrigginNow);
-            }
-        }
-        //
-        public string sqlRightFrigginNowDate {
-            get {
-                return DbController.encodeSQLDate(rightFrigginNowDate);
+                return DbController.encodeSQLDate(dateTimeNowMockable);
             }
         }
         //
@@ -558,6 +551,7 @@ namespace Contensive.Processor.Controllers {
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
             cpParent = cp;
+            _mockNow = null;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-0, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -585,6 +579,7 @@ namespace Contensive.Processor.Controllers {
         public CoreController(CPClass cp, string applicationName) {
             this.cpParent = cp;
             this.cpParent.core = this;
+            _mockNow = null;
             deleteSessionOnExit = true;
             LogController.log(this, "CoreController constructor-1, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -640,6 +635,7 @@ namespace Contensive.Processor.Controllers {
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) {
             cpParent = cp;
             deleteSessionOnExit = true;
+            _mockNow = null;
             LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -666,6 +662,7 @@ namespace Contensive.Processor.Controllers {
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
             this.cpParent = cp;
             this.cpParent.core = this;
+            _mockNow = null;
             deleteSessionOnExit = false;
             LogController.log(this, "CoreController constructor-3, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
@@ -688,6 +685,7 @@ namespace Contensive.Processor.Controllers {
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) {
             this.cpParent = cp;
             this.cpParent.core = this;
+            _mockNow = null;
             LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
@@ -716,7 +714,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 doc.docGuid = GenericController.getGUID();
                 doc.allowDebugLog = true;
-                doc.profileStartTime = rightFrigginNow;
+                doc.profileStartTime = dateTimeNowMockable;
                 doc.visitPropertyAllowDebugging = true;
                 //
                 // -- attempt auth load

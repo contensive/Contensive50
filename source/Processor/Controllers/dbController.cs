@@ -374,7 +374,7 @@ namespace Contensive.Processor.Controllers {
         public DataTable insert(string tableName, int memberId) {
             try {
                 string sqlGuid = encodeSQLText(GenericController.getGUID());
-                string sqlDateAdded = encodeSQLDate(DateTime.Now);
+                string sqlDateAdded = encodeSQLDate(core.dateTimeNowMockable);
                 NameValueCollection sqlList = new NameValueCollection {
                     { "ccGuid", sqlGuid },
                     { "dateadded", sqlDateAdded },

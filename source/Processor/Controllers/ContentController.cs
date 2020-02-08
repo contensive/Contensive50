@@ -38,7 +38,7 @@ namespace Contensive.Processor.Controllers {
                         // -- new collection
                         string CollectionVersionFolder =  AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                         core.privateFiles.createPath(CollectionVersionFolder);
-                        CollectionFolderController.updateCollectionFolderConfig(core, addonCollection.name, addonCollection.ccguid, DateTime.Now, CollectionVersionFolderName);
+                        CollectionFolderController.updateCollectionFolderConfig(core, addonCollection.name, addonCollection.ccguid, core.dateTimeNowMockable, CollectionVersionFolderName);
                     }
                 }
             }

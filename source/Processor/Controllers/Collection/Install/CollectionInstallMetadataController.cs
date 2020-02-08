@@ -648,7 +648,7 @@ namespace Contensive.Processor.Controllers {
                     if (!StyleSheetAdd.Length.Equals(0)) {
                         SiteStyles = SiteStyles
                             + Environment.NewLine + "\r\n/*"
-                            + Environment.NewLine + "Styles added " + DateTime.Now + Environment.NewLine + "*/"
+                            + Environment.NewLine + "Styles added " + core.dateTimeNowMockable + Environment.NewLine + "*/"
                             + Environment.NewLine + StyleSheetAdd;
                     }
                     core.wwwFiles.saveFile("templates/styles.css", SiteStyles);

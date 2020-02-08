@@ -35,9 +35,9 @@ namespace Contensive.Processor.Addons.Diagnostics {
             try {
                 var resultList = new StringBuilder();
                 var core = ((CPClass)(cp)).core;
-                string pauseHint = " To pause alarm " + ((cp.User.IsAdmin) ? "set site property 'Diagnostics Pause Until Date' or [/status?pauseUntil=" + DateTime.Now.AddHours(1) + "]." : "login as administrator.");
+                string pauseHint = " To pause alarm " + ((cp.User.IsAdmin) ? "set site property 'Diagnostics Pause Until Date' or [/status?pauseUntil=" + core.dateTimeNowMockable.AddHours(1) + "]." : "login as administrator.");
                 cp.Response.SetType("text/plain");
-                if (cp.Site.GetDate("Diagnostics pause until date") > DateTime.Now) {
+                if (cp.Site.GetDate("Diagnostics pause until date") > core.dateTimeNowMockable) {
                     return "ok, diagnostics paused until " + cp.Site.GetDate("Diagnostics pause until date") + "." + Environment.NewLine + resultList.ToString();
                 }
                 foreach (var addon in DbBaseModel.createList<AddonModel>(core.cpParent, "(diagnostic>0)")) {

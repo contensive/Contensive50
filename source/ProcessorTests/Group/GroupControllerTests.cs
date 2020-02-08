@@ -123,8 +123,8 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 PersonModel user = DbBaseModel.addEmpty<PersonModel>(cp);
                 user.name = "User1";
                 user.save(cp);
-                DateTime tomorrow = DateTime.Now.AddDays(1);
-                DateTime yesterday = DateTime.Now.AddDays(-1);
+                DateTime tomorrow = core.dateTimeNowMockable.AddDays(1);
+                DateTime yesterday = core.dateTimeNowMockable.AddDays(-1);
                 Assert.IsNotNull(groupToInclude);
                 Assert.IsNotNull(user);
                 //

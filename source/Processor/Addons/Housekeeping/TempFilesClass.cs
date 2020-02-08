@@ -34,7 +34,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     deleteFiles(core, path + folder.Name + "\\");
                 }
                 foreach (var file in core.tempFiles.getFileList(path)) {
-                    if (encodeDate(file.DateCreated).AddHours(1) < DateTime.Now) {
+                    if (encodeDate(file.DateCreated).AddHours(1) < core.dateTimeNowMockable) {
                         core.tempFiles.deleteFile(path + file.Name);
                     }
                 }

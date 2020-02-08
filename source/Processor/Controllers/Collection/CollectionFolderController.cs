@@ -454,7 +454,7 @@ namespace Contensive.Processor.Controllers {
             // create a collection 'version' folder for these new files
             string TimeStamp = "";
             DateTime NowTime = default(DateTime);
-            NowTime = DateTime.Now;
+            NowTime = core.dateTimeNowMockable;
             int NowPart = NowTime.Year;
             TimeStamp += NowPart.ToString();
             NowPart = NowTime.Month;

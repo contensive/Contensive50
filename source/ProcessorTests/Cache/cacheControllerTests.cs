@@ -145,7 +145,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 var originalObject = new cacheTestClass();
                 string keyTestWithDate = "testWithDate" + GenericController.getRandomInteger(cp.core).ToString();
                 string keyTestNoDate = "testNoDate" + GenericController.getRandomInteger(cp.core).ToString();
-                DateTime invalidateDate = DateTime.Now.AddMilliseconds(1);
+                DateTime invalidateDate = cp.core.dateTimeNowMockable.AddMilliseconds(1);
                 // act
                 cp.core.cache.storeObject(keyTestNoDate, originalObject);
                 cp.core.cache.storeObject(keyTestWithDate, originalObject, invalidateDate);

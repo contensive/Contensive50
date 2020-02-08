@@ -90,7 +90,7 @@ namespace Contensive.Processor {
                         cs.SetField("datasourceid", dataSourceId.ToString());
                         cs.SetField("sqlquery", sql);
                         cs.SetField("maxRows", pageSize.ToString());
-                        cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
+                        cs.SetField("dateexpires", cp.core.dateTimeNowMockable.AddDays(1).ToString());
                         cs.SetField("QueryTypeID", RemoteQueryType.sql.ToString());
                         cs.SetField("VisitID", cp.Visit.Id.ToString());
                     }
@@ -361,7 +361,7 @@ namespace Contensive.Processor {
                         cs.SetField("datasourceid", dataSourceId.ToString());
                         cs.SetField("sqlquery", sql);
                         cs.SetField("maxRows", pageSize.ToString());
-                        cs.SetField("dateexpires", DateTime.Now.AddDays(1).ToString());
+                        cs.SetField("dateexpires", cp.core.dateTimeNowMockable.AddDays(1).ToString());
                         cs.SetField("QueryTypeID", RemoteQueryType.sql.ToString());
                         cs.SetField("VisitID", cp.Visit.Id.ToString());
                     }

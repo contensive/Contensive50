@@ -54,7 +54,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="nonCriticalErrorList"></param>
         /// <param name="logPrefix"></param>
         /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
-        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix) {
+        public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, List<string> collectionsInstalledList) {
             try {
                 int hint = 1;
                 contextLog.Push("installBaseCollection");
@@ -87,7 +87,6 @@ namespace Contensive.Processor.Controllers {
                         core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
                         string installErrorMessage = "";
                         string installedCollectionGuid = "";
-                        var collectionsInstalledList = new List<string>();
                         bool isDependency = false;
                         if (!installCollectionFromPrivateFile(core, isDependency, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
                             throw new GenericException("installBaseCollection, call to installCollectionFromPrivateFile failed, message returned [" + installErrorMessage + "]");
@@ -972,7 +971,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + installPrivatePath + "]");
                 traceContextLog(core, contextLog);
-                DateTime CollectionLastChangeDate = DateTime.Now;
+                DateTime CollectionLastChangeDate = core.dateTimeNowMockable;
                 //
                 // -- collectionsToInstall = collections stored in the collection folder that need to be stored in the Db
                 var collectionsToInstall = new List<string>();
@@ -1020,7 +1019,7 @@ namespace Contensive.Processor.Controllers {
                 DateTime CollectionLastChangeDate;
                 //
                 // -- build the collection folder and download/install all collection dependencies, return list collectionsDownloaded
-                CollectionLastChangeDate = DateTime.Now;
+                CollectionLastChangeDate = core.dateTimeNowMockable;
                 var collectionsDownloaded = new List<string>();
                 var collectionsBuildingFolder = new List<string>();
                 if (!CollectionFolderController.buildCollectionFolderFromCollectionZip(core, contextLog, pathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsDownloaded, ref collectionsInstalledList, ref collectionsBuildingFolder)) {

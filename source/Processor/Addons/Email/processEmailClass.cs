@@ -31,7 +31,7 @@ namespace Contensive.Processor.Addons.Email {
                 // -- send queue
                 EmailController.sendEmailInQueue(core);
                 //
-                core.siteProperties.setProperty("EmailServiceLastCheck", encodeText(core.rightFrigginNow));
+                core.siteProperties.setProperty("EmailServiceLastCheck", encodeText(core.dateTimeNowMockable));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

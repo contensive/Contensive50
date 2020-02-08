@@ -309,7 +309,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // increment count for matching warning
                 //
-                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + DbController.encodeSQLDate(DateTime.Now) + " where id=" + warningId;
+                SQL = "update ccsitewarnings set count=count+1,DateLastReported=" + DbController.encodeSQLDate(core.dateTimeNowMockable) + " where id=" + warningId;
                 core.db.executeNonQuery(SQL);
             } else {
                 //
@@ -321,7 +321,7 @@ namespace Contensive.Processor.Controllers {
                         csData.set("description", Description);
                         csData.set("generalKey", issueCategory);
                         csData.set("count", 1);
-                        csData.set("DateLastReported", DateTime.Now);
+                        csData.set("DateLastReported", core.dateTimeNowMockable);
                         csData.set("location", location);
                         csData.set("pageId", PageID);
                     }

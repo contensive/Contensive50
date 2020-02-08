@@ -292,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                         recordCnt = 0;
                         using (var csData = new CsModel(core)) {
                             sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
-                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
+                            sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
                             csData.open("People", sqlCriteria, "ID", true, core.session.user.id, "username,password", 1);
                             if (!csData.ok()) {
                                 //
@@ -310,7 +310,7 @@ namespace Contensive.Processor.Controllers {
                                         //
                                         csData.set("developer", "1");
                                         csData.set("admin", "1");
-                                        if (csData.getDate("dateExpires") > DateTime.MinValue) { csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString()); }
+                                        if (csData.getDate("dateExpires") > DateTime.MinValue) { csData.set("dateExpires", core.dateTimeNowMockable.AddDays(7).Date.ToString()); }
                                     } else {
                                         //
                                         // inject support record
@@ -321,7 +321,7 @@ namespace Contensive.Processor.Controllers {
                                         csData.set("email", workingEmail);
                                         csData.set("developer", "1");
                                         csData.set("admin", "1");
-                                        csData.set("dateExpires", DateTime.Now.AddDays(7).Date.ToString());
+                                        csData.set("dateExpires", core.dateTimeNowMockable.AddDays(7).Date.ToString());
                                     }
                                 } else {
                                     ErrorController.addUserError(core, "No current user was found matching this email address. Please try again. ");

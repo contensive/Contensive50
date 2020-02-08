@@ -30,12 +30,21 @@ namespace Contensive.Processor {
         //
         // ====================================================================================================
         /// <summary>
+        /// Returns core.dateTimeMockable unless MockDateTime is set
+        /// </summary>
+        /// <returns></returns>
+        public override DateTime GetDateTimeMockable() {
+            return cp.core.dateTimeNowMockable;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
         /// Authentication token can be used to authenticate the user with the request "eid=token". The default expiration is 24 hours.
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
         public override string GetAuthenticationToken(int userId) {
-            return SecurityController.encodeToken(cp.core, userId, DateTime.Now.AddDays(1));
+            return SecurityController.encodeToken(cp.core, userId, cp.core.dateTimeNowMockable.AddDays(1));
         }
         //
         // ====================================================================================================

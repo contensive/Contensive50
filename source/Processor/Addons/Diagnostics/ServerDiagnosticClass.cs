@@ -68,10 +68,10 @@ namespace Contensive.Processor.Addons.Diagnostics {
                 result.AppendLine("ok, database connection passed.");
                 //
                 // -- test for taskscheduler not running
-                if (DbBaseModel.createList<AddonModel>(core.cpParent, "(ProcessNextRun<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
+                if (DbBaseModel.createList<AddonModel>(core.cpParent, "(ProcessNextRun<" + DbController.encodeSQLDate( core.dateTimeNowMockable.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are process addons unexecuted for over 1 hour. TaskScheduler may not be enabled, or no server is running the Contensive Task Service.";
                 }
-                if (DbBaseModel.createList<TaskModel>(core.cpParent, "(dateCompleted is null)and(dateStarted<" + DbController.encodeSQLDate(DateTime.Now.AddHours(-1)) + ")").Count > 0) {
+                if (DbBaseModel.createList<TaskModel>(core.cpParent, "(dateCompleted is null)and(dateStarted<" + DbController.encodeSQLDate(core.dateTimeNowMockable.AddHours(-1)) + ")").Count > 0) {
                     return "ERROR, there are tasks that have been executing for over 1 hour. The Task Runner Server may have stopped.";
                 }
                 result.AppendLine("ok, taskscheduler running.");
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Addons.Diagnostics {
                 result.AppendLine("ok, taskrunner running.");
                 //
                 // -- verify the email process is running.
-                if (cp.Site.GetDate("EmailServiceLastCheck") < DateTime.Now.AddHours(-1)) {
+                if (cp.Site.GetDate("EmailServiceLastCheck") < core.dateTimeNowMockable.AddHours(-1)) {
                     return "ERROR, Email process has not executed for over 1 hour.";
                 }
                 result.AppendLine("ok, email process running.");

@@ -175,7 +175,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- create log entry
                                 LibraryFileLogModel log = LibraryFileLogModel.addEmpty<LibraryFileLogModel>(core.cpParent);
                                 if (log != null) {
-                                    log.name = DateTime.Now.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
+                                    log.name = core.dateTimeNowMockable.ToString() + " user [#" + core.session.user.name + ", " + core.session.user.name + "]";
                                     log.fileId = file.id;
                                     log.visitId = core.session.visit.id;
                                     log.memberId = core.session.user.id;

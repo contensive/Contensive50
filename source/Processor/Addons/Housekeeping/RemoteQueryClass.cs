@@ -14,7 +14,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 // Remote Query Expiration
                 //
-                SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + DbController.encodeSQLDate(DateTime.Now) + ")";
+                SQL = "delete from ccRemoteQueries where (DateExpires is not null)and(DateExpires<" + DbController.encodeSQLDate(core.dateTimeNowMockable) + ")";
                 core.db.executeNonQuery(SQL);
                 SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
                 core.db.executeNonQuery(SQL);

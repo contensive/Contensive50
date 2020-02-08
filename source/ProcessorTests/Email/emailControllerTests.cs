@@ -13,12 +13,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     public class EmailControllerTests {
         //
         [TestMethod]
-        public void processConditional_DaysAfterjoining_Test_DontSendBefore() {
+        public void processConditional_DaysBeforeExpire_Test() {
             using (CPClass cp = new CPClass(testAppName)) {
                 //
-                // arrange
+                // arrange, now = 1/1/2020 at 12:00 am
                 cp.core.mockEmail = true;
-                cp.core.mockNow = new DateTime(1990, 8, 7,12,0,0);
+                cp.core.mockDateTimeNow(new DateTime(2020, 1, 1, 0, 0, 0));
                 //
                 // -- group
                 GroupModel group = DbBaseModel.addDefault<GroupModel>(cp);
@@ -33,29 +33,58 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 person.email = "test@test.com";
                 person.save(cp);
                 //
-                // -- join now, expires 3 days later, 8/10/1990
-                cp.Group.AddUser(group.id, person.id, cp.core.mockNow.AddDays(3));
+                // -- join 1/1/2020 at 12:00 am, expire from group in 10 days later, 1/10/2020 at 12:00 am
+                cp.Group.AddUser(group.id, person.id, ((DateTime)cp.core.dateTimeNowMockable).AddDays(10));
                 //
-                // -- setup conditional email, send 4 days before group expiration - should not send
-                ConditionalEmailModel emailDoesntSend = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
-                emailDoesntSend.name = "emailDoesntSend-name";
-                emailDoesntSend.subject = "emailDoesntSend-subject";
-                emailDoesntSend.testMemberId = 0;
-                emailDoesntSend.conditionExpireDate = cp.core.rightFrigginNow.AddDays(4);
-                emailDoesntSend.fromAddress = "a@b.c";
-                emailDoesntSend.conditionId = 1;
-                emailDoesntSend.save(cp);
+                // -- setup conditional email, send 5 days before group expiration, so send after 1/5/2020 12:00am and before 1/6/2020 12:00am
+                ConditionalEmailModel email = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
+                email.name = "ConditionalEmailTest";
+                email.subject = "ConditionalEmailTest-subject";
+                email.testMemberId = 0;
+                email.conditionExpireDate = null;
+                email.conditionPeriod = 5;
+                email.fromAddress = "ConditionalEmailTest@kma.net";
+                email.conditionId = 1;
+                email.submitted = true;
+                email.save(cp);
                 //
-                // -- toSend conditional email 2.5 before expiration - should not send
-                ConditionalEmailModel testEmail = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
-                testEmail.conditionExpireDate = cp.core.rightFrigginNow.AddDays(2.5);
-                testEmail.save(cp);
+                // -- setup email-group, associating this email to the 
+                EmailGroupModel rule = DbBaseModel.addDefault<EmailGroupModel>(cp);
+                rule.emailId = email.id;
+                rule.groupId = group.id;                    
+                rule.save(cp);
                 //
-                // act
+                // act/asset
                 EmailController.processConditionalEmail(cp.core);
-                //
-                // assert
                 Assert.AreEqual(0, cp.core.mockEmailList.Count);
+                //
+                // 1/1/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(0.5));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/2/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/3/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/4/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/5/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/6/2020 at noon, must send one. If others are in the system, it 
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(1, EmailController.processConditionalEmail(cp.core));
+                //
+                // 1/7/2020 at noon
+                cp.core.mockDateTimeNow(cp.Utils.GetDateTimeMockable().AddDays(1));
+                Assert.AreEqual(0, EmailController.processConditionalEmail(cp.core));
             }
         }
         //

@@ -39,19 +39,19 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 archiveAlarm = false;
                 lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default);
-                core.siteProperties.setProperty("housekeep, last check", core.rightFrigginNow);
+                core.siteProperties.setProperty("housekeep, last check", core.dateTimeNowMockable);
                 force = core.docProperties.getBoolean("force");
                 serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
-                runDailyTasks = ((core.rightFrigginNow.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.rightFrigginNow.Hour));
-                yesterday = core.rightFrigginNow.AddDays(-1).Date;
-                aLittleWhileAgo = core.rightFrigginNow.AddDays(-90).Date;
+                runDailyTasks = ((core.dateTimeNowMockable.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.dateTimeNowMockable.Hour));
+                yesterday = core.dateTimeNowMockable.AddDays(-1).Date;
+                aLittleWhileAgo = core.dateTimeNowMockable.AddDays(-90).Date;
                 //sQLNow = DbController.encodeSQLDate(core.rightFrigginNow);
                 defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 archiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
                 sqlDateMidnightTwoDaysAgo = DbController.encodeSQLDate(midnightTwoDaysAgo);
-                yesterday = core.rightFrigginNow.AddDays(-1).Date;
-                midnightTwoDaysAgo = core.rightFrigginNow.AddDays(-2).Date;
-                thirtyDaysAgo = core.rightFrigginNow.AddDays(-30).Date;
+                yesterday = core.dateTimeNowMockable.AddDays(-1).Date;
+                midnightTwoDaysAgo = core.dateTimeNowMockable.AddDays(-2).Date;
+                thirtyDaysAgo = core.dateTimeNowMockable.AddDays(-30).Date;
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
                 visitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
@@ -59,8 +59,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     visitArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
                 }
-                visitArchiveDate = core.rightFrigginNow.AddDays(-visitArchiveAgeDays).Date;
-                oldestVisitSummaryWeCareAbout = core.rightFrigginNow.Date.AddDays(-120);
+                visitArchiveDate = core.dateTimeNowMockable.AddDays(-visitArchiveAgeDays).Date;
+                oldestVisitSummaryWeCareAbout = core.dateTimeNowMockable.Date.AddDays(-120);
                 if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
                     oldestVisitSummaryWeCareAbout = visitArchiveDate;
                 }
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     AlarmTimeString = "12:00:00 AM";
                     core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
                 }
-                double minutesSinceMidnight = core.rightFrigginNow.TimeOfDay.TotalMinutes;
+                double minutesSinceMidnight = core.dateTimeNowMockable.TimeOfDay.TotalMinutes;
                 double LastCheckMinutesFromMidnight = lastCheckDateTime.TimeOfDay.TotalMinutes;
                 if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
                     //

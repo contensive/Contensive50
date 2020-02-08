@@ -58,7 +58,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // add them to the list
                 //
-                core.doc.emailBlockListStore = blockList + Environment.NewLine + EmailAddress + "\t" + DateTime.Now;
+                core.doc.emailBlockListStore = blockList + Environment.NewLine + EmailAddress + "\t" + core.dateTimeNowMockable;
                 core.privateFiles.saveFile(emailBlockListFilename, core.doc.emailBlockListStore);
                 core.doc.emailBlockListStoreLoaded = false;
             }
@@ -1117,7 +1117,7 @@ namespace Contensive.Processor.Controllers {
                 string Criteria = "(ccemail.active<>0)"
                     + " and ((ccemail.Sent is null)or(ccemail.Sent=0))"
                     + " and (ccemail.submitted<>0)"
-                    + " and ((ccemail.scheduledate is null)or(ccemail.scheduledate<" + core.sqlRightFrigginNow + "))"
+                    + " and ((ccemail.scheduledate is null)or(ccemail.scheduledate<" + core.sqlDateTimeMockable + "))"
                     + " and ((ccemail.ConditionID is null)OR(ccemail.ConditionID=0))"
                     + "";
                 using (var CSEmail = new CsModel(core)) {
@@ -1173,7 +1173,7 @@ namespace Contensive.Processor.Controllers {
                                     + " and (ccMembers.active<>0)"
                                     + " and (ccMembers.AllowBulkEmail<>0)"
                                     + " and (ccMembers.email<>'')"
-                                    + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + core.sqlRightFrigginNow + "))"
+                                    + " and ((ccMemberRules.DateExpires is null)or(ccMemberRules.DateExpires>" + core.sqlDateTimeMockable + "))"
                                     + " order by ccMembers.email,ccMembers.id";
                                 csPerson.openSql(SQL);
                                 //
@@ -1216,17 +1216,19 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// Send conditional email based on days after joining a group
+        ///  Return the number of emails effected
         ///  sends email between the condition period date and date +1. if a conditional email is setup and there are already
         ///  peope in the group, they do not get the email if they are past the one day threshhold.
         ///  To keep them from only getting one, the log is used for the one day.
         ///  Housekeep logs far > 1 day
         /// </summary>
         /// <param name="core"></param>
-        public static void processConditional_DaysAfterjoining(CoreController core) {
+        public static int  processConditional_DaysAfterjoining(CoreController core) {
+            int emailsEffected = 0;
             using (var csEmailList = new CsModel(core)) {
                 string sql = Properties.Resources.sqlConditionalEmail_DaysAfterJoin;
                 string bounceAddress = getBounceAddress(core, "");
-                sql = sql.Replace("{{sqldatenow}}", core.sqlRightFrigginNow);
+                sql = sql.Replace("{{sqldatenow}}", core.sqlDateTimeMockable);
                 csEmailList.openSql(sql);
                 while (csEmailList.ok()) {
                     int emailId = csEmailList.getInteger("EmailID");
@@ -1245,6 +1247,7 @@ namespace Contensive.Processor.Controllers {
                             string EmailCopy = csEmail.getText("CopyFilename");
                             string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEid, "");
                             queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                            emailsEffected++;
                         }
                         csEmail.close();
                     }
@@ -1253,30 +1256,38 @@ namespace Contensive.Processor.Controllers {
                 }
                 csEmailList.close();
             }
+            return emailsEffected;
         }
         //
         //====================================================================================================
-        public static void processConditional_DaysBeforeExpiration(CoreController core) {
+        /// <summary>
+        /// send conditional emmails, return the count of emails effected
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static int processConditional_DaysBeforeExpiration(CoreController core) {
+            int emailsEffected = 0;
             string bounceAddress = getBounceAddress(core, "");
             using (var csList = new CsModel(core)) {
                 string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
                 string sqlDateTest = "";
                 sqlDateTest = ""
-                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod > " + core.sqlRightFrigginNow + ")"
-                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + core.sqlRightFrigginNow + ")"
+                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod > " + core.sqlDateTimeMockable + ")"
+                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + core.sqlDateTimeMockable + ")"
                     + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod < ccemail.lastProcessDate)"
                     + "";
-                string SQL = "SELECT DISTINCT " + FieldList + " FROM ((((ccEmail"
+                string SQL = "SELECT DISTINCT " + FieldList 
+                    + " FROM ((((ccEmail"
                     + " LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)"
                     + " LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)"
                     + " LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)"
                     + " LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)"
                     + " Where (ccEmail.id Is Not Null)"
-                    + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + core.sqlRightFrigginNow + ")" // dont send before
-                    + " and(DATEADD(day, -ccEmail.ConditionPeriod-1.0, ccMemberRules.DateExpires) > " + core.sqlRightFrigginNow + ")" // don't send after 1-day
+                    + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + core.sqlDateTimeMockable + ")" // dont send before
+                    + " and(DATEADD(day, -ccEmail.ConditionPeriod+1.0, ccMemberRules.DateExpires) > " + core.sqlDateTimeMockable + ")" // don't send after 1-day
                     + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.DateExpires) > ccemail.lastProcessDate )" // don't send if condition occured before last proces date
-                    + " AND (ccEmail.ConditionExpireDate > " + core.sqlRightFrigginNow + " OR ccEmail.ConditionExpireDate IS NULL)"
-                    + " AND (ccEmail.ScheduleDate < " + core.sqlRightFrigginNow + " OR ccEmail.ScheduleDate IS NULL)"
+                    + " AND (ccEmail.ConditionExpireDate > " + core.sqlDateTimeMockable + " OR ccEmail.ConditionExpireDate IS NULL)"
+                    + " AND (ccEmail.ScheduleDate < " + core.sqlDateTimeMockable + " OR ccEmail.ScheduleDate IS NULL)"
                     + " AND (ccEmail.Submitted <> 0)"
                     + " AND (ccEmail.ConditionId = 1)"
                     + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
@@ -1295,15 +1306,20 @@ namespace Contensive.Processor.Controllers {
                     using (var csEmail = new CsModel(core)) {
                         csEmail.openRecord("Conditional Email", emailId);
                         if (csEmail.ok()) {
+                            //
+                            // -- send this conditional email
                             int EmailTemplateId = csEmail.getInteger("EmailTemplateID");
                             string EmailTemplate = getEmailTemplate(core, EmailTemplateId);
-                            string FromAddress = csEmail.getText("FromAddress");
+                            string fromAddress = csEmail.getText("FromAddress");
                             int ConfirmationMemberId = csEmail.getInteger("testmemberid");
                             bool EmailAddLinkEid = csEmail.getBoolean("AddLinkEID");
                             string EmailSubject = csEmail.getText("Subject");
                             string EmailCopy = csEmail.getText("CopyFilename");
-                            string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, FromAddress, EmailTemplate, FromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
-                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                            string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, fromAddress, EmailTemplate, fromAddress, csEmail.getText("Subject"), csEmail.getText("CopyFilename"), csEmail.getBoolean("AllowSpamFooter"), csEmail.getBoolean("AddLinkEID"), "");
+                            emailsEffected++;
+                            //
+                            // -- send confirmation for this send
+                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", fromAddress, EmailStatus + "<BR>", "Conditional Email");
                         }
                         csEmail.close();
                     }
@@ -1314,32 +1330,38 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- save this processing date to all email records to document last process, and as a way to block re-process of conditional email
-            core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlRightFrigginNow);
+            core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlDateTimeMockable);
+            //
+            return emailsEffected;
         }
 
         //
         //====================================================================================================
         /// <summary>
-        /// process conditional email, adding each to the email queue
+        /// process conditional email, adding each to the email queue. Return the number of emails effected
         /// </summary>
         /// <param name="core"></param>
         /// <param name="IsNewHour"></param>
         /// <param name="IsNewDay"></param>
-        public static void processConditionalEmail(CoreController core) {
+        public static int processConditionalEmail(CoreController core) {
+            int emailsEffected = 0;
             try {
                 //
                 // -- prepopulate new emails with processDate to prevent new emails from past triggering group joins
-                core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlRightFrigginNow + " where (lastProcessDate is null)");
+                core.db.executeNonQuery("update ccemail set lastProcessDate=" + core.sqlDateTimeMockable + " where (lastProcessDate is null)");
                 //
                 // Send Conditional Email - Offset days after Joining
                 //
-                processConditional_DaysAfterjoining(core);
+                emailsEffected += processConditional_DaysAfterjoining(core);
                 //
                 // Send Conditional Email - Offset days Before Expiration
                 //
-                processConditional_DaysBeforeExpiration(core);
+                emailsEffected += processConditional_DaysBeforeExpiration(core);
+                //
+                return emailsEffected;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return emailsEffected;
             }
         }
         //

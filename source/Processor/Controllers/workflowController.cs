@@ -42,8 +42,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="userId"></param>
         /// <param name="tableRecordKey"></param>
         /// <returns></returns>
-        public static string getAuthoringControlCriteria(string tableRecordKey)
-            => "(contentRecordKey=" + tableRecordKey + ")and((DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + ")or(DateExpires Is null))";
+        public static string getAuthoringControlCriteria(string tableRecordKey, DateTime dateTimeMockable)
+            => "(contentRecordKey=" + tableRecordKey + ")and((DateExpires>" + DbController.encodeSQLDate(dateTimeMockable) + ")or(DateExpires Is null))";
         //
         //=================================================================================
         /// <summary>
@@ -52,9 +52,9 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableId"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
-        private static string getAuthoringControlCriteria(int tableId, int recordId) {
-            return getAuthoringControlCriteria(getTableRecordKey(tableId, recordId));
-        }
+        //private static string getAuthoringControlCriteria(int tableId, int recordId) {
+        //    return getAuthoringControlCriteria(getTableRecordKey(tableId, recordId));
+        //}
         //
         //==========================================================================================
         /// <summary>
@@ -64,8 +64,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableRecordKey"></param>
         /// <param name="ControlType"></param>
         /// <returns></returns>
-        public static string getAuthoringControlCriteria(string tableRecordKey, AuthoringControls ControlType)
-            => "(controltype=" + (int)ControlType + ")and(" + getAuthoringControlCriteria(tableRecordKey) + ")";
+        public static string getAuthoringControlCriteria(string tableRecordKey, AuthoringControls ControlType, DateTime dateTimeMockable)
+            => "(controltype=" + (int)ControlType + ")and(" + getAuthoringControlCriteria(tableRecordKey, dateTimeMockable) + ")";
         //
         //=====================================================================================================
         /// <summary>
@@ -88,7 +88,7 @@ namespace Contensive.Processor.Controllers {
             if (cdef == null) return "(1=0)";
             var table = DbBaseModel.createByUniqueName<TableModel>(core.cpParent, cdef.tableName);
             if (table == null) return "(1=0)";
-            return getAuthoringControlCriteria(getTableRecordKey(table.id, recordId));
+            return getAuthoringControlCriteria(getTableRecordKey(table.id, recordId),core.dateTimeNowMockable);
         }
         //
         //=================================================================================
@@ -106,7 +106,7 @@ namespace Contensive.Processor.Controllers {
                 if (table != null) {
                     //
                     // -- get the edit control for this record (not by this person) with the oldest expiration date
-                    string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId), AuthoringControls.Editing);
+                    string criteria = "(createdby<>" + core.session.user.id + ")and" + getAuthoringControlCriteria(getTableRecordKey(table.id, recordId), AuthoringControls.Editing, core.dateTimeNowMockable);
                     var authoringControlList = DbBaseModel.createList<AuthoringControlModel>(core.cpParent, criteria, "dateexpires desc");
                     if (authoringControlList.Count > 0) {
                         var person = DbBaseModel.create<PersonModel>(core.cpParent, GenericController.encodeInteger(authoringControlList.First().createdBy));
@@ -184,7 +184,7 @@ namespace Contensive.Processor.Controllers {
             editLock.contentRecordKey = contentRecordKey;
             editLock.controlType = (int)AuthoringControls.Editing;
             editLock.createdBy = userId;
-            editLock.dateAdded = DateTime.Now;
+            editLock.dateAdded = core.dateTimeNowMockable;
             editLock.save(core.cpParent, userId);
         }
         //

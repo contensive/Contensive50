@@ -306,7 +306,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- set value in Db
-                            string SQLNow = DbController.encodeSQLDate(DateTime.Now);
+                            string SQLNow = DbController.encodeSQLDate(core.dateTimeNowMockable);
                             string SQL = "UPDATE ccSetup Set FieldValue=" + DbController.encodeSQLText(Value) + ",ModifiedDate=" + SQLNow + " WHERE name=" + DbController.encodeSQLText(propertyName);
                             int recordsAffected = 0;
                             core.db.executeNonQuery(SQL, ref recordsAffected);

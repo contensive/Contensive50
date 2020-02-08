@@ -42,39 +42,39 @@ namespace Contensive.Processor.Addons.Tools {
                 if (button == ButtonCacheGet) {
                     //
                     // -- Get Cache
-                    formBody.add("<div>" + DateTime.Now + " cache.getObject(" + cacheKey + ")</div>");
+                    formBody.add("<div>" + core.dateTimeNowMockable + " cache.getObject(" + cacheKey + ")</div>");
                     object resultObj = cp.Cache.GetObject(cacheKey);
                     if (resultObj == null) {
-                        formBody.add("<div>" + DateTime.Now + " NULL returned</div>");
+                        formBody.add("<div>" + core.dateTimeNowMockable + " NULL returned</div>");
                     } else {
                         try {
                             cacheValue = Newtonsoft.Json.JsonConvert.SerializeObject(resultObj);
-                            formBody.add("<div>" + DateTime.Now + "CacheValue object returned, json serialized, length [" + cacheValue.Length + "]</div>");
+                            formBody.add("<div>" + core.dateTimeNowMockable + "CacheValue object returned, json serialized, length [" + cacheValue.Length + "]</div>");
                         } catch (Exception ex) {
-                            formBody.add("<div>" + DateTime.Now + " exception during serialization, ex [" + ex + "]</div>");
+                            formBody.add("<div>" + core.dateTimeNowMockable + " exception during serialization, ex [" + ex + "]</div>");
                         }
                     }
-                    formBody.add("<p>" + DateTime.Now + " Done</p>");
+                    formBody.add("<p>" + core.dateTimeNowMockable + " Done</p>");
                 } else if (button == ButtonCacheStore) {
                     //
                     // -- Store Cache
-                    formBody.add("<div>" + DateTime.Now + " cache.store(" + cacheKey + "," + cacheValue + ")</div>");
+                    formBody.add("<div>" + core.dateTimeNowMockable + " cache.store(" + cacheKey + "," + cacheValue + ")</div>");
                     cp.Cache.Store(cacheKey, cacheValue);
-                    formBody.add("<p>" + DateTime.Now + " Done</p>");
+                    formBody.add("<p>" + core.dateTimeNowMockable + " Done</p>");
                 } else if (button == ButtonCacheInvalidate) {
                     //
                     // -- Invalidate
                     cacheValue = "";
-                    formBody.add("<div>" + DateTime.Now + " cache.Invalidate(" + cacheKey + ")</div>");
+                    formBody.add("<div>" + core.dateTimeNowMockable + " cache.Invalidate(" + cacheKey + ")</div>");
                     cp.Cache.Invalidate(cacheKey);
-                    formBody.add("<p>" + DateTime.Now + " Done</p>");
+                    formBody.add("<p>" + core.dateTimeNowMockable + " Done</p>");
                 } else if (button == ButtonCacheInvalidateAll) {
                     //
                     // -- Store Cache
                     cacheValue = "";
-                    formBody.add("<div>" + DateTime.Now + " cache.InvalidateAll()</div>");
+                    formBody.add("<div>" + core.dateTimeNowMockable + " cache.InvalidateAll()</div>");
                     cp.Cache.InvalidateAll();
-                    formBody.add("<p>" + DateTime.Now + " Done</p>");
+                    formBody.add("<p>" + core.dateTimeNowMockable + " Done</p>");
                 }
                 //
                 // Display form

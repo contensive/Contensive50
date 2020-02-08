@@ -15,7 +15,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="env"></param>
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
-                bool NewHour = (core.rightFrigginNow.Hour != env.lastCheckDateTime.Hour);
+                bool NewHour = (core.dateTimeNowMockable.Hour != env.lastCheckDateTime.Hour);
                 if (env.force || NewHour) {
                     //
                     // Set NextSummaryStartDate based on the last time we ran hourly summarization
@@ -48,7 +48,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             }
                         }
                     }
-                    DateTime PeriodStartDate = core.rightFrigginNow.Date.AddDays(-90);
+                    DateTime PeriodStartDate = core.dateTimeNowMockable.Date.AddDays(-90);
                     double PeriodStep = 1;
                     int HoursPerDay = 0;
                     for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
@@ -75,7 +75,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         //
                         LogController.logInfo(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
                         PeriodStep = (double)1 / (double)24;
-                        VisitSummaryClass.summarizePeriod(core, env, NextSummaryStartDate, core.rightFrigginNow, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                        VisitSummaryClass.summarizePeriod(core, env, NextSummaryStartDate, core.dateTimeNowMockable, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
                     }
                 }
             } catch (Exception ex) {

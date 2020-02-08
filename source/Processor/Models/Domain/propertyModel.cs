@@ -153,7 +153,7 @@ namespace Contensive.Processor.Models.Domain {
                 } else if (propertyCache[1, Ptr] != propertyValue) {
                     propertyCache[1, Ptr] = propertyValue;
                     int RecordId = GenericController.encodeInteger(propertyCache[2, Ptr]);
-                    string SQLNow = DbController.encodeSQLDate(DateTime.Now);
+                    string SQLNow = DbController.encodeSQLDate(core.dateTimeNowMockable);
                     //
                     // save the value in the property that was found
                     //

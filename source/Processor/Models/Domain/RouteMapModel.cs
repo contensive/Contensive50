@@ -66,7 +66,7 @@ namespace Contensive.Processor.Models.Domain {
                 result = getCache(core);
                 if (result == null) {
                     result = new RouteMapModel {
-                        dateCreated = DateTime.Now,
+                        dateCreated = core.dateTimeNowMockable,
                         routeDictionary = new Dictionary<string, RouteClass>()
                     };
                     string physicalFile = "~/" + core.siteProperties.serverPageDefault;

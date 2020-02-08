@@ -137,7 +137,7 @@ namespace Contensive.Processor.Controllers {
                     CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
                     if (dependantCacheDocument == null) {
                         // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                        storeCacheDocument(dependentKey, new CacheDocumentClass {
+                        storeCacheDocument(dependentKey, new CacheDocumentClass(core.dateTimeNowMockable) {
                             keyPtr = null,
                             content = "",
                             saveDate = globalInvalidationDate
@@ -336,9 +336,9 @@ namespace Contensive.Processor.Controllers {
         public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                var cacheDocument = new CacheDocumentClass {
+                var cacheDocument = new CacheDocumentClass(core.dateTimeNowMockable) {
                     content = content,
-                    saveDate = DateTime.Now,
+                    saveDate = core.dateTimeNowMockable,
                     invalidationDate = invalidationDate,
                     dependentKeyList = dependentKeyList
                 };
@@ -361,7 +361,7 @@ namespace Contensive.Processor.Controllers {
         /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
         /// invalidates if any dependent key is invalid.</remarks>
         public void storeObject(string key, object content, List<string> dependentKeyList) {
-            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), dependentKeyList);
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyList);
         }
         //
         //====================================================================================================
@@ -374,7 +374,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dependantKey"></param>
         /// <remarks></remarks>
         public void storeObject(string key, object content, string dependantKey) {
-            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { dependantKey });
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<string> { dependantKey });
         }
         //
         //====================================================================================================
@@ -397,7 +397,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key">key generated from createKey methods</param>
         /// <param name="content"></param>
         public void storeObject(string key, object content) {
-            storeObject(key, content, DateTime.Now.AddDays(invalidationDaysDefault), new List<string> { });
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<string> { });
         }
         //
         //====================================================================================================
@@ -457,9 +457,9 @@ namespace Contensive.Processor.Controllers {
             try {
                 keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                CacheDocumentClass cacheDocument = new CacheDocumentClass {
-                    saveDate = DateTime.Now,
-                    invalidationDate = DateTime.Now.AddDays(invalidationDaysDefault),
+                CacheDocumentClass cacheDocument = new CacheDocumentClass(core.dateTimeNowMockable) {
+                    saveDate = core.dateTimeNowMockable,
+                    invalidationDate = core.dateTimeNowMockable.AddDays(invalidationDaysDefault),
                     keyPtr = key
                 };
                 storeCacheDocument(keyPtr, cacheDocument);
@@ -476,7 +476,7 @@ namespace Contensive.Processor.Controllers {
         public void invalidateAll()  {
             try {
                 string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
+                storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -499,14 +499,14 @@ namespace Contensive.Processor.Controllers {
                     CacheDocumentClass cacheDocument = getCacheDocument(key);
                     if (cacheDocument == null) {
                         // no cache for this key, if this is a dependency for another key, save invalidated
-                        storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
+                        storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                     } else {
                         if (!string.IsNullOrWhiteSpace(cacheDocument.keyPtr)) {
                             // this key is an alias, invalidate it's parent key
                             invalidate(cacheDocument.keyPtr, --recursionLimit);
                         } else {
                             // key is a valid cache, invalidate it
-                            storeCacheDocument(key, new CacheDocumentClass { saveDate = DateTime.Now });
+                            storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                         }
                     }
                 }
@@ -645,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    storeCacheDocument(cacheNameGlobalInvalidationDate, new CacheDocumentClass { saveDate = encodeDate(_globalInvalidationDate) });
+                    storeCacheDocument(cacheNameGlobalInvalidationDate, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = encodeDate(_globalInvalidationDate) });
                 }
                 return encodeDate(_globalInvalidationDate);
             }
@@ -754,7 +754,7 @@ namespace Contensive.Processor.Controllers {
         public void storeCacheDocument_MemoryCache(string serverKey, CacheDocumentClass cacheDocument) {
             ObjectCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy {
-                AbsoluteExpiration = cacheDocument.invalidationDate // DateTime.Now.AddMinutes(100);
+                AbsoluteExpiration = cacheDocument.invalidationDate // core.dateTimeMockable.AddMinutes(100);
             };
             cache.Set(serverKey, cacheDocument, policy);
         }
@@ -766,7 +766,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         public void store_LastRecordModifiedDate(string tableName) {
-            storeObject(createCacheKey_LastRecordModifiedDate(tableName), DateTime.Now);
+            storeObject(createCacheKey_LastRecordModifiedDate(tableName), core.dateTimeNowMockable);
         }
         //
         //========================================================================
@@ -777,7 +777,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="dbTableName"></param>
         public void invalidateTableObjects(string dbTableName) {
-            storeObject(createCacheKey_TableObjectsInvalidationDate(dbTableName), DateTime.Now);
+            storeObject(createCacheKey_TableObjectsInvalidationDate(dbTableName), core.dateTimeNowMockable);
         }
         //
         //====================================================================================================

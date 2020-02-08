@@ -22,7 +22,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// verify the current database matches the requirements for this build. Manager SiteProperty("BuildVersion")
+        /// Reinstall the core collectin. If repair true, include all dependencies and all updatable installed collections that come from the library
         /// </summary>
         /// <param name="core"></param>
         /// <param name="isNewBuild"></param>
@@ -35,7 +35,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 {
                     string DataBuildVersion = core.siteProperties.dataBuildVersion;
-                    List<string> nonCriticalErrorList = new List<string>();
                     //
                     // -- determine primary domain
                     string primaryDomain = core.appConfig.name;
@@ -63,7 +62,13 @@ namespace Contensive.Processor.Controllers {
                     LogController.logInfo(core, logPrefix + ", install base collection");
                     var context = new Stack<string>();
                     context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]");
-                    CollectionInstallController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix);
+                    var collectionsInstalledList = new List<string>();
+                    List<string> nonCriticalErrorList = new List<string>();
+                    CollectionInstallController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, collectionsInstalledList);
+                    foreach (string nonCriticalError in nonCriticalErrorList) {
+                        //
+                        // -- error messages, already reported?
+                    }
                     //
                     // -- upgrade work only for the first build, not upgrades of version 5+
                     if (isNewBuild) {
@@ -205,6 +210,27 @@ namespace Contensive.Processor.Controllers {
                         defaultRouteAddon = DbBaseModel.create<AddonModel>(core.cpParent, addonGuidPageManager);
                         if (defaultRouteAddon != null) {
                             core.siteProperties.defaultRouteId = defaultRouteAddon.id;
+                        }
+                    }
+                    //
+                    // - if repair, reinstall all ipgradable collections not already re-installed
+                    if (repair) {
+                        foreach ( var collection in DbBaseModel.createList<AddonCollectionModel>(core.cpParent, "(updatable>0)")) {
+                            if(!collectionsInstalledList.Contains(collection.ccguid)) {
+                                //
+                                // -- install all of them, ignore install errors
+                                string installErrorMessage = "";
+                                nonCriticalErrorList = new List<string>();
+                                CollectionLibraryController.installCollectionFromLibrary(core, false, new Stack<string>(), collection.ccguid, ref installErrorMessage, isNewBuild, repair, ref nonCriticalErrorList, "", ref collectionsInstalledList);
+                                if (!string.IsNullOrWhiteSpace(installErrorMessage)) {
+                                    //
+                                    // -- error messages, already reported?
+                                }
+                                foreach ( string nonCriticalError in nonCriticalErrorList) {
+                                    //
+                                    // -- error messages, already reported?
+                                }
+                            }
                         }
                     }
                     //

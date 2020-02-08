@@ -91,37 +91,37 @@ namespace Contensive.Processor.Addons.Tools {
                     string errBefore = ErrorController.getDocExceptionHtmlList(core);
                     if (!string.IsNullOrWhiteSpace(errBefore)) {
                         // -- error in interface, should be fixed before attempting query
-                        Stream.add("<br>" + DateTime.Now + " SQL NOT executed. The following errors were detected before execution");
+                        Stream.add("<br>" + core.dateTimeNowMockable + " SQL NOT executed. The following errors were detected before execution");
                         Stream.add(errBefore);
                     } else {
-                        Stream.add("<p>" + DateTime.Now + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
+                        Stream.add("<p>" + core.dateTimeNowMockable + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
                         DataTable dt = null;
                         try {
                             dt = core.db.executeQuery(SQL, PageSize * (PageNumber - 1), PageSize);
                         } catch (Exception ex) {
                             //
                             // ----- error
-                            Stream.add("<br>" + DateTime.Now + " SQL execution returned the following error");
+                            Stream.add("<br>" + core.dateTimeNowMockable + " SQL execution returned the following error");
                             Stream.add("<br>" + ex.Message);
                         }
                         string errSql = ErrorController.getDocExceptionHtmlList(core);
                         if (!string.IsNullOrWhiteSpace(errSql)) {
-                            Stream.add("<br>" + DateTime.Now + " SQL execution returned the following error");
+                            Stream.add("<br>" + core.dateTimeNowMockable + " SQL execution returned the following error");
                             Stream.add("<br>" + errSql);
                             core.doc.errorList.Clear();
                         } else {
-                            Stream.add("<br>" + DateTime.Now + " SQL executed successfully");
+                            Stream.add("<br>" + core.dateTimeNowMockable + " SQL executed successfully");
                             if (dt == null) {
-                                Stream.add("<br>" + DateTime.Now + " SQL returned invalid data.");
+                                Stream.add("<br>" + core.dateTimeNowMockable + " SQL returned invalid data.");
                             } else if (dt.Rows == null) {
-                                Stream.add("<br>" + DateTime.Now + " SQL returned invalid data rows.");
+                                Stream.add("<br>" + core.dateTimeNowMockable + " SQL returned invalid data rows.");
                             } else if (dt.Rows.Count == 0) {
-                                Stream.add("<br>" + DateTime.Now + " The SQL returned no data.");
+                                Stream.add("<br>" + core.dateTimeNowMockable + " The SQL returned no data.");
                             } else {
                                 //
                                 // ----- print results
                                 //
-                                Stream.add("<br>" + DateTime.Now + " The following results were returned");
+                                Stream.add("<br>" + core.dateTimeNowMockable + " The following results were returned");
                                 Stream.add("<br></p>");
                                 //
                                 // --- Create the Fields for the new table
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Addons.Tools {
                             }
                         }
                     }
-                    Stream.add("<p>" + DateTime.Now + " Done</p>");
+                    Stream.add("<p>" + core.dateTimeNowMockable + " Done</p>");
                 }
                 //
                 // Display form

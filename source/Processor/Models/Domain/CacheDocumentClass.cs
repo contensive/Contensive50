@@ -13,10 +13,10 @@ namespace Contensive.Processor.Models.Domain {
         //
         // ====================================================================================================
         //
-        public CacheDocumentClass()  {
+        public CacheDocumentClass(DateTime dateTimeMockable)  {
             dependentKeyList = new List<string>();
-            saveDate = DateTime.Now;
-            invalidationDate = DateTime.Now.AddDays(Constants.invalidationDaysDefault);
+            saveDate = dateTimeMockable;
+            invalidationDate = dateTimeMockable.AddDays(Constants.invalidationDaysDefault);
         }
         //
         // if populated, all other properties are ignored and the primary tag b

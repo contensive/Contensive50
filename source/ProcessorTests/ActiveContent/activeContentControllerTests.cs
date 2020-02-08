@@ -25,7 +25,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // arrange
                 string source = "<ac Type=\"content\">";
                 // act
-                DateTime dateBefore = DateTime.Now.AddSeconds(-1);
+                DateTime dateBefore = cp.core.dateTimeNowMockable.AddSeconds(-1);
                 string resultString = ActiveContentController.renderHtmlForWeb(
                     core: cp.core,
                     source: source,

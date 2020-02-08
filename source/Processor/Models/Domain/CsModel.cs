@@ -358,7 +358,7 @@ namespace Contensive.Processor {
                 }
                 //
                 string sqlGuid = DbController.encodeSQLText(getGUID());
-                string sqlDateAdded = DbController.encodeSQLDate(DateTime.Now);
+                string sqlDateAdded = DbController.encodeSQLDate(core.dateTimeNowMockable);
                 sqlList.Add("ccguid", sqlGuid);
                 sqlList.Add("DATEADDED", sqlDateAdded);
                 sqlList.Add("CONTENTCONTROLID", DbController.encodeSQLNumber(meta.id));
@@ -1268,7 +1268,7 @@ namespace Contensive.Processor {
                 // -- create the Db controller instance
                 using (var db = new DbController(core, this.contentMeta.dataSourceName)) {
                     string sqlUpdate = "";
-                    DateTime sqlModifiedDate = DateTime.Now;
+                    DateTime sqlModifiedDate = core.dateTimeNowMockable;
                     int sqlModifiedBy = this.userId;
                     bool AuthorableFieldUpdate = false;
                     int FieldFoundCount = 0;
@@ -1567,7 +1567,7 @@ namespace Contensive.Processor {
                     }
                     //
                     // -- group expiration
-                    SQL += "and((ccMemberRules.DateExpires Is Null)or(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
+                    SQL += "and((ccMemberRules.DateExpires Is Null)or(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
                     //
                     // Build outer query to get all ccmember fields
                     // Must do this inner/outer because if the table has a text field, it can not be in the distinct

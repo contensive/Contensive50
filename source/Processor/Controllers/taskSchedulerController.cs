@@ -130,7 +130,7 @@ namespace Contensive.Processor.Controllers {
                                     + " and("
                                     + "  ((ProcessRunOnce is not null)and(ProcessRunOnce<>0))"
                                     + "  or((ProcessInterval is not null)and(ProcessInterval<>0)and(ProcessNextRun is null))"
-                                    + "  or(ProcessNextRun<" + DbController.encodeSQLDate(core.rightFrigginNow) + ")"
+                                    + "  or(ProcessNextRun<" + DbController.encodeSQLDate(core.dateTimeNowMockable) + ")"
                                     + " )";
                                 var addonList = DbBaseModel.createList<AddonModel>(cpApp, sqlAddonsCriteria);
                                 foreach (var addon in addonList) {
@@ -139,14 +139,14 @@ namespace Contensive.Processor.Controllers {
                                     if (addon.processRunOnce)  {
                                         //
                                         // -- run once checked 
-                                        addon.processNextRun = core.rightFrigginNow;
+                                        addon.processNextRun = core.dateTimeNowMockable;
                                         addon.processRunOnce = false;
                                     } else if ((addon.processNextRun == null) && (addonProcessInterval > 0)) {
                                         //
                                         // -- processInterval set but everything else blank )
-                                        addon.processNextRun = core.rightFrigginNow.AddMinutes(addonProcessInterval);
+                                        addon.processNextRun = core.dateTimeNowMockable.AddMinutes(addonProcessInterval);
                                     }
-                                    if (addon.processNextRun <= core.rightFrigginNow) {
+                                    if (addon.processNextRun <= core.dateTimeNowMockable) {
                                         //
                                         LogController.logInfo(cpApp.core, "scheduleTasks, addon [" + addon.name + "], add task, addonProcessRunOnce [" + addon.processRunOnce + "], addonProcessNextRun [" + addon.processNextRun + "]");
                                         //
@@ -159,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                                         if (addonProcessInterval > 0) {
                                             //
                                             // -- interval set, update the next run
-                                            addon.processNextRun = core.rightFrigginNow.AddMinutes(addonProcessInterval);
+                                            addon.processNextRun = core.dateTimeNowMockable.AddMinutes(addonProcessInterval);
                                         } else {
                                             //
                                             // -- no interval, no next run
@@ -199,7 +199,7 @@ namespace Contensive.Processor.Controllers {
                     Dictionary<string, string> defaultValues = ContentMetadataModel.getDefaultValueDict(core, DownloadModel.tableMetadata.contentName);
                     var download = DbBaseModel.addDefault<DownloadModel>(core.cpParent, defaultValues);
                     download.name = downloadName;
-                    download.dateRequested = core.rightFrigginNow;
+                    download.dateRequested = core.dateTimeNowMockable;
                     download.requestedBy = core.session.user.id;
                     if (!string.IsNullOrEmpty(downloadFilename)) {
                         //

@@ -67,20 +67,20 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // Run the SQL
                     Stream.add(SpanClassAdminSmall + "<br><br>");
-                    Stream.add(DateTime.Now + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
+                    Stream.add(core.dateTimeNowMockable + " Opening Table Schema on DataSource [" + datasource.name + "]<br>");
                     //
                     RSSchema = core.db.getTableSchemaData(TableName);
-                    Stream.add(DateTime.Now + " GetSchema executed successfully<br>");
+                    Stream.add(core.dateTimeNowMockable + " GetSchema executed successfully<br>");
                     if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(core.dateTimeNowMockable + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(core.dateTimeNowMockable + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
@@ -125,19 +125,19 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     //    RSSchema = DataSourceConnectionObjs(DataSourcePointer).Conn.OpenSchema(SchemaEnum.adSchemaColumns, Array(Empty, Empty, TableName, Empty))
                     Stream.add(SpanClassAdminSmall + "<br><br>");
-                    Stream.add(DateTime.Now + " Opening Index Schema<br>");
+                    Stream.add(core.dateTimeNowMockable + " Opening Index Schema<br>");
                     //
                     RSSchema = core.db.getIndexSchemaData(TableName);
                     if (!DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(core.dateTimeNowMockable + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(core.dateTimeNowMockable + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
@@ -182,20 +182,20 @@ namespace Contensive.Processor.Addons.Tools {
                     // Column Schema
                     //
                     Stream.add(SpanClassAdminSmall + "<br><br>");
-                    Stream.add(DateTime.Now + " Opening Column Schema<br>");
+                    Stream.add(core.dateTimeNowMockable + " Opening Column Schema<br>");
                     //
                     RSSchema = core.db.getColumnSchemaData(TableName);
-                    Stream.add(DateTime.Now + " GetSchema executed successfully<br>");
+                    Stream.add(core.dateTimeNowMockable + " GetSchema executed successfully<br>");
                     if (DbController.isDataTableOk(RSSchema)) {
                         //
                         // ----- no result
                         //
-                        Stream.add(DateTime.Now + " A schema was returned, but it contains no records.<br>");
+                        Stream.add(core.dateTimeNowMockable + " A schema was returned, but it contains no records.<br>");
                     } else {
                         //
                         // ----- print results
                         //
-                        Stream.add(DateTime.Now + " The following results were returned<br>");
+                        Stream.add(core.dateTimeNowMockable + " The following results were returned<br>");
                         //
                         // --- Create the Fields for the new table
                         //
@@ -238,7 +238,7 @@ namespace Contensive.Processor.Addons.Tools {
                     if (!StatusOK) {
                         Stream.add("There was a problem executing this query that may have prevented the results from printing.");
                     }
-                    Stream.add(DateTime.Now + " Done</SPAN>");
+                    Stream.add(core.dateTimeNowMockable + " Done</SPAN>");
                 }
                 //
                 // Display form

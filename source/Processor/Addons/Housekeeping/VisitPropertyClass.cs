@@ -26,7 +26,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 {
                     //
                     // old Properties
-                    string sql = "delete from ccProperties where (TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.visit + ")and(dateAdded<" + DbController.encodeSQLDate(DateTime.Now.AddDays(-1)) + ")";
+                    string sql = "delete from ccProperties where (TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.visit + ")and(dateAdded<" + DbController.encodeSQLDate(core.dateTimeNowMockable.AddDays(-1)) + ")";
                     Task.Run(() => core.db.executeNonQueryAsync(sql));
                 }
                 {

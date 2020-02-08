@@ -202,7 +202,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- expire linkToken after 15 minutes
-                if (linkToken.expires.CompareTo(DateTime.Now) < 0) { linkToken.id = 0; }
+                if (linkToken.expires.CompareTo(core.dateTimeNowMockable) < 0) { linkToken.id = 0; }
                 //
                 // -- determine visit
                 bool AllowOnNewVisitEvent = false;
@@ -420,7 +420,7 @@ namespace Contensive.Processor.Controllers {
                                         + "";
                                     core.privateFiles.saveFile(Filename, botFileContent);
                                 }
-                                core.cache.storeObject("DefaultBotNameList", botFileContent, DateTime.Now.AddHours(1), new List<string>());
+                                core.cache.storeObject("DefaultBotNameList", botFileContent, core.dateTimeNowMockable.AddHours(1), new List<string>());
                             }
                             //
                             if (!string.IsNullOrEmpty(botFileContent)) {
@@ -817,7 +817,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         Criteria = "(username=" + DbController.encodeSQLText(iLoginFieldValue) + ")";
                     }
-                    Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(DateTime.Now) + "))";
+                    Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
                     using (var csData = new CsModel(core)) {
                         csData.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2);
                         if (!csData.ok()) {
