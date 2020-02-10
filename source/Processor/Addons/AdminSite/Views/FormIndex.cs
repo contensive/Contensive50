@@ -479,7 +479,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <returns></returns>
         public static string getForm_Index_Header(CoreController core, IndexConfigClass IndexConfig, ContentMetadataModel content, int recordCnt, string ContentAccessLimitMessage) {
             var filterLine = new StringBuilder();
-            filterLine.Append((IndexConfig.activeOnly) ? "Active and inactive records" : "Active records");
+            filterLine.Append((IndexConfig.activeOnly) ? ", only active records" : "");
             string filterLastEdited = "";
             if (IndexConfig.lastEditedByMe) {
                 filterLastEdited = filterLastEdited + " by " + core.session.user.name;
@@ -595,7 +595,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             int TitleRows = 0;
             if (!filterLine.Length.Equals(0)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
-                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.ToString()));
+                Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.ToString().Substring(1)));
                 TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
