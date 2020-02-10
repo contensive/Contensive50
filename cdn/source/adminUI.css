@@ -1507,7 +1507,6 @@ div.ccDialogPageNotFound {
     color: white ! important;
 }
 .iconAddonDefault {
-    display: inline-block;
     font-size: 30px;
     line-height: 60px;
     background-color: #54b752;
@@ -1516,12 +1515,18 @@ div.ccDialogPageNotFound {
     height: 60px;
     border-radius: 6px; 
     box-shadow: 2px 2px 2px 2px rgba(0,0,0,0.15);
+    margin: auto;
 }
 .iconAddonDefault i {
     font-size: 30px;
     line-height: 60px;
     background-color: #54b752;
     color: white ! important;
+    display: block;
+    margin: auto;
+    text-align: center;
+    vertical-align: middle;
+    border-radius: 5px;
 }
 
 /*

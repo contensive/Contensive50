@@ -725,6 +725,12 @@ namespace Contensive.Models.Db {
                     instance = (T)Activator.CreateInstance(instanceType);
                     foreach (PropertyInfo instanceProperty in instance.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                         string propertyName = instanceProperty.Name;
+                        if (!row.Table.Columns.Contains(propertyName)) {
+                            //
+                            // -- if field is missing from table, log error, leave property default and skip to next field. Error, but not fatal. Do not let a missing field stop the site.
+                            cp.Site.ErrorReport("Database missing field [" + propertyName + "] in table [" + derivedTableName(instanceType) + "] for content [" + derivedContentName(instanceType) + "]. Field skipped.");
+                            continue;
+                        }
                         string propertyValue = row[propertyName].ToString();
                         switch (propertyName.ToLowerInvariant()) {
                             case "specialcasefield": {

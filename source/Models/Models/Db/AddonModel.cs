@@ -98,6 +98,10 @@ namespace Contensive.Models.Db {
         /// The category for the addon. Use categories to make selecting addons easier in lists.
         /// </summary>
         public int addonCategoryId { get; set; }
+        /// <summary>
+        /// If this addon uses a primary content associated to the instanceId (guid) from the page editor, select the content for that record
+        /// </summary>
+        public int? instanceSettingPrimaryContentId { get; set; }
         //
         // -- deprecated, but for leave for now and log error
         public string javaScriptBodyEnd { get; set; }
