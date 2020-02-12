@@ -209,7 +209,7 @@ namespace Contensive.Processor.Controllers {
                                                     // when importing a collectin that will be used for an include
                                                     int scriptinglanguageid = (int)AddonController.ScriptLanguages.VBScript;
                                                     string ScriptingLanguage = XmlController.getXMLAttribute(core, ref IsFound, Addonfield, "language", "").ToLowerInvariant();
-                                                    if(ScriptingLanguage.Equals("javascript")|| ScriptingLanguage.Equals("jscript")) {
+                                                    if (ScriptingLanguage.Equals("javascript") || ScriptingLanguage.Equals("jscript")) {
                                                         scriptinglanguageid = (int)AddonController.ScriptLanguages.Javascript;
                                                     }
                                                     cs.set("scriptinglanguageid", scriptinglanguageid);
@@ -408,16 +408,26 @@ namespace Contensive.Processor.Controllers {
                                                     break;
                                                 }
                                             case "category": {
-                                                    string fieldValue = Addonfield.InnerText;
-                                                    if (!string.IsNullOrWhiteSpace(fieldValue)) {
-                                                        AddonCategoryModel category = DbBaseModel.createByUniqueName<AddonCategoryModel>(core.cpParent, fieldValue);
+                                                    if (!string.IsNullOrWhiteSpace(Addonfield.InnerText)) {
+                                                        AddonCategoryModel category = DbBaseModel.createByUniqueName<AddonCategoryModel>(core.cpParent, Addonfield.InnerText);
                                                         if (category == null) {
                                                             category = DbBaseModel.addDefault<AddonCategoryModel>(core.cpParent);
-                                                            category.name = fieldValue;
+                                                            category.name = Addonfield.InnerText;
                                                             category.save(core.cpParent);
                                                         }
                                                         cs.set("addonCategoryId", category.id);
                                                     }
+                                                    break;
+                                                }
+                                            case "instancesettingprimarycontentid": {
+                                                    int lookupContentId = 0;
+                                                    if (!string.IsNullOrWhiteSpace(Addonfield.InnerText)) {
+                                                        ContentModel lookupContent = DbBaseModel.createByUniqueName<ContentModel>(core.cpParent, Addonfield.InnerText);
+                                                        if (lookupContent != null) {
+                                                            lookupContentId = lookupContent.id;
+                                                        }
+                                                    }
+                                                    cs.set("instancesettingprimarycontentid", lookupContentId);
                                                     break;
                                                 }
                                             default: {

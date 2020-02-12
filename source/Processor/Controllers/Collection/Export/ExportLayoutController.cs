@@ -18,7 +18,7 @@ namespace Contensive.Processor.Controllers {
                         + " name=\"" + System.Net.WebUtility.HtmlEncode(layout.name) + "\""
                         + " guid=\"" + layout.ccguid + "\""
                         + " >"
-                        + ExportController.tabIndent(cp, ExportController.EncodeCData(cp, layout.layout.content ))
+                        + ExportController.tabIndent(cp, ExportController.EncodeCData(layout.layout.content ))
                     + "\r\n\t" + "</Layout>";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex, "GetAddonNode");

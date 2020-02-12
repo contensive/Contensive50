@@ -22,10 +22,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             string result = "";
             CPClass cp = (CPClass)cpBase;
             try {
-                //
-                // -- disable PageBuilder
-                cp.Visit.SetProperty("AllowQuickEditor", false);
-                //
                 if (!cp.core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login

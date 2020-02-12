@@ -70,12 +70,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// 
-        /// </summary>
-        public int requestedRecordId { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// true if there was an error loading the edit record - use to block the edit form
         /// </summary>
         public bool blockEditForm { get; set; }
@@ -527,21 +521,40 @@ namespace Contensive.Processor.Addons.AdminSite {
                 editRecord = new EditRecordModel {
                     loaded = false
                 };
-                requestedRecordId = core.docProperties.getInteger("id");
-                if ((userAllowContentEdit) && (requestedRecordId != 0) && (adminContent.id > 0)) {
-                    //
-                    // set adminContext.content to the content definition of the requested record
-                    //
-                    using (var csData = new CsModel(core)) {
-                        csData.openRecord(adminContent.name, requestedRecordId, "contentControlId");
-                        if (csData.ok()) {
-                            editRecord.id = requestedRecordId;
-                            int recordContentId = csData.getInteger("contentControlId");
-                            if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
-                                adminContent = ContentMetadataModel.create(core, recordContentId);
+                if (userAllowContentEdit && !adminContent.id.Equals(0)) {
+                    int requestedRecordId = core.docProperties.getInteger("id");
+                    if (!requestedRecordId.Equals(0)) {
+                        using (var csData = new CsModel(core)) {
+                            csData.openRecord(adminContent.name, requestedRecordId, "id,contentControlId");
+                            if (csData.ok()) {
+                                editRecord.id = csData.getInteger("id");
+                                //
+                                // -- if this record is within a sub-content, reload adminContent
+                                int recordContentId = csData.getInteger("contentControlId");
+                                if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
+                                    adminContent = ContentMetadataModel.create(core, recordContentId);
+                                }
+                            }
+                            csData.close();
+                        }
+                    }
+                    if (editRecord.id.Equals(0)) {
+                        string requestedGuid = core.docProperties.getText("guid");
+                        if (!string.IsNullOrWhiteSpace(requestedGuid) && isGuid(requestedGuid)) {
+                            using (var csData = new CsModel(core)) {
+                                csData.open(adminContent.name, "(ccguid=" + DbController.encodeSQLText(requestedGuid) + ")", "id", false, core.session.user.id, "id,contentControlId");
+                                if (csData.ok()) {
+                                    editRecord.id = csData.getInteger("id");
+                                    //
+                                    // -- if this record is within a sub-content, reload adminContent
+                                    int recordContentId = csData.getInteger("contentControlId");
+                                    if ((recordContentId > 0) && (recordContentId != adminContent.id)) {
+                                        adminContent = ContentMetadataModel.create(core, recordContentId);
+                                    }
+                                }
+                                csData.close();
                             }
                         }
-                        csData.close();
                     }
                 }
                 //

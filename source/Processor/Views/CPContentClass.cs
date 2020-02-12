@@ -60,6 +60,38 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override string GetAddLink(string contentName, string presetNameValueList) {
+            string result = "";
+            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, presetNameValueList, false, true)) {
+                result += link;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetAddLink(string contentName) {
+            string result = "";
+            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, "", false, true)) {
+                result += link;
+            }
+            return result;
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetAddLink(int contentId, string PresetNameValueList) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetAddLink(int contentId) {
+            throw new NotImplementedException();
+        }
+        //
+        //====================================================================================================
+        //
         public override string GetContentControlCriteria(string contentName) {
             var meta = ContentMetadataModel.createByUniqueName(cp.core, contentName);
             if (meta != null) { return meta.legacyContentControlCriteria; }
@@ -85,6 +117,36 @@ namespace Contensive.Processor {
         //
         public override string GetEditLink(string contentName, string recordID, bool allowCut, string recordName, bool isEditing) {
             return AdminUIController.getRecordEditAndCutAnchorTag(cp.core, contentName, GenericController.encodeInteger(recordID), allowCut, recordName);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditLink(string contentName, int recordId) {
+            return AdminUIController.getRecordEditAndCutAnchorTag(cp.core, contentName, recordId, false, "");
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditLink(string contentName, string recordGuid) {
+            var contentMetadata = ContentMetadataModel.createByUniqueName(cp.core, contentName);
+            if (contentMetadata == null) { throw new GenericException("ContentName [" + contentName + "], but no content metadata found with this name."); }
+            return AdminUIController.getRecordEditAnchorTag(cp.core, contentMetadata, recordGuid);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditLink(int contentId, int recordId) {
+            var contentMetadata = ContentMetadataModel.create(cp.core, contentId);
+            if (contentMetadata == null) { throw new GenericException("contentId [" + contentId + "], but no content metadata found."); }
+            return AdminUIController.getRecordEditAnchorTag(cp.core, contentMetadata, recordId);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditLink(int contentId, string recordGuid) {
+            var contentMetadata = ContentMetadataModel.create(cp.core, contentId);
+            if (contentMetadata == null) { throw new GenericException("contentId [" + contentId + "], but no content metadata found."); }
+            return AdminUIController.getRecordEditAnchorTag(cp.core, contentMetadata, recordGuid);
         }
         //
         //====================================================================================================
@@ -274,7 +336,14 @@ namespace Contensive.Processor {
             var content = DbBaseModel.createByUniqueName<ContentModel>(cp, ContentName);
             if (content != null) return content.id;
             return 0;
-
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetName(int contentId) {
+            var content = DbBaseModel.create<ContentModel>(cp, contentId);
+            if (content != null) return content.name;
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -328,6 +397,5 @@ namespace Contensive.Processor {
             AddContentField(ContentName, FieldName, (FieldTypeIdEnum)fileTypeEnum);
             throw new NotImplementedException();
         }
-
     }
 }

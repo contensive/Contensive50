@@ -817,6 +817,21 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
+        public static string getRecordEditAndCutAnchorTag(CoreController core, string contentName, int recordId, bool allowCut, string recordName) {
+            try {
+                if (!core.session.isEditing()) { return string.Empty; }
+                if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
+                var contentMetadata = ContentMetadataModel.createByUniqueName(core, contentName);
+                if (contentMetadata == null) { throw new GenericException("ContentName [" + contentName + "], but no content metadata found with this name."); }
+                return getRecordEditAndCutAnchorTag(core, contentMetadata, recordId, allowCut, recordName);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        //====================================================================================================
+        //
         public static string getRecordEditAndCutAnchorTag(CoreController core, ContentMetadataModel contentMetadata, int recordId, bool allowCut, string recordName) {
             try {
                 if (!core.session.isEditing()) { return string.Empty; }
@@ -837,13 +852,14 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getRecordEditAndCutAnchorTag(CoreController core, string contentName, int recordId, bool allowCut, string recordName) {
+        public static string getRecordEditAndCutAnchorTag(CoreController core, ContentMetadataModel contentMetadata, string recordGuid) {
             try {
                 if (!core.session.isEditing()) { return string.Empty; }
-                if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
-                var contentMetadata = ContentMetadataModel.createByUniqueName(core, contentName);
-                if (contentMetadata == null) { throw new GenericException("ContentName [" + contentName + "], but no content metadata found with this name."); }
-                return getRecordEditAndCutAnchorTag(core, contentMetadata, recordId, allowCut, recordName);
+                if (contentMetadata == null) { throw new GenericException("contentMetadata null."); }
+                var editSegmentList = new List<string> {
+                    getRecordEditSegment(core, contentMetadata, recordGuid)
+                };
+                return getRecordEditAnchorTag(core, editSegmentList);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return string.Empty;
@@ -860,20 +876,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordName"></param>
         /// <returns></returns>
         public static string getEditSegmentRecordCaption(string verb, string contentName, int recordId, string recordName) {
-            //string captionName;
-            //if (!string.IsNullOrWhiteSpace(recordName)) {
-            //    //
-            //    // -- named record
-            //    captionName = "'" + HtmlController.encodeHtml(recordName) + "'";
-            //} else if (recordId != 0) {
-            //    //
-            //    // -- record #123
-            //    captionName = "record #" + recordId.ToString();
-            //} else {
-            //    //
-            //    // -- record
-            //    captionName = "record";
-            //}
             string result = verb + "&nbsp;";
             switch (contentName.ToLower(CultureInfo.InvariantCulture)) {
                 case "page content": {
@@ -886,7 +888,6 @@ namespace Contensive.Processor.Controllers {
                     }
                 default: {
                         result += ContentController.pluralToSingular(contentName);
-                        //result += captionName + "&nbsp;in&nbsp;" + HtmlController.encodeHtml(encodeInitialCaps(contentName));
                         break;
                     }
             }
@@ -954,17 +955,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// returns a record edit link to be included getEditLink wrapper
         /// </summary>
-        public static string getRecordEditSegment(CoreController core, ContentMetadataModel contentMetadata, int recordId, string recordName) {
-            try {
-                if (!core.session.isEditing()) { return string.Empty; }
-                if (recordId < 1) { throw new GenericException("RecordID [" + recordId + "] is invalid"); }
-                if (contentMetadata == null) { throw new GenericException("getRecordEditLink called with null content metadata."); }
-                return AdminUIController.getRecordEditAnchorTag(core, contentMetadata, recordId, getEditSegmentRecordCaption("Edit", contentMetadata.name, recordId, recordName));
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                return string.Empty;
-            }
-        }
+        public static string getRecordEditSegment(CoreController core, ContentMetadataModel contentMetadata, int recordId, string recordName) 
+            => getRecordEditAnchorTag(core, contentMetadata, recordId, getEditSegmentRecordCaption("Edit", contentMetadata.name, recordId, recordName));
+        //
+        //====================================================================================================
+        /// <summary>
+        /// returns a record edit link to be included getEditLink wrapper
+        /// </summary>
+        public static string getRecordEditSegment(CoreController core, ContentMetadataModel contentMetadata, string recordGuid) 
+            => getRecordEditAnchorTag(core, contentMetadata, recordGuid);
         //
         public static string getRecordEditSegment(CoreController core, string contentName, int recordID)
             => getRecordEditSegment(core, contentName, recordID, "");
@@ -1183,21 +1182,58 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// get a link to edit a record in the admin site
+        /// get record add tag
         /// </summary>
         /// <param name="core"></param>
         /// <param name="cdef"></param>
         /// <returns></returns>
-        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef) => getRecordEditAnchorTag(core, cdef, 0, "");
-        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId) => getRecordEditAnchorTag(core, cdef, recordId, "");
-        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId, string caption) {
-            return getRecordEditAnchorTag("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, "ccRecordEditLink");
-        }
-        public static string getRecordEditAnchorTag(string link) => getRecordEditAnchorTag(link, "", "");
-        public static string getRecordEditAnchorTag(string link, string caption) => getRecordEditAnchorTag(link, caption, "");
-        public static string getRecordEditAnchorTag(string link, string caption, string htmlClass) {
-            return HtmlController.a(iconEdit_Green + ((string.IsNullOrWhiteSpace(caption)) ? "" : "&nbsp;" + caption), link, htmlClass);
-        }
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef) 
+            => getRecordEditAnchorTag(core, cdef, 0, "");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get record edit tag based on recordId
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId)
+            => getRecordEditAnchorTag(core, cdef, recordId, "");
+        //
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId, string caption)
+            => getRecordEditAnchorTag("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, "ccRecordEditLink");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// get record edit tag based on guid
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="cdef"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, string recordGuid)
+            => getRecordEditAnchorTag(core, cdef, recordGuid, "");
+        //
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, string recordGuid, string caption)
+            => getRecordEditAnchorTag("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&guid=" + recordGuid, caption, "ccRecordEditLink");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// UI Edit Record, with url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="caption"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
+        public static string getRecordEditAnchorTag(string url, string caption, string htmlClass)
+            => HtmlController.a(iconEdit_Green + ((string.IsNullOrWhiteSpace(caption)) ? "" : "&nbsp;" + caption), url, htmlClass);
+        //
+        public static string getRecordEditAnchorTag(string url, string caption) 
+            => getRecordEditAnchorTag(url, caption, "");
+        //
+        public static string getRecordEditAnchorTag(string url) 
+            => getRecordEditAnchorTag(url, "", "");
         //
         //====================================================================================================
         /// <summary>

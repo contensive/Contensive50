@@ -12,7 +12,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 string result = "";
                 if (DataRecordList != "") {
-                    result += "\r\n" + "\t" + "<DataRecordList>" + ExportController.EncodeCData(cp, DataRecordList) + "</DataRecordList>";
+                    result += "\r\n" + "\t" + "<DataRecordList>" + ExportController.EncodeCData( DataRecordList) + "</DataRecordList>";
                     string[] DataRecords = Strings.Split(DataRecordList, "\r\n");
                     string RecordNodes = "";
                     for (var Ptr = 0; Ptr <= Information.UBound(DataRecords); Ptr++) {
@@ -248,7 +248,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // text files
                                                                 // 
                                                                 FieldValue = CSData.GetText(FieldName);
-                                                                FieldValue = ExportController.EncodeCData(cp, FieldValue);
+                                                                FieldValue = ExportController.EncodeCData( FieldValue);
                                                                 break;
                                                             }
 
@@ -318,7 +318,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // text types
                                                                 // 
                                                                 FieldValue = CSData.GetText(FieldName);
-                                                                FieldValue = ExportController.EncodeCData(cp, FieldValue);
+                                                                FieldValue = ExportController.EncodeCData( FieldValue);
                                                                 break;
                                                             }
                                                     }

@@ -52,9 +52,9 @@ namespace Contensive.Processor.Controllers {
                     collectionXml += "\r\n" + "<Collection";
                     collectionXml += " name=\"" + CollectionName + "\"";
                     collectionXml += " guid=\"" + CollectionGuid + "\"";
-                    collectionXml += " system=\"" + getYesNo(cp, CS.GetBoolean("system")) + "\"";
-                    collectionXml += " updatable=\"" + getYesNo(cp, CS.GetBoolean("updatable")) + "\"";
-                    collectionXml += " blockNavigatorNode=\"" + getYesNo(cp, CS.GetBoolean("blockNavigatorNode")) + "\"";
+                    collectionXml += " system=\"" + getYesNo( CS.GetBoolean("system")) + "\"";
+                    collectionXml += " updatable=\"" + getYesNo( CS.GetBoolean("updatable")) + "\"";
+                    collectionXml += " blockNavigatorNode=\"" + getYesNo( CS.GetBoolean("blockNavigatorNode")) + "\"";
                     collectionXml += " onInstallAddonGuid=\"" + onInstallAddonGuid + "\"";
                     collectionXml += ">";
                     cdnExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                                     CS2.Open("Scripting Modules", "ccguid=" + cp.Db.EncodeSQLText(ModuleGuid));
                                     if (CS2.OK()) {
                                         string Code = CS2.GetText("code").Trim();
-                                        Code = EncodeCData(cp, Code);
+                                        Code = EncodeCData(Code);
                                         collectionXml += "\r\n" + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>";
                                     }
                                     CS2.Close();
@@ -154,7 +154,7 @@ namespace Contensive.Processor.Controllers {
                                             + " suffix=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("suffix")) + "\""
                                             + " sortOrder=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("sortOrder")) + "\""
                                             + ">"
-                                            + EncodeCData(cp, CS2.GetText("styleFilename").Trim())
+                                            + EncodeCData(CS2.GetText("styleFilename").Trim())
                                             + "</SharedStyle>";
                                     CS2.Close();
                                 }
@@ -219,7 +219,7 @@ namespace Contensive.Processor.Controllers {
                                         CoreController core = ((CPClass)cp).core;
                                         string addonPath = AddonController.getPrivateFilesAddonPath();
                                         string collectionPath = CollectionFolderController.getCollectionConfigFolderPath(core, collection.ccguid);
-                                        if (!cp.PrivateFiles.FileExists(addonPath + collectionPath + filename  )) {
+                                        if (!cp.PrivateFiles.FileExists(addonPath + collectionPath + filename)) {
                                             //
                                             // - not there
                                             cp.UserError.Add("There was an error exporting this collection because the zip file [" + pathFilename + "] was not found in the collection path [" + collectionPath + "].");
@@ -311,61 +311,42 @@ namespace Contensive.Processor.Controllers {
         }
         // 
         // ====================================================================================================
-        /// <summary>
-        ///         ''' create a simple text node with a name and content
-        ///         ''' </summary>
-        ///         ''' <param name="NodeName"></param>
-        ///         ''' <param name="NodeContent"></param>
-        ///         ''' <returns></returns>
-        ///         ''' <remarks></remarks>
-        public static string getNodeText(CPBaseClass cp, string NodeName, string NodeContent, bool deprecated = false) {
-            string result = "";
-            try {
-                string prefix = "";
-                if ((deprecated))
-                    prefix = "<!-- deprecated -->";
-                if (NodeContent == "")
-                    return result + "\r\n" + "\t" + prefix + "<" + NodeName + "></" + NodeName + ">";
-                else
-                    return result + "\r\n" + "\t" + prefix + "<" + NodeName + ">" + EncodeCData(cp, NodeContent) + "</" + NodeName + ">";
-            } catch (Exception ex) {
-                cp.Site.ErrorReport(ex, "getNodeText");
-                return string.Empty;
-            }
+        //
+        public static string getNode(string NodeName, string NodeContent, bool deprecated) {
+            if (string.IsNullOrWhiteSpace(NodeContent)) return string.Empty;
+            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + EncodeCData(NodeContent) + "</" + NodeName + ">";
         }
+        //
+        public static string getNode(string NodeName, string NodeContent)
+            => getNode(NodeName, NodeContent, false);
         // 
         // ====================================================================================================
-        /// <summary>
-        ///         ''' create a simple boolean node with a name and content
-        ///         ''' </summary>
-        ///         ''' <param name="NodeName"></param>
-        ///         ''' <param name="NodeContent"></param>
-        ///         ''' <returns></returns>
-        ///         ''' <remarks></remarks>
-        public static string getNodeBoolean(CPBaseClass cp, string NodeName, bool NodeContent) {
-            try {
-                return "\r\n" + "\t" + "<" + NodeName + ">" + getYesNo(cp, NodeContent) + "</" + NodeName + ">";
-            } catch (Exception ex) {
-                cp.Site.ErrorReport(ex, "GetNodeBoolean");
-                return string.Empty;
-            }
+        //
+        public static string getNode(string NodeName, int NodeContent, bool deprecated) {
+            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + NodeContent + "</" + NodeName + ">";
         }
+        //
+        public static string getNode(string NodeName, int NodeContent)
+            => getNode(NodeName, NodeContent, false);
         // 
         // ====================================================================================================
-        /// <summary>
-        ///         ''' create a simple integer node with a name and content
-        ///         ''' </summary>
-        ///         ''' <param name="NodeName"></param>
-        ///         ''' <param name="NodeContent"></param>
-        ///         ''' <returns></returns>
-        ///         ''' <remarks></remarks>
-        public static string GetNodeInteger(CPBaseClass cp, string NodeName, int NodeContent) {
-            try {
-                return "\r\n" + "\t" + "<" + NodeName + ">" + System.Convert.ToString(NodeContent) + "</" + NodeName + ">";
-            } catch (Exception ex) {
-                cp.Site.ErrorReport(ex, "GetNodeInteger");
-                return string.Empty;
+        //
+        public static string getNode(string NodeName, bool NodeContent, bool deprecated) {
+            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + getYesNo(NodeContent) + "</" + NodeName + ">";
+        }
+        //
+        public static string getNode(string NodeName, bool NodeContent)
+            => getNode(NodeName, NodeContent, false);
+        // 
+        // ====================================================================================================
+        //
+        public static string getNodeLookupContentName(CPBaseClass cp, string nodeName, int recordId, string contentName) {
+            using (CPCSBaseClass cs = cp.CSNew()) {
+                if (cs.OpenRecord(contentName, recordId, "name", false)) {
+                    return getNode(nodeName, cs.GetText("name"), false);
+                }
             }
+            return getNode(nodeName, "", false);
         }
         // 
         // ====================================================================================================
@@ -473,29 +454,18 @@ namespace Contensive.Processor.Controllers {
         // 
         // ====================================================================================================
         // 
-        public static string EncodeCData(CPBaseClass cp, string Source) {
-            try {
-                string result = Source;
-                if (result != "")
-                    result = "<![CDATA[" + Strings.Replace(result, "]]>", "]]]]><![CDATA[>") + "]]>";
-                return result;
-            } catch (Exception ex) {
-                cp.Site.ErrorReport(ex, "EncodeCData");
-                return string.Empty;
-            }
+        public static string EncodeCData(string source) {
+            if (string.IsNullOrWhiteSpace(source)) return "";
+            return "<![CDATA[" + Strings.Replace(source, "]]>", "]]]]><![CDATA[>") + "]]>";
         }
         // 
         // ====================================================================================================
-        public static string getYesNo(CPBaseClass cp, bool Key) {
+        //
+        public static string getYesNo(bool Key) {
             return Key ? "Yes" : "No";
         }
         // 
         // =======================================================================================
-        /// <summary>
-        ///         ''' zip
-        ///         ''' </summary>
-        ///         ''' <param name="PathFilename"></param>
-        ///         ''' <remarks></remarks>
         public static void UnzipFile(CPBaseClass cp, string PathFilename) {
             try {
                 // 

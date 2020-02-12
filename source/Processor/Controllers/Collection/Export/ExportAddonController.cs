@@ -21,27 +21,28 @@ namespace Contensive.Processor.Controllers {
                         if (((Strings.LCase(addonName) == "oninstall") | (Strings.LCase(addonName) == "_oninstall")))
                             processRunOnce = true;
                         // 
-                        // ActiveX DLL node is being deprecated. This should be in the collection resource section
-                        result += ExportController.getNodeText(cp, "Copy", CS.GetText("Copy"));
-                        result += ExportController.getNodeText(cp, "CopyText", CS.GetText("CopyText"));
+                        // content
+                        result += ExportController.getNode( "Copy", CS.GetText("Copy"));
+                        result += ExportController.getNode( "CopyText", CS.GetText("CopyText"));
                         // 
                         // DLL
-                        result += ExportController.getNodeText(cp, "ActiveXProgramID", CS.GetText("objectprogramid"), true);
-                        result += ExportController.getNodeText(cp, "DotNetClass", CS.GetText("DotNetClass"));
+                        result += ExportController.getNode( "ActiveXProgramID", CS.GetText("objectprogramid"), true);
+                        result += ExportController.getNode( "DotNetClass", CS.GetText("DotNetClass"));
                         // 
                         // Features
-                        result += ExportController.getNodeText(cp, "ArgumentList", CS.GetText("ArgumentList"));
-                        result += ExportController.getNodeBoolean(cp, "AsAjax", CS.GetBoolean("AsAjax"));
-                        result += ExportController.getNodeBoolean(cp, "Filter", CS.GetBoolean("Filter"));
-                        result += ExportController.getNodeText(cp, "Help", CS.GetText("Help"));
-                        result += ExportController.getNodeText(cp, "HelpLink", CS.GetText("HelpLink"));
+                        result += ExportController.getNode( "ArgumentList", CS.GetText("ArgumentList"));
+                        result += ExportController.getNodeLookupContentName(cp, "instanceSettingPrimaryContentId", CS.GetInteger("instanceSettingPrimaryContentId"), "content");
+                        result += ExportController.getNode( "AsAjax", CS.GetBoolean("AsAjax"));
+                        result += ExportController.getNode( "Filter", CS.GetBoolean("Filter"));
+                        result += ExportController.getNode( "Help", CS.GetText("Help"));
+                        result += ExportController.getNode( "HelpLink", CS.GetText("HelpLink"));
                         result += "\r\n" + "\t" + "<Icon Link=\"" + CS.GetText("iconfilename") + "\" width=\"" + CS.GetInteger("iconWidth") + "\" height=\"" + CS.GetInteger("iconHeight") + "\" sprites=\"" + CS.GetInteger("iconSprites") + "\" />";
-                        result += ExportController.getNodeBoolean(cp, "InIframe", CS.GetBoolean("InFrame"));
-                        result += CS.FieldOK("BlockEditTools") ? ExportController.getNodeBoolean(cp, "BlockEditTools", CS.GetBoolean("BlockEditTools")) : "";
-                        result += CS.FieldOK("aliasList") ? ExportController.getNodeText(cp, "AliasList", CS.GetText("aliasList")) : "";
+                        result += ExportController.getNode( "InIframe", CS.GetBoolean("InFrame"));
+                        result += ExportController.getNode("BlockEditTools", CS.GetBoolean("BlockEditTools"));
+                        result += ExportController.getNode( "AliasList", CS.GetText("aliasList"));
                         // 
                         // -- Form XML
-                        result += ExportController.getNodeText(cp, "FormXML", CS.GetText("FormXML"));
+                        result += ExportController.getNode( "FormXML", CS.GetText("FormXML"));
                         // 
                         // -- addon dependencies
                         using (CPCSBaseClass CS2 = cp.CSNew()) {
@@ -66,40 +67,40 @@ namespace Contensive.Processor.Controllers {
                         }
                         // 
                         // -- is inline/block
-                        result += ExportController.getNodeBoolean(cp, "IsInline", CS.GetBoolean("IsInline"));
+                        result += ExportController.getNode( "IsInline", CS.GetBoolean("IsInline"));
                         // 
                         // -- javascript (xmlnode may not match Db filename)
-                        result += ExportController.getNodeText(cp, "JavascriptInHead", CS.GetText("JSFilename"));
-                        result += ExportController.getNodeBoolean(cp, "javascriptForceHead", CS.GetBoolean("javascriptForceHead"));
-                        result += ExportController.getNodeText(cp, "JSHeadScriptSrc", CS.GetText("JSHeadScriptSrc"));
+                        result += ExportController.getNode( "JavascriptInHead", CS.GetText("JSFilename"));
+                        result += ExportController.getNode( "javascriptForceHead", CS.GetBoolean("javascriptForceHead"));
+                        result += ExportController.getNode( "JSHeadScriptSrc", CS.GetText("JSHeadScriptSrc"));
                         // 
                         // -- javascript deprecated
-                        result += ExportController.getNodeText(cp, "JSBodyScriptSrc", CS.GetText("JSBodyScriptSrc"), true);
-                        result += ExportController.getNodeText(cp, "JavascriptBodyEnd", CS.GetText("JavascriptBodyEnd"), true);
-                        result += ExportController.getNodeText(cp, "JavascriptOnLoad", CS.GetText("JavascriptOnLoad"), true);
+                        result += ExportController.getNode( "JSBodyScriptSrc", CS.GetText("JSBodyScriptSrc"), true);
+                        result += ExportController.getNode( "JavascriptBodyEnd", CS.GetText("JavascriptBodyEnd"), true);
+                        result += ExportController.getNode( "JavascriptOnLoad", CS.GetText("JavascriptOnLoad"), true);
                         // 
                         // -- Placements
-                        result += ExportController.getNodeBoolean(cp, "Content", CS.GetBoolean("Content"));
-                        result += ExportController.getNodeBoolean(cp, "Template", CS.GetBoolean("Template"));
-                        result += ExportController.getNodeBoolean(cp, "Email", CS.GetBoolean("Email"));
-                        result += ExportController.getNodeBoolean(cp, "Admin", CS.GetBoolean("Admin"));
-                        result += ExportController.getNodeBoolean(cp, "OnPageEndEvent", CS.GetBoolean("OnPageEndEvent"));
-                        result += ExportController.getNodeBoolean(cp, "OnPageStartEvent", CS.GetBoolean("OnPageStartEvent"));
-                        result += ExportController.getNodeBoolean(cp, "OnBodyStart", CS.GetBoolean("OnBodyStart"));
-                        result += ExportController.getNodeBoolean(cp, "OnBodyEnd", CS.GetBoolean("OnBodyEnd"));
-                        result += ExportController.getNodeBoolean(cp, "RemoteMethod", CS.GetBoolean("RemoteMethod"));
-                        result += CS.FieldOK("Diagnostic") ? ExportController.getNodeBoolean(cp, "Diagnostic", CS.GetBoolean("Diagnostic")) : "";
+                        result += ExportController.getNode( "Content", CS.GetBoolean("Content"));
+                        result += ExportController.getNode( "Template", CS.GetBoolean("Template"));
+                        result += ExportController.getNode( "Email", CS.GetBoolean("Email"));
+                        result += ExportController.getNode( "Admin", CS.GetBoolean("Admin"));
+                        result += ExportController.getNode( "OnPageEndEvent", CS.GetBoolean("OnPageEndEvent"));
+                        result += ExportController.getNode( "OnPageStartEvent", CS.GetBoolean("OnPageStartEvent"));
+                        result += ExportController.getNode( "OnBodyStart", CS.GetBoolean("OnBodyStart"));
+                        result += ExportController.getNode( "OnBodyEnd", CS.GetBoolean("OnBodyEnd"));
+                        result += ExportController.getNode( "RemoteMethod", CS.GetBoolean("RemoteMethod"));
+                        result += CS.FieldOK("Diagnostic") ? ExportController.getNode( "Diagnostic", CS.GetBoolean("Diagnostic")) : "";
                         // 
                         // -- Process
-                        result += ExportController.getNodeBoolean(cp, "ProcessRunOnce", processRunOnce);
-                        result += ExportController.GetNodeInteger(cp, "ProcessInterval", CS.GetInteger("ProcessInterval"));
+                        result += ExportController.getNode( "ProcessRunOnce", processRunOnce);
+                        result += ExportController.getNode( "ProcessInterval", CS.GetInteger("ProcessInterval"));
                         // 
                         // Meta
                         // 
-                        result += ExportController.getNodeText(cp, "MetaDescription", CS.GetText("MetaDescription"));
-                        result += ExportController.getNodeText(cp, "OtherHeadTags", CS.GetText("OtherHeadTags"));
-                        result += ExportController.getNodeText(cp, "PageTitle", CS.GetText("PageTitle"));
-                        result += ExportController.getNodeText(cp, "RemoteAssetLink", CS.GetText("RemoteAssetLink"));
+                        result += ExportController.getNode( "MetaDescription", CS.GetText("MetaDescription"));
+                        result += ExportController.getNode( "OtherHeadTags", CS.GetText("OtherHeadTags"));
+                        result += ExportController.getNode( "PageTitle", CS.GetText("PageTitle"));
+                        result += ExportController.getNode( "RemoteAssetLink", CS.GetText("RemoteAssetLink"));
                         // 
                         // Styles
                         string Styles = "";
@@ -112,15 +113,15 @@ namespace Contensive.Processor.Controllers {
                             else
                                 Styles = StylesTest;
                         }
-                        result += ExportController.getNodeText(cp, "Styles", Styles);
-                        result += ExportController.getNodeText(cp, "styleslinkhref", CS.GetText("styleslinkhref"));
+                        result += ExportController.getNode( "Styles", Styles);
+                        result += ExportController.getNode( "styleslinkhref", CS.GetText("styleslinkhref"));
                         // 
                         // 
                         // Scripting
                         // 
                         string NodeInnerText = CS.GetText("ScriptingCode").Trim();
                         if (NodeInnerText != "")
-                            NodeInnerText = "\r\n" + "\t" + "\t" + "<Code>" + ExportController.EncodeCData(cp, NodeInnerText) + "</Code>";
+                            NodeInnerText = "\r\n" + "\t" + "\t" + "<Code>" + ExportController.EncodeCData(NodeInnerText) + "</Code>";
                         using (CPCSBaseClass CS2 = cp.CSNew()) {
                             CS2.Open("Add-on Scripting Module Rules", "addonid=" + addonid);
                             while (CS2.OK()) {

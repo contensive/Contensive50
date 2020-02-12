@@ -152,6 +152,14 @@ namespace Contensive.BaseClasses {
         /// <remarks></remarks>
         public abstract string GetAddLink(string ContentName, string PresetNameValueList, bool AllowPaste, bool IsEditing);
         //
+        public abstract string GetAddLink(string ContentName, string PresetNameValueList);
+        //
+        public abstract string GetAddLink(string ContentName);
+        //
+        public abstract string GetAddLink(int contentId, string PresetNameValueList);
+        //
+        public abstract string GetAddLink(int contentId);
+        //
         //====================================================================================================
         /// <summary>
         /// Returns an SQL compatible where-clause which includes all the contentcontentid values allowed for this content name.
@@ -172,6 +180,14 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Return the contentName from its id
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <returns></returns>
+        public abstract string GetName(int contentId);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Returns the datasource name of the content given.
         /// </summary>
         /// <param name="ContentName"></param>
@@ -183,14 +199,22 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Get an icon linked to the administration site which edits the referenced record. The record is identified by its ID. The recordname is only used for the display caption.
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="AllowCut">If true and the content allows cut and paste, and cut icon will be included in the return string.</param>
-        /// <param name="RecordName">Used as a caption for the label</param>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="allowCut">If true and the content allows cut and paste, and cut icon will be included in the return string.</param>
+        /// <param name="recordLabel">Used as a caption for the label</param>
         /// <param name="IsEditing">If false, this call returns nothing. Set it true if IsEdiing( contentname ) is true.</param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public abstract string GetEditLink(string ContentName, string RecordID, bool AllowCut, string RecordName, bool IsEditing);
+        public abstract string GetEditLink(string contentName, string recordId, bool allowCut, string recordLabel, bool IsEditing);
+        //
+        public abstract string GetEditLink(string contentName, int recordId);
+        //
+        public abstract string GetEditLink(string contentName, string recordGuid);
+        //
+        public abstract string GetEditLink(int contentId, int recordId);
+        //
+        public abstract string GetEditLink(int contentId, string recordGuid);
         //
         //====================================================================================================
         /// <summary>
