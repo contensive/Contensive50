@@ -12,6 +12,7 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("email", "ccemail", "default", true);
         //
         //====================================================================================================
+        public string addonList { get; set; }
         public bool addLinkEId { get; set; }
         public bool allowSpamFooter { get; set; }
         public bool blockSiteStyles { get; set; }
