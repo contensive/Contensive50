@@ -388,7 +388,8 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated, access model properties instead", false)]
         public override string GetProperty(string ContentName, string PropertyName) {
-            var contentMetadata = Models.Domain.ContentMetadataModel.createByUniqueName(cp.core, ContentName);
+            var contentMetadata = ContentMetadataModel.createByUniqueName(cp.core, ContentName);
+            if(contentMetadata==null) { return string.Empty;  }
             return contentMetadata.getContentProperty(cp.core, PropertyName);
         }
         //

@@ -215,8 +215,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // - if repair, reinstall all ipgradable collections not already re-installed
                     if (repair) {
-                        foreach ( var collection in DbBaseModel.createList<AddonCollectionModel>(core.cpParent, "(updatable>0)")) {
-                            if(!collectionsInstalledList.Contains(collection.ccguid)) {
+                        foreach (var collection in DbBaseModel.createList<AddonCollectionModel>(core.cpParent, "(updatable>0)")) {
+                            if (!collectionsInstalledList.Contains(collection.ccguid)) {
                                 //
                                 // -- install all of them, ignore install errors
                                 string installErrorMessage = "";
@@ -226,7 +226,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // -- error messages, already reported?
                                 }
-                                foreach ( string nonCriticalError in nonCriticalErrorList) {
+                                foreach (string nonCriticalError in nonCriticalErrorList) {
                                     //
                                     // -- error messages, already reported?
                                 }
@@ -320,7 +320,7 @@ namespace Contensive.Processor.Controllers {
             => verifyRecord(core, contentName, name, sqlName, "");
         //
         private static void verifyRecord(CoreController core, string contentName, string name)
-        => verifyRecord(core, contentName, name, "", "");
+            => verifyRecord(core, contentName, name, "", "");
         //
         //====================================================================================================
         /// <summary>
@@ -800,7 +800,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        private static void verifyManyManyDeleteTriggers( CoreController core ) {
+        private static void verifyManyManyDeleteTriggers(CoreController core) {
             LogController.logWarn(core, "verifyManyManyDeleteTriggers not implemented");
         }
         //
@@ -1076,7 +1076,7 @@ namespace Contensive.Processor.Controllers {
             // -- Landing Page
             PageContentModel landingPage = DbBaseModel.create<PageContentModel>(core.cpParent, defaultLandingPageGuid);
             if (landingPage == null) {
-                landingPage = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict( core, "page content"));
+                landingPage = PageContentModel.addDefault<PageContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "page content"));
                 landingPage.name = "Home";
                 landingPage.ccguid = defaultLandingPageGuid;
             }
@@ -1095,7 +1095,7 @@ namespace Contensive.Processor.Controllers {
             //
             // -- verify menu record
             var menu = MenuModel.create<MenuModel>(core.cpParent, "Header Nav Menu");
-            if(menu == null ) {
+            if (menu == null) {
                 menu = MenuModel.addDefault<MenuModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, "Menus"));
                 menu.ccguid = "Header Nav Menu";
                 menu.name = "Header Nav Menu";

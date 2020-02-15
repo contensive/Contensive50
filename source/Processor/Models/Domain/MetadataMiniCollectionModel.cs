@@ -1,15 +1,6 @@
 ﻿
 using System;
-using System.Xml;
-using System.Linq;
 using System.Collections.Generic;
-using System.Data;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using Contensive.Processor.Exceptions;
-using Contensive.Models.Db;
-using System.Text;
 //
 namespace Contensive.Processor.Models.Domain {
     //

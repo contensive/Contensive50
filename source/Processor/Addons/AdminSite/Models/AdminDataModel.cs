@@ -1249,7 +1249,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // If there are any form fields that were no loaded, flag the error now
                     //
                     if (allowAdminFieldCheck(core) && (FormFieldLcListToBeLoaded.Count > 0)) {
-                        Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The following fields where not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
+                        Processor.Controllers.ErrorController.addUserError(core, "There has been an error reading the response from your browser. Please try your change again. If this error occurs again, please report this problem To your site administrator. The following fields were not found [" + string.Join(",", FormFieldLcListToBeLoaded) + "].");
                         throw (new GenericException("Unexpected exception"));
                     }
                 }

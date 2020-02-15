@@ -2,7 +2,6 @@
 using System;
 using System.Xml;
 using System.Collections.Generic;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 using Contensive.Processor.Models.Domain;
 using System.Linq;
@@ -13,7 +12,6 @@ using System.Reflection;
 using NLog;
 using Contensive.Models.Db;
 using System.Globalization;
-using System.Text;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -56,12 +54,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="collectionsInstalledList">A list of collection guids that are already installed this pass. All collections that install will be added to it. </param>
         public static void installBaseCollection(CoreController core, Stack<string> contextLog, bool isNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, List<string> collectionsInstalledList) {
             try {
-                int hint = 1;
                 contextLog.Push("installBaseCollection");
                 traceContextLog(core, contextLog);
                 //
                 // -- new build
-                // 20171029 -- upgrading should restore base collection fields as a fix to deleted required fields
                 const string baseCollectionFilename = "aoBase51.xml";
                 string baseCollectionXml = core.programFiles.readFileText(baseCollectionFilename);
                 if (string.IsNullOrEmpty(baseCollectionXml)) {
@@ -72,7 +68,6 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // -- Special Case - must install base collection metadata first because it builds the system that the system needs to do everything else
-                    hint = 2;
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installBaseCollection, install metadata first to verify system requirements");
 
                     CollectionInstallMetadataController.installMetaDataMiniCollectionFromXml(true, core, baseCollectionXml, isNewBuild, reinstallDependencies, true, logPrefix);
@@ -80,7 +75,6 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
-                    hint = 3;
                     string installPrivatePath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
                     try {
                         core.privateFiles.createPath(installPrivatePath);
