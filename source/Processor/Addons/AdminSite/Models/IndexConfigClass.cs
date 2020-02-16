@@ -214,7 +214,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if ((returnIndexConfig.columns.Count == 0) && (adminData.adminContent.adminColumns.Count > 0)) {
                     foreach (var keyValuePair in adminData.adminContent.adminColumns) {
                         returnIndexConfig.columns.Add(new IndexConfigColumnClass {
-                            Name = keyValuePair.Value.Name,
+                            Name = keyValuePair.Value.Name.ToLowerInvariant(),
                             Width = keyValuePair.Value.Width
                         });
                     }
