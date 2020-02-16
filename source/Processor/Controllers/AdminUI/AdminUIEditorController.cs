@@ -324,9 +324,9 @@ namespace Contensive.Processor.Controllers {
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "Select One", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "Select One", htmlId, "select form-control");
                 } else {
-                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, index, lookupList, "", htmlId, "select form-control");
                 }
 
             }
@@ -349,9 +349,9 @@ namespace Contensive.Processor.Controllers {
                 result += WhyReadOnlyMsg;
             } else {
                 if (!fieldRequired) {
-                    result += HtmlController.selectFromList(core, htmlName, currentValue, lookupList, "Select One", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, currentValue, lookupList, "Select One", htmlId, "select form-control");
                 } else {
-                    result += HtmlController.selectFromList(core, htmlName, currentValue, lookupList, "", "", "select form-control");
+                    result += HtmlController.selectFromList(core, htmlName, currentValue, lookupList, "", htmlId, "select form-control");
                 }
 
             }

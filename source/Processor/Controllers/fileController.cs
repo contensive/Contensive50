@@ -375,7 +375,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns></returns>
         public string createUniquePath() {
-            string uniquePath = GenericController.createGuid().Replace("-", "").Replace("{", "").Replace("}", "").ToLowerInvariant() + @"\";
+            string uniquePath = GenericController.getGUID().Replace("-", "").Replace("{", "").Replace("}", "").ToLowerInvariant() + @"\";
             createPath(uniquePath);
             return uniquePath;
         }

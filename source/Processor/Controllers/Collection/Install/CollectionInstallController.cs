@@ -1,4 +1,4 @@
-﻿
+﻿    
 using System;
 using System.Xml;
 using System.Collections.Generic;
@@ -75,14 +75,14 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
-                    string installPrivatePath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
+                    string installTempPath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
                     try {
-                        core.privateFiles.createPath(installPrivatePath);
-                        core.programFiles.copyFile(baseCollectionFilename, installPrivatePath + baseCollectionFilename, core.privateFiles);
+                        core.tempFiles.createPath(installTempPath);
+                        core.programFiles.copyFile(baseCollectionFilename, installTempPath + baseCollectionFilename, core.tempFiles);
                         string installErrorMessage = "";
                         string installedCollectionGuid = "";
                         bool isDependency = false;
-                        if (!installCollectionFromPrivateFile(core, isDependency, contextLog, installPrivatePath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
+                        if (!installCollectionFromTempFile(core, isDependency, contextLog, installTempPath + baseCollectionFilename, ref installErrorMessage, ref installedCollectionGuid, isNewBuild, reinstallDependencies, ref nonCriticalErrorList, logPrefix, ref collectionsInstalledList)) {
                             throw new GenericException("installBaseCollection, call to installCollectionFromPrivateFile failed, message returned [" + installErrorMessage + "]");
                         }
                     } catch (Exception ex) {
@@ -91,7 +91,7 @@ namespace Contensive.Processor.Controllers {
                     } finally {
                         //
                         // -- remove temp folder
-                        core.privateFiles.deleteFolder(installPrivatePath);
+                        core.tempFiles.deleteFolder(installTempPath);
                         //
                         // -- invalidate cache
                         core.cache.invalidateAll();
@@ -950,7 +950,7 @@ namespace Contensive.Processor.Controllers {
         /// Calls installCollectionFromCollectionFolder.
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="installPrivatePath"></param>
+        /// <param name="installTempPath"></param>
         /// <param name="return_ErrorMessage"></param>
         /// <param name="collectionsInstalledList">a list of the collections installed to the database during this installation (dependencies etc.). The collections installed are added to this list</param>
         /// <param name="IsNewBuild"></param>
@@ -960,17 +960,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="includeBaseMetaDataInstall"></param>
         /// <param name="collectionsDownloaded">List of collections that have been downloaded during this istall pass but have not been installed yet. Do no need to download them again.</param>
         /// <returns></returns>
-        public static bool installCollectionsFromPrivateFolder(CoreController core, bool isDependency, Stack<string> contextLog, string installPrivatePath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
+        public static bool installCollectionsFromTempFolder(CoreController core, bool isDependency, Stack<string> contextLog, string installTempPath, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool returnSuccess = false;
             try {
-                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + installPrivatePath + "]");
+                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + installTempPath + "]");
                 traceContextLog(core, contextLog);
                 DateTime CollectionLastChangeDate = core.dateTimeNowMockable;
                 //
                 // -- collectionsToInstall = collections stored in the collection folder that need to be stored in the Db
                 var collectionsToInstall = new List<string>();
                 var collectionsBuildingFolder = new List<string>();
-                returnSuccess = CollectionFolderController.buildCollectionFoldersFromCollectionZips(core, contextLog, installPrivatePath, CollectionLastChangeDate, ref collectionsToInstall, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder);
+                returnSuccess = CollectionFolderController.buildCollectionFoldersFromCollectionZips(core, contextLog, installTempPath, CollectionLastChangeDate, ref collectionsToInstall, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder);
                 if (!returnSuccess) {
                     //
                     // BuildLocal failed, log it and do not upgrade
@@ -1001,14 +1001,14 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         /// <summary>
-        /// Installs a collectionZip from a file in privateFiles.
+        /// Installs a collectionZip from a file in tempFiles.
         /// Builds the Collection Folder. 
         /// Calls installCollectionFromCollectionFolder.
         /// </summary>
-        public static bool installCollectionFromPrivateFile(CoreController core, bool isDependency, Stack<string> contextLog, string pathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
+        public static bool installCollectionFromTempFile(CoreController core, bool isDependency, Stack<string> contextLog, string tempPathFilename, ref string return_ErrorMessage, ref string return_CollectionGUID, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList) {
             bool returnSuccess = true;
             try {
-                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + pathFilename + "]");
+                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + tempPathFilename + "]");
                 traceContextLog(core, contextLog);
                 DateTime CollectionLastChangeDate;
                 //
@@ -1016,7 +1016,7 @@ namespace Contensive.Processor.Controllers {
                 CollectionLastChangeDate = core.dateTimeNowMockable;
                 var collectionsDownloaded = new List<string>();
                 var collectionsBuildingFolder = new List<string>();
-                if (!CollectionFolderController.buildCollectionFolderFromCollectionZip(core, contextLog, pathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsDownloaded, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                if (!CollectionFolderController.buildCollectionFolderFromCollectionZip(core, contextLog, tempPathFilename, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsDownloaded, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
                     //
                     // BuildLocal failed, log it and do not upgrade
                     //
@@ -1048,96 +1048,6 @@ namespace Contensive.Processor.Controllers {
                 contextLog.Pop();
             }
             return returnSuccess;
-        }
-        //
-        //======================================================================================================
-        /// <summary>
-        /// copy resources from install folder to www folder
-        /// </summary>
-        private static void copyPrivateFilesSrcPathToWwwDstPath(CoreController core, string privateFilesSrcPath, string wwwFilesDstPath, string BlockFileList, string BlockFolderList) {
-            try {
-
-                string privateFilesSrcFolder = null;
-                string wwwFilesDstDstFolder = null;
-                //
-                privateFilesSrcFolder = privateFilesSrcPath;
-                if (privateFilesSrcFolder.Substring(privateFilesSrcFolder.Length - 1) == "\\") {
-                    privateFilesSrcFolder = privateFilesSrcFolder.left(privateFilesSrcFolder.Length - 1);
-                }
-                //
-                wwwFilesDstDstFolder = wwwFilesDstPath;
-                if (wwwFilesDstDstFolder.Substring(wwwFilesDstDstFolder.Length - 1) == "\\") {
-                    wwwFilesDstDstFolder = wwwFilesDstDstFolder.left(wwwFilesDstDstFolder.Length - 1);
-                }
-                //
-                if (core.privateFiles.pathExists(privateFilesSrcFolder)) {
-                    List<FileDetail> FileInfoArray = core.privateFiles.getFileList(privateFilesSrcFolder);
-                    foreach (FileDetail file in FileInfoArray) {
-                        if ((file.Extension == "dll") || (file.Extension == "exe") || (file.Extension == "zip")) {
-                            //
-                            // can not copy dll or exe
-                            //
-                        } else if (("," + BlockFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            //
-                            // can not copy the current collection file
-                            //
-                        } else {
-                            //
-                            // copy this file to destination
-                            //
-                            core.privateFiles.copyFile(privateFilesSrcPath + file.Name, wwwFilesDstPath + file.Name, core.wwwFiles);
-                        }
-                    }
-                    //
-                    // copy folders to dst
-                    //
-                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(privateFilesSrcFolder);
-                    foreach (FolderDetail folder in FolderInfoArray) {
-                        if (("," + BlockFolderList + ",").IndexOf("," + folder.Name + ",", System.StringComparison.OrdinalIgnoreCase) == -1) {
-                            copyPrivateFilesSrcPathToWwwDstPath(core, privateFilesSrcPath + folder.Name + "\\", wwwFilesDstPath + folder.Name + "\\", BlockFileList, "");
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //
-        //======================================================================================================
-        //
-        private static string GetCollectionFileList(CoreController core, string privateFilesSrcPath, string SubFolder, string ExcludeFileList) {
-            string result = "";
-            try {
-                string privateFilesSrcFolder;
-                //
-                privateFilesSrcFolder = privateFilesSrcPath + SubFolder;
-                if (privateFilesSrcFolder.Substring(privateFilesSrcFolder.Length - 1) == "\\") {
-                    privateFilesSrcFolder = privateFilesSrcFolder.left(privateFilesSrcFolder.Length - 1);
-                }
-                //
-                if (core.privateFiles.pathExists(privateFilesSrcFolder)) {
-                    List<FileDetail> FileInfoArray = core.privateFiles.getFileList(privateFilesSrcFolder);
-                    foreach (FileDetail file in FileInfoArray) {
-                        if (("," + ExcludeFileList + ",").IndexOf("," + file.Name + ",", System.StringComparison.OrdinalIgnoreCase) != -1) {
-                            //
-                            // do not copy the current collection file
-                        } else {
-                            result += Environment.NewLine + SubFolder + file.Name;
-                        }
-                    }
-                    //
-                    // get subfolders
-                    List<FolderDetail> FolderInfoArray = core.privateFiles.getFolderList(privateFilesSrcFolder);
-                    foreach (FolderDetail folder in FolderInfoArray) {
-                        result += GetCollectionFileList(core, privateFilesSrcPath, SubFolder + folder.Name + "\\", ExcludeFileList);
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return result;
         }
         //
         //======================================================================================================

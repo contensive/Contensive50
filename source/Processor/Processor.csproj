@@ -63,12 +63,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.2002.13.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.2002.13.1\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.2002.16.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.2002.16.1\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.13.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.16.1\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -136,7 +136,7 @@
     <Compile Include="Addons\AdminSite\Models\FieldTypeEditorAddonModel.cs" />
     <Compile Include="Addons\AdminSite\Models\FieldEditorAddonModel.cs" />
     <Compile Include="Addons\AdminSite\Views\EditorRowClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormEditTabs.cs" />
+    <Compile Include="Addons\AdminSite\Views\EditViewTabList.cs" />
     <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
     <Compile Include="Addons\Authentication\Authenticate.cs" />
     <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
@@ -224,27 +224,23 @@
     <Compile Include="Controllers\EmailHippoController.cs" />
     <Compile Include="Controllers\BuildDataMigrationController.cs" />
     <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormEditTabControlInfo.cs" />
-    <Compile Include="Addons\AdminSite\Views\EmailBounceEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\LinkAliasEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\ContentTrackingEditor.cs" />
+    <Compile Include="Addons\AdminSite\Views\EditViewTabControlInfo.cs" />
+    <Compile Include="Controllers\AdminUI\LinkAliasEditor.cs" />
     <Compile Include="Addons\Tools\ToolDownloads.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormRoot.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormQuickStats.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormEdit.cs" />
+    <Compile Include="Addons\AdminSite\Views\RootView.cs" />
+    <Compile Include="Addons\AdminSite\Views\QuickStatsView.cs" />
+    <Compile Include="Addons\AdminSite\Views\EditView.cs" />
     <Compile Include="Addons\Tools\ToolCustomReports.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormEditConfig.cs" />
+    <Compile Include="Addons\AdminSite\Views\EditorConfigView.cs" />
     <Compile Include="Addons\AdminSite\_BlankEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\EmailTopicEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\EmailRuleEditor.cs" />
     <Compile Include="Addons\AdminSite\Models\AdminDataModel.cs" />
     <Compile Include="Addons\AdminSite\Controllers\AdminErrorController.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormIndexExport.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormIndexAdvancedSearch.cs" />
+    <Compile Include="Addons\AdminSite\Views\ListViewExport.cs" />
+    <Compile Include="Addons\AdminSite\Views\ListViewAdvancedSearch.cs" />
     <Compile Include="Addons\AdminSite\Models\IndexConfigClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\GroupRuleEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormIndex.cs" />
-    <Compile Include="Addons\AdminSite\Views\FormIndexSetColumns.cs" />
+    <Compile Include="Controllers\AdminUI\GroupRuleEditor.cs" />
+    <Compile Include="Addons\AdminSite\Views\ListView.cs" />
+    <Compile Include="Addons\AdminSite\Views\ListViewSetColumns.cs" />
     <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
     <Compile Include="Addons\PageManager\GetChildPageList.cs" />
     <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />

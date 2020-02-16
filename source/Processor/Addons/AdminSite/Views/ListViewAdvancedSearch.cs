@@ -8,7 +8,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormIndexAdvancedSearchClass {
+    public class ListViewAdvancedSearch {
         //
         //=================================================================================
         //

@@ -24,6 +24,7 @@ namespace Contensive.BaseClasses {
         /// <param name="body"></param>
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
         public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
@@ -34,9 +35,10 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Sends an email that includes all the form elements in the current webpage response.
         /// </summary>
-        /// <param name="ToAddress"></param>
-        /// <param name="FromAddress"></param>
-        /// <param name="Subject"></param>
+        /// <param name="toAddress"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
         public abstract void sendForm(string toAddress, string fromAddress, string subject);

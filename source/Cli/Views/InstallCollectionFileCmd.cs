@@ -63,17 +63,17 @@ namespace Contensive.CLI {
                 // todo - this interface should all be tempFiles not private files (to avoid all the remote file system copies
                 //
                 // -- copy the file to private files
-                string privatePath = "installTmp\\";
-                string privatePathFilename = privatePath + System.IO.Path.GetFileName(collectionPhysicalPathFilename);
-                string privatePhysicalPathFilename = cpApp.PrivateFiles.PhysicalFilePath + privatePathFilename;
-                if (!cpApp.PrivateFiles.FolderExists(privatePath)) {
-                    cpApp.PrivateFiles.CreateFolder(privatePath);
+                string tempPath = "install" + Contensive.Processor.Controllers.GenericController.getGUIDNaked() + "\\";
+                string tempPathFilename = tempPath + System.IO.Path.GetFileName(collectionPhysicalPathFilename);
+                string tempPhysicalPathFilename = cpApp.TempFiles.PhysicalFilePath + tempPathFilename;
+                if (!cpApp.TempFiles.FolderExists(tempPath)) {
+                    cpApp.TempFiles.CreateFolder(tempPath);
                 }
-                if (System.IO.File.Exists(privatePhysicalPathFilename)) {
-                    System.IO.File.Delete(privatePhysicalPathFilename);
+                if (System.IO.File.Exists(tempPhysicalPathFilename)) {
+                    System.IO.File.Delete(tempPhysicalPathFilename);
                 }
-                System.IO.File.Copy(collectionPhysicalPathFilename, privatePhysicalPathFilename);
-                cpApp.PrivateFiles.CopyLocalToRemote(privatePathFilename);
+                System.IO.File.Copy(collectionPhysicalPathFilename, tempPhysicalPathFilename);
+                cpApp.TempFiles.CopyLocalToRemote(tempPathFilename);
                 //
                 // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
                 var collectionsDownloaded = new List<string>();
@@ -81,13 +81,13 @@ namespace Contensive.CLI {
                 var nonCriticalErrorList = new List<string>();
                 var collectionsInstalled = new List<string>();
                 string collectionGuidsInstalled = "";
-                CollectionInstallController.installCollectionFromPrivateFile(cpApp.core, false, contextLog, privatePathFilename, ref return_ErrorMessage, ref collectionGuidsInstalled, false, false, ref nonCriticalErrorList, logPrefix, ref collectionsInstalled);
+                CollectionInstallController.installCollectionFromTempFile(cpApp.core, false, contextLog, tempPathFilename, ref return_ErrorMessage, ref collectionGuidsInstalled, false, false, ref nonCriticalErrorList, logPrefix, ref collectionsInstalled);
                 if (!string.IsNullOrEmpty(returnErrorMessage)) {
                     Console.WriteLine("There was an error installing the collection: " + returnErrorMessage);
                 } else {
                     Console.WriteLine("Command line collection installation completed with no errors.");
                 }
-                cpApp.PrivateFiles.DeleteFile(privatePhysicalPathFilename);
+                cpApp.TempFiles.DeleteFile(tempPhysicalPathFilename);
                 cpApp.Cache.InvalidateAll();
             }
         }

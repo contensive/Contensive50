@@ -9,7 +9,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormIndexSetColumnsClass {
+    public class ListViewSetColumns {
         //
         //=============================================================================
         //   Print the Configure Index Form

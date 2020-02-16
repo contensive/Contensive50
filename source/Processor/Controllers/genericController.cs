@@ -22,10 +22,6 @@ namespace Contensive.Processor.Controllers {
     public class GenericController {
         //
         //====================================================================================================
-        //
-        public static string createGuid() => getGUID(true);
-        //
-        //====================================================================================================
         /// <summary>
         /// return a normalized guid in registry format (which include the {})
         /// </summary>

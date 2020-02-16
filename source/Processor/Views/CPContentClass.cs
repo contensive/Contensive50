@@ -293,7 +293,7 @@ namespace Contensive.Processor {
         public override int AddContentField(string contentName, string fieldName, CPContentBaseClass.FieldTypeIdEnum fieldType) {
             var contentMetadata = ContentMetadataModel.createByUniqueName(cp.core, contentName);
             var fieldMeta = ContentFieldMetadataModel.createDefault(cp.core, fieldName, fieldType);
-            contentMetadata.verifyContentField(cp.core, fieldMeta, false);
+            contentMetadata.verifyContentField(cp.core, fieldMeta, false, "Api CPContent.AddContentField [" + contentName + "." + fieldName + "]");
             return fieldMeta.id;
         }
         //
@@ -321,7 +321,7 @@ namespace Contensive.Processor {
                 dataSourceName = dataSource.name,
                 tableName = sqlTableName,
                 name = contentName
-            });
+            }, "Adding content [" + contentName + "], sqlTableName [" + sqlTableName + "]");
         }
         //
         //====================================================================================================

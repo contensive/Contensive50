@@ -7,7 +7,7 @@ using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public static class FormEditTabs {
+    public static class EditViewTabList {
         //
         // ====================================================================================================
         /// <summary>

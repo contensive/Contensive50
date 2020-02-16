@@ -196,7 +196,7 @@ namespace Contensive.Processor.Controllers {
                             // -- run included add-ons before their parent
                             foreach (var dependentAddon in core.addonCache.getDependsOnList(addon.id)) {
                                 if (dependentAddon == null) {
-                                    LogController.logError(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
+                                    LogController.logWarn(core, new GenericException("Addon not found. An included addon of [" + addon.name + "] was not found. The included addon may have been deleted. Recreate or reinstall the missing addon, then reinstall [" + addon.name + "] or manually correct the included addon selection."));
                                 } else {
                                     executeContext.errorContextMessage = "adding dependent addon [" + dependentAddon.name + "] for addon [" + addon.name + "] called within context [" + executeContext.errorContextMessage + "]";
                                     result.Append(executeDependency(dependentAddon, executeContext));

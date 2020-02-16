@@ -482,6 +482,8 @@ namespace Contensive.Processor.Models.Domain {
         public static void verifyContentFieldFromSqlTableField(CoreController core, ContentMetadataModel contentMetadata, string fieldName, int ADOFieldType) {
             try {
                 //
+                string logMsgContext = "Verifying content field from db field data,  [" + fieldName + "] in table [" + contentMetadata.tableName + "]";
+                //
                 ContentFieldMetadataModel field = new ContentFieldMetadataModel {
                     fieldTypeId = core.db.getFieldTypeIdByADOType(ADOFieldType),
                     caption = fieldName,
@@ -672,7 +674,7 @@ namespace Contensive.Processor.Models.Domain {
                         field.defaultValue = "0";
                         break;
                 }
-                contentMetadata.verifyContentField(core, field, true);
+                contentMetadata.verifyContentField(core, field, true, logMsgContext);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

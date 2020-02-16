@@ -856,8 +856,9 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="ContentName"></param>
         /// <param name="fieldMetadata"></param>
         /// <param name="blockCacheClear"></param>
+        /// <param name="logMsgContext">A message to be added to log entries to help understand the context of the issue.</param>
         /// <returns></returns>
-        public void verifyContentField(CoreController core, ContentFieldMetadataModel fieldMetadata, bool blockCacheClear) {
+        public void verifyContentField(CoreController core, ContentFieldMetadataModel fieldMetadata, bool blockCacheClear, string logMsgContext) {
             try {
                 if (fieldMetadata == null) {
                     throw (new GenericException("Could not create Field for content [" + name + "] because the field metadata is not valid."));
@@ -879,7 +880,7 @@ namespace Contensive.Processor.Models.Domain {
                 if ((!fieldMetadata.isBaseField) && (RecordIsBaseField)) {
                     //
                     // This update is not allowed
-                    LogController.logWarn(core, new GenericException("Warning, updating base field from non-base collection, content [" + name + "], field [" + fieldMetadata.nameLc + "]"));
+                    LogController.logWarn(core, new GenericException("Warning, updating base field from non-base collection, context [" + logMsgContext + "], content [" + name + "], field [" + fieldMetadata.nameLc + "]"));
                 }
                 using (var db = new DbController(core, dataSourceName)) {
                     //
@@ -1029,8 +1030,11 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentMetadata"></param>
         /// <returns></returns>
-        public static int verifyContent_returnId(CoreController core, ContentMetadataModel contentMetadata) {
+        public static int verifyContent_returnId(CoreController core, ContentMetadataModel contentMetadata, string logMsgContext) {
             try {
+                //
+                logMsgContext += ", verifying content [" + contentMetadata.name + "]";
+                //
                 if (string.IsNullOrWhiteSpace(contentMetadata.name)) { throw new GenericException("Content name can not be blank"); }
                 if (string.IsNullOrWhiteSpace(contentMetadata.tableName)) { throw new GenericException("Content table name can not be blank"); }
                 using (var db = new DbController(core, contentMetadata.dataSourceName)) {
@@ -1163,7 +1167,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         //
                         if (!contentMetadata.fields.ContainsKey("name")) {
@@ -1177,7 +1181,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         //
                         if (!contentMetadata.fields.ContainsKey("active")) {
@@ -1191,7 +1195,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "1",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         //
                         if (!contentMetadata.fields.ContainsKey("sortorder")) {
@@ -1205,7 +1209,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         //
                         if (!contentMetadata.fields.ContainsKey("dateadded")) {
@@ -1219,7 +1223,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("createdby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1233,7 +1237,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.set_lookupContentName(core, "People");
                             fieldMetadata.defaultValue = "";
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("modifieddate")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1246,7 +1250,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("modifiedby")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1260,7 +1264,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.set_lookupContentName(core, "People");
                             fieldMetadata.defaultValue = "";
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("ContentControlId")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1274,7 +1278,7 @@ namespace Contensive.Processor.Models.Domain {
                             fieldMetadata.set_lookupContentName(core, "Content");
                             fieldMetadata.defaultValue = "";
                             fieldMetadata.isBaseField = contentMetadata.isBaseContent;
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("CreateKey")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1287,7 +1291,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                         if (!contentMetadata.fields.ContainsKey("ccGuid")) {
                             ContentFieldMetadataModel fieldMetadata = new Models.Domain.ContentFieldMetadataModel {
@@ -1300,7 +1304,7 @@ namespace Contensive.Processor.Models.Domain {
                                 defaultValue = "",
                                 isBaseField = contentMetadata.isBaseContent
                             };
-                            contentMetadata.verifyContentField(core, fieldMetadata, true);
+                            contentMetadata.verifyContentField(core, fieldMetadata, true, logMsgContext);
                         }
                     }
                 }
@@ -1325,36 +1329,38 @@ namespace Contensive.Processor.Models.Domain {
         /// Imports the named table into the content system
         /// </summary>
         /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
+        /// <param name="tableName"></param>
         /// <param name="ContentName"></param>
         //
-        public static ContentMetadataModel createFromSQLTable(CoreController core, DataSourceModel DataSource, string TableName, string ContentName) {
+        public static ContentMetadataModel createFromSQLTable(CoreController core, DataSourceModel DataSource, string tableName, string ContentName) {
             try {
+                //
+                string logMsgContext = "createFromSQLTable, ContentName [" + ContentName + "], tableName [" + tableName + "]";
                 //
                 // -- add a record if none found
                 var contentMetadata = new ContentMetadataModel();
                 using (var targetDb = new DbController(core, DataSource.name)) {
-                    using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
+                    using (DataTable dt = targetDb.executeQuery("select top 1 * from " + tableName)) {
                         if (dt.Rows.Count == 0) {
                             var fieldList = new NameValueCollection {
                                 { "name", DbController.encodeSQLText("test-record") }
                             };
-                            core.db.insert(TableName, fieldList);
+                            core.db.insert(tableName, fieldList);
                         }
                     }
-                    using (DataTable dt = targetDb.executeQuery("select top 1 * from " + TableName)) {
-                        if (dt.Rows.Count == 0) { throw new GenericException("Could not add a record To table [" + TableName + "]."); }
+                    using (DataTable dt = targetDb.executeQuery("select top 1 * from " + tableName)) {
+                        if (dt.Rows.Count == 0) { throw new GenericException("Could not add a record To table [" + tableName + "]."); }
                         //
                         // -- Find/Create the Content Definition
                         contentMetadata.id = DbController.getContentId(core, ContentName);
                         if (contentMetadata.id <= 0) {
                             //
                             // -- Content definition not found, create it
-                            contentMetadata.id = verifyContent_returnId(core, new ContentMetadataModel {
-                                tableName = TableName,
+                            contentMetadata.id = verifyContent_returnId(core, new ContentMetadataModel() {
+                                tableName = tableName,
                                 name = ContentName,
                                 active = true
-                            });
+                            }, logMsgContext);
                             // todo - verifyContent needs to return the model
                             contentMetadata = create(core, contentMetadata.id);
                             core.cache.invalidateAll();
@@ -1389,7 +1395,7 @@ namespace Contensive.Processor.Models.Domain {
                         }
                         //
                         // -- Fill ContentControlID fields with new ContentID
-                        targetDb.executeQuery("Update " + TableName + " Set ContentControlID=" + contentMetadata.id + " where (ContentControlID Is null);");
+                        targetDb.executeQuery("Update " + tableName + " Set ContentControlID=" + contentMetadata.id + " where (ContentControlID Is null);");
                         //
                         // ----- Load metadata, Load only if the previous state of autoload was true, Leave Autoload false during load so more do not trigger
                         core.cache.invalidateAll();
@@ -1543,7 +1549,7 @@ namespace Contensive.Processor.Models.Domain {
                 childContent.name = childContentName;
                 childContent.createdBy = childContent.modifiedBy = memberID;
                 childContent.dateAdded = childContent.modifiedDate = core.dateTimeNowMockable;
-                childContent.ccguid = createGuid();
+                childContent.ccguid = getGUID();
                 childContent.id = 0;
                 childContent.save(core.cpParent);
                 //

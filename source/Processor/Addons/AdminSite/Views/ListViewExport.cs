@@ -7,7 +7,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormIndexExport {
+    public class ListViewExport {
         //
         //=============================================================================
         //   Export the Admin List form results
@@ -85,7 +85,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // Get the SQL parts
                         //
                         IndexConfig = IndexConfigClass.get(core, adminData);
-                        FormIndex.setIndexSQL(core, adminData, IndexConfig, ref AllowContentAccess, ref sqlFieldList, ref SQLFrom, ref SQLWhere, ref SQLOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
+                        ListView.setIndexSQL(core, adminData, IndexConfig, ref AllowContentAccess, ref sqlFieldList, ref SQLFrom, ref SQLWhere, ref SQLOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
                         if (!AllowContentAccess) {
                             //
                             // This should be caught with check earlier, but since I added this, and I never make mistakes, I will leave this in case there is a mistake in the earlier code

@@ -19,34 +19,34 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// class logger initialization
         /// </summary>
-        private static Logger logger = NLog.LogManager.GetCurrentClassLogger();
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
         //
         //====================================================================================================
         /// <summary>
-        /// Build collection folders for all collection files in a privatefiles folder
+        /// Build collection folders for all collection files in a tempFiles folder
         /// - enumerate zip files in a folder and call buildCollectionFolderFromCollectionZip
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="sourcePrivateFolderPath"></param>
+        /// <param name="sourceTempFolderPath"></param>
         /// <param name="CollectionLastChangeDate"></param>
         /// <param name="collectionsToInstall">A list of collection guids that need to be installed in the database. Any collection folders built are added to he collectionsToInstall list.</param>
         /// <param name="return_ErrorMessage"></param>
         /// <param name="collectionsInstalledList"></param>
         /// <param name="collectionsBuildingFolder">list of collection guids in the process of folder building. use to block recursive loop.</param>
         /// <returns></returns>
-        public static bool buildCollectionFoldersFromCollectionZips(CoreController core, Stack<string> contextLog, string sourcePrivateFolderPath, DateTime CollectionLastChangeDate, ref List<string> collectionsToInstall, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
+        public static bool buildCollectionFoldersFromCollectionZips(CoreController core, Stack<string> contextLog, string sourceTempFolderPath, DateTime CollectionLastChangeDate, ref List<string> collectionsToInstall, ref string return_ErrorMessage, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
             bool success = false;
             try {
                 //
-                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + sourcePrivateFolderPath + "]");
+                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + sourceTempFolderPath + "]");
                 traceContextLog(core, contextLog);
                 //
-                if (core.privateFiles.pathExists(sourcePrivateFolderPath)) {
-                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, processing files in private folder [" + sourcePrivateFolderPath + "]");
-                    List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.privateFiles.getFileList(sourcePrivateFolderPath);
+                if (core.tempFiles.pathExists(sourceTempFolderPath)) {
+                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, processing files in private folder [" + sourceTempFolderPath + "]");
+                    List<CPFileSystemClass.FileDetail> SrcFileNamelist = core.tempFiles.getFileList(sourceTempFolderPath);
                     foreach (CPFileSystemClass.FileDetail file in SrcFileNamelist) {
                         if ((file.Extension == ".zip") || (file.Extension == ".xml")) {
-                            success = buildCollectionFolderFromCollectionZip(core, contextLog, sourcePrivateFolderPath + file.Name, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsToInstall, ref collectionsInstalledList, ref collectionsBuildingFolder);
+                            success = buildCollectionFolderFromCollectionZip(core, contextLog, sourceTempFolderPath + file.Name, CollectionLastChangeDate, ref return_ErrorMessage, ref collectionsToInstall, ref collectionsInstalledList, ref collectionsBuildingFolder);
                         }
                     }
                 }
@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
         /// unzip a folder and if the collection is not in the collections installed or the collectionsToInstall, save the collection to the appropriate collection folder and add it to the collectionsToInstall
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="sourcePrivateFolderPathFilename"></param>
+        /// <param name="sourceTempFolderPathFilename"></param>
         /// <param name="CollectionLastChangeDate"></param>
         /// <param name="collectionGuid"></param>
         /// <param name="return_ErrorMessage"></param>
@@ -73,52 +73,52 @@ namespace Contensive.Processor.Controllers {
         /// <param name="collectionsInstalledList">collection guids that have been saved to the database during this install.</param>
         /// <param name="collectionsBuildingFolder">folder building is recursive. These are the collection guids whose folders are currently being built.</param>
         /// <returns></returns>
-        public static bool buildCollectionFolderFromCollectionZip(CoreController core, Stack<string> contextLog, string sourcePrivateFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_ErrorMessage, ref List<string> collectionsDownloaded, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
+        public static bool buildCollectionFolderFromCollectionZip(CoreController core, Stack<string> contextLog, string sourceTempFolderPathFilename, DateTime CollectionLastChangeDate, ref string return_ErrorMessage, ref List<string> collectionsDownloaded, ref List<string> collectionsInstalledList, ref List<string> collectionsBuildingFolder) {
             try {
                 //
-                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + sourcePrivateFolderPathFilename + "]");
+                contextLog.Push(MethodInfo.GetCurrentMethod().Name + ", [" + sourceTempFolderPathFilename + "]");
                 traceContextLog(core, contextLog);
                 //
                 string collectionPath = "";
                 string collectionFilename = "";
-                core.privateFiles.splitDosPathFilename(sourcePrivateFolderPathFilename, ref collectionPath, ref collectionFilename);
+                core.tempFiles.splitDosPathFilename(sourceTempFolderPathFilename, ref collectionPath, ref collectionFilename);
                 string CollectionVersionFolderName = "";
-                if (!core.privateFiles.pathExists(collectionPath)) {
+                if (!core.tempFiles.pathExists(collectionPath)) {
                     //
                     // return false, The working folder is not there
                     return_ErrorMessage = "<p>There was a problem with the installation. The installation folder is not valid.</p>";
-                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, CheckFileFolder was false for the private folder [" + collectionPath + "]");
+                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, CheckFileFolder was false for the temp folder [" + collectionPath + "]");
                     return false;
                 }
                 //
-                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, processing files in private folder [" + collectionPath + "]");
+                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, processing files in temp folder [" + collectionPath + "]");
                 //
                 // --move collection file to a temp directory
                 // -- use try-finally to delete temp folder
                 string tmpInstallPath = "tmpInstallCollection" + GenericController.getGUIDNaked() + "\\";
                 try {
-                    core.privateFiles.copyFile(sourcePrivateFolderPathFilename, tmpInstallPath + collectionFilename);
+                    core.tempFiles.copyFile(sourceTempFolderPathFilename, tmpInstallPath + collectionFilename);
                     if (collectionFilename.ToLowerInvariant().Substring(collectionFilename.Length - 4) == ".zip") {
-                        core.privateFiles.unzipFile(tmpInstallPath + collectionFilename);
-                        core.privateFiles.deleteFile(tmpInstallPath + collectionFilename);
+                        core.tempFiles.unzipFile(tmpInstallPath + collectionFilename);
+                        core.tempFiles.deleteFile(tmpInstallPath + collectionFilename);
                     }
                     //
                     // -- find xml file in temp folder and process it
                     bool CollectionXmlFileFound = false;
-                    foreach (FileDetail file in core.privateFiles.getFileList(tmpInstallPath)) {
+                    foreach (FileDetail file in core.tempFiles.getFileList(tmpInstallPath)) {
                         if (file.Name.Substring(file.Name.Length - 4).ToLower(CultureInfo.InvariantCulture) == ".xml") {
                             //
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", build collection folder for Collection file [" + file.Name + "]");
                             //
                             XmlDocument CollectionFile = new XmlDocument();
                             try {
-                                CollectionFile.LoadXml(core.privateFiles.readFileText(tmpInstallPath + file.Name));
+                                CollectionFile.LoadXml(core.tempFiles.readFileText(tmpInstallPath + file.Name));
                             } catch (Exception ex) {
                                 //
                                 // -- There was a parse error in this xml file. Set the return message and the flag
                                 // -- If another xml files shows up, and process OK it will cover this error
                                 return_ErrorMessage = "There was a problem installing the Collection File [" + tmpInstallPath + file.Name + "]. The error reported was [" + ex.Message + "].";
-                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, error reading collection [" + sourcePrivateFolderPathFilename + "]");
+                                LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, error reading collection [" + sourceTempFolderPathFilename + "]");
                                 continue;
                             }
                             string CollectionFileBaseName = GenericController.toLCase(CollectionFile.DocumentElement.Name);
@@ -160,7 +160,7 @@ namespace Contensive.Processor.Controllers {
                                 CollectionVersionFolderName = verifyCollectionVersionFolderName(core, collectionGuid, Collectionname);
                                 string CollectionVersionFolder = AddonController.getPrivateFilesAddonPath() + CollectionVersionFolderName;
                                 //
-                                core.privateFiles.copyPath(tmpInstallPath, CollectionVersionFolder);
+                                core.tempFiles.copyPath(tmpInstallPath, CollectionVersionFolder, core.privateFiles);
                                 //
                                 // -- iterate through all nodes of this collection xml file and install all dependencies
                                 foreach (XmlNode metaDataSection in CollectionFile.DocumentElement.ChildNodes) {
@@ -197,12 +197,12 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // If it is not already installed, download and install it also
                                                         //
-                                                        string ChildWorkingPath = CollectionVersionFolder + "\\" + ChildCollectionGUID + "\\";
+                                                        string workingTempPath = GenericController.getGUIDNaked() + "\\";
                                                         DateTime libraryCollectionLastModifiedDate = default(DateTime);
                                                         try {
                                                             //
                                                             // try-finally to delete the working folder
-                                                            if (!CollectionLibraryController.downloadCollectionFromLibrary(core, ChildWorkingPath, ChildCollectionGUID, ref libraryCollectionLastModifiedDate, ref return_ErrorMessage)) {
+                                                            if (!CollectionLibraryController.downloadCollectionFromLibrary(core, workingTempPath, ChildCollectionGUID, ref libraryCollectionLastModifiedDate, ref return_ErrorMessage)) {
                                                                 //
                                                                 // -- did not download correctly
                                                                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], downloadCollectionFiles returned error state, message [" + return_ErrorMessage + "]");
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // -- install the downloaded file
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, collection missing or needs to be updated.");
-                                                                    if (!buildCollectionFoldersFromCollectionZips(core, contextLog, ChildWorkingPath, libraryCollectionLastModifiedDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
+                                                                    if (!buildCollectionFoldersFromCollectionZips(core, contextLog, workingTempPath, libraryCollectionLastModifiedDate, ref collectionsDownloaded, ref return_ErrorMessage, ref collectionsInstalledList, ref collectionsBuildingFolder)) {
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, [" + statusMsg + "], BuildLocalCollectionFolder returned error state, message [" + return_ErrorMessage + "]");
                                                                         if (string.IsNullOrEmpty(return_ErrorMessage)) {
                                                                             return_ErrorMessage = statusMsg + ". The installation can not continue because there was an unknown error installing the included collection file, guid [" + ChildCollectionGUID + "].";
@@ -254,7 +254,7 @@ namespace Contensive.Processor.Controllers {
                                                         } finally {
                                                             //
                                                             // -- remove child installation working folder
-                                                            core.privateFiles.deleteFolder(ChildWorkingPath);
+                                                            core.tempFiles.deleteFolder(workingTempPath);
                                                             //
                                                             // -- no longer building this folder
                                                             collectionsBuildingFolder.Remove(ChildCollectionGUID);
@@ -299,7 +299,7 @@ namespace Contensive.Processor.Controllers {
                 } finally {
                     //
                     // delete the tmp working folder
-                    core.privateFiles.deleteFolder(tmpInstallPath);
+                    core.tempFiles.deleteFolder(tmpInstallPath);
                 }
                 //
                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", BuildLocalCollectionFolder, Exiting with ErrorMessage [" + return_ErrorMessage + "]");
@@ -411,7 +411,7 @@ namespace Contensive.Processor.Controllers {
                     //-- tmp patch. non-empty path must end in a dos slash
                     return collectionFolder.path + "\\";
                 }
-                return collectionFolder.path; 
+                return collectionFolder.path;
             }
             return string.Empty;
         }

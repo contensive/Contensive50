@@ -4,7 +4,7 @@ using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormQuickStats {
+    public class QuickStatsView {
         //
         //====================================================================================================
         //

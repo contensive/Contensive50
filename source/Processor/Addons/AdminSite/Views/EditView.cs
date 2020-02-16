@@ -10,7 +10,7 @@ using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public static class FormEdit {
+    public static class EditView {
         //
         // ====================================================================================================
         /// <summary>
@@ -210,14 +210,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Stream.add(AdminUIController.getSectionHeader(core, "", titleBarDetails));
                 {
                     var editTabs = new EditTabModel();
-                    FormEditTabs.addContentTabs(core, adminData, editTabs, editorEnv);
+                    EditViewTabList.addContentTabs(core, adminData, editTabs, editorEnv);
                     if (allowPeopleGroups) {
-                        FormEditTabs.addCustomTab(core, editTabs, "Groups", GroupRuleEditor.get(core, adminData));
+                        EditViewTabList.addCustomTab(core, editTabs, "Groups", GroupRuleEditor.get(core, adminData));
                     }
                     if (allowLinkAlias) {
-                        FormEditTabs.addCustomTab(core, editTabs, "Link Aliases", LinkAliasEditor.getForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly));
+                        EditViewTabList.addCustomTab(core, editTabs, "Link Aliases", LinkAliasEditor.getForm_Edit_LinkAliases(core, adminData, adminData.editRecord.userReadOnly));
                     }
-                    FormEditTabs.addCustomTab(core, editTabs, "Control&nbsp;Info", FormEditTabControlInfo.get(core, adminData, editorEnv));
+                    EditViewTabList.addCustomTab(core, editTabs, "Control&nbsp;Info", EditViewTabControlInfo.get(core, adminData, editorEnv));
                     Stream.add(editTabs.getTabs(core));
                 }
                 Stream.add(editSectionButtonBar);

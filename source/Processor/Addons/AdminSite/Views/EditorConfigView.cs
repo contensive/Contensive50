@@ -5,7 +5,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormEditConfig {
+    public class EditorConfigView {
         //
         //========================================================================
         //   Editor features are stored in the \config\EditorFeatures.txt file

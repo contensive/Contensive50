@@ -32,13 +32,13 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool allowLoginIcon {
             get {
-                if (_allowLoginIcon==null) {
-                    // 20180622 - default false not true
+                if (_allowLoginIcon == null) {
                     _allowLoginIcon = getBoolean("AllowLoginIcon", false);
                 }
                 return Convert.ToBoolean(_allowLoginIcon);
             }
-        } private bool? _allowLoginIcon = null;
+        }
+        private bool? _allowLoginIcon = null;
         //
         //====================================================================================================
         /// <summary>
@@ -317,7 +317,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             //
                             // -- set simple lazy cache
-                            string cacheName = getNameValueDictKey( propertyName );
+                            string cacheName = getNameValueDictKey(propertyName);
                             if (nameValueDict.ContainsKey(cacheName)) {
                                 nameValueDict.Remove(cacheName);
                             }
@@ -326,7 +326,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -337,7 +337,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <returns></returns>
-        internal string getNameValueDictKey( string propertyName ) {
+        internal string getNameValueDictKey(string propertyName) {
             return propertyName.Trim().ToLowerInvariant();
         }
         //
@@ -395,22 +395,21 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         /// <remarks></remarks>
         public string getTextFromDb(string PropertyName, string DefaultValue, ref bool return_propertyFound) {
-            string returnString = "";
             try {
-                returnString = SitePropertyModel.getValue(core.cpParent, PropertyName, ref return_propertyFound);
-                if (!return_propertyFound) {
-                    if (!string.IsNullOrEmpty(DefaultValue)) {
-                        // do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
-                        setProperty(PropertyName, DefaultValue);
-                        returnString = DefaultValue;
-                        return_propertyFound = true;
-                    }
-                }
+                string returnString = SitePropertyModel.getValue(core.cpParent, PropertyName, ref return_propertyFound);
+                if (return_propertyFound) { return returnString; }
+                //
+                // -- proprety not found
+                if (string.IsNullOrEmpty(DefaultValue)) { return string.Empty; }
+                //
+                // do not set - set may have to save, and save needs contentId, which now loads ondemand, which checks cache, which does a getSiteProperty.
+                setProperty(PropertyName, DefaultValue);
+                return_propertyFound = true;
+                return DefaultValue;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnString;
         }
         //
         //========================================================================
@@ -423,56 +422,52 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         /// <remarks></remarks>
         public string getText(string propertyName, string DefaultValue) {
-            string result = "";
             try {
                 if (dbNotReady) {
                     //
-                    // -- if not ready, return default 
-                    result = DefaultValue;
-                } else {
-                    string cacheName = getNameValueDictKey(propertyName);
-                    if (cacheName.Equals("adminurl")) {
-                        result = "/" + core.appConfig.adminRoute;
-                    } else {
-                        if (string.IsNullOrEmpty(cacheName)) {
-                            //
-                            // -- bad property name 
-                            result = DefaultValue;
-                        } else {
-                            //
-                            // -- test simple lazy cache to keep from reading the same property mulitple times on one doc
-                            if (nameValueDict.ContainsKey(cacheName)) {
-                                //
-                                // -- property in memory cache
-                                result = nameValueDict[cacheName];
-                            } else {
-                                //
-                                // -- read property from cache, no, with preloaded local cache, this will never be used
-                                bool propertyFound = false;
-                                result = getTextFromDb(propertyName, DefaultValue, ref propertyFound);
-                                if (propertyFound) {
-                                    //
-                                    // -- found in Db, save in lazy cache in case it is repeated
-                                    if (nameValueDict.ContainsKey(cacheName)) {
-                                        nameValueDict.Remove(cacheName);
-                                    }
-                                    nameValueDict.Add(cacheName, result);
-                                } else {
-                                    //
-                                    // -- property not found in db, if default is not blank, write it and set cache
-                                    result = DefaultValue;
-                                    nameValueDict.Add(cacheName, result);
-                                    setProperty(cacheName, DefaultValue);
-                                }
-                            }
-                        }
-                    }
+                    // -- if db not ready, return default 
+                    return DefaultValue;
                 }
+                string cacheName = getNameValueDictKey(propertyName);
+                if (cacheName.Equals("adminurl")) {
+                    //
+                    // -- adminRoute became an appConfig property
+                    return "/" + core.appConfig.adminRoute;
+                }
+                if (string.IsNullOrEmpty(cacheName)) {
+                    //
+                    // -- return default if bad property name 
+                    return DefaultValue;
+                }
+                //
+                // -- test simple lazy cache
+                if (nameValueDict.ContainsKey(cacheName)) {
+                    //
+                    // -- return property in memory cache
+                    return nameValueDict[cacheName];
+                }
+                //
+                // -- read db value
+                bool propertyFound = false;
+                string result = getTextFromDb(propertyName, DefaultValue, ref propertyFound);
+                if (propertyFound) {
+                    //
+                    // -- found in Db, save in lazy cache in case it is repeated
+                    if (nameValueDict.ContainsKey(cacheName)) {
+                        nameValueDict.Remove(cacheName);
+                    }
+                    nameValueDict.Add(cacheName, result);
+                    return result;
+                }
+                //
+                // -- property not found in db, cache and return default
+                nameValueDict.Add(cacheName, DefaultValue);
+                setProperty(cacheName, DefaultValue);
+                return DefaultValue;
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //========================================================================
@@ -493,7 +488,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public int getInteger(string PropertyName, int DefaultValue = 0) {
-            return GenericController.encodeInteger(getText(PropertyName, DefaultValue.ToString()));
+            return encodeInteger(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -504,7 +499,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public double getNumber(string PropertyName, double DefaultValue = 0) {
-            return GenericController.encodeNumber(getText(PropertyName, DefaultValue.ToString()));
+            return encodeNumber(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -515,7 +510,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public bool getBoolean(string PropertyName, bool DefaultValue = false) {
-            return GenericController.encodeBoolean(getText(PropertyName, DefaultValue.ToString()));
+            return encodeBoolean(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //========================================================================
@@ -526,7 +521,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
         public DateTime getDate(string PropertyName, DateTime DefaultValue = default(DateTime)) {
-            return GenericController.encodeDate(getText(PropertyName, DefaultValue.ToString()));
+            return encodeDate(getText(PropertyName, DefaultValue.ToString()));
         }
         //
         //====================================================================================================
@@ -573,7 +568,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public bool allowLegacyDescrambleFallback {
             get {
-                if (_allowLegacyDescrambleFallback == null ) {
+                if (_allowLegacyDescrambleFallback == null) {
                     _allowLegacyDescrambleFallback = getBoolean("Allow Legacy Descramble Fallback");
                 }
                 return (bool)_allowLegacyDescrambleFallback;

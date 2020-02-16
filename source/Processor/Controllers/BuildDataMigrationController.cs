@@ -308,11 +308,11 @@ namespace Contensive.Processor.Controllers {
         public static void convertPageContentToAddonList( CoreController core, PageContentModel page) {
             // 
             // -- save copyFilename copy to new Text Block record
-            string textBlockInstanceGuid = GenericController.createGuid();
+            string textBlockInstanceGuid = GenericController.getGUID();
             core.cpParent.Db.ExecuteNonQuery("insert into dbText (active,name,text,ccguid) values (1,'Text Block'," + core.cpParent.Db.EncodeSQLText(page.copyfilename.content) + "," + core.cpParent.Db.EncodeSQLText(textBlockInstanceGuid) + ")");
             // 
             // -- assign all child pages without a childpageListname to this new childpageList addon
-            string childListInstanceGuid = GenericController.createGuid();
+            string childListInstanceGuid = GenericController.getGUID();
             core.cpParent.Db.ExecuteNonQuery("update ccpagecontent set parentListName=" + core.cpParent.Db.EncodeSQLText(childListInstanceGuid) + " where (parentId=" + page.id + ")and((parentListName='')or(parentListName is null))");
             //
             // -- set defaultAddonList.json into page.addonList

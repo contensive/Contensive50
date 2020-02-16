@@ -8,7 +8,7 @@ using Contensive.Models.Db;
 using System.Collections.Generic;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormEditTabControlInfo {
+    public class EditViewTabControlInfo {
         //
         //========================================================================
         /// <summary>

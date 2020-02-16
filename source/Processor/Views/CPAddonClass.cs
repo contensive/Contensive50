@@ -144,20 +144,28 @@ namespace Contensive.Processor {
         /// <summary>
         /// Install an uploaded collection file from a private folder. Return true if successful, else the issue is in the returnUserError
         /// </summary>
-        /// <param name="privatePathFilename"></param>
+        /// <param name="tempPathFilename"></param>
         /// <param name="returnUserError"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        public override bool InstallCollectionFile(string privatePathFilename, ref string returnUserError) {
+        public override bool InstallCollectionFile(string tempPathFilename, ref string returnUserError) {
             bool returnOk = false;
             try {
+                bool deleteTempFileWhenDone = false;
+                if (!cp.TempFiles.FileExists(tempPathFilename) && cp.PrivateFiles.FileExists(tempPathFilename)) {
+                    //
+                    // -- if caller uploaded to privateFiles, copy to tempFiles
+                    cp.PrivateFiles.Copy(tempPathFilename, tempPathFilename, cp.TempFiles);
+                    deleteTempFileWhenDone = true;
+                }
                 string ignoreReturnedCollectionGuid = "";
                 var tmpList = new List<string> { };
                 string logPrefix = "CPSiteClass.installCollectionFile";
                 var installedCollections = new List<string>();
                 var context = new Stack<string>();
-                context.Push("Api call cp.addon.InstallCollectionFile [" + privatePathFilename + "]");
-                returnOk = Controllers.CollectionInstallController.installCollectionFromPrivateFile(cp.core, false, context, privatePathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+                context.Push("Api call cp.addon.InstallCollectionFile [" + tempPathFilename + "]");
+                returnOk = Controllers.CollectionInstallController.installCollectionFromTempFile(cp.core, false, context, tempPathFilename, ref returnUserError, ref ignoreReturnedCollectionGuid, false, true, ref tmpList, logPrefix, ref installedCollections);
+                if (deleteTempFileWhenDone) { cp.TempFiles.DeleteFolder(tempPathFilename); }
             } catch (Exception ex) {
                 Controllers.LogController.logError(cp.core, ex);
                 if (!cp.core.siteProperties.trapErrors) {
@@ -167,7 +175,7 @@ namespace Contensive.Processor {
             return returnOk;
         }
         //
-        public override int InstallCollectionFileAsync(string privatePathFilename) {
+        public override int InstallCollectionFileAsync(string tempPathFilename) {
             throw new NotImplementedException("InstallCollectionFileAsync, async methods are not yet implemented.");
         }
         //
@@ -175,10 +183,17 @@ namespace Contensive.Processor {
         /// <summary>
         /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
-        /// <param name="privateFolder"></param>
+        /// <param name="tempPath"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        public override bool InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone, ref string returnUserError) {
+        public override bool InstallCollectionsFromFolder(string tempPath, bool deleteFolderWhenDone, ref string returnUserError) {
+            bool deleteTempFolderWhenDone = false;
+            if (!cp.TempFiles.FolderExists(tempPath) && cp.PrivateFiles.FolderExists(tempPath)) {
+                //
+                // -- if caller uploaded to privateFiles, copy to tempFiles
+                cp.PrivateFiles.CopyPath(tempPath, tempPath, cp.TempFiles);
+                deleteTempFolderWhenDone = true;
+            }
             string ignoreUserMessage = "";
             List<string> ignoreList1 = new List<string>();
             List<string> ignoreList2 = new List<string>();
@@ -186,12 +201,22 @@ namespace Contensive.Processor {
             var collectionsInstalledList = new List<string>();
             var collectionsDownloaded = new List<string>();
             var context = new Stack<string>();
-            context.Push("Api call cp.addon.InstallCollectionFromFolder [" + privateFolder + "]");
+            context.Push("Api call cp.addon.InstallCollectionFromFolder [" + tempPath + "]");
             bool isDependency = false;
-            return CollectionInstallController.installCollectionsFromPrivateFolder(cp.core, isDependency, context, privateFolder, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
+            bool result = CollectionInstallController.installCollectionsFromTempFolder(cp.core, isDependency, context, tempPath, ref ignoreUserMessage, ref collectionsInstalledList, false, false, ref ignoreList2, logPrefix, true, ref collectionsDownloaded);
+            if (deleteTempFolderWhenDone) { 
+                //
+                // -- caller used private folder. delete the temp path created, but do not delete anything from private folder. They need to do it right.
+                cp.TempFiles.DeleteFolder(tempPath); 
+            } else {
+                //
+                // -- if they used the temp folder and asked folder to be deleted, delete.
+                if (deleteFolderWhenDone) { cp.TempFiles.DeleteFolder(tempPath); }
+            }
+            return result;
         }
         //
-        public override int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone) {
+        public override int InstallCollectionsFromFolderAsync(string tempFolder, bool deleteFolderWhenDone) {
             throw new NotImplementedException("InstallCollectionsFromFolderAsync, async methods are not yet implemented");
         }
         //
@@ -231,7 +256,7 @@ namespace Contensive.Processor {
             try {
                 AddonCollectionModel collection = DbBaseModel.create<AddonCollectionModel>(cp, collectionId);
                 collectionZipPathFilename = ExportController.createCollectionZip_returnCdnPathFilename(cp, collection);
-                if(!cp.UserError.OK()) {
+                if (!cp.UserError.OK()) {
                     returnUserError = string.Join("", cp.UserError.GetList());
                 }
                 return (cp.UserError.OK());

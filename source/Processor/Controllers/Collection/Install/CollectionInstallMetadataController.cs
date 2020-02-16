@@ -214,9 +214,6 @@ namespace Contensive.Processor.Controllers {
                                                 metaDataField.rssTitleField = XmlController.getXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSTitle", DefaultMetaDataField.rssTitleField);
                                                 metaDataField.rssDescriptionField = XmlController.getXMLAttributeBoolean(core, Found, MetaDataChildNode, "RSSDescriptionField", DefaultMetaDataField.rssDescriptionField);
                                                 string memberSelectGroup = XmlController.getXMLAttribute(core, ref Found, MetaDataChildNode, "MemberSelectGroup", "");
-                                                if (!string.IsNullOrEmpty(memberSelectGroup)) {
-                                                    memberSelectGroup = memberSelectGroup;
-                                                }
                                                 metaDataField.memberSelectGroupName_set(core, memberSelectGroup);
                                                 metaDataField.editTabName = XmlController.getXMLAttribute(core, ref Found, MetaDataChildNode, "EditTab", DefaultMetaDataField.editTabName);
                                                 metaDataField.scramble = XmlController.getXMLAttributeBoolean(core, Found, MetaDataChildNode, "Scramble", DefaultMetaDataField.scramble);
@@ -420,6 +417,7 @@ namespace Contensive.Processor.Controllers {
         private static void installMetaDataMiniCollection_BuildDb(CoreController core, bool isBaseCollection, MetadataMiniCollectionModel Collection, bool isNewBuild, bool reinstallDependencies, string logPrefix) {
             try {
                 //
+                string logMsgContext = "installing MetaDataMiniCollection BuildDb, collection [" + Collection.name + "]";
                 LogController.logInfo(core, "Application: " + core.appConfig.name + ", Upgrademetadata_BuildDbFromCollection");
                 //
                 //----------------------------------------------------------------------------------------------------------------------
@@ -492,7 +490,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 foreach (var keypairvalue in Collection.metaData) {
                     if (keypairvalue.Value.name.ToLowerInvariant() == "content") {
-                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, keypairvalue.Value);
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, keypairvalue.Value, logMsgContext);
                         break;
                     }
                 }
@@ -513,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     if ((fieldChanged || workingMetaData.dataChanged) && (workingMetaData.name.ToLowerInvariant() != "content")) {
-                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, workingMetaData);
+                        installMetaDataMiniCollection_buildDb_saveMetaDataToDb(core, workingMetaData, logMsgContext);
                     }
                 }
                 core.clearMetaData();
@@ -666,10 +664,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Update a table from a collection metadata node
         /// </summary>
-        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, ContentMetadataModel contentMetadata) {
+        internal static void installMetaDataMiniCollection_buildDb_saveMetaDataToDb(CoreController core, ContentMetadataModel contentMetadata, string logMsgContext) {
             try {
                 //
-                LogController.logInfo(core, "Update db metadata [" + contentMetadata.name + "]");
+                logMsgContext += ", updating db metadata for content [" + contentMetadata.name + "]";
+                LogController.logInfo(core, logMsgContext);
                 //
                 // -- get contentid and protect content with IsBaseContent true
                 {
@@ -677,7 +676,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- update definition (use SingleRecord as an update flag)
                         var datasource = DataSourceModel.createByUniqueName(core.cpParent, contentMetadata.dataSourceName);
-                        ContentMetadataModel.verifyContent_returnId(core, contentMetadata);
+                        ContentMetadataModel.verifyContent_returnId(core, contentMetadata, logMsgContext);
                     }
                     //
                     // -- update Content Field Records and Content Field Help records
@@ -685,7 +684,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (var nameValuePair in contentMetadata.fields) {
                         ContentFieldMetadataModel fieldMetadata = nameValuePair.Value;
                         if (fieldMetadata.dataChanged) {
-                            contentMetadata.verifyContentField(core, fieldMetadata, false);
+                            contentMetadata.verifyContentField(core, fieldMetadata, false, logMsgContext);
                         }
                         //
                         // -- update content field help records

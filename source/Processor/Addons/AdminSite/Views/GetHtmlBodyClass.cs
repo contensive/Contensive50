@@ -261,11 +261,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                         switch (adminData.adminForm) {
                             //
                             case AdminFormIndex: {
-                                    adminBody = FormIndex.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
+                                    adminBody = ListView.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
                                     break;
                                 }
                             case AdminFormEdit: {
-                                    adminBody = FormEdit.get(cp.core, adminData);
+                                    adminBody = EditView.get(cp.core, adminData);
                                     break;
                                 }
                             case AdminFormToolSyncTables: {
@@ -327,7 +327,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormQuickStats: {
-                                    adminBody = FormQuickStats.get(cp.core);
+                                    adminBody = QuickStatsView.get(cp.core);
                                     break;
                                 }
                             case AdminFormClose: {
@@ -369,7 +369,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 }
                             case AdminFormEditorConfig: {
-                                    adminBody = FormEditConfig.get(cp.core);
+                                    adminBody = EditorConfigView.get(cp.core);
                                     break;
                                 }
                             default: {
@@ -421,14 +421,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (string.IsNullOrEmpty(adminBody)) {
                                 //
                                 // empty returned, display desktop
-                                adminBody = FormRoot.getForm_Root(cp.core);
+                                adminBody = RootView.getForm_Root(cp.core);
                             }
 
                         }
                     } else {
                         //
                         // nothing so far, display desktop
-                        adminBody = FormRoot.getForm_Root(cp.core);
+                        adminBody = RootView.getForm_Root(cp.core);
                     }
                     //
                     // add user errors

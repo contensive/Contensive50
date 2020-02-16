@@ -5,7 +5,7 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class FormRoot {
+    public class RootView {
         //
         //========================================================================
         //   Print the root form

@@ -40,12 +40,12 @@ namespace Contensive.Processor.Controllers {
         /// download a collectionZip from the collection library to a privateFilesPath
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="privateFilesDownloadPath"></param>
+        /// <param name="tempFilesDownloadPath"></param>
         /// <param name="collectionGuid"></param>
         /// <param name="return_CollectionLastModifiedDate"></param>
         /// <param name="return_ErrorMessage"></param>
         /// <returns></returns>
-        internal static bool downloadCollectionFromLibrary(CoreController core, string privateFilesDownloadPath, string collectionGuid, ref DateTime return_CollectionLastModifiedDate, ref string return_ErrorMessage) {
+        internal static bool downloadCollectionFromLibrary(CoreController core, string tempFilesDownloadPath, string collectionGuid, ref DateTime return_CollectionLastModifiedDate, ref string return_ErrorMessage) {
             bool result = false;
             try {
                 //
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                                                     break;
                                                 case "help":
                                                     if (!string.IsNullOrWhiteSpace(metaDataInterfaces.InnerText)) {
-                                                        core.privateFiles.saveFile(privateFilesDownloadPath + "Collection.hlp", metaDataInterfaces.InnerText);
+                                                        core.tempFiles.saveFile(tempFilesDownloadPath + "Collection.hlp", metaDataInterfaces.InnerText);
                                                     }
                                                     break;
                                                 case "guid":
@@ -148,8 +148,8 @@ namespace Contensive.Processor.Controllers {
                                                             // Skip this file because the collecion file link has no slash (no file)
                                                             LogController.logInfo(core, errorPrefix + "Collection [" + Collectionname + "] was not installed because the Collection File Link does not point to a valid file [" + CollectionFileLink + "]");
                                                         } else {
-                                                            string CollectionFilePath = privateFilesDownloadPath + CollectionFileLink.Substring(Pos);
-                                                            core.privateFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
+                                                            string CollectionFilePath = tempFilesDownloadPath + CollectionFileLink.Substring(Pos);
+                                                            core.tempFiles.saveHttpRequestToFile(CollectionFileLink, CollectionFilePath);
                                                         }
                                                     }
                                                     break;
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Controllers {
                                                             UserError = "There was an error processing a collection in the download file [" + Collectionname + "]. The ActiveX filename attribute was empty, and the filename could not be read from the link [" + ResourceLink + "].";
                                                             LogController.logInfo(core, errorPrefix + UserError);
                                                         } else {
-                                                            core.privateFiles.saveHttpRequestToFile(ResourceLink, privateFilesDownloadPath + ResourceFilename);
+                                                            core.tempFiles.saveHttpRequestToFile(ResourceLink, tempFilesDownloadPath + ResourceFilename);
                                                         }
                                                     }
                                                     break;
@@ -238,20 +238,20 @@ namespace Contensive.Processor.Controllers {
                 } else if (!collectionsInstalledList.Contains(collectionGuid.ToLower(CultureInfo.InvariantCulture))) {
                     //
                     // Download all files for this collection and build the collection folder(s)
-                    string privateFilesDownloadPath = AddonController.getPrivateFilesAddonPath() + "temp_" + GenericController.getRandomInteger(core) + "\\";
-                    core.privateFiles.createPath(privateFilesDownloadPath);
+                    string tempFilesDownloadPath = AddonController.getPrivateFilesAddonPath() +  Contensive.Processor.Controllers.GenericController.getGUIDNaked() + "\\";
+                    core.tempFiles.createPath(tempFilesDownloadPath);
                     //
                     // -- download the collection file into the download path from the collectionGuid provided
                     DateTime CollectionLastModifiedDate = default;
-                    if (CollectionLibraryController.downloadCollectionFromLibrary(core, privateFilesDownloadPath, collectionGuid, ref CollectionLastModifiedDate, ref return_ErrorMessage)) {
+                    if (CollectionLibraryController.downloadCollectionFromLibrary(core, tempFilesDownloadPath, collectionGuid, ref CollectionLastModifiedDate, ref return_ErrorMessage)) {
                         //
                         // -- build the collection folders for all collection files in the download path and created a list of collection Guids that need to be installed
                         var collectionsDownloaded = new List<string>();
-                        CollectionInstallController.installCollectionsFromPrivateFolder(core, isDependency, contextLog, privateFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
+                        CollectionInstallController.installCollectionsFromTempFolder(core, isDependency, contextLog, tempFilesDownloadPath, ref return_ErrorMessage, ref collectionsInstalledList, IsNewBuild, repair, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                     }
                     //
                     // -- delete the temporary install folder
-                    core.privateFiles.deleteFolder(privateFilesDownloadPath);
+                    core.tempFiles.deleteFolder(tempFilesDownloadPath);
                     //
                     // -- invalidate cache
                     core.cache.invalidateAll();

@@ -16,7 +16,7 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings.
         /// </summary>
-        /// <param name="addonName"></param>
+        /// <param name="addonGuid"></param>
         /// <returns></returns>
         public abstract string Execute(string addonGuid);
         //
@@ -24,8 +24,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Pass arguments to the addon that can be read with cp.doc.get() methods.
         /// </summary>
-        /// <param name="addonGuid"></param>
-        /// <param name="argumentKeyValuePairs"></param>
+        /// <param name="addonGuid">The guid of the addon to be executed.</param>
+        /// <param name="argumentKeyValuePairs">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         /// <returns></returns>
         public abstract string Execute(string addonGuid, Dictionary<string, string> argumentKeyValuePairs);
         //
@@ -33,8 +33,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Provide details for the execution environment, such as argument key value pairs.
         /// </summary>
-        /// <param name="addonGuid"></param>
-        /// <param name="executeContext"></param>
+        /// <param name="addonGuid">The guid of the addon to be executed.</param>
+        /// <param name="executeContext">The context where the addon is being executed (on a page, in an email, etc.). Typical is 'Simple' which blocks html comments.</param>
         /// <returns></returns>
         public abstract string Execute(string addonGuid, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
@@ -42,7 +42,7 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings.
         /// </summary>
-        /// <param name="addonId"></param>
+        /// <param name="addonId">The id of the addon to be executed.</param>
         /// <returns></returns>
         public abstract string Execute(int addonId);
         //
@@ -50,8 +50,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Pass arguments to the addon that can be read with cp.doc.get() methods.
         /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="argumentKeyValuePairs"></param>
+        /// <param name="addonId">The id of the addon to be executed.</param>
+        /// <param name="argumentKeyValuePairs">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         /// <returns></returns>
         public abstract string Execute(int addonId, Dictionary<string, string> argumentKeyValuePairs);
         //
@@ -59,8 +59,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Provide details for the execution environment, such as argument key value pairs.
         /// </summary>
-        /// <param name="addonId"></param>
-        /// <param name="executeContext"></param>
+        /// <param name="addonId">The id of the addon to be executed.</param>
+        /// <param name="executeContext">The context where the addon is being executed (on a page, in an email, etc.). Typical is 'Simple' which blocks html comments.</param>
         /// <returns></returns>
         public abstract string Execute(int addonId, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
@@ -68,7 +68,7 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings.
         /// </summary>
-        /// <param name="addonName"></param>
+        /// <param name="addonName">The name of the addon to be executed.</param>
         /// <returns></returns>
         public abstract string ExecuteByUniqueName(string addonName);
         //
@@ -76,8 +76,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Pass arguments to the addon that can be read with cp.doc.get() methods.
         /// </summary>
-        /// <param name="addonName"></param>
-        /// <param name="argumentKeyValuePairs"></param>
+        /// <param name="addonName">The name of the addon to be executed.</param>
+        /// <param name="argumentKeyValuePairs">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         /// <returns></returns>
         public abstract string ExecuteByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs);
         //
@@ -85,8 +85,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon in the default addon environment (type=simple, etc) and returns its resulting object. Generally addons return strings. Provide details for the execution environment, such as argument key value pairs.
         /// </summary>
-        /// <param name="addonName"></param>
-        /// <param name="executeContext"></param>
+        /// <param name="addonName">The name of the addon to be executed.</param>
+        /// <param name="executeContext">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         /// <returns></returns>
         public abstract string ExecuteByUniqueName(string addonName, CPUtilsBaseClass.addonExecuteContext executeContext);
         //
@@ -94,44 +94,44 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Execute an addon asynchonously with the current session environment.
         /// </summary>
-        /// <param name="addonName"></param>
+        /// <param name="addonName">The name of the addon to be executed.</param>
         public abstract void ExecuteAsyncByUniqueName(string addonName);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an addon asynchonously with the current session environment. Arguments can be passed that the addon can read with cp.doc.get methods.
         /// </summary>
-        /// <param name="addonName"></param>
-        /// <param name="argumentKeyValuePairs"></param>
+        /// <param name="addonName">The name of the addon to be executed.</param>
+        /// <param name="argumentKeyValuePairs">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         public abstract void ExecuteAsyncByUniqueName(string addonName, Dictionary<string, string> argumentKeyValuePairs);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an addon asynchonously with the current session environment.
         /// </summary>
-        /// <param name="addonGuid"></param>
+        /// <param name="addonGuid">The guid of the addon to be executed.</param>
         public abstract void ExecuteAsync(string addonGuid);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an addon asynchonously with the current session environment. Arguments can be passed that the addon can read with cp.doc.get methods.
         /// </summary>
-        /// <param name="addonGuid"></param>
-        /// <param name="argumentKeyValuePairs"></param>
+        /// <param name="addonGuid">The guid of the addon to be executed.</param>
+        /// <param name="argumentKeyValuePairs">The executing addon can read these arguments with methods like cp.doc.getText("key").</param>
         public abstract void ExecuteAsync(string addonGuid, Dictionary<string, string> argumentKeyValuePairs);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an addon asynchonously with the current session environment.
         /// </summary>
-        /// <param name="addonid"></param>
+        /// <param name="addonid">The id of the addon to be executed.</param>
         public abstract void ExecuteAsync(int addonid);
         //
         //====================================================================================================
         /// <summary>
         /// Execute an addon asynchonously with the current session environment. Arguments can be passed that the addon can read with cp.doc.get methods.
         /// </summary>
-        /// <param name="addonid"></param>
+        /// <param name="addonid">The id of the addon to be executed.</param>
         /// <param name="argumentKeyValuePairs"></param>
         public abstract void ExecuteAsync(int addonid, Dictionary<string, string> argumentKeyValuePairs);
         //
@@ -139,44 +139,44 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Install addon collection from a file in private files
         /// </summary>
-        /// <param name="privatePathFilename"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="tempPathFilename">The path and filename in the tempFiles store. A path starts with the folder name and ends with a slash (like myfolder\subfolder\)</param>
+        /// <param name="returnUserError">If the installation is successful, this returns string.empty.</param>
         /// <returns></returns>
-        public abstract bool InstallCollectionFile(string privatePathFilename, ref string returnUserError);
+        public abstract bool InstallCollectionFile(string tempPathFilename, ref string returnUserError);
         //
         //====================================================================================================
         /// <summary>
         /// Install addon collection from a file in private files
         /// </summary>
-        /// <param name="privatePathFilename"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="tempPathFilename">The path and filename in the tempFiles store. A path starts with the folder name and ends with a slash (like myfolder\subfolder\)</param>
         /// <returns></returns>
-        public abstract int InstallCollectionFileAsync(string privatePathFilename);
+        public abstract int InstallCollectionFileAsync(string tempPathFilename);
         //
         //====================================================================================================
         /// <summary>
         /// Install addon collection by its guid from the addon collection library
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="tempFolder">The path and filename in the tempFiles store. A path starts with the folder name and ends with a slash (like myfolder\subfolder\)</param>
+        /// <param name="deleteFolderWhenDone">Delete the temp folder when it is no longer needed.</param>
+        /// <param name="returnUserError">If the installation is successful, this returns string.empty.</param>
         /// <returns></returns>
-        public abstract bool InstallCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone, ref string returnUserError);
+        public abstract bool InstallCollectionsFromFolder(string tempFolder, bool deleteFolderWhenDone, ref string returnUserError);
         //
         //====================================================================================================
         /// <summary>
         /// Install addon collection by its guid from the addon collection library
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="tempFolder">The path and filename in the tempFiles store. A path starts with the folder name and ends with a slash (like myfolder\subfolder\)</param>
+        /// <param name="deleteFolderWhenDone">Delete the temp folder when it is no longer needed.</param>
         /// <returns></returns>
-        public abstract int InstallCollectionsFromFolderAsync(string privateFolder, bool deleteFolderWhenDone);
+        public abstract int InstallCollectionsFromFolderAsync(string tempFolder, bool deleteFolderWhenDone);
         //
         //====================================================================================================
         /// <summary>
         /// Install addon collection by its guid from the addon collection library
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="collectionGuid">The guid of the collection to be installed.</param>
+        /// <param name="returnUserError">If the installation is successful, this returns string.empty.</param>
         /// <returns></returns>
         public abstract bool InstallCollectionFromLibrary(string collectionGuid, ref string returnUserError);
         //
@@ -184,44 +184,46 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Install addon collection by its guid from the addon collection library
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="collectionGuid">The guid of the collection to be installed.</param>
         /// <returns></returns>
         public abstract int InstallCollectionFromLibraryAsync(string collectionGuid);
         //
         //====================================================================================================
         /// <summary>
-        /// Install addon collection by its guid from the addon collection library
+        /// Install addon collection from a link. This link should download a collection zip or xml file when requested.
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="collectionFileLink">This link should download a collection zip or xml file when requested.</param>
+        /// <param name="returnUserError">If the installation is successful, this returns string.empty.</param>
         /// <returns></returns>
-        public abstract bool InstallCollectionFromLink(string link, ref string returnUserError);
+        public abstract bool InstallCollectionFromLink(string collectionFileLink, ref string returnUserError);
         //
         //====================================================================================================
         /// <summary>
-        /// Install addon collection by its guid from the addon collection library
+        /// Install addon collection by its guid from the addon collection library.
         /// </summary>
-        /// <param name="collectionGuid"></param>
-        /// <param name="returnUserError"></param>
+        /// <param name="collectionFileLink">This link should download a collection zip or xml file when requested.</param>
         /// <returns></returns>
-        public abstract int InstallCollectionFromLinkAsync(string link);
+        public abstract int InstallCollectionFromLinkAsync(string collectionFileLink);
         //
         //====================================================================================================
         /// <summary>
-        /// Package a collection into a collection zip file and return a cdn path to the zip file.
+        /// Package a collection into a collection zip file and return a path to the zip file in the cdnFiles store.
         /// </summary>
-        /// <param name="collectionId"></param>
+        /// <param name="collectionId">The id of the collection to be exported.</param>
+        /// <param name="collectionZipCdnPathFilename">A path in the cdnFiles store. (ex myfolder\subfolder\)</param>
+        /// <param name="returnUserError">If the export is successful, this returns string.empty.</param>
         /// <returns></returns>
-        public abstract bool ExportCollection(int collectionId, ref string collectionZipPathFilename, ref string returnUserError);
+        public abstract bool ExportCollection(int collectionId, ref string collectionZipCdnPathFilename, ref string returnUserError);
         //
         //====================================================================================================
         /// <summary>
-        /// Package a collection into a collection zip file and return a cdn path to the zip file
+        /// Package a collection into a collection zip file and return a path to the zip file in the cdnFiles store.
         /// </summary>
-        /// <param name="collectionGuid"></param>
+        /// <param name="collectionGuid">The guid of the collection to be exported.</param>
+        /// <param name="collectionZipCdnPathFilename">A path in the cdnFiles store. (ex myfolder\subfolder\)</param>
+        /// <param name="returnUserError">If the export is successful, this returns string.empty.</param>
         /// <returns></returns>
-        public abstract bool ExportCollection(string collectionGuid, ref string collectionZipPathFilename, ref string returnUserError);
+        public abstract bool ExportCollection(string collectionGuid, ref string collectionZipCdnPathFilename, ref string returnUserError);
         //
         //====================================================================================================
         /// <summary>
@@ -544,7 +546,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// if the ScriptCode has more than one routine and you want to run one other than the first, list is here.
+        /// If the ScriptCode has more than one routine and you want to run one other than the first, list is here.
         /// </summary>
         [Obsolete("Deprecated. Use cp.addon.id or cp.addon.ccguid to create a model object and use its properties", false)]
         public abstract string ScriptEntryPoint { get; }

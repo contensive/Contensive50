@@ -230,7 +230,7 @@ namespace Contensive.Processor.Addons.SafeAddonManager {
                                 var context = new Stack<string>();
                                 context.Push("AddonManager install from path [" + privateFilesInstallPath + "]");
                                 var collectionsDownloaded = new List<string>();
-                                UpgradeOK = CollectionInstallController.installCollectionsFromPrivateFolder(core, false, context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
+                                UpgradeOK = CollectionInstallController.installCollectionsFromTempFolder(core, false, context, privateFilesInstallPath, ref ErrorMessage, ref collectionsInstalledList, false, true, ref nonCriticalErrorList, logPrefix, true, ref collectionsDownloaded);
                                 if (!UpgradeOK) {
                                     if (string.IsNullOrEmpty(ErrorMessage)) {
                                         ErrorController.addUserError(core, "The Add-on Collection did not install correctly, but no detailed error message was given.");

@@ -22,7 +22,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (ContentId == 0) {
                     result = "No filter is available";
                 } else {
-                    result = FormIndex.getForm_IndexFilterContent(core, new AdminDataModel(core));
+                    result = ListView.getForm_IndexFilterContent(core, new AdminDataModel(core));
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
