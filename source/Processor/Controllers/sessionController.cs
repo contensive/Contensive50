@@ -142,6 +142,7 @@ namespace Contensive.Processor.Controllers {
             visit = new VisitModel();
             visitor = new VisitorModel();
             user = new PersonModel();
+            visitStateOk = true;
         }
         //
         //========================================================================

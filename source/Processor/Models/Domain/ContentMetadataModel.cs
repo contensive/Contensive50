@@ -870,7 +870,7 @@ namespace Contensive.Processor.Models.Domain {
                     throw (new GenericException("Could not create Field [" + fieldMetadata.nameLc + "] for content [" + name + "] because the field type [" + fieldMetadata.fieldTypeId + "] is not valid."));
                 }
                 bool RecordIsBaseField = false;
-                var contentFieldList = ContentFieldModel.createList<ContentFieldModel>(core.cpParent, "(ContentID=" + DbController.encodeSQLNumber(id) + ")and(name=" + DbController.encodeSQLText(fieldMetadata.nameLc) + ")");
+                var contentFieldList = DbBaseModel.createList<ContentFieldModel>(core.cpParent, "(ContentID=" + DbController.encodeSQLNumber(id) + ")and(name=" + DbController.encodeSQLText(fieldMetadata.nameLc) + ")");
                 if (contentFieldList.Count > 0) {
                     fieldMetadata.id = contentFieldList.First().id;
                     RecordIsBaseField = contentFieldList.First().isBaseField;
