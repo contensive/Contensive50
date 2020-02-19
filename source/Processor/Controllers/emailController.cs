@@ -1229,6 +1229,10 @@ namespace Contensive.Processor.Controllers {
                 string sql = Properties.Resources.sqlConditionalEmail_DaysAfterJoin;
                 string bounceAddress = getBounceAddress(core, "");
                 sql = sql.Replace("{{sqldatenow}}", core.sqlDateTimeMockable);
+                //
+                // -- almost impossible to debug without a log entry
+                LogController.logInfo(core, "processConditional_DaysAfterjoining, select emails to send to users, sql [" + sql + "]");
+                //
                 csEmailList.openSql(sql);
                 while (csEmailList.ok()) {
                     int emailId = csEmailList.getInteger("EmailID");
@@ -1297,6 +1301,10 @@ namespace Contensive.Processor.Controllers {
                     + " AND (ccMembers.Active <> 0)"
                     + " AND (ccMembers.AllowBulkEmail <> 0)"
                     + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.memberId=ccMembers.ID))";
+                //
+                // -- almost impossible to debug without a log entry
+                LogController.logInfo(core, "processConditional_DaysBeforeExpiration, select emails to send to users, sql [" + SQL + "]");
+                //
                 csList.openSql(SQL);
                 while (csList.ok()) {
                     int emailId = csList.getInteger("EmailID");
