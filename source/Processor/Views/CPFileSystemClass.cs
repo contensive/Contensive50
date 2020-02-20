@@ -122,6 +122,21 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
+        public override string SaveHttpGet(string pathFilename, string url) {
+            throw new NotImplementedException();
+        }
+        //
+        //==========================================================================================
+        public override string SaveHttpPost(string pathFilename, string url, List<KeyValuePair<string, string>> requestArguments) {
+            throw new NotImplementedException();
+        }
+        //
+        //==========================================================================================
+        public override string SaveHttpPost(string pathFilename, string url, string entity) {
+            throw new NotImplementedException();
+        }
+        //
+        //==========================================================================================
         public override void SaveBinary(string filename, byte[] fileContent) {
             fileSystemController.saveFile(filename, fileContent);
         }
@@ -239,6 +254,7 @@ namespace Contensive.Processor {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         ~CPFileSystemClass() {
             Dispose(false);
         }

@@ -285,6 +285,35 @@ namespace Contensive.BaseClasses {
         /// <param name="pathFilename"></param>
         public abstract void UnzipFile(string pathFilename);
         //
+        // ====================================================================================================
+        /// <summary>
+        /// Get url to a text file
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        public abstract string SaveHttpGet(string pathFilename, string url);
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Post key/values to  a url and save to text file
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
+        /// <param name="requestArguments"></param>
+        /// <returns></returns>
+        public abstract string SaveHttpPost(string pathFilename, string url, List<KeyValuePair<string, string>> requestArguments);
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// post entity to a url and save to text file
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public abstract string SaveHttpPost(string pathFilename, string url, string entity);
+        //
         //==========================================================================================
         // deprecated
         //

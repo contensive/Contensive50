@@ -423,6 +423,20 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
+        /// http helper class
+        /// </summary>
+        public override CPHttpBaseClass Http {
+            get {
+                if (_HttpObj == null) {
+                    _HttpObj = new CPHttpClass(this);
+                }
+                return _HttpObj;
+            }
+        }
+        private CPHttpClass _HttpObj;
+        //
+        //====================================================================================================
+        /// <summary>
         /// Json serialize/deserialize
         /// </summary>
         public override CPJSONBaseClass JSON {

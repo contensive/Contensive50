@@ -176,6 +176,12 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Helper class for common http request methods. For saving http verbs to files, see the file object
+        /// </summary>
+        public abstract CPHttpBaseClass Http { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// utilities for json
         /// </summary>
         /// <value></value>

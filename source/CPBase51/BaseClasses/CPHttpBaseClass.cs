@@ -12,7 +12,7 @@ namespace Contensive.BaseClasses {
         //
         // ====================================================================================================
         /// <summary>
-        /// Get
+        /// Get url to a string. Use file objects to save to file
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
@@ -20,7 +20,7 @@ namespace Contensive.BaseClasses {
         //
         // ====================================================================================================
         /// <summary>
-        /// Post key/values to  a url
+        /// Post key/values to  a url. Use file objects to save to file
         /// </summary>
         /// <param name="url"></param>
         /// <param name="requestArguments"></param>
@@ -29,7 +29,7 @@ namespace Contensive.BaseClasses {
         //
         // ====================================================================================================
         /// <summary>
-        /// post entity to a url
+        /// post entity to a url. Use file objects to save to file
         /// </summary>
         /// <param name="url"></param>
         /// <param name="entity"></param>
