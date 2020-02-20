@@ -25,8 +25,14 @@ namespace Contensive.Processor {
         }
         //
         // ====================================================================================================
+        /// <summary>
+        /// Simple http get of a url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
         public override string Get(string url) {
-            throw new NotImplementedException();
+            HttpRequestController kmaHTTP = new HttpRequestController();
+            return kmaHTTP.getURL(url);
         }
         //
         // ====================================================================================================

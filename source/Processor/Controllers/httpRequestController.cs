@@ -108,7 +108,7 @@ namespace Contensive.Processor.Controllers {
         //   If the HTTPResponse is "", Check the SocketResponse
         //======================================================================================
         //
-        public string getURL(ref string URL) {
+        public string getURL(string url) {
             string returnString = "";
             try {
                 string[] cookies = null;
@@ -132,7 +132,7 @@ namespace Contensive.Processor.Controllers {
                 privateResponseStatusCode = 0;
                 privateResponseStatusDescription = "";
                 try {
-                    returnString = http.DownloadString(URL);
+                    returnString = http.DownloadString(url);
                     privateResponseStatusCode = 200;
                     privateResponseStatusDescription = HttpStatusCode.OK.ToString();
                     privateResponseHeaders = http.ResponseHeaders;

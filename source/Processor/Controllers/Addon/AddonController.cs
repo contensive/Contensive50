@@ -378,7 +378,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     int PosStart = 0;
                                     HttpRequestController kmaHTTP = new HttpRequestController();
-                                    string RemoteAssetContent = kmaHTTP.getURL(ref RemoteAssetLink);
+                                    string RemoteAssetContent = kmaHTTP.getURL(RemoteAssetLink);
                                     int Pos = GenericController.strInstr(1, RemoteAssetContent, "<body", 1);
                                     if (Pos > 0) {
                                         Pos = GenericController.strInstr(Pos, RemoteAssetContent, ">");

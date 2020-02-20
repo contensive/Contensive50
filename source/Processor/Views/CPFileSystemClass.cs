@@ -122,17 +122,17 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
-        public override string SaveHttpGet(string pathFilename, string url) {
+        public override void SaveHttpGet(string pathFilename, string url) {
+            fileSystemController.saveHttpRequestToFile(pathFilename, url);
+        }
+        //
+        //==========================================================================================
+        public override void SaveHttpPost(string pathFilename, string url, List<KeyValuePair<string, string>> requestArguments) {
             throw new NotImplementedException();
         }
         //
         //==========================================================================================
-        public override string SaveHttpPost(string pathFilename, string url, List<KeyValuePair<string, string>> requestArguments) {
-            throw new NotImplementedException();
-        }
-        //
-        //==========================================================================================
-        public override string SaveHttpPost(string pathFilename, string url, string entity) {
+        public override void SaveHttpPost(string pathFilename, string url, string entity) {
             throw new NotImplementedException();
         }
         //
