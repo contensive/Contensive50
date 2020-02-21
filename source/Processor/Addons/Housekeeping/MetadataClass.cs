@@ -10,6 +10,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, metadata");
+                //
+                //
                 // block duplicate redirect fields (match contentid+fieldtype+caption)
                 //
                 LogController.logInfo(core, "Inactivate duplicate redirect fields");

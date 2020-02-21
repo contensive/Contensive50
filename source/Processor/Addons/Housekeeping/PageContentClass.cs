@@ -10,14 +10,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
         //
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
-                string SQL = "";
+                //
+                LogController.logInfo(core, "HousekeepDaily, page content");
                 {
                     //
                     // Move Archived pages from their current parent to their archive parent
                     //
                     bool NeedToClearCache = false;
-                    LogController.logInfo(core, "Archive update for pages on [" + core.appConfig.name + "]");
-                    SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + core.sqlDateTimeMockable + "))and(active<>0)";
+                    string SQL = "select * from ccpagecontent where (( DateArchive is not null )and(DateArchive<" + core.sqlDateTimeMockable + "))and(active<>0)";
                     using (var csData = new CsModel(core)) {
                         csData.openSql(SQL);
                         while (csData.ok()) {

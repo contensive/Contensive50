@@ -8,17 +8,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "HousekeepDaily, emaildrops older then " + env.emailDropArchiveAgeDays + " days");
+                //
                 // email drops for only 365 days
-                core.db.executeNonQuery("delete from ccemaildrops where (dateadded < DATEADD(day,-365,CAST(GETDATE() AS DATE)))");
-                //
-                // delete email drops older than archive.
-                //
-                LogController.logInfo(core, "Deleting email drops older then " + env.emailDropArchiveAgeDays + " days");
-                //
-                DateTime ArchiveEmailDropDate = default(DateTime);
-                ArchiveEmailDropDate =  core.dateTimeNowMockable.AddDays(-env.emailDropArchiveAgeDays).Date;
-                MetadataController.deleteContentRecords(core, "Email drops", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(ArchiveEmailDropDate) + ")");
-
+                core.db.executeNonQuery("delete from ccemaildrops where (dateadded < dateadd(day,-" + env.emailDropArchiveAgeDays + ",cast(getdate() as date)))");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

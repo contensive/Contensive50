@@ -9,6 +9,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep( CoreController core, HouseKeepEnvironmentModel env ) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, visits");
+                //
+                //
                 // Visits with no DateAdded
                 //
                 LogController.logInfo(core, "Deleting visits with no DateAdded");

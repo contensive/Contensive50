@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, memberrules");
+                //
+                //
                 // -- delete rows with invalid columns
                 core.db.executeNonQuery("delete from ccMemberRules where groupid is null or memberid is null");
                 //

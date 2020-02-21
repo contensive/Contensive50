@@ -13,6 +13,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, viewingsummary");
+                //
+                //
                 // -- there is a bug and I need to move on.
                 return;
                 //

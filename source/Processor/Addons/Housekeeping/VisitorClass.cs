@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, visitors");
+                //
+                //
                 // delete nocookie visits
                 // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
                 //

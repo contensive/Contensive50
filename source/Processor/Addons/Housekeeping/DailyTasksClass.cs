@@ -7,13 +7,15 @@ namespace Contensive.Processor.Addons.Housekeeping {
     public static class DailyTasksClass {
         //====================================================================================================
         //
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+        public static void housekeepDaily(CoreController core, HouseKeepEnvironmentModel env) {
             try {
+                //
+                LogController.logInfo(core, "HousekeepDaily");
                 //
                 // -- Download Updates
                 SoftwareUpdatesClass.downloadAndInstall(core);
                 //
-                // -- Addons
+                // -- Addon folder
                 AddonFolderClass.housekeep(core);
                 //
                 // -- metadata

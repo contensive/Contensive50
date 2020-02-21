@@ -8,14 +8,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
-                // ContentWatch with bad CContentID
-                //     must be deleted manually
+                LogController.logInfo(core, "HousekeepDaily, contentwatch");
                 //
-                LogController.logInfo(core, "Deleting Content Watch with bad ContentID.");
                 using (var csData = new CsModel(core)) {
-                    string sql = "Select ccContentWatch.ID"
-                        + " From ccContentWatch LEFT JOIN ccContent on ccContent.ID=ccContentWatch.ContentID"
-                        + " WHERE (ccContent.ID is null)or(ccContent.Active=0)or(ccContent.Active is null)";
+                    string sql = "select cccontentwatch.id from cccontentwatch left join cccontent on cccontent.id=cccontentwatch.contentid  where (cccontent.id is null)or(cccontent.active=0)or(cccontent.active is null)";
                     csData.openSql(sql);
                     while (csData.ok()) {
                         MetadataController.deleteContentRecord(core, "Content Watch", csData.getInteger("ID"));

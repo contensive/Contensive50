@@ -8,8 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, linkalias");
+                //
                 // -- delete dups
-                LogController.logInfo(core, "Delete duplicate Link Alias");
                 string sql = "delete from ccLinkAliases where id in ( select b.id from cclinkaliases a,cclinkaliases b where a.id<b.id and a.name=b.name )";
                 core.db.executeNonQuery(sql);
 

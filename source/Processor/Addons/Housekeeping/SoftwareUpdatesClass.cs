@@ -11,17 +11,16 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static bool downloadAndInstall(CoreController core) {
             bool loadOK = true;
             try {
-                XmlDocument Doc = null;
-                string URL = null;
-                string Copy = null;
                 //
-                Doc = new XmlDocument() { XmlResolver = null};
-                URL = "http://support.contensive.com/GetUpdates?iv=" + CoreController.codeVersion();
+                LogController.logInfo(core, "Housekeep, download and install");
+                //
+                var Doc = new XmlDocument() { XmlResolver = null};
+                string URL = "http://support.contensive.com/GetUpdates?iv=" + CoreController.codeVersion();
                 loadOK = true;
                 Doc.Load(URL);
                 if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
-                        Copy = CDefSection.InnerText;
+                        string Copy = CDefSection.InnerText;
                         switch (GenericController.toLCase(CDefSection.Name)) {
                             case "mastervisitnamelist":
                                 //

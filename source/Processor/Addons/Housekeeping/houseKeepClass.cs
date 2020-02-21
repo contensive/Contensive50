@@ -7,7 +7,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// support for housekeeping functions
     /// </summary>
-    public class HouseKeepClass : Contensive.BaseClasses.AddonBaseClass {
+    public class HouseKeepClass : AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -19,6 +19,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
             string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
+                //
+                LogController.logInfo(core, "Housekeep");
+                //
                 var env = new HouseKeepEnvironmentModel(core);
                 int TimeoutSave = core.db.sqlCommandTimeout;
                 core.db.sqlCommandTimeout = 1800;
@@ -27,8 +30,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 HourlyTasksClass.housekeep(core, env);
                 //
                 // -- daily tasks
-                if (env.force || env.runDailyTasks) {
-                    DailyTasksClass.housekeep(core, env);
+                if (env.forceHousekeep || env.runDailyTasks) {
+                    DailyTasksClass.housekeepDaily(core, env);
                 }
                 core.db.sqlCommandTimeout = TimeoutSave;
             } catch (Exception ex) {

@@ -2889,3 +2889,11 @@ if (typeof cj.frame !== 'object') {
     function afwPostFrame(remoteMethodName, formHtmlId, frameHtmlId) { cj.frame.submitForm(remoteMethodName, frameHtmlId, formHtmlId) }
     function afwUpdateFrame(remoteMethodName, qs, frameHtmlId) { cj.frame.update(remoteMethodName, frameHtmlId, qs) }
 }
+/*
+* DateTime editor creates descrete inputs for date and for time. This method populates a datetime hidden used for request.
+*/
+function setDateTimeEditorHidden(htmlId) {
+    var dateVal = $("#component-" + htmlId + "-date").val();
+    var timeVal = $("#component-" + htmlId + "-time").val();
+    $("#" + htmlId ).val(dateVal + ((timeVal) ? "T" + timeVal : "" ));
+}

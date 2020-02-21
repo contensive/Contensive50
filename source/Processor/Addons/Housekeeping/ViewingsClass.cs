@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, viewings");
+                //
+                //
                 // log for only 365 days
                 core.db.executeNonQuery("delete from ccemaillog where (dateadded < DATEADD(day,-" + env.visitArchiveAgeDays + ",CAST(GETDATE() AS DATE)))");
                 //

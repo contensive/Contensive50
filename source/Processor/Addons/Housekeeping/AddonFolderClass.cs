@@ -15,7 +15,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core) {
             try {
                 //
-                LogController.logInfo(core, "Entering RegisterAddonFolder");
+                LogController.logInfo(core, "HousekeepDaily, addon folder");
                 //
                 bool loadOK = true;
                 XmlDocument Doc = new XmlDocument();

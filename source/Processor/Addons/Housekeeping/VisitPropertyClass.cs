@@ -16,27 +16,26 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         public static void housekeep(CoreController core) {
             try {
+                //
+                LogController.logInfo(core, "Housekeep, visitproperites");
+                //
+                {
+                    //
+                    // Visit Properties with no visits
+                    string sql = "delete ccproperties from ccproperties left join ccvisits on ccvisits.id=ccproperties.keyid where (ccproperties.typeid=1) and (ccvisits.id is null)";
+                    Task.Run(() => core.db.executeNonQueryAsync(sql));
+                }
                 {
                     //
                     // -- delete properties of visits over 1 hour old
-                    string sql = "delete from ccproperties from ccproperties p left join  ccvisits v on (v.id=p.KeyID and p.TypeID=1) where v.LastVisitTime<DATEADD(hour, -1, GETDATE())";
+                    string sql = "delete from ccproperties from ccproperties p left join  ccvisits v on (v.id=p.keyid and p.typeid=1) where v.lastvisittime<dateadd(hour, -1, getdate())";
                     Task.Run(() => core.db.executeNonQueryAsync(sql));
 
                 }
                 {
                     //
-                    // old Properties
-                    string sql = "delete from ccProperties where (TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.visit + ")and(dateAdded<" + DbController.encodeSQLDate(core.dateTimeNowMockable.AddDays(-1)) + ")";
-                    Task.Run(() => core.db.executeNonQueryAsync(sql));
-                }
-                {
-                    //
-                    // Visit Properties with no visits
-                    LogController.logInfo(core, "Deleting visit properties with no visit record.");
-                    string sql = "delete ccProperties"
-                        + " from ccProperties LEFT JOIN ccVisits on ccVisits.ID=ccProperties.KeyID"
-                        + " WHERE (ccProperties.TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.visit + ")"
-                        + " AND (ccVisits.ID is null)";
+                    // -- fallback, delete all visit properties over 24 hours old
+                    string sql = "delete from ccProperties where (TypeID=1)and(dateAdded<dateadd(hour, -24, getdate()))";
                     Task.Run(() => core.db.executeNonQueryAsync(sql));
                 }
 

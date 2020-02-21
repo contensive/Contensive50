@@ -8,6 +8,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, fieldhelp");
+                //
                 // Field help with no field
                 //
                 LogController.logInfo(core, "Deleting field help with no field.");

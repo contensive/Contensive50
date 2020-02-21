@@ -15,8 +15,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="env"></param>
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
-                bool NewHour = (core.dateTimeNowMockable.Hour != env.lastCheckDateTime.Hour);
-                if (env.force || NewHour) {
+                //
+                LogController.logInfo(core, "Housekeep, visitsummary");
+                //
+                bool newHour = (core.dateTimeNowMockable.Hour != env.lastCheckDateTime.Hour);
+                if (env.forceHousekeep || newHour) {
                     //
                     // Set NextSummaryStartDate based on the last time we ran hourly summarization
                     //

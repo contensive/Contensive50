@@ -11,6 +11,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep hourly");
+                //
+                //
                 // -- delete temp files
                 TempFilesClass.deleteFiles(core);
 

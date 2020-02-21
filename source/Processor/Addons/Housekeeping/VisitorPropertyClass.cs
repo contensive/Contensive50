@@ -15,6 +15,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         public static void housekeep(CoreController core) {
             try {
+                //
+                LogController.logInfo(core, "Housekeep, visitorproperties");
+                //
                 string sql = "delete from ccProperties from ccProperties p left join ccvisitors m on m.id=p.KeyID where (p.TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.visitor + ") and (m.ID is null)";
                 Task.Run(() => core.db.executeNonQueryAsync(sql));
 

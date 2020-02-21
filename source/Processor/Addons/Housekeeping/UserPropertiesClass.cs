@@ -14,16 +14,16 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         public static void housekeep(CoreController core) {
             try {
+                //
+                LogController.logInfo(core, "Housekeep, userproperites");
+                //
                 string sql = "delete from ccProperties from ccProperties p left join ccmembers m on m.id=p.KeyID where (p.TypeID=" + (int)PropertyModelClass.PropertyTypeEnum.user + ") and (m.ID is null)";
                 core.db.executeNonQuery(sql);
                 //
                 // Member Properties with no member
                 //
                 LogController.logInfo(core, "Deleting member properties with no member record.");
-                sql = "delete ccProperties"
-                    + " From ccProperties LEFT JOIN ccmembers on ccmembers.ID=ccProperties.KeyID"
-                    + " WHERE (ccProperties.TypeID=0)"
-                    + " AND (ccmembers.ID is null)";
+                sql = "delete ccproperties from ccproperties left join ccmembers on ccmembers.id=ccproperties.keyid where (ccproperties.typeid=0) and (ccmembers.id is null)";
                 core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {

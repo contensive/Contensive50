@@ -10,7 +10,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// housekeep environment, to facilitate argument passing
     /// </summary>
     public class HouseKeepEnvironmentModel {
-        public bool force { get; set; }
+        public bool forceHousekeep { get; set; }
         public bool runDailyTasks { get; set; }
         public DateTime lastCheckDateTime { get; set; }
         public int serverHousekeepHour { get; set; }
@@ -40,16 +40,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 archiveAlarm = false;
                 lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default);
                 core.siteProperties.setProperty("housekeep, last check", core.dateTimeNowMockable);
-                force = core.docProperties.getBoolean("force");
+                forceHousekeep = core.docProperties.getBoolean("force");
                 serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
                 runDailyTasks = ((core.dateTimeNowMockable.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.dateTimeNowMockable.Hour));
                 yesterday = core.dateTimeNowMockable.AddDays(-1).Date;
                 aLittleWhileAgo = core.dateTimeNowMockable.AddDays(-90).Date;
-                //sQLNow = DbController.encodeSQLDate(core.rightFrigginNow);
                 defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
                 archiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
                 sqlDateMidnightTwoDaysAgo = DbController.encodeSQLDate(midnightTwoDaysAgo);
-                yesterday = core.dateTimeNowMockable.AddDays(-1).Date;
                 midnightTwoDaysAgo = core.dateTimeNowMockable.AddDays(-2).Date;
                 thirtyDaysAgo = core.dateTimeNowMockable.AddDays(-30).Date;
                 //
@@ -66,17 +64,21 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 }
                 //
                 // -- Get GuestArchiveAgeDays
-                guestArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchivePeopleAgeDays", "2"));
+                guestArchiveAgeDays = core.siteProperties.getInteger("ArchivePeopleAgeDays", 2);
                 if (guestArchiveAgeDays < 2) {
                     guestArchiveAgeDays = 2;
-                    core.siteProperties.setProperty("ArchivePeopleAgeDays", guestArchiveAgeDays.ToString());
+                    core.siteProperties.setProperty("ArchivePeopleAgeDays", guestArchiveAgeDays);
                 }
                 //
                 // -- Get EmailDropArchiveAgeDays
-                emailDropArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveEmailDropAgeDays", "90"));
+                emailDropArchiveAgeDays = core.siteProperties.getInteger("ArchiveEmailDropAgeDays", 90);
                 if (emailDropArchiveAgeDays < 2) {
                     emailDropArchiveAgeDays = 2;
-                    core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays.ToString());
+                    core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays);
+                }
+                if (emailDropArchiveAgeDays > 365) {
+                    emailDropArchiveAgeDays = 365;
+                    core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays);
                 }
                 //
                 // -- Get emailLogBodyRetainDays -- 

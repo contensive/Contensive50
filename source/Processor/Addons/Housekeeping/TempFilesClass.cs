@@ -15,6 +15,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         public static void deleteFiles(CoreController core) {
             try {
+                //
+                LogController.logInfo(core, "Housekeep, delete temp files over 1 hour old");
+                //
                 deleteFiles(core, "\\");
 
             } catch (Exception ex) {

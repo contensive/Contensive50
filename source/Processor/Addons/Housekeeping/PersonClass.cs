@@ -8,6 +8,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, people");
+                //
+                //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
                 core.db.executeNonQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
                 //
@@ -15,13 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
                 //
                 LogController.logInfo(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
-                string sql = "delete from ccmembers from ccmembers m,ccvisits v"
-                    + " where v.memberid=m.id"
-                    + " and(m.Visits=1)"
-                    + " and(m.createdbyvisit=1)"
-                    + " and(m.Username is null)"
-                    + " and(m.email is null)"
-                    + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
+                string sql = "delete from ccmembers from ccmembers m,ccvisits v where v.memberid=m.id and(m.visits=1) and(m.createdbyvisit=1) and(m.username is null) and(m.email is null) and(v.cookiesupport=0)and(v.lastvisittime<DATEADD(hour, -2, GETDATE()))";
                 try {
                     core.db.executeNonQuery(sql);
                 } catch (Exception ex) {
@@ -35,12 +32,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 LogController.logInfo(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + ArchiveDate + "], exactly one total visit, a null username and a null email address.");
                 //
-                string SQLCriteria = ""
-                    + " (LastVisit<" + DeleteBeforeDateSQL + ")"
-                    + " and(createdbyvisit=1)"
-                    + " and(Visits=1)"
-                    + " and(Username is null)"
-                    + " and(email is null)";
+                string SQLCriteria = "(LastVisit<" + DeleteBeforeDateSQL + ")and(createdbyvisit=1)and(Visits=1)and(Username is null)and(email is null)";
                 core.db.deleteTableRecordChunks("ccmembers", SQLCriteria, 1000, 10000);
                 //
                 // delete 'guests' Members with one visits but no valid visit record
