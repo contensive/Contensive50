@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Stop all activity through the content server, but do not unload
         /// </summary>
-        public void stopTimerEvents()  {
+        public void stopTimerEvents() {
             try {
                 processTimer.Enabled = false;
                 using (CPClass cp = new CPClass()) {
@@ -56,7 +56,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="setVerbose"></param>
         /// <param name="singleThreaded"></param>
         /// <returns></returns>
-        public bool startTimerEvents()  {
+        public bool startTimerEvents() {
             bool returnStartedOk = false;
             try {
                 // todo StartServiceInProgress does nothing. windows will not call it twice
@@ -136,7 +136,7 @@ namespace Contensive.Processor.Controllers {
                                 foreach (var addon in addonList) {
                                     //
                                     int addonProcessInterval = encodeInteger(addon.processInterval);
-                                    if (addon.processRunOnce)  {
+                                    if (addon.processRunOnce) {
                                         //
                                         // -- run once checked 
                                         addon.processNextRun = core.dateTimeNowMockable;
@@ -155,7 +155,7 @@ namespace Contensive.Processor.Controllers {
                                             addonId = addon.id,
                                             addonName = addon.name,
                                             args = GenericController.convertAddonArgumentstoDocPropertiesList(cpApp.core, addon.argumentList)
-                                        }, false);
+                                        }, true);
                                         if (addonProcessInterval > 0) {
                                             //
                                             // -- interval set, update the next run
@@ -191,7 +191,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="downloadName"></param>
         /// <returns></returns>
         static public bool addTaskToQueue(CoreController core, TaskModel.CmdDetailClass cmdDetail, bool blockDuplicates, string downloadName, string downloadFilename) {
-            bool resultTaskAdded = true;
             try {
                 //
                 int downloadId = 0;
@@ -211,29 +210,32 @@ namespace Contensive.Processor.Controllers {
                     download.save(core.cpParent);
                 }
                 string cmdDetailJson = SerializeObject(cmdDetail);
+                bool allowAdd = true;
                 if (blockDuplicates) {
                     //
                     // -- Search for a duplicate
-                    string sql = "select top 1 id from cctasks where ((cmdDetail=" + cmdDetailJson + ")and(datestarted is not null))";
+                    string sql = "select top 1 id from cctasks where ((cmdDetail=" + DbController.encodeSQLText(cmdDetailJson) + ")and(datestarted is null)and(datecompleted is null))";
                     using (var csData = new CsModel(core)) {
-                        resultTaskAdded = !csData.openSql(sql);
+                        allowAdd = !csData.openSql(sql);
                     }
                 }
                 //
                 // -- add it to the queue and shell out to the command
-                if (resultTaskAdded) {
+                if (allowAdd) {
                     var task = TaskModel.addEmpty<TaskModel>(core.cpParent);
                     task.name = "addon [#" + cmdDetail.addonId + "," + cmdDetail.addonName + "]";
                     task.cmdDetail = cmdDetailJson;
                     task.resultDownloadId = downloadId;
                     task.save(core.cpParent);
-                    LogController.logTrace(core, "addTaskToQueue, cmdDetailJson [" + cmdDetailJson + "]");
+                    LogController.logTrace(core, "addTaskToQueue, task added, cmdDetailJson [" + cmdDetailJson + "]");
+                    return true;
                 }
+                LogController.logTrace(core, "addTaskToQueue, task blocked because duplicate found, cmdDetailJson [" + cmdDetailJson + "]");
+                return false;
             } catch (Exception ex) {
-                LogController.logTrace(core, "addTaskToQueue, exeception [" + ex + "]");
                 LogController.logError(core, ex);
+                return false;
             }
-            return resultTaskAdded;
         }
         //
         static public bool addTaskToQueue(CoreController core, TaskModel.CmdDetailClass cmdDetail, bool blockDuplicates)
@@ -247,11 +249,11 @@ namespace Contensive.Processor.Controllers {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~TaskSchedulerController()  {
+        ~TaskSchedulerController() {
             Dispose(false);
 
 

@@ -10,35 +10,35 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 LogController.logInfo(core, "Housekeep, viewings");
                 //
-                //
-                // log for only 365 days
-                core.db.executeNonQuery("delete from ccemaillog where (dateadded < DATEADD(day,-" + env.visitArchiveAgeDays + ",CAST(GETDATE() AS DATE)))");
-                //
-                // delete nocookie visits
-                // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
+                try {
+                    //
+                    // delete old viewings
+                    core.db.executeNonQuery("delete from ccviewings where (dateadded < DATEADD(day,-" + env.visitArchiveAgeDays + ",CAST(GETDATE() AS DATE)))");
+                } catch (Exception) {
+                    LogController.logWarn(core, "exception deleting old viewings");
+                }
                 //
                 if (env.archiveDeleteNoCookie) {
                     //
-                    // delete viewings from the non-cookie visits
-                    //
                     LogController.logInfo(core, "Deleting viewings from visits with no cookie support older than Midnight, Two Days Ago");
-                    string sql = "delete from ccviewings"
-                        + " from ccviewings h,ccvisits v"
-                        + " where h.visitid=v.id"
-                        + " and(v.CookieSupport=0)and(v.LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")";
+                    //
                     // if this fails, continue with the rest of the work
                     try {
+                        string sql = "delete from ccviewings from ccviewings h,ccvisits v where h.visitid=v.id and(v.CookieSupport=0)and(v.LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))";
                         core.db.executeNonQuery(sql);
-                    } catch (Exception ex) {
-                        LogController.logError(core, ex);
+                    } catch (Exception) {
+                        LogController.logWarn(core, "exception deleting viewings with no cookie");
                     }
                 }
                 //
-                // viewings with no visit
-                //
                 LogController.logInfo(core, "Deleting viewings with null or invalid VisitID");
-                core.db.deleteTableRecordChunks("ccviewings", "(visitid=0 or visitid is null)", 1000, 10000);
-
+                //
+                try {
+                    string sql = "delete from ccviewings  where (visitid=0 or visitid is null)";
+                    core.db.executeNonQuery(sql);
+                } catch (Exception) {
+                    LogController.logWarn(core, "exception deleting viewings with invalid visits");
+                }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

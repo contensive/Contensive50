@@ -164,7 +164,7 @@ namespace Contensive.Processor.Controllers {
                 // collect list of DLL files and add them to the exec files if they were missed
                 List<string> assembliesInZip = new List<string>();
                 foreach (FileDetail file in srcFileInfoArray) {
-                    if (file.Extension.ToLowerInvariant() == "dll") {
+                    if (file.Extension.ToLowerInvariant() == ".dll") {
                         if (!assembliesInZip.Contains(file.Name.ToLowerInvariant())) {
                             LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], adding DLL from folder[" + file.Name.ToLowerInvariant() + "].");
                             assembliesInZip.Add(file.Name.ToLowerInvariant());

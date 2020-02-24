@@ -6,31 +6,27 @@ using static Contensive.Processor.Controllers.GenericController;
 namespace Contensive.Processor.Addons.Housekeeping {
     //
     public static class VisitClass {
-        public static void housekeep( CoreController core, HouseKeepEnvironmentModel env ) {
+        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, visits");
-                //
-                //
-                // Visits with no DateAdded
-                //
-                LogController.logInfo(core, "Deleting visits with no DateAdded");
-                core.db.deleteTableRecordChunks("ccvisits", "(DateAdded is null)or(DateAdded<=" + DbController.encodeSQLDate(new DateTime(1995, 1, 1)) + ")", 1000, 10000);
-                //
-                // Visits with no visitor
-                //
-                LogController.logInfo(core, "Deleting visits with no visitor");
-                core.db.deleteTableRecordChunks("ccvisits", "(VisitorID is null)or(VisitorID=0)", 1000, 10000);
-                //
-                // delete nocookie visits
-                // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
-                //
+                {
+                    //
+                    LogController.logInfo(core, "Deleting visits with no DateAdded");
+                    //
+                    core.db.executeNonQuery("delete from ccvisits where (DateAdded is null)or(DateAdded<DATEADD(year,-10,CAST(GETDATE() AS DATE)))");
+                }
+                {
+                    //
+                    LogController.logInfo(core, "Deleting visits with no visitor");
+                    //
+                    core.db.executeNonQuery("delete from ccvisits from ccvisits v left join ccvisitors r on r.id=v.visitorid where (r.id is null)");
+                }
                 if (env.archiveDeleteNoCookie) {
                     //
-                    // delete visits from the non-cookie visits
-                    //
                     LogController.logInfo(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
-                    core.db.deleteTableRecordChunks("ccvisits", "(CookieSupport=0)and(LastVisitTime<" + env.sqlDateMidnightTwoDaysAgo + ")", 1000, 10000);
+                    //
+                    core.db.executeNonQuery("delete from ccvisits where (CookieSupport=0)and(LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
                 }
                 DateTime OldestVisitDate = default(DateTime);
                 //
@@ -46,9 +42,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //   this is to prevent the entire server from being bogged down for one site change
                 //
                 if (OldestVisitDate == DateTime.MinValue) {
-                    LogController.logInfo(core, "No records were removed because no visit records were found while requesting the oldest visit.");
-                } else if (env.visitArchiveAgeDays <= 0) {
-                    LogController.logInfo(core, "No records were removed because Housekeep ArchiveRecordAgeDays is 0.");
+                    LogController.logInfo(core, "No visit records were removed because no visit records were found while requesting the oldest visit.");
                 } else {
                     DateTime ArchiveDate = core.dateTimeNowMockable.AddDays(-env.visitArchiveAgeDays).Date;
                     int DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
@@ -101,14 +95,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 LogController.logInfo(core, "Deleting viewings with visitIDs lower then the lowest ccVisits.ID");
                 core.db.deleteTableRecordChunks("ccviewings", "(visitid<(select min(ID) from ccvisits))", 1000, 10000);
-                //
-                // Visitors with no visits
-                //
-                LogController.logInfo(core, "Deleting visitors with no visits");
-                SQL = "delete ccVisitors"
-                    + " from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID"
-                    + " where ccVisits.ID is null";
-                core.db.executeNonQuery(SQL);
+
                 //
                 // restore sved timeout
                 //

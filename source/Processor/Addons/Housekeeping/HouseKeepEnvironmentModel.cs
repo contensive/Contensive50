@@ -52,13 +52,13 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 thirtyDaysAgo = core.dateTimeNowMockable.AddDays(-30).Date;
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
-                visitArchiveAgeDays = GenericController.encodeInteger(core.siteProperties.getText("ArchiveRecordAgeDays", "365"));
+                visitArchiveAgeDays = core.siteProperties.getInteger("ArchiveRecordAgeDays", 2);
                 if (visitArchiveAgeDays < 2) {
                     visitArchiveAgeDays = 2;
-                    core.siteProperties.setProperty("ArchiveRecordAgeDays", "2");
+                    core.siteProperties.setProperty("ArchiveRecordAgeDays", 2);
                 }
                 visitArchiveDate = core.dateTimeNowMockable.AddDays(-visitArchiveAgeDays).Date;
-                oldestVisitSummaryWeCareAbout = core.dateTimeNowMockable.Date.AddDays(-120);
+                oldestVisitSummaryWeCareAbout = core.dateTimeNowMockable.Date.AddDays(-30);
                 if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
                     oldestVisitSummaryWeCareAbout = visitArchiveDate;
                 }

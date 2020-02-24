@@ -19,7 +19,49 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// controller for shared non-specific tasks
     /// </summary>
-    public class GenericController {
+    public static class GenericController {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// returns true if first version is older than the second version
+        /// </summary>
+        /// <param name="version"></param>
+        /// <param name="versionCompare"></param>
+        /// <returns></returns>
+        public static bool versionIsOlder(string versionFirst, string versionSecond) {
+            try {
+                string[] vfsplit = versionFirst.Split('.');
+                string[] vssplit = versionSecond.Split('.');
+                //
+                {
+                    int vf = (vfsplit.Length >= 1) ? encodeInteger(vfsplit[0]) : 0;
+                    int vs = (vssplit.Length >= 1) ? encodeInteger(vssplit[0]) : 0;
+                    if (vf < vs) { return true; }
+                    if (vf > vs) { return false; }
+                }
+                {
+                    int vf = (vfsplit.Length >= 2) ? encodeInteger(vfsplit[1]) : 0;
+                    int vs = (vssplit.Length >= 2) ? encodeInteger(vssplit[1]) : 0;
+                    if (vf < vs) { return true; }
+                    if (vf > vs) { return false; }
+                }
+                {
+                    int vf = (vfsplit.Length >= 3) ? encodeInteger(vfsplit[2]) : 0;
+                    int vs = (vssplit.Length >= 3) ? encodeInteger(vssplit[2]) : 0;
+                    if (vf < vs) { return true; }
+                    if (vf > vs) { return false; }
+                }
+                {
+                    int vf = (vfsplit.Length >= 4) ? encodeInteger(vfsplit[3]) : 0;
+                    int vs = (vssplit.Length >= 4) ? encodeInteger(vssplit[3]) : 0;
+                    if (vf < vs) { return true; }
+                    if (vf > vs) { return false; }
+                }
+                return false;
+            } catch (Exception) {
+                return true;
+            }
+        }
         //
         //====================================================================================================
         /// <summary>

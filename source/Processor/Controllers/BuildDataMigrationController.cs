@@ -66,7 +66,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- 4.1 to 5 conversions
-                if (DataBuildVersion.Substring(0, 3).CompareTo("4.1")<1) {
+                if (GenericController.versionIsOlder(DataBuildVersion, "4.1")) {
                     //
                     // -- create Data Migration Assets collection
                     var migrationCollection = DbBaseModel.createByUniqueName<AddonCollectionModel>(cp, "Data Migration Assets");
@@ -274,7 +274,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- 5.19.1223 conversion -- render AddonList no copyFilename
-                if (DataBuildVersion.Substring(0, 9).CompareTo("5.19.1223")<1) {
+                if (GenericController.versionIsOlder(DataBuildVersion, "5.19.1223")) {
                     //
                     // -- verify design block installation
                     string returnUserError = "";
@@ -290,12 +290,15 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- 5.2002.12 conversion -- collections incorrectly marked not-updateable - mark all except themes (templates)
-                if (DataBuildVersion.Substring(0, 9).CompareTo("5.2002.12") < 1) {
+                if (GenericController.versionIsOlder(DataBuildVersion, "5.2002.12")) {
                     //
                     // -- 
                     cp.Db.ExecuteNonQuery("update ccaddoncollections set updatable=1 where name not like '%theme%'");
                 }
                 //
+                // -- delete legacy corehelp collection. Created with fields that have only field name, legacy install layed collections over the application collection
+                //    new install loads fields directly from collection, which coreHelp then marks all fields inactive.
+                core.db.delete("{6e905db1-d3f0-40af-aac4-4bd78e680fae}", "ccaddoncollections");
                 // -- Reload
                 core.cache.invalidateAll();
                 core.clearMetaData();

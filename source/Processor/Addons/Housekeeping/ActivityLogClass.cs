@@ -9,18 +9,20 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, activitylog");
-                //
-                //
-                // activity log for only 30 days
-                core.db.executeNonQuery("delete from abaccountinglog where (dateadded < DATEADD(day,-30,CAST(GETDATE() AS DATE)))");
-                //
-                // Activities with no Member
-                //
-                LogController.logInfo(core, "Deleting activities with no member record.");
-                string sql = "delete ccactivitylog"
-                    + " From ccactivitylog LEFT JOIN ccmembers on ccmembers.ID=ccactivitylog.memberid"
-                    + " WHERE (ccmembers.ID is null)";
-                core.db.executeNonQuery(sql);
+                {
+                    //
+                    //
+                    LogController.logInfo(core, "Deleting activities older than 30 days.");
+                    //
+                    core.db.executeNonQuery("delete from ccactivitylog where (DateAdded is null)or(DateAdded<DATEADD(day,-30,CAST(GETDATE() AS DATE)))");
+
+                }
+                {
+                    //
+                    LogController.logInfo(core, "Deleting activities with no member record.");
+                    //
+                    core.db.executeNonQuery("delete ccactivitylog from ccactivitylog left join ccmembers on ccmembers.id=ccactivitylog.memberid where (ccmembers.id is null)");
+                }
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);

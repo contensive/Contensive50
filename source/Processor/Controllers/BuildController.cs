@@ -35,6 +35,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 {
                     string DataBuildVersion = core.siteProperties.dataBuildVersion;
+                    if (versionIsOlder(DataBuildVersion,"4.1.636")) {
+                        // this is a test
+                    }
                     //
                     // -- determine primary domain
                     string primaryDomain = core.appConfig.name;
@@ -136,7 +139,7 @@ namespace Contensive.Processor.Controllers {
                         DataBuildVersion = CoreController.codeVersion();
                         core.siteProperties.dataBuildVersion = CoreController.codeVersion();
                     }
-                    if (string.CompareOrdinal(DataBuildVersion, CoreController.codeVersion()) < 0) {
+                    if(versionIsOlder(DataBuildVersion, CoreController.codeVersion())) {
                         //
                         // -- data updates
                         LogController.logInfo(core, logPrefix + ", run database conversions, DataBuildVersion [" + DataBuildVersion + "], software version [" + CoreController.codeVersion() + "]");
@@ -213,7 +216,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
-                    // - if repair, reinstall all ipgradable collections not already re-installed
+                    // - if repair, reinstall all upgradable collections not already re-installed
                     if (repair) {
                         foreach (var collection in DbBaseModel.createList<AddonCollectionModel>(core.cpParent, "(updatable>0)")) {
                             if (!collectionsInstalledList.Contains(collection.ccguid)) {
