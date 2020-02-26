@@ -143,7 +143,7 @@ namespace Contensive.Processor.Controllers {
                         if (core.doc.redirectRecordID != 0) {
                             string contentName = MetadataController.getContentNameByID(core, core.doc.redirectContentID);
                             if (!string.IsNullOrEmpty(contentName)) {
-                                if (WebServerController.redirectByRecord_ReturnStatus(core, contentName, core.doc.redirectRecordID, "")) {
+                                if (core.webServer.redirectByRecord_ReturnStatus(contentName, core.doc.redirectRecordID, "")) {
                                     core.doc.continueProcessing = false;
                                     return string.Empty;
                                 } else {

@@ -16,7 +16,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (ServerManager serverManager = new ServerManager()) {
                 // act
                 using (CPClass cp = new CPClass()) {
-                    WebServerController.verifyAppPool(cp.core, appPoolName);
+                    cp.core.webServer.verifyAppPool(appPoolName);
                 }
             }
             // assert

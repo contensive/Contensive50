@@ -7,40 +7,74 @@ using static Contensive.Processor.Controllers.GenericController;
 using System.IO;
 using System.Net;
 using Contensive.Processor.Exceptions;
+using System.Text;
+using System.Collections.Generic;
 //
 namespace Contensive.Processor.Controllers {
     //
     public class HttpRequestController {
-        //
-        private WebClientExt http;
-        private System.Net.WebHeaderCollection privateRequestHeaders;
-        private string privateRequestPassword;
-        private string privateRequestUsername;
-        private readonly string privateRequestUserAgent;
-        private string privateRequestCookie;
-        private readonly int privateRequestTimeoutMsec;
+        private WebHeaderCollection privateRequestHeaders;
+        private string _password;
+        private string _username;
+        private string _setCookie;
         private string privateResponseFilename;
         //
         // had to fake bc webClient removes first line of header
-        private readonly string privateResponseProtocol = "HTTP/1.1"; 
-        private string privateResponseStatusDescription;
-        private int privateResponseStatusCode;
+        private readonly string privateResponseProtocol = "HTTP/1.1";
+        private string _responseStatusDescription;
+        private int _responseStatusCode;
         private WebHeaderCollection privateResponseHeaders = new System.Net.WebHeaderCollection();
-        private readonly string privateSocketResponse = "";
+        private readonly string _socketResponse = "";
         //
         //======================================================================================
         // constructor
         //======================================================================================
         //
-        public HttpRequestController()  {
-            // Me.core = core
+        public HttpRequestController() {
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
-            privateRequestTimeoutMsec = 30000;
-            privateRequestUserAgent = "kmaHTTP/" + myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("00") + "." + myVersion.Build.ToString("00000000");
-            http = new WebClientExt();
+            userAgent = "contensive/" + myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("0000") + "." + myVersion.Build.ToString("00");
+            _timeout = 30000;
+        }
+        //
+        //======================================================================================
+        /// <summary>
+        /// initialize http object from values in this object. Call right before http method call
+        /// </summary>
+        /// <param name="http"></param>
+        private void initHttp(WebClientExt http) {
+            //
+            http.password = _password;
+            http.username = _username;
+            http.userAgent = userAgent;
+            if (!string.IsNullOrEmpty(_setCookie)) {
+                string[] cookies = _setCookie.Split(';');
+                int CookiePointer = 0;
+                for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
+                    string[] CookiePart = cookies[CookiePointer].Split('=');
+                    http.addCookie(CookiePart[0], CookiePart[1]);
+                }
+            }
+            http.timeout = _timeout;
+        }
+        //
+        //======================================================================================
+        //
+        public string postUrl(string url) {
+            return postUrl(url, new System.Collections.Specialized.NameValueCollection());
+        }
+        //
+        //======================================================================================
+        //
+        public string postUrl(string url, System.Collections.Specialized.NameValueCollection requestArguments) {
+            using (WebClientExt http = new WebClientExt()) {
+                initHttp(http);
+                byte[] responsebytes = http.UploadValues(url, "POST", requestArguments);
+                UTF8Encoding utf8 = new UTF8Encoding();
+                return utf8.GetString(responsebytes);
+            }
         }
         //
         //======================================================================================
@@ -50,54 +84,36 @@ namespace Contensive.Processor.Controllers {
         //   If the HTTPResponse is "", Check the SocketResponse
         //======================================================================================
         //
-        public void getUrlToFile(string URL, string Filename) {
+        public void getUrlToFile(string URL, string physicalFilename) {
             try {
-                string[] cookies = null;
-                int CookiePointer = 0;
-                string[] CookiePart = null;
-                string path = null;
-                int ptr = 0;
-                //
-                privateResponseFilename = Filename;
-                path = Filename.Replace("/", "\\");
-                ptr = path.LastIndexOf("\\");
-                if (ptr > 0) {
-                    path = Filename.left( ptr);
-                    Directory.CreateDirectory(path);
-                }
-                File.Delete(privateResponseFilename);
-                http.password = privateRequestPassword;
-                http.username = privateRequestUsername;
-                http.userAgent = privateRequestUserAgent;
-                if (!string.IsNullOrEmpty(privateRequestCookie)) {
-                    cookies = privateRequestCookie.Split(';');
-                    for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
-                        CookiePart = cookies[CookiePointer].Split('=');
-                        http.addCookie(CookiePart[0], CookiePart[1]);
+                using (WebClientExt http = new WebClientExt()) {
+                    initHttp(http);
+                    //
+                    privateResponseFilename = physicalFilename;
+                    string path = physicalFilename.Replace("/", "\\");
+                    int ptr = path.LastIndexOf("\\");
+                    if (ptr > 0) {
+                        path = physicalFilename.left(ptr);
+                        Directory.CreateDirectory(path);
+                    }
+                    File.Delete(privateResponseFilename);
+                    privateRequestHeaders = http.Headers;
+                    try {
+                        http.DownloadFile(URL, privateResponseFilename);
+                        _responseStatusCode = 200;
+                        _responseStatusDescription = HttpStatusCode.OK.ToString();
+                        privateResponseHeaders = http.ResponseHeaders;
+                    } catch {
+                        //
+                        // -- exception, no http data is valid
+                        _responseStatusCode = 0;
+                        _responseStatusDescription = "";
+                        privateResponseHeaders = new System.Net.WebHeaderCollection();
+                        throw;
                     }
                 }
-                //
-                privateRequestHeaders = http.Headers;
-                http.timeout = privateRequestTimeoutMsec;
-                //
-                privateRequestHeaders = http.Headers;
-                privateResponseHeaders = new System.Net.WebHeaderCollection();
-                try {
-                    http.DownloadFile(URL, privateResponseFilename);
-                    privateResponseStatusCode = 200;
-                    privateResponseStatusDescription = HttpStatusCode.OK.ToString();
-                    privateResponseHeaders = http.ResponseHeaders;
-                } catch {
-                    //
-                    //
-                    //
-                    privateResponseStatusCode = 0;
-                    privateResponseStatusDescription = "";
-                    privateResponseHeaders = new System.Net.WebHeaderCollection();
-                    throw;
-                }
             } catch (Exception ex) {
-                throw new HttpException("Error in getUrlToFile(" + URL + "," + Filename + ")", ex);
+                throw new HttpException("Exception in getUrlToFile(" + URL + "," + physicalFilename + ")", ex);
             }
         }
         //
@@ -109,238 +125,136 @@ namespace Contensive.Processor.Controllers {
         //======================================================================================
         //
         public string getURL(string url) {
-            string returnString = "";
             try {
-                string[] cookies = null;
-                int CookiePointer = 0;
-                string[] CookiePart = null;
-                //
-                http.password = privateRequestPassword;
-                http.username = privateRequestUsername;
-                http.userAgent = privateRequestUserAgent;
-                if (!string.IsNullOrEmpty(privateRequestCookie)) {
-                    cookies = privateRequestCookie.Split(';');
-                    for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
-                        CookiePart = cookies[CookiePointer].Split('=');
-                        http.addCookie(CookiePart[0], CookiePart[1]);
+                using (WebClientExt http = new WebClientExt()) {
+                    initHttp(http);
+                    privateRequestHeaders = http.Headers;
+                    try {
+                        string returnString = http.DownloadString(url);
+                        _responseStatusCode = 200;
+                        _responseStatusDescription = HttpStatusCode.OK.ToString();
+                        privateResponseHeaders = http.ResponseHeaders;
+                        return returnString;
+
+                    } catch {
+                        //
+                        // -- exception, no http data is valid
+                        _responseStatusCode = 0;
+                        _responseStatusDescription = "";
+                        privateResponseHeaders = new System.Net.WebHeaderCollection();
+                        throw;
                     }
                 }
-                http.timeout = privateRequestTimeoutMsec;
-                //
-                privateRequestHeaders = http.Headers;
-                privateResponseHeaders = new System.Net.WebHeaderCollection();
-                privateResponseStatusCode = 0;
-                privateResponseStatusDescription = "";
-                try {
-                    returnString = http.DownloadString(url);
-                    privateResponseStatusCode = 200;
-                    privateResponseStatusDescription = HttpStatusCode.OK.ToString();
-                    privateResponseHeaders = http.ResponseHeaders;
-                } catch {
-                    //
-                    //
-                    //
-                    throw;
-                }
-            } catch {
-                //
-                // general catch for the routine
-                //
-                throw;
-            }
-            return returnString;
-        }
-        //
-        //================================================================
-        //
-        //================================================================
-        //
-        public string userAgent {
-            get {
-                string returnString = "";
-                try {
-                    returnString = http.userAgent;
-                } catch  {
-                    throw new GenericException("Error in UserAgent Property, get Method");
-                }
-                return returnString;
-            }
-            set {
-                try {
-                    http.userAgent = value;
-                } catch {
-                    throw new GenericException("Error in UserAgent Property, set Method");
-                }
+            } catch (Exception ex) {
+                throw new HttpException("Exception in getURL(" + url + ")", ex);
             }
         }
         //
         //================================================================
+        //
+        public string userAgent { get; set; }
         //
         //================================================================
         //
         public int timeout {
             get {
-                int returnTimeout = 0;
-                try {
-                    returnTimeout = encodeInteger(http.timeout / 1000);
-                } catch {
-                    throw new GenericException("Error in Timeout Property, get Method");
-                }
-                return returnTimeout;
+                return encodeInteger(_timeout / 1000);
             }
             set {
-                try {
-                    if (value > 65535) {
-                        value = 65535;
-                    }
-                    http.timeout = value * 1000;
-                } catch {
-                    throw new GenericException("Error in Timeout Property, set Method");
+                if (value > 65535) {
+                    value = 65535;
                 }
+                _timeout = value * 1000;
             }
         }
-        //
-        //================================================================
+        private int _timeout;
         //
         //================================================================
         //
         public string requestHeader {
             get {
-                string returnString = "";
-                int ptr = 0;
-                //
                 try {
+                    string returnString = "";
                     if (privateRequestHeaders.Count > 0) {
-                        for (ptr = 0; ptr < privateRequestHeaders.Count; ptr++) {
+                        for (int ptr = 0; ptr < privateRequestHeaders.Count; ptr++) {
                             returnString += privateRequestHeaders[ptr];
                         }
                     }
-                } catch {
-                    throw new GenericException("Error in requestHeader Property, get Method");
+                    return returnString;
+                } catch (Exception ex) {
+                    throw new GenericException("exception in requestHeader Property, get Method", ex);
                 }
-                return returnString;
             }
         }
-        //
-        //================================================================
         //
         //================================================================
         //
         public string responseHeader {
             get {
-                string returnString = "";
-                int ptr = 0;
-                //
                 try {
-                    if (privateResponseStatusCode != 0) {
-                        returnString += privateResponseProtocol + " " + privateResponseStatusCode + " " + privateResponseStatusDescription;
+                    string returnString = "";
+                    if (_responseStatusCode != 0) {
+                        returnString += privateResponseProtocol + " " + _responseStatusCode + " " + _responseStatusDescription;
                         if (privateResponseHeaders.Count > 0) {
-                            for (ptr = 0; ptr < privateResponseHeaders.Count; ptr++) {
+                            for (int ptr = 0; ptr < privateResponseHeaders.Count; ptr++) {
                                 returnString += Environment.NewLine + privateResponseHeaders.GetKey(ptr) + ":" + privateResponseHeaders[ptr];
                             }
                         }
                     }
-                } catch {
-                    throw;
+                    return returnString;
+                } catch (Exception ex) {
+                    throw new GenericException("exception in responseHeader Property, get Method", ex);
                 }
-                return returnString;
             }
         }
-        //
-        //================================================================
         //
         //================================================================
         //
         public string socketResponse {
             get {
-                string returnString = "";
-                //
-                try {
-                    returnString = privateSocketResponse;
-                } catch {
-                    throw new GenericException("Error in SocketResponse Property, get Method");
-                }
-                return returnString;
+                return _socketResponse;
             }
         }
-        //
-        //================================================================
         //
         //================================================================
         //
         public string responseStatusDescription {
             get {
-                string returnString = "";
-                //
-                try {
-                    returnString = privateResponseStatusDescription;
-                } catch {
-                    throw;
-                }
-                return returnString;
+                return _responseStatusDescription;
             }
         }
-        //
-        //================================================================
         //
         //================================================================
         //
         public int responseStatusCode {
             get {
-                int returnCode = 0;
-                //
-                try {
-                    returnCode = privateResponseStatusCode;
-                } catch  {
-                    throw;
-                }
-                return returnCode;
+                return _responseStatusCode;
             }
         }
         //
-        //
+        //================================================================
         //
         public string setCookie {
             set {
-                try {
-                    privateRequestCookie = value;
-                } catch  {
-                    throw;
-                }
+                _setCookie = value;
             }
         }
         //
-        //
+        //================================================================
         //
         public string username {
             set {
-                try {
-                    privateRequestUsername = value;
-                } catch  {
-                    throw;
-                }
+                _username = value;
             }
         }
         //
-        //
+        //================================================================
         //
         public string password {
             set {
-                try {
-                    privateRequestPassword = value;
-                } catch {
-                    throw;
-                }
+                _password = value;
             }
         }
-        //
-        ~HttpRequestController()  {           
-            
-            http.Dispose();
-        }
-        //
-        //
-        //
     }
     //
     // exception classes
@@ -350,6 +264,9 @@ namespace Contensive.Processor.Controllers {
         public HttpException(string context, Exception innerEx) : base("Unknown error in http4Class, " + context + ", innerException [" + innerEx.ToString() + "]") {
         }
     }
+
+
+
 
 }
 

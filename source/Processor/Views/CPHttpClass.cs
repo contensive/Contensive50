@@ -31,18 +31,22 @@ namespace Contensive.Processor {
         /// <param name="url"></param>
         /// <returns></returns>
         public override string Get(string url) {
-            HttpRequestController kmaHTTP = new HttpRequestController();
-            return kmaHTTP.getURL(url);
+            HttpRequestController httpRequest = new HttpRequestController();
+            return httpRequest.getURL(url);
         }
         //
         // ====================================================================================================
-        public override string Post(string url, List<KeyValuePair<string, string>> requestArguments) {
-            throw new NotImplementedException();
+        //
+        public override string Post(string url, System.Collections.Specialized.NameValueCollection requestArguments) {
+            HttpRequestController httpRequest = new HttpRequestController();
+            return httpRequest.postUrl(url, requestArguments);
         }
         //
         // ====================================================================================================
-        public override string Post(string url, string entity) {
-            throw new NotImplementedException();
+        //
+        public override string Post(string url) {
+            HttpRequestController httpRequest = new HttpRequestController();
+            return httpRequest.postUrl(url);
         }
     }
 }

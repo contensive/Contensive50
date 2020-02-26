@@ -850,7 +850,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 //
                                                                                                 NewImageFilename = ImageFilenameNoExt + "-" + ImageAltSize + "." + ImageFilenameExt;
                                                                                                 // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                                string imageNewLink = GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename);
+                                                                                                string imageNewLink = (getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename).Replace(" ", "%20" );
                                                                                                 ElementText = GenericController.strReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
                                                                                             } else if ((RecordWidth < ImageWidth) || (RecordHeight < ImageHeight)) {
                                                                                                 //
@@ -858,7 +858,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                 // reize image larger then original - go with it as is
                                                                                                 //
                                                                                                 // images included in email have spaces that must be converted to "%20" or they 404
-                                                                                                ElementText = GenericController.strReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, RecordVirtualFilename))));
+                                                                                                string imageNewLink = GenericController.getCdnFileLink(core, RecordVirtualFilename).Replace(" ", "%20");
+                                                                                                ElementText = GenericController.strReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(imageNewLink));
                                                                                             } else {
                                                                                                 //
                                                                                                 // resized image - create NewImageFilename (and add new alt size to the record)
@@ -944,7 +945,8 @@ namespace Contensive.Processor.Controllers {
                                                                                                     }
                                                                                                     //
                                                                                                     // Change the image src to the AltSize
-                                                                                                    ElementText = GenericController.strReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(GenericController.encodeURL(GenericController.getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename)));
+                                                                                                    string newImagePathFilename = getCdnFileLink(core, ImageVirtualFilePath) + NewImageFilename;
+                                                                                                    ElementText = strReplace(ElementText, ImageSrcOriginal, HtmlController.encodeHtml(newImagePathFilename.Replace(" ","%20")));
                                                                                                 }
                                                                                             }
                                                                                         }

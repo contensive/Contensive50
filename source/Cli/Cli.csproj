@@ -153,12 +153,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.2002.23.4, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.2002.23.4\lib\net461\ContensiveDbModels.dll</HintPath>
+    <Reference Include="ContensiveDbModels, Version=5.2002.25.4, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.5.2002.25.4\lib\net461\ContensiveDbModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.23.4\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2002.25.4\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -188,8 +188,8 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=5.2002.23.4, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\packages\Contensive.Processor.5.2002.23.4\lib\net472\Processor.dll</HintPath>
+    <Reference Include="processor, Version=5.2002.25.4, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Contensive.Processor.5.2002.25.4\lib\net472\Processor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -234,7 +234,9 @@
     <Compile Include="Views\DeleteProtectionCmd.cs" />
     <Compile Include="Views\ExportCollectionCmd.cs" />
     <Compile Include="Views\GetCacheCmd.cs" />
+    <Compile Include="Views\iisrecycleCmd.cs" />
     <Compile Include="Views\InstallCollectionFileCmd.cs" />
+    <Compile Include="Views\DomainCmd.cs" />
     <Compile Include="Views\VerifyBasicWebsiteCmd.cs" />
     <Compile Include="Views\StatusCmd.cs" />
     <Compile Include="Views\HousekeepCmd.cs" />
@@ -247,6 +249,7 @@
     <Compile Include="Views\HelpCmd.cs" />
     <Compile Include="Views\VersionCmd.cs" />
     <Compile Include="Views\RunTaskCmd.cs" />
+    <Compile Include="Views\iisresetCmd.cs" />
     <Compile Include="Views\_BlankCmd.cs" />
     <Compile Include="Views\InstallCollectionCmd.cs" />
     <Compile Include="Views\FileDownloadCmd.cs" />
@@ -262,20 +265,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Models\dataModelFields.txt" />
-    <Content Include="Resources\adminNavBarHtml.txt" />
-    <Content Include="Resources\adminTemplateHtml.txt" />
-    <Content Include="Resources\defaultForgetPassword_html.txt" />
-    <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
-    <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />
-    <Content Include="Resources\defaultLogin_email_html.txt" />
-    <Content Include="Resources\defaultLogin_html.txt" />
-    <Content Include="Resources\DefaultTemplateHtml.txt" />
-    <Content Include="Resources\Icons\AdminHeaderIconSettings.txt" />
-    <Content Include="Resources\Icons\IdeaAdminHeaderIconAddonManager.txt" />
-    <Content Include="Resources\LoginButtonFormHtml.txt" />
-    <Content Include="Resources\LogoutButtonFormHtml.txt" />
-    <Content Include="Resources\sqlTriggerManyManyRule.txt" />
     <None Include="app.config" />
     <None Include="aspnetAppPatternDataSet.xsc">
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
@@ -322,6 +311,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Models\" />
+    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

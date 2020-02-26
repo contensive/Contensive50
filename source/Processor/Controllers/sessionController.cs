@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
                     if (_language == null) {
                         //
                         // -- try browser language if available
-                        string HTTP_Accept_Language = Controllers.WebServerController.getBrowserAcceptLanguage(core);
+                        string HTTP_Accept_Language = core.webServer.getBrowserAcceptLanguage();
                         if (!string.IsNullOrEmpty(HTTP_Accept_Language)) {
                             List<LanguageModel> languageList = DbBaseModel.createList<LanguageModel>(core.cpParent, "(HTTP_Accept_Language='" + HTTP_Accept_Language + "')");
                             if (languageList.Count > 0) {

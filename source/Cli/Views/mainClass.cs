@@ -33,6 +33,40 @@ namespace Contensive.CLI {
                         }
                         string cmd = getNextCmd(args, ref argPtr);
                         switch (cmd.ToLowerInvariant()) {
+                            case "--domain":
+                                //
+                                // -- require elevated permissions
+                                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                                    Console.WriteLine("The --domain command requires elevated permissions (run as administrator).");
+                                    return;
+                                }
+                                //
+                                // -- set an applications primary domain
+                                string primaryDomain = getNextCmdArg(args, ref argPtr);
+                                DomainCmd.execute(cpServer, appName, primaryDomain);
+                                break;
+                            case "--iisrecycle":
+                                //
+                                // -- require elevated permissions
+                                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                                    Console.WriteLine("The --iisrecycle command requires elevated permissions (run as administrator).");
+                                    return;
+                                }
+                                //
+                                // -- set an applications primary domain
+                                IisRecycleCmd.execute(cpServer, appName);
+                                break;
+                            case "--iisreset":
+                                //
+                                // -- require elevated permissions
+                                if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
+                                    Console.WriteLine("The --iisreset command requires elevated permissions (run as administrator).");
+                                    return;
+                                }
+                                //
+                                // -- set an applications primary domain
+                                IisResetCmd.execute(cpServer);
+                                break;
                             case "--pause":
                             case "-p":
                                 //
@@ -101,7 +135,7 @@ namespace Contensive.CLI {
                                 //
                                 // -- require elevated permissions
                                 if (!WindowsIdentity.GetCurrent().Owner.IsWellKnown(WellKnownSidType.BuiltinAdministratorsSid)) {
-                                    Console.WriteLine("The command requires elevated Administrator permissions.");
+                                    Console.WriteLine("The --newapp (-n) command requires elevated permissions (run as administrator).");
                                     return;
                                 }
                                 //

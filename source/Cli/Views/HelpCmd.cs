@@ -15,6 +15,7 @@ namespace Contensive.CLI {
             Console.Write(NewAppCmd.helpText);
             Console.Write(DeleteAppCmd.helpText);
             Console.Write(DeleteProtectionCmd.helpText);
+            Console.Write(DomainCmd.helpText);
             Console.Write(ExecuteAddonCmd.helpText);
             Console.Write(FileDownloadCmd.helpText);
             Console.Write(FileUploadCmd.helpText);
@@ -22,6 +23,8 @@ namespace Contensive.CLI {
             Console.Write(FlushCacheCmd.helpText);
             Console.Write(GetCacheCmd.helpText);
             Console.Write(HousekeepCmd.helpText);
+            Console.Write(IisRecycleCmd.helpText);
+            Console.Write(IisResetCmd.helpText);
             Console.Write(InstallCmd.helpText);
             Console.Write(InstallFileCmd.helpText);
             //Console.Write(LoggingCmd.helpText);

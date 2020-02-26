@@ -1004,197 +1004,9 @@ namespace Contensive.Processor.Controllers {
         //
         public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound)
             => redirect(NonEncodedLink, RedirectReason, IsPageNotFound, false);
-        //
-        //====================================================================================================
-        //
-        public void flushStream() {
-            if (iisContext != null) {
-                iisContext.Response.Flush();
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Verify a site exists, it not add it, it is does, verify all its settings
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="appName"></param>
-        /// <param name="DomainName"></param>
-        /// <param name="rootPublicFilesPath"></param>
-        /// <param name="defaultDocOrBlank"></param>
-        /// '
-        public static void verifySite(CoreController core, string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
-            try {
-                verifyAppPool(core, appName);
-                verifyWebsite(core, appName, DomainName, rootPublicFilesPath, appName);
-            } catch (Exception ex) {
-                LogController.logError(core, ex, "verifySite");
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// verify the application pool. If it exists, update it. If not, create it
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="poolName"></param>
-        public static void verifyAppPool(CoreController core, string poolName) {
-            try {
-                using (ServerManager serverManager = new ServerManager()) {
-                    bool poolFound = false;
-                    ApplicationPool appPool = null;
-                    foreach (ApplicationPool appPoolWithinLoop in serverManager.ApplicationPools) {
-                        if (appPoolWithinLoop.Name == poolName) {
-                            poolFound = true;
-                            break;
-                        }
-                    }
-                    if (!poolFound) {
-                        appPool = serverManager.ApplicationPools.Add(poolName);
-                    } else {
-                        appPool = serverManager.ApplicationPools[poolName];
-                    }
-                    appPool.ManagedRuntimeVersion = "v4.0";
-                    appPool.Enable32BitAppOnWin64 = true;
-                    appPool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
-                    serverManager.CommitChanges();
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex, "verifyAppPool");
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// verify the website. If it exists, update it. If not, create it
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="appName"></param>
-        /// <param name="domainName"></param>
-        /// <param name="phyPath"></param>
-        /// <param name="appPool"></param>
-        private static void verifyWebsite(CoreController core, string appName, string domainName, string phyPath, string appPool) {
-            try {
-
-                using (ServerManager iisManager = new ServerManager()) {
-                    //
-                    // -- verify the site exists
-                    bool found = false;
-                    foreach (Site siteWithinLoop in iisManager.Sites) {
-                        if (siteWithinLoop.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
-                    }
-                    Site site = iisManager.Sites[appName];
-                    //
-                    // -- verify the domain binding
-                    verifyWebsite_Binding(core, site, "*:80:" + domainName, "http");
-                    //
-                    // -- verify the application pool
-                    site.ApplicationDefaults.ApplicationPoolName = appPool;
-                    foreach (Application iisApp in site.Applications) {
-                        iisApp.ApplicationPoolName = appPool;
-                    }
-                    //
-                    // -- verify the cdn virtual directory (if configured)
-                    string cdnFilesPrefix = core.appConfig.cdnFileUrl;
-                    if (cdnFilesPrefix.IndexOf("://", StringComparison.InvariantCulture) < 0) {
-                        verifyWebsite_VirtualDirectory(core, site, appName, cdnFilesPrefix, core.appConfig.localFilesPath);
-                    }
-                    //
-                    // -- commit any changes
-                    iisManager.CommitChanges();
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex, "verifyWebsite");
-            }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Verify the binding
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="site"></param>
-        /// <param name="bindingInformation"></param>
-        /// <param name="bindingProtocol"></param>
-        private static void verifyWebsite_Binding(CoreController core, Site site, string bindingInformation, string bindingProtocol) {
-            try {
-                using (ServerManager iisManager = new ServerManager()) {
-                    bool found = false;
-                    foreach (Binding bindingWithinLoop in site.Bindings) {
-                        if ((bindingWithinLoop.BindingInformation == bindingInformation) && (bindingWithinLoop.Protocol == bindingProtocol)) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        Binding binding = site.Bindings.CreateElement();
-                        binding.BindingInformation = bindingInformation;
-                        binding.Protocol = bindingProtocol;
-                        site.Bindings.Add(binding);
-                        iisManager.CommitChanges();
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex, "verifyWebsite_Binding");
-            }
-        }
-        //
-        //====================================================================================================
-        //
-        private static void verifyWebsite_VirtualDirectory(CoreController core, Site site, string appName, string virtualFolder, string physicalPath) {
-            try {
-                bool found = false;
-                foreach (Application iisApp in site.Applications) {
-                    if (iisApp.ApplicationPoolName.ToLowerInvariant() == appName.ToLowerInvariant()) {
-                        foreach (VirtualDirectory virtualDirectory in iisApp.VirtualDirectories) {
-                            if (virtualDirectory.Path == virtualFolder) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            //
-                            // -- create each of the folder segments in the virtualFolder
-                            List<string> appVirtualFolderSegments = virtualFolder.Split('/').ToList();
-                            foreach (string appVirtualFolderSegment in appVirtualFolderSegments) {
-                                if (!string.IsNullOrEmpty(appVirtualFolderSegment)) {
-                                    string newDirectoryPath = "/" + appVirtualFolderSegment;
-                                    bool directoryFound = false;
-                                    foreach (VirtualDirectory currentDirectory in iisApp.VirtualDirectories) {
-                                        if (currentDirectory.Path.ToLowerInvariant() == newDirectoryPath.ToLowerInvariant()) {
-                                            directoryFound = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!directoryFound) {
-                                        iisApp.VirtualDirectories.Add(newDirectoryPath, physicalPath);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (found) {
-                        break;
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex, "verifyWebsite_VirtualDirectory");
-            }
-        }
-        //========================================================================
-        // main_RedirectByRecord( iContentName, iRecordID )
-        //   looks up the record
-        //   increments the 'clicks' field and redirects to the 'link' field
-        //   returns true if the redirect happened OK
         //========================================================================
         //
-        public static bool redirectByRecord_ReturnStatus(CoreController core, string contentName, int recordId, string fieldName) {
+        public bool redirectByRecord_ReturnStatus(string contentName, int recordId, string fieldName) {
             string iContentName = GenericController.encodeText(contentName);
             int iRecordId = GenericController.encodeInteger(recordId);
             string iFieldName = GenericController.encodeEmpty(fieldName, "link");
@@ -1214,7 +1026,7 @@ namespace Contensive.Processor.Controllers {
                         // ----- handle content special cases (prevent redirect to deleted records)
                         //
                         NonEncodedLink = GenericController.decodeResponseVariable(EncodedLink);
-                        if(iContentName.ToLowerInvariant()=="content watch") {
+                        if (iContentName.ToLowerInvariant() == "content watch") {
                             //
                             // ----- special case
                             //       if this is a content watch record, check the underlying content for
@@ -1278,7 +1090,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string getBrowserAcceptLanguage(CoreController core) {
+        public string getBrowserAcceptLanguage() {
             try {
                 string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
                 int CommaPosition = GenericController.strInstr(1, AcceptLanguageString, ",");
@@ -1302,6 +1114,229 @@ namespace Contensive.Processor.Controllers {
             }
             return "";
         }
+        //
+        //====================================================================================================
+        //
+        public void flushStream() {
+            if (iisContext != null) {
+                iisContext.Response.Flush();
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Verify a site exists, it not add it, it is does, verify all its settings
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="appName"></param>
+        /// <param name="DomainName"></param>
+        /// <param name="rootPublicFilesPath"></param>
+        /// <param name="defaultDocOrBlank"></param>
+        /// '
+        public void verifySite(string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
+            try {
+                verifyAppPool(appName);
+                verifyWebsite(appName, DomainName, rootPublicFilesPath, appName);
+            } catch (Exception ex) {
+                LogController.logError(core, ex, "verifySite");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// verify the application pool. If it exists, update it. If not, create it
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="poolName"></param>
+        public void verifyAppPool(string poolName) {
+            try {
+                using (ServerManager serverManager = new ServerManager()) {
+                    bool poolFound = false;
+                    ApplicationPool appPool = null;
+                    foreach (ApplicationPool appPoolWithinLoop in serverManager.ApplicationPools) {
+                        if (appPoolWithinLoop.Name == poolName) {
+                            poolFound = true;
+                            break;
+                        }
+                    }
+                    if (!poolFound) {
+                        appPool = serverManager.ApplicationPools.Add(poolName);
+                    } else {
+                        appPool = serverManager.ApplicationPools[poolName];
+                    }
+                    appPool.ManagedRuntimeVersion = "v4.0";
+                    appPool.Enable32BitAppOnWin64 = true;
+                    appPool.ManagedPipelineMode = ManagedPipelineMode.Integrated;
+                    serverManager.CommitChanges();
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex, "verifyAppPool");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// verify the website. If it exists, update it. If not, create it
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="appName"></param>
+        /// <param name="domainName"></param>
+        /// <param name="phyPath"></param>
+        /// <param name="appPool"></param>
+        public void verifyWebsite(string appName, string domainName, string phyPath, string appPool) {
+            try {
+
+                using (ServerManager iisManager = new ServerManager()) {
+                    //
+                    // -- verify the site exists
+                    bool found = false;
+                    foreach (Site siteWithinLoop in iisManager.Sites) {
+                        if (siteWithinLoop.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        iisManager.Sites.Add(appName, "http", "*:80:" + appName, phyPath);
+                    }
+                    Site site = iisManager.Sites[appName];
+                    //
+                    // -- verify the domain binding
+                    verifyWebsiteBinding(site, domainName);
+                    //
+                    // -- verify the application pool
+                    site.ApplicationDefaults.ApplicationPoolName = appPool;
+                    foreach (Application iisApp in site.Applications) {
+                        iisApp.ApplicationPoolName = appPool;
+                    }
+                    //
+                    // -- verify the cdn virtual directory (if configured)
+                    string cdnFilesPrefix = core.appConfig.cdnFileUrl;
+                    if (cdnFilesPrefix.IndexOf("://", StringComparison.InvariantCulture) < 0) {
+                        verifyWebsiteVirtualDirectory(site, appName, cdnFilesPrefix, core.appConfig.localFilesPath);
+                    }
+                    //
+                    // -- commit any changes
+                    iisManager.CommitChanges();
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex, "verifyWebsite");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Verify the binding
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="site"></param>
+        /// <param name="bindingInformation"></param>
+        /// <param name="bindingProtocol"></param>
+        private void verifyWebsiteBinding(Site site, string domainName) {
+            try {
+                string bindingInformation = "*:80:" + domainName;
+                string bindingProtocol = "http";
+                using (ServerManager iisManager = new ServerManager()) {
+                    bool found = false;
+                    foreach (Binding bindingWithinLoop in site.Bindings) {
+                        if ((bindingWithinLoop.BindingInformation == bindingInformation) && (bindingWithinLoop.Protocol == bindingProtocol)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        Binding binding = site.Bindings.CreateElement();
+                        binding.BindingInformation = bindingInformation;
+                        binding.Protocol = bindingProtocol;
+                        site.Bindings.Add(binding);
+                        iisManager.CommitChanges();
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex, "verifyWebsite_Binding");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// verify a binding exists for the 
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="appName"></param>
+        /// <param name="domainName"></param>
+        public void verifyWebsiteBinding(string appName, string domainName) {
+            using (ServerManager iisManager = new ServerManager()) {
+                //
+                // -- verify the site exists
+                bool found = false;
+                foreach (Site siteWithinLoop in iisManager.Sites) {
+                    if (siteWithinLoop.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    Site site = iisManager.Sites[appName];
+                    //
+                    // -- verify the domain binding
+                    verifyWebsiteBinding(site, domainName);
+                    //
+                    // -- commit any changes
+                    iisManager.CommitChanges();
+                }
+            }
+        }
+        //
+        //====================================================================================================
+        //
+        public void verifyWebsiteVirtualDirectory(  Site site, string appName, string virtualFolder, string physicalPath) {
+            try {
+                bool found = false;
+                foreach (Application iisApp in site.Applications) {
+                    if (iisApp.ApplicationPoolName.ToLowerInvariant() == appName.ToLowerInvariant()) {
+                        foreach (VirtualDirectory virtualDirectory in iisApp.VirtualDirectories) {
+                            if (virtualDirectory.Path == virtualFolder) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            //
+                            // -- create each of the folder segments in the virtualFolder
+                            List<string> appVirtualFolderSegments = virtualFolder.Split('/').ToList();
+                            foreach (string appVirtualFolderSegment in appVirtualFolderSegments) {
+                                if (!string.IsNullOrEmpty(appVirtualFolderSegment)) {
+                                    string newDirectoryPath = "/" + appVirtualFolderSegment;
+                                    bool directoryFound = false;
+                                    foreach (VirtualDirectory currentDirectory in iisApp.VirtualDirectories) {
+                                        if (currentDirectory.Path.ToLowerInvariant() == newDirectoryPath.ToLowerInvariant()) {
+                                            directoryFound = true;
+                                            break;
+                                        }
+                                    }
+                                    if (!directoryFound) {
+                                        iisApp.VirtualDirectories.Add(newDirectoryPath, physicalPath);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (found) {
+                        break;
+                    }
+                }
+            } catch (Exception ex) {
+                LogController.logError(core, ex, "verifyWebsite_VirtualDirectory");
+            }
+        }
+        //
+        // main_RedirectByRecord( iContentName, iRecordID )
+        //   looks up the record
+        //   increments the 'clicks' field and redirects to the 'link' field
+        //   returns true if the redirect happened OK
+        //
+        //========================================================================
+        //
         public void clearResponseBuffer() {
             iisContext.Response.ClearHeaders();
             bufferRedirect = "";

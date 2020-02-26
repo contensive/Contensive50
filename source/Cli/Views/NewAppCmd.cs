@@ -207,7 +207,7 @@ namespace Contensive.CLI {
                 //
                 using (CPClass cp = new CPClass(appName)) {
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Verify website.");
-                    Processor.Controllers.WebServerController.verifySite(cp.core, appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
+                    cp.core.webServer.verifySite(appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
                     //
                     Processor.Controllers.LogController.logInfo(cp.core, "Install iisDefaultSite.");
                     var tempFiles = new Processor.Controllers.FileController(cp.core,cp.TempFiles.PhysicalFilePath);

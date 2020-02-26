@@ -25,7 +25,7 @@ namespace Contensive.BaseClasses {
         /// <param name="url"></param>
         /// <param name="requestArguments"></param>
         /// <returns></returns>
-        public abstract string Post(string url, List<KeyValuePair<string, string>> requestArguments);
+        public abstract string Post(string url, System.Collections.Specialized.NameValueCollection requestArguments);
         //
         // ====================================================================================================
         /// <summary>
@@ -34,7 +34,7 @@ namespace Contensive.BaseClasses {
         /// <param name="url"></param>
         /// <param name="entity"></param>
         /// <returns></returns>
-        public abstract string Post(string url, string entity);
+        public abstract string Post(string url);
     }
 }
 
