@@ -304,23 +304,15 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=======================================================================================
-        //   IIS Reset
-        //
-        //   Must be called from a process running as admin
-        //   This can be done using the command queue, which kicks off the ccCmd process from the Server
-        //
+        /// <summary>
+        /// IIS Reset, must be called from an elevated process
+        /// </summary>
         public void reset() {
             try {
-                string LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
-                string Cmd = "IISReset.exe";
-                string arg = "/restart >> \"" + LogFilename + "\"";
-                runProcess(core, Cmd, arg, true);
-                string logMessage = core.privateFiles.readFileText(LogFilename);
-                logMessage = strReplace(logMessage, Environment.NewLine, " ");
-                logMessage = strReplace(logMessage, "\r", " ");
-                logMessage = strReplace(logMessage, "\n", " ");
-                LogController.logInfo(core, logMessage);
-                core.privateFiles.deleteFile(LogFilename);
+                string logFilename = core.tempFiles.localAbsRootPath + "iisreset-" + getRandomInteger(core).ToString() + ".Log";
+                string cmd = "IISReset.exe";
+                string arg = "";
+                string stdOut = runProcess(core, cmd, arg, true);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -335,18 +327,15 @@ namespace Contensive.Processor.Controllers {
         //
         public void stop() {
             try {
-                string Cmd = null;
-                string LogFilename = null;
-                string Copy = null;
-                //
-                LogFilename = "Temp\\" + GenericController.encodeText(GenericController.getRandomInteger(core)) + ".Log";
-                Cmd = "%comspec% /c IISReset /stop >> \"" + LogFilename + "\"";
-                runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFileText(LogFilename);
-                core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.strReplace(Copy, "\r", "\\n");
-                Copy = GenericController.strReplace(Copy, "\n", "\\n");
+                string logFilename = core.tempFiles.localAbsRootPath + "iis-stop-" + getRandomInteger(core).ToString() + ".Log";
+                string cmd = "%comspec% /c IISReset /stop >> \"" + logFilename + "\"";
+                runProcess(core, cmd, "", true);
+                string logMessage = core.tempFiles.readFileText(logFilename);
+                core.tempFiles.deleteFile(logFilename);
+                logMessage = strReplace(logMessage, Environment.NewLine, " ");
+                logMessage = strReplace(logMessage, "\r", " ");
+                logMessage = strReplace(logMessage, "\n", " ");
+                LogController.logInfo(core, "iis stop, stdout [" + logMessage + "]");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -362,17 +351,15 @@ namespace Contensive.Processor.Controllers {
         //
         public void start() {
             try {
-                string Cmd = null;
-                string LogFilename = core.privateFiles.localAbsRootPath + "iisResetPipe.log";
-                string Copy = null;
-                //
-                Cmd = "%comspec% /c IISReset /start >> \"" + LogFilename + "\"";
-                runProcess(core, Cmd, "", true);
-                Copy = core.privateFiles.readFileText(LogFilename);
-                core.privateFiles.deleteFile(LogFilename);
-                Copy = GenericController.strReplace(Copy, Environment.NewLine, "\\n");
-                Copy = GenericController.strReplace(Copy, "\r", "\\n");
-                Copy = GenericController.strReplace(Copy, "\n", "\\n");
+                string logFilename = core.tempFiles.localAbsRootPath + "iis-start-" + getRandomInteger(core).ToString() + ".Log";
+                string cmd = "%comspec% /c IISReset /start >> \"" + logFilename + "\"";
+                runProcess(core, cmd, "", true);
+                string logMessage = core.tempFiles.readFileText(logFilename);
+                core.tempFiles.deleteFile(logFilename);
+                logMessage = GenericController.strReplace(logMessage, Environment.NewLine, " ");
+                logMessage = GenericController.strReplace(logMessage, "\r", " ");
+                logMessage = GenericController.strReplace(logMessage, "\n", " ");
+                LogController.logInfo(core, "iis start, stdout [" + logMessage + "]");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -382,17 +369,15 @@ namespace Contensive.Processor.Controllers {
         //=======================================================================================
         // recycle iis process
         //
-        public void recycle(string appName) {
+        public void recycle() {
             try {
-                ServerManager serverManager = null;
-                ApplicationPoolCollection appPoolColl = null;
-                //
-                serverManager = new ServerManager();
-                appPoolColl = serverManager.ApplicationPools;
+                ServerManager serverManager = new ServerManager();
+                ApplicationPoolCollection appPoolColl = serverManager.ApplicationPools;
                 foreach (ApplicationPool appPool in appPoolColl) {
-                    if (appPool.Name.ToLowerInvariant() == appName.ToLowerInvariant()) {
+                    if (appPool.Name.ToLowerInvariant() == core.appConfig.name.ToLowerInvariant()) {
                         if (appPool.Start() == ObjectState.Started) {
                             appPool.Recycle();
+                            LogController.logInfo(core, "iis recycle, app [" + core.appConfig.name + "]");
                         }
                     }
                 }
@@ -752,11 +737,10 @@ namespace Contensive.Processor.Controllers {
         // Read a cookie to the stream
         //
         public string getRequestCookie(string CookieName) {
-            string cookieValue = "";
             if (requestCookies.ContainsKey(CookieName)) {
-                cookieValue = requestCookies[CookieName].value;
+                return requestCookies[CookieName].value;
             }
-            return cookieValue;
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -1289,7 +1273,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void verifyWebsiteVirtualDirectory(  Site site, string appName, string virtualFolder, string physicalPath) {
+        public void verifyWebsiteVirtualDirectory(Site site, string appName, string virtualFolder, string physicalPath) {
             try {
                 bool found = false;
                 foreach (Application iisApp in site.Applications) {

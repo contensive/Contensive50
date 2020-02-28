@@ -3295,16 +3295,16 @@
       <field name="caption">Site Managers</field>
     </record>
     <record content="add-on categories" guid="{3e6055bf-7e7c-41fc-94b1-1d1a81c2842b}" name="Applications">
-      <field name="iconhtml"><![CDATA[<div class="fas fa-cogs"></div>]]></field>
+      <field name="iconhtml"><![CDATA[<i class="fas fa-cogs"></i>]]></field>
     </record>
     <record content="add-on categories" guid="{bc311ad8-fcae-4228-800d-e432733fdf3e}" name="Containers">
-      <field name="iconhtml"><![CDATA[<div class="fas fa-columns"></div>]]></field>
+      <field name="iconhtml"><![CDATA[<i class="fas fa-th-large"></i>]]></field>
     </record>
     <record content="add-on categories" guid="{03b8f353-788c-4bdc-a30d-d2051b59d851}" name="Content">
-      <field name="iconhtml"><![CDATA[<p><i class="fas fa-file-alt"></i></p>]]></field>
+      <field name="iconhtml"><![CDATA[<i class="fas fa-file-alt"></i>]]></field>
     </record>
     <record content="add-on categories" guid="{63973d69-1d50-41ba-9986-c421db10a04d}" name="Extras">
-      <field name="iconhtml"><![CDATA[<div class="fas fa-cog"></div>]]></field>
+      <field name="iconhtml"><![CDATA[<i class="fas fa-cog"></i>]]></field>
     </record>
   </data>
   <ImportCollection name="Add-on Manager">{A3E58089-74FC-4FB3-B847-0AD22B51AA72}</ImportCollection>

@@ -1,5 +1,7 @@
 ﻿
+using Contensive.Processor;
 using System;
+using System.Linq;
 
 namespace Contensive.CLI {
     //
@@ -9,7 +11,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static readonly string  helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--iisrecycle"
             + Environment.NewLine + "    Runs an iis recycle, restarting each appPool selected. Use -a appName first to limit the recycle to one site. Requires elevated permissions."
@@ -19,13 +21,19 @@ namespace Contensive.CLI {
         /// <summary>
         /// manage the task scheduler service
         /// </summary>
-        public static void execute(Contensive.Processor.CPClass cpServer, string appName) {
+        public static void execute(CPClass cpServer, string appName) {
             if (string.IsNullOrEmpty(appName)) {
-                foreach (var kvp in cpServer.core.serverConfig.apps) {
-                    cpServer.core.webServer.recycle(kvp.Key);
+                //
+                // -- use the first app
+                if (cpServer.core.serverConfig.apps.Count > 0) {
+                    using (CPClass cp = new CPClass(cpServer.core.serverConfig.apps.First().Key)) {
+                        cp.core.webServer.recycle();
+                    }
                 }
             } else {
-                cpServer.core.webServer.recycle(appName);
+                using (var cp = new CPClass(appName)) {
+                    cp.core.webServer.recycle();
+                }
             }
         }
     }

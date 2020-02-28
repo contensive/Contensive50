@@ -1286,15 +1286,15 @@ namespace Contensive.Processor.Controllers {
             using (Process p = new Process()) {
                 p.StartInfo.FileName = Cmd;
                 p.StartInfo.Arguments = Arguments;
-                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.UseShellExecute = true;
                 p.StartInfo.CreateNoWindow = true;
                 p.StartInfo.ErrorDialog = false;
                 p.StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
-                p.StartInfo.RedirectStandardOutput = WaitForReturn;
+                //p.StartInfo.RedirectStandardOutput = WaitForReturn;
                 p.Start();
                 if (WaitForReturn) {
                     p.WaitForExit(1000 * 60 * 5);
-                    return p.StandardOutput.ReadToEnd();
+                    //return p.StandardOutput.ReadToEnd();
                 }
             }
             return "";

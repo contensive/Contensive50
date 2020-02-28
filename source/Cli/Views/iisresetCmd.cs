@@ -1,5 +1,7 @@
 ﻿
+using Contensive.Processor;
 using System;
+using System.Linq;
 
 namespace Contensive.CLI {
     //
@@ -9,7 +11,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static readonly string  helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--iisreset"
             + Environment.NewLine + "    Runs an iisreset, stopping and restarted the webserver (all sites). Requires elevated permissions."
@@ -20,7 +22,23 @@ namespace Contensive.CLI {
         /// manage the task scheduler service
         /// </summary>
         public static void execute(Contensive.Processor.CPClass cpServer) {
-            cpServer.core.webServer.reset();
+            //
+            // -- use the first app
+            if (cpServer.core.serverConfig.apps.Count > 0) {
+
+
+                //string path = Environment.GetFolderPath(Environment.SpecialFolder.System) + @"\iisreset.exe";
+                //System.Diagnostics.ProcessStartInfo info = new System.Diagnostics.ProcessStartInfo(path) {
+                //    UseShellExecute = true,
+                //     CreateNoWindow = true,
+                //     WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden
+                //};
+                //System.Diagnostics.Process.Start(info);
+                //
+                using (CPClass cp = new CPClass(cpServer.core.serverConfig.apps.First().Key)) {
+                    cp.core.webServer.reset();
+                }
+            }
         }
     }
 }
