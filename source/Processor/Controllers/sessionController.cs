@@ -480,7 +480,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- new visit, update the persistant visitor cookie
                         if (trackVisits) {
-                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, encodeDate(resultSessionContext.visit.startTime)), encodeDate(resultSessionContext.visit.startTime).AddYears(1), "", appRootPath, false);
+                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, encodeDate(resultSessionContext.visit.startTime).AddYears(1)), encodeDate(resultSessionContext.visit.startTime).AddYears(1), "", appRootPath, false);
                         }
                         //
                         // -- OnNewVisit Add-on call
@@ -581,7 +581,7 @@ namespace Contensive.Processor.Controllers {
                     if (user_changes) {
                         resultSessionContext.user.save(core.cpParent, 0, true);
                     }
-                    string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, encodeDate(resultSessionContext.visit.lastVisitTime));
+                    string visitCookieNew = SecurityController.encodeToken(core, resultSessionContext.visit.id, encodeDate(resultSessionContext.visit.lastVisitTime).AddMinutes(60));
                     if (trackVisits && (visitCookie != visitCookieNew)) {
                         visitCookie = visitCookieNew;
                     }
@@ -599,7 +599,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Write Visit Cookie
                 LogController.logTrace(core, "write visit cookie");
-                visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime);
+                visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime.AddMinutes(60));
                 // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
                 core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
             } catch (Exception ex) {

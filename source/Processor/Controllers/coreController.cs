@@ -60,7 +60,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// set the datetime to be used for dateTimeNowMockable. set to null to use the actual datetime.now.
         /// </summary>
-        public void mockDateTimeNow( DateTime? mockNow) {
+        public void mockDateTimeNow(DateTime? mockNow) {
             _mockNow = mockNow;
         }
         private DateTime? _mockNow;
@@ -71,7 +71,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public DateTime dateTimeNowMockable {
             get {
-                if(_mockNow!=null) {
+                if (_mockNow != null) {
                     return (DateTime)_mockNow;
                 }
                 return DateTime.Now;
@@ -858,7 +858,7 @@ namespace Contensive.Processor.Controllers {
                                         pagetitle = doc.htmlMetaContent_TitleList[0].content;
                                     }
                                     string sql = "insert into ccviewings ("
-                                        + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,pagetime,Active,RecordID,ExcludeFromAnalytics,pagetitle"
+                                        + "Name,VisitId,MemberID,Host,Path,Page,QueryString,Form,Referer,DateAdded,StateOK,pagetime,Active,RecordID,ExcludeFromAnalytics,pagetitle,ccguid"
                                         + ")values("
                                         + " " + DbController.encodeSQLText(ViewingName)
                                         + "," + session.visit.id.ToString()
@@ -875,7 +875,8 @@ namespace Contensive.Processor.Controllers {
                                         + ",1"
                                         + "," + PageId.ToString()
                                         + "," + DbController.encodeSQLBoolean(webServer.pageExcludeFromAnalytics)
-                                        + "," + DbController.encodeSQLText(pagetitle);
+                                        + "," + DbController.encodeSQLText(pagetitle)
+                                        + "," + DbController.encodeSQLText(doc.docGuid);
                                     sql += ");";
                                     Task.Run(() => db.executeNonQueryAsync(sql));
                                 }

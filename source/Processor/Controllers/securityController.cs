@@ -24,13 +24,13 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="keyInteger"></param>
-        /// <param name="keyDate"></param>
+        /// <param name="expiresDate"></param>
         /// <returns></returns>
-        public static string encodeToken(CoreController core, int keyInteger, DateTime keyDate) {
+        public static string encodeToken(CoreController core, int keyInteger, DateTime expiresDate) {
             try {
-                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + keyDate.ToString("yyyy-MM-dd'T'HH:mm:ss"));
+                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + expiresDate.ToString("yyyy-MM-dd'T'HH:mm:ss"));
             } catch (Exception ex) {
-                LogController.logError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + keyDate + "]");
+                LogController.logError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + expiresDate + "]");
                 return "";
             }
         }

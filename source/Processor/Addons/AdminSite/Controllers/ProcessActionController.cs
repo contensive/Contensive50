@@ -116,10 +116,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             using (var csData = new CsModel(cp.core)) {
                                                 csData.openRecord("Group Email", adminData.editRecord.id);
                                                 if (!csData.ok()) {
-                                                } else if (csData.getText("FromAddress") == "") {
-                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
-                                                } else if (csData.getText("Subject") == "") {
-                                                    Processor.Controllers.ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
+                                                } else if (string.IsNullOrWhiteSpace(csData.getText("FromAddress"))) {
+                                                    ErrorController.addUserError(cp.core, "A 'From Address' is required before sending an email.");
+                                                } else if (string.IsNullOrWhiteSpace(csData.getText("Subject"))) {
+                                                    ErrorController.addUserError(cp.core, "A 'Subject' is required before sending an email.");
                                                 } else {
                                                     csData.set("submitted", true);
                                                     csData.set("ConditionID", 0);
@@ -185,7 +185,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     break;
                                 case Constants.AdminActionSendEmailTest:
                                     if (adminData.editRecord.userReadOnly) {
-                                        Processor.Controllers.ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
+                                        ErrorController.addUserError(cp.core, "Your request was blocked because the record you specified is now locked by another authcontext.user.");
                                     } else {
                                         //
                                         adminData.loadEditRecord(cp.core);
@@ -274,8 +274,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 return;
+            } catch (GenericException) {
             } catch (Exception ex) {
-                Processor.Controllers.ErrorController.addUserError(cp.core, "There was an unknown error processing this page at " + cp.core.doc.profileStartTime + ". Please try again, Or report this error To the site administrator.");
+                ErrorController.addUserError(cp.core, "There was an unknown error processing this page at " + cp.core.doc.profileStartTime + ". Please try again, Or report this error To the site administrator.");
                 LogController.logError(cp.core, ex);
             }
         }
@@ -448,7 +449,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (!cp.core.doc.userErrorList.Count.Equals(0)) {
                     adminData.adminForm = adminData.adminSourceForm;
                 }
-                adminData.admin_Action = Constants.AdminActionNop; 
+                adminData.admin_Action = Constants.AdminActionNop;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }
@@ -739,7 +740,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // -- Log Activity for changes to people and organizattions
                                 if (fieldChanged) {
                                     if (adminData.adminContent.tableName.Equals("cclibraryfiles")) {
-                                        if (cp.core.docProperties.getText("filename") != "") {
+                                        if (!string.IsNullOrWhiteSpace(cp.core.docProperties.getText("filename"))) {
                                             csData.set("altsizelist", "");
                                         }
                                     }
@@ -1081,10 +1082,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (adminData.adminContent.allowContentTracking && (!editRecord.userReadOnly)) {
                     //
                     // ----- Set default content watch link label
-                    if ((adminData.contentWatchListIDCount > 0) && (adminData.contentWatchLinkLabel == "")) {
-                        if (editRecord.menuHeadline != "") {
+                    if ((adminData.contentWatchListIDCount > 0) && (string.IsNullOrWhiteSpace(adminData.contentWatchLinkLabel))) {
+                        if (!string.IsNullOrWhiteSpace(editRecord.menuHeadline)) {
                             adminData.contentWatchLinkLabel = editRecord.menuHeadline;
-                        } else if (editRecord.nameLc != "") {
+                        } else if (!string.IsNullOrWhiteSpace(editRecord.nameLc)) {
                             adminData.contentWatchLinkLabel = editRecord.nameLc;
                         } else {
                             adminData.contentWatchLinkLabel = "Click Here";

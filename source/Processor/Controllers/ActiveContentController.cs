@@ -73,7 +73,7 @@ namespace Contensive.Processor.Controllers {
                 // Fixup Anchor Query (additional AddonOptionString pairs to add to the end)
                 string AnchorQuery = "";
                 if (addLinkAuthenticationToAllLinks && (deprecated_personalizationPeopleId != 0)) {
-                    AnchorQuery += "&eid=" + encodeURL(SecurityController.encodeToken(core, deprecated_personalizationPeopleId, core.dateTimeNowMockable));
+                    AnchorQuery += "&eid=" + encodeURL(SecurityController.encodeToken(core, deprecated_personalizationPeopleId, core.dateTimeNowMockable.AddDays(30)));
                 }
                 //
                 if (!string.IsNullOrEmpty(queryStringToAppendToAllLinks)) {

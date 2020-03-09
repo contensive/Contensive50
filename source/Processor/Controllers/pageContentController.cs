@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Add cookie test
                     bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.session.visit.pageVisits == 1);
                     if (AllowCookieTest) {
-                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + SecurityController.encodeToken(core, core.session.visit.id, core.doc.profileStartTime) + "')};", "Cookie Test");
+                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + SecurityController.encodeToken(core, core.session.visit.id, core.doc.profileStartTime.AddSeconds(30)) + "')};", "Cookie Test");
                     }
                     //
                     // -- Contensive Form Page Processing
@@ -2049,7 +2049,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 string innerHtml = ""
                     + HtmlController.inputHidden("ContensiveFormPageID", FormPageId)
-                    + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime))
+                    + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime.AddMinutes(30)))
                     + pageForm.preRepeat
                     + RepeatBody
                     + pageForm.postRepeat;

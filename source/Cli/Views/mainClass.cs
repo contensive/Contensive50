@@ -238,6 +238,16 @@ namespace Contensive.CLI {
                                 }
                                 VerifyBasicWebsiteCmd.execute(cpServer, appName);
                                 return;
+                            case "--addadmin":
+                                //
+                                // -- add an administrator
+                                AddAdminCmd.execute(cpServer, 
+                                    appName, 
+                                    getNextCmdArg(args, ref argPtr),
+                                    getNextCmdArg(args, ref argPtr)
+                                );
+                                break;
+
                             case "":
                                 //
                                 // -- empty command, done

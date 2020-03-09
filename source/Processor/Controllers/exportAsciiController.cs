@@ -72,7 +72,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 while (csData.ok()) {
                                     if (!(csData.getBoolean("Developer"))) {
-                                        Copy = SecurityController.encodeToken(core, csData.getInteger("ID"), core.doc.profileStartTime);
+                                        Copy = SecurityController.encodeToken(core, csData.getInteger("ID"), core.doc.profileStartTime.AddDays(30));
                                         sb.Append("\"" + Copy + "\"");
                                         Delimiter = ",";
                                         FieldNameVariant = csData.getFirstFieldName();

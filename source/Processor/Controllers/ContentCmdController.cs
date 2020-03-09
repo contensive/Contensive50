@@ -177,7 +177,7 @@ namespace Contensive.Processor.Controllers {
     //           setOuter findLocation replace
     //           user firstname
     //           site propertyname
-    public class ContentCmdController {
+    public static class ContentCmdController {
         //
         //============================================================================================
         /// <summary>
@@ -191,6 +191,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context) {
             try {
+                //
+                // -- work-around for users putting content-cmds in with a wysiwyg editor
+                src = src.replace("&nbsp;", " ", StringComparison.InvariantCultureIgnoreCase);
                 //
                 // -- exit if no src to process
                 if (string.IsNullOrWhiteSpace(src)) { return src; }
@@ -247,7 +250,7 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 } while (escape == "\\");
                                 int posNextQuote = getFirstNonZeroInteger(posSq, posDq);
-                                if (posNextQuote==0) {
+                                if (posNextQuote == 0) {
                                     notFound = false;
                                 } else {
                                     //
@@ -278,7 +281,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // no cmd found, add from the last ptr to the end
                         //
-                        result.Append( src.Substring(ptrLast - 1));
+                        result.Append(src.Substring(ptrLast - 1));
                         Ptr = -1;
                     } else {
                         //
@@ -292,7 +295,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             cmdResult = contentReplaceEscapeStart + Cmd + contentReplaceEscapeEnd;
                         }
-                        result.Append( src.Substring(ptrLast - 1, posOpen - ptrLast) + cmdResult);
+                        result.Append(src.Substring(ptrLast - 1, posOpen - ptrLast) + cmdResult);
                         Ptr = posClose + 2;
                     }
                     ptrLast = Ptr;
@@ -310,7 +313,6 @@ namespace Contensive.Processor.Controllers {
         /// convert a single command in the command formats to call the execute
         /// </summary>
         private static string executeSingleCommand(CoreController core, string cmdSrc, CPUtilsBaseClass.addonContext Context) {
-            string returnValue = "";
             try {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
@@ -691,7 +693,7 @@ namespace Contensive.Processor.Controllers {
                                     string addonName = "";
                                     Dictionary<string, string> addonArgDict = new Dictionary<string, string>();
                                     foreach (KeyValuePair<string, object> kvp in cmdArgDef) {
-                                        if( kvp.Key.ToLowerInvariant().Equals("addon")) {
+                                        if (kvp.Key.ToLowerInvariant().Equals("addon")) {
                                             addonName = kvp.Value.ToString();
                                         } else {
                                             addonArgDict.Add(kvp.Key, kvp.Value.ToString());
@@ -749,12 +751,11 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                returnValue = CmdAccumulator;
+                return CmdAccumulator;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnValue;
         }
 
 

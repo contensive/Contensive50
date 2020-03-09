@@ -91,23 +91,20 @@ namespace Contensive.Processor.Controllers {
             var group = DbBaseModel.create<GroupModel>(core.cpParent, groupId);
             if (group == null) {
                 //
-                // -- invalid groupId
-                LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
+                // -- inactive or invalid groupId
+                //LogController.logError(core, new GenericException("addUser called with invalid groupId [" + groupId + "]"));
                 return;
             }
-            PersonModel user = null;
             if (userId.Equals(0)) {
                 //
                 // -- default to keyboard user
-                user = DbBaseModel.create<PersonModel>(core.cpParent, core.session.user.id);
-                addUser(core, group, user, dateExpires);
-                return;
+                userId = core.session.user.id;
             }
-            user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
+            PersonModel user = DbBaseModel.create<PersonModel>(core.cpParent, userId);
             if (user == null) {
                 //
-                // -- invalid userId
-                LogController.logError(core, new GenericException("addUser called with invalid userId [" + userId + "]"));
+                // -- inactive or invalid userId
+                //LogController.logError(core, new GenericException("addUser called with invalid userId [" + userId + "]"));
                 return;
             }
             addUser(core, group, user, dateExpires);
