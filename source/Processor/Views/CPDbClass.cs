@@ -136,7 +136,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetRemoteQueryKey(string sql)
-            => GetRemoteQueryKey(sql, Constants.sqlPageSizeDefault);
+            => GetRemoteQueryKey(sql, DbController.sqlPageSizeDefault);
         //
         //====================================================================================================
         //
@@ -376,7 +376,7 @@ namespace Contensive.Processor {
         //
         [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override string GetRemoteQueryKey(string sql, string ignoreDataSourceName)
-            => GetRemoteQueryKey(sql, Constants.sqlPageSizeDefault);
+            => GetRemoteQueryKey(sql, DbController.sqlPageSizeDefault);
         //
         [Obsolete("Deprecated. Use methods without explicit datasource.", false)]
         public override void ExecuteNonQuery(string sql, string ignoreDataSourceName) {

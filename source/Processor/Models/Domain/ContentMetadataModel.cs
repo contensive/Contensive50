@@ -915,7 +915,7 @@ namespace Contensive.Processor.Models.Domain {
                             { "CAPTION", DbController.encodeSQLText(fieldMetadata.caption) },
                             { "ReadOnly", DbController.encodeSQLBoolean(fieldMetadata.readOnly) },
                             { "REQUIRED", DbController.encodeSQLBoolean(fieldMetadata.required) },
-                            { "TEXTBUFFERED", SQLFalse },
+                            { "TEXTBUFFERED", DbController.SQLFalse },
                             { "PASSWORD", DbController.encodeSQLBoolean(fieldMetadata.password) },
                             { "EDITSORTPRIORITY", DbController.encodeSQLNumber(fieldMetadata.editSortPriority) },
                             { "ADMINONLY", DbController.encodeSQLBoolean(fieldMetadata.adminOnly) },

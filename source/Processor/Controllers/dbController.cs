@@ -35,7 +35,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// default page size. Page size is how many records are read in a single fetch.
         /// </summary>
-        public const int pageSizeDefault = 9999;
+        internal const int sqlPageSizeDefault = 9999999;
+        //
+        //========================================================================
+        // Sql/Db
+        //
+        internal const string SQLTrue = "1";
+        internal const string SQLFalse = "0";
         //
         /// <summary>
         /// set true when configured and tested - else db calls are skipped
@@ -144,7 +150,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        /// <param name="startRecord"></param>
+        /// <param name="startRecord">0 based start record</param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
         public DataTable executeQuery(string sql, int startRecord, int maxRecords) {
@@ -154,15 +160,15 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Execute a query (returns data)
+        /// Execute a query (returns data). max records 10M
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        /// <param name="startRecord"></param>
+        /// <param name="startRecord">0 based start record</param>
         /// <returns></returns>
         public DataTable executeQuery(string sql, int startRecord) {
             int tempVar = 0;
-            return executeQuery(sql, startRecord, Constants.sqlPageSizeDefault, ref tempVar);
+            return executeQuery(sql, startRecord, DbController.sqlPageSizeDefault, ref tempVar);
         }
         //
         //====================================================================================================
@@ -173,7 +179,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public DataTable executeQuery(string sql) {
             int tempVar = 0;
-            return executeQuery(sql, 0, Constants.sqlPageSizeDefault, ref tempVar);
+            return executeQuery(sql, 0, DbController.sqlPageSizeDefault, ref tempVar);
         }
         //
         //====================================================================================================
@@ -182,8 +188,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        /// <param name="startRecord"></param>
-        /// <param name="maxRecords"></param>
+        /// <param name="startRecord">0 based start record</param>
+        /// <param name="maxRecords">required. max number of records the client will support.</param>
         /// <param name="recordsReturned"></param>
         /// <returns></returns>
         public DataTable executeQuery(string sql, int startRecord, int maxRecords, ref int recordsReturned) {
@@ -219,7 +225,8 @@ namespace Contensive.Processor.Controllers {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;
                         cmdSQL.Connection = connSQL;
-                        using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
+                        cmdSQL.CommandTimeout = sqlCommandTimeout;
+                        using (SqlDataAdapter adptSQL = new SqlDataAdapter(cmdSQL)) {
                             recordsReturned = adptSQL.Fill(startRecord, maxRecords, returnData);
                         }
                     }
@@ -244,8 +251,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sql"></param>
         public void executeNonQuery(string sql) {
-            int tempVar = 0;
-            executeNonQuery(sql, ref tempVar);
+            int recordsAffectedIgnore = 0;
+            executeNonQuery(sql, ref recordsAffectedIgnore);
         }
         //
         //====================================================================================================
@@ -265,6 +272,7 @@ namespace Contensive.Processor.Controllers {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;
                         cmdSQL.Connection = connSQL;
+                        cmdSQL.CommandTimeout = sqlCommandTimeout;
                         recordsAffected = cmdSQL.ExecuteNonQuery();
                     }
                 }
@@ -298,6 +306,7 @@ namespace Contensive.Processor.Controllers {
                         cmdSQL.CommandType = CommandType.Text;
                         cmdSQL.CommandText = sql;
                         cmdSQL.Connection = connSQL;
+                        cmdSQL.CommandTimeout = sqlCommandTimeout;
                         result = await cmdSQL.ExecuteNonQueryAsync();
                     }
                 }
@@ -451,7 +460,7 @@ namespace Contensive.Processor.Controllers {
                     SQL += " ORDER BY " + sortFieldList;
                 }
                 //SQL &= ";"
-                returnDataTable = executeQuery(SQL, (pageNumber - 1) * pageSize, pageSize);
+                returnDataTable = executeQuery(SQL, getStartRecord( pageSize, pageNumber) , pageSize);
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
@@ -1561,6 +1570,17 @@ namespace Contensive.Processor.Controllers {
                 if (dt.Rows.Count == 0) { return 0; }
                 return getDataRowFieldInteger(dt.Rows[0], "id");
             }
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// calculate startRecord (0-based) from pagesize and pagenumber (1 based). Required to convert older 1-based methods to current 0-based methods
+        /// </summary>
+        /// <param name="pageSize">records per page</param>
+        /// <param name="pageNumber">1-based page number</param>
+        /// <returns></returns>
+        public static int getStartRecord( int pageSize, int pageNumber ) {
+            return pageSize * (pageNumber - 1);
         }
         /// <summary>
         /// model for simplest generic recorsd

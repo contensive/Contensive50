@@ -652,7 +652,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 int TestInteger = core.docProperties.getInteger("indexGoToPage");
                 if (TestInteger > 0) {
                     IndexConfig.pageNumber = TestInteger;
-                    IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                    IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                 } else {
                     //
                     // ----- Read filter changes and First/Next/Previous from form
@@ -664,13 +664,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                             //
                             // Force to first page
                             IndexConfig.pageNumber = 1;
-                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber)  ;
                             break;
                             case ButtonNext:
                             //
                             // Go to next page
                             IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
-                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                             break;
                             case ButtonPrevious:
                             //
@@ -679,13 +679,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (IndexConfig.pageNumber <= 0) {
                                 IndexConfig.pageNumber = 1;
                             }
-                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                             break;
                             case ButtonFind:
                             //
                             // Find (change search criteria and go to first page)
                             IndexConfig.pageNumber = 1;
-                            IndexConfig.recordTop = ((IndexConfig.pageNumber - 1) * IndexConfig.recordsPerPage);
+                            IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                             ColumnCnt = core.docProperties.getInteger("ColumnCnt");
                             if (ColumnCnt > 0) {
                                 int ColumnPtr = 0;

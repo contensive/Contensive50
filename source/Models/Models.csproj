@@ -40,7 +40,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2003.8.1\lib\net472\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.5.2003.19.1\lib\net472\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -64,6 +64,7 @@
     <Compile Include="Models\Db\AddonIncludeRuleModel.cs" />
     <Compile Include="Models\Db\AddonModel.cs" />
     <Compile Include="Models\Db\AddonCategoryModel.cs" />
+    <Compile Include="Models\Db\GroupRoleModel.cs" />
     <Compile Include="Models\Db\VisitSummaryModel.cs" />
     <Compile Include="Models\Db\PageViewSummaryModel.cs" />
     <Compile Include="Models\Db\TopicModel.cs" />

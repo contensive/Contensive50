@@ -1540,11 +1540,13 @@ namespace Contensive.Processor {
         /// <param name="sortFieldList"></param>
         /// <param name="activeOnly"></param>
         /// <param name="pageSize"></param>
-        /// <param name="pageNumber"></param>
+        /// <param name="pageNumber">1 based page number</param>
         /// <returns></returns>
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber) {
             try {
                 if (groupList.Count > 0) {
+                    pageSize = (pageSize > 0) ? pageSize : DbController.sqlPageSizeDefault;
+                    pageNumber = (pageNumber > 0) ? pageNumber : 1;
                     //
                     // Build Inner Query to select distinct id needed
                     //
@@ -1579,9 +1581,7 @@ namespace Contensive.Processor {
                     if (!string.IsNullOrEmpty(sortFieldList)) {
                         SQL += " order by " + sortFieldList;
                     }
-                    int sqlPageSize = (pageSize < 1) ? DbController.pageSizeDefault : pageSize;
-                    int sqlPageNumber = (pageNumber < 1) ? 1 : pageNumber;
-                    return openSql(SQL, "Default", sqlPageSize, sqlPageNumber);
+                    return openSql(SQL, "Default", pageSize, pageNumber);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1594,16 +1594,16 @@ namespace Contensive.Processor {
             => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
+            => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, DbController.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList)
-            => openGroupUsers(groupList, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
+            => openGroupUsers(groupList, sqlCriteria, sortFieldList, true, DbController.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList, string sqlCriteria)
-            => openGroupUsers(groupList, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
+            => openGroupUsers(groupList, sqlCriteria, "", true, DbController.sqlPageSizeDefault, 1);
         //
         public bool openGroupUsers(List<string> groupList)
-            => openGroupUsers(groupList, "", "", true, Constants.sqlPageSizeDefault, 1);
+            => openGroupUsers(groupList, "", "", true, DbController.sqlPageSizeDefault, 1);
         //
         //========================================================================
         /// <summary>
@@ -1752,9 +1752,6 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="SortFieldList"></param>
-        /// <param name="ActiveOnly"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
         /// <returns></returns>
         public bool openWhatsNew(string SortFieldList) {
             try {
@@ -1772,13 +1769,15 @@ namespace Contensive.Processor {
         /// <param name="core"></param>
         /// <param name="listName"></param>
         /// <param name="sortFieldList"></param>
-        /// <param name="sctiveOnly"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="pageNumber"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber">1 based page number</param>
         /// <returns></returns>
-        public bool openContentWatchList(string listName, string sortFieldList, bool sctiveOnly, int PageSize, int pageNumber) {
+        public bool openContentWatchList(string listName, string sortFieldList, bool activeOnly, int pageSize, int pageNumber) {
             try {
                 sortFieldList = encodeEmpty(sortFieldList, "dateadded").Trim(' ');
+                pageSize = (pageSize > 0) ? pageSize : DbController.sqlPageSizeDefault;
+                pageNumber = (pageNumber > 0) ? pageNumber : 1;
                 //
                 // ----- Add tablename to the front of SortFieldList fieldnames
                 sortFieldList = " " + GenericController.strReplace(sortFieldList, ",", " , ") + " ";
@@ -1815,7 +1814,7 @@ namespace Contensive.Processor {
                     + "AND ((ccContentWatch.WhatsNewDateExpires is null)or(ccContentWatch.WhatsNewDateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
                     + ")"
                     + " ORDER BY " + sortFieldList + ";";
-                if (!openSql(SQL, "", PageSize, pageNumber)) {
+                if (!openSql(SQL, "", pageSize, pageNumber)) {
                     //
                     // Check if listname exists
                     //
@@ -1839,13 +1838,13 @@ namespace Contensive.Processor {
             => openContentWatchList(listName, sortFieldList, activeOnly, pageSize, 1);
         //
         public bool openContentWatchList(string listName, string sortFieldList, bool activeOnly)
-            => openContentWatchList(listName, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
+            => openContentWatchList(listName, sortFieldList, activeOnly, DbController.sqlPageSizeDefault, 1);
         //
         public bool openContentWatchList(string listName, string sortFieldList)
-            => openContentWatchList(listName, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
+            => openContentWatchList(listName, sortFieldList, true, DbController.sqlPageSizeDefault, 1);
         //
         public bool openContentWatchList(string listName)
-            => openContentWatchList(listName, "", true, Constants.sqlPageSizeDefault, 1);
+            => openContentWatchList(listName, "", true, DbController.sqlPageSizeDefault, 1);
         //
         //========================================================================
         //
@@ -1869,10 +1868,10 @@ namespace Contensive.Processor {
         /// <param name="ignorefalse2"></param>
         /// <param name="ignorefalse"></param>
         /// <param name="sqlSelectFieldList"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber">1 based page number</param>
         /// <returns></returns>
-        public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList, int PageSize, int PageNumber) {
+        public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList, int pageSize, int pageNumber) {
             bool result = false;
             try {
                 //
@@ -1887,6 +1886,8 @@ namespace Contensive.Processor {
                 if (string.IsNullOrWhiteSpace(contentMetaData.tableName)) { throw (new GenericException("Content metadata [" + contentName + "] does not reference a valid table")); }
                 sqlOrderBy = GenericController.encodeEmpty(sqlOrderBy, contentMetaData.defaultSortMethod);
                 sqlSelectFieldList = GenericController.encodeEmpty(sqlSelectFieldList, contentMetaData.selectCommaList);
+                pageSize = (pageSize > 0) ? pageSize : DbController.sqlPageSizeDefault;
+                pageNumber = (pageNumber > 0) ? pageNumber : 1;
                 //
                 // -- verify the sortfields are in this table
                 if (!string.IsNullOrEmpty(sqlOrderBy)) {
@@ -1931,7 +1932,7 @@ namespace Contensive.Processor {
                 string sql = "select " + sqlSelectFieldList + " from " + contentMetaData.tableName + " where (" + sqlContentCriteria + ")" + (string.IsNullOrWhiteSpace(sqlOrderBy) ? "" : " order by " + sqlOrderBy);
                 //
                 // -- now open the sql
-                if (openSql(sql, contentMetaData.dataSourceName, PageSize, PageNumber)) {
+                if (openSql(sql, contentMetaData.dataSourceName, pageSize, pageNumber)) {
                     //
                     // -- correct the status
                     this.readable = true;
@@ -1949,25 +1950,25 @@ namespace Contensive.Processor {
         }
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, "", Constants.sqlPageSizeDefault, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, "", DbController.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList, int PageSize)
             => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, PageSize, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly, int memberId, string sqlSelectFieldList)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, Constants.sqlPageSizeDefault, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, memberId, sqlSelectFieldList, DbController.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy, bool activeOnly)
-            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, 0, "", Constants.sqlPageSizeDefault, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, activeOnly, 0, "", DbController.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria, string sqlOrderBy)
-            => open(contentName, sqlCriteria, sqlOrderBy, true, 0, "", Constants.sqlPageSizeDefault, 1);
+            => open(contentName, sqlCriteria, sqlOrderBy, true, 0, "", DbController.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName, string sqlCriteria)
-            => open(contentName, sqlCriteria, "", true, 0, "", Constants.sqlPageSizeDefault, 1);
+            => open(contentName, sqlCriteria, "", true, 0, "", DbController.sqlPageSizeDefault, 1);
         //
         public bool open(string contentName)
-            => open(contentName, "", "", true, 0, "", Constants.sqlPageSizeDefault, 1);
+            => open(contentName, "", "", true, 0, "", DbController.sqlPageSizeDefault, 1);
         //
         //========================================================================
         /// <summary>
@@ -1975,8 +1976,8 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="dataSourceName"></param>
-        /// <param name="pageSize"></param>
-        /// <param name="pageNumber"></param>
+        /// <param name="pageSize">records per page</param>
+        /// <param name="pageNumber">1 based page number</param>
         /// <returns></returns>
         public bool openSql(string sql, string dataSourceName, int pageSize, int pageNumber) {
             try {
@@ -1985,8 +1986,11 @@ namespace Contensive.Processor {
                 this.createdWithMetaData = false;
                 this.contentName = "";
                 this.sqlSource = sql;
+                pageSize = (pageSize > 0) ? pageSize : DbController.sqlPageSizeDefault;
+                pageNumber = (pageNumber > 0) ? pageNumber : 1;
+                //
                 using (var db = new DbController(core, dataSourceName)) {
-                    this.dt = core.db.executeQuery(sql, pageSize * (pageNumber - 1), pageSize);
+                    this.dt = core.db.executeQuery(sql, DbController.getStartRecord( pageSize, pageNumber ), pageSize);
                 }
                 initAfterOpen();
                 return ok();
@@ -1998,9 +2002,9 @@ namespace Contensive.Processor {
         //
         public bool openSql(string sql, string dataSourceName, int pageSize) => openSql(sql, dataSourceName, pageSize, 1);
         //
-        public bool openSql(string sql, string dataSourceName) => openSql(sql, dataSourceName, Constants.sqlPageSizeDefault, 1);
+        public bool openSql(string sql, string dataSourceName) => openSql(sql, dataSourceName, DbController.sqlPageSizeDefault, 1);
         //
-        public bool openSql(string sql) => openSql(sql, "default", Constants.sqlPageSizeDefault, 1);
+        public bool openSql(string sql) => openSql(sql, "default", DbController.sqlPageSizeDefault, 1);
         //
         //========================================================================
         // Dispose
@@ -2040,6 +2044,5 @@ namespace Contensive.Processor {
         }
         #endregion
     }
-
 }
 

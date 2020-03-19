@@ -128,7 +128,7 @@ namespace Contensive.Processor.Controllers {
                     // -- Add cookie test
                     bool AllowCookieTest = core.siteProperties.allowVisitTracking && (core.session.visit.pageVisits == 1);
                     if (AllowCookieTest) {
-                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('f92vo2a8d=" + SecurityController.encodeToken(core, core.session.visit.id, core.doc.profileStartTime.AddSeconds(30)) + "')};", "Cookie Test");
+                        core.html.addScriptCode_onLoad("if (document.cookie && document.cookie != null){cj.ajax.qs('" + rnCookieDetect + "=" + SecurityController.encodeToken(core, core.session.visit.id, core.doc.profileStartTime.AddSeconds(30)) + "')};", "Cookie Test");
                     }
                     //
                     // -- Contensive Form Page Processing
@@ -1590,7 +1590,7 @@ namespace Contensive.Processor.Controllers {
                         Link = GenericController.modifyLinkQuery(Link, "AdminWarningPageID", EditPageId.ToString(), true);
                     }
                     //
-                    Link = GenericController.modifyLinkQuery(Link, RequestNameBlockContentTracking, "1", true);
+                    Link = GenericController.modifyLinkQuery(Link, rnBlockContentTracking, "1", true);
                     Link = GenericController.modifyLinkQuery(Link, "AdminWarningMsg", "<p>" + adminMessage + "</p>", true);
                 }
                 //
@@ -2433,7 +2433,7 @@ namespace Contensive.Processor.Controllers {
                     + " AND ((ccMemberRules.DateExpires) Is Null Or (ccMemberRules.DateExpires)>" + DbController.encodeSQLDate(core.doc.profileStartTime) + ")"
                     + " AND ((ccMemberRules.memberId)=" + core.session.user.id + "));";
                 int recordsReturned = 0;
-                DataTable dt = core.db.executeQuery(sql, 1, 1, ref recordsReturned);
+                DataTable dt = core.db.executeQuery(sql, 0, 1, ref recordsReturned);
                 return !recordsReturned.Equals(0);
             } catch (Exception ex) {
                 LogController.logError(core, ex);

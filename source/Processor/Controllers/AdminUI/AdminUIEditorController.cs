@@ -76,7 +76,7 @@ namespace Contensive.Processor.Controllers {
                 + "$('body').on('change','#component-" + htmlId + "-date,#component-" + htmlId + "-time',function(e){console.log('date/time change');setDateTimeEditorHidden('" + htmlId + "');});"
                 + "});"
                 + "");
-            return HtmlController.div(inputDate + inputTime + inputDateTime + js, "input-group");
+            return HtmlController.div(HtmlController.div(inputDate + inputTime, "input-group") + inputDateTime + js);
         }
         //
         // ====================================================================================================

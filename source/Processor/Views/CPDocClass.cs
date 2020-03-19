@@ -125,7 +125,34 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="code"></param>
         public override void AddHeadJavascript(string code) {
-            cp.core.html.addScriptCode(code, "",true);
+            cp.core.html.addScriptCode(code, "api", true);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// adds a link to javascript code to the head of the document
+        /// </summary>
+        /// <param name="code"></param>
+        public override void AddHeadJavascriptLink(string codeLink) {
+            cp.core.html.addScriptLinkSrc( codeLink, "api", true);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// adds javascript code to the head of the document
+        /// </summary>
+        /// <param name="code"></param>
+        public override void AddBodyJavascript(string code) {
+            cp.core.html.addScriptCode(code, "api", false);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// adds a link to javascript code to the head of the document
+        /// </summary>
+        /// <param name="code"></param>
+        public override void AddBodyJavascriptLink(string codeLink) {
+            cp.core.html.addScriptLinkSrc(codeLink, "api", false);
         }
         //
         //====================================================================================================

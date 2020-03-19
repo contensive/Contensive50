@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseClasses\AddonBaseClass.cs" />
+    <Compile Include="BaseClasses\BaseAdminUIClasses\ListReportBaseClass.cs" />
     <Compile Include="BaseClasses\BaseAdminUIClasses\ToolFormBaseClass.cs" />
     <Compile Include="BaseClasses\CPAddonBaseClass.cs" />
     <Compile Include="BaseClasses\CPBaseClass.cs" />

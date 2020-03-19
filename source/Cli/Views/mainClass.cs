@@ -241,10 +241,17 @@ namespace Contensive.CLI {
                             case "--addadmin":
                                 //
                                 // -- add an administrator
-                                AddAdminCmd.execute(cpServer, 
-                                    appName, 
+                                AddAdminCmd.execute(cpServer,
+                                    appName,
                                     getNextCmdArg(args, ref argPtr),
                                     getNextCmdArg(args, ref argPtr)
+                                );
+                                break;
+                            case "--addroot":
+                                //
+                                // -- add an administrator
+                                AddRootCmd.execute(cpServer,
+                                    appName
                                 );
                                 break;
 

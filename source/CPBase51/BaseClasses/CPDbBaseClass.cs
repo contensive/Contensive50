@@ -16,7 +16,10 @@ namespace Contensive.BaseClasses {
         /// creates a pathFilename for a field that stores text content, like css, js, etc.
         /// </summary>
         /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <param name="recordId"></param>
+        /// <param name="fieldTypeId"></param>
+        /// <returns></returns>
         public abstract string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.FieldTypeIdEnum fieldTypeId);
         //
         //====================================================================================================
@@ -24,7 +27,11 @@ namespace Contensive.BaseClasses {
         /// creates a pathFilename for a field that stores the path of an uploaded file
         /// </summary>
         /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
         /// <param name="recordId"></param>
+        /// <param name="filename"></param>
+        /// <param name="fieldTypeId"></param>
+        /// <returns></returns>
         public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldTypeId);
         //
         //====================================================================================================
@@ -32,7 +39,8 @@ namespace Contensive.BaseClasses {
         /// Add a record to a table in the default datasource and return its Id
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="createdByUserId"></param>
+        /// <returns></returns>
         public abstract int Add(string tableName, int createdByUserId);
         //
         //====================================================================================================
@@ -40,7 +48,8 @@ namespace Contensive.BaseClasses {
         /// update records in a table. Criteria is an sql compatible where-clause, the sqlList is a list of fields and values to update
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="criteria"></param>
+        /// <param name="sqlList"></param>
         public abstract void Update(string tableName, string criteria, NameValueCollection sqlList);
         //
         //====================================================================================================
@@ -48,7 +57,9 @@ namespace Contensive.BaseClasses {
         /// update records in a table. Criteria is an sql compatible where-clause, the sqlList is a list of fields and values to update. If Async is true, the query is queued for later
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="criteria"></param>
+        /// <param name="sqlList"></param>
+        /// <param name="Async"></param>
         public abstract void Update(string tableName, string criteria, NameValueCollection sqlList, bool Async);
         //
         //====================================================================================================
@@ -64,7 +75,7 @@ namespace Contensive.BaseClasses {
         /// Delete the record specified by tablename and guid
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="guid"></param>
         public abstract void Delete(string tableName, string guid);
         //
         //====================================================================================================
@@ -72,12 +83,12 @@ namespace Contensive.BaseClasses {
         /// Delete the record specified by tablename and guid
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
+        /// <param name="sqlCriteria"></param>
         public abstract void DeleteRows(string tableName, string sqlCriteria);
         //
         //====================================================================================================
         /// <summary>
-        /// get the connection string for his 
+        /// get the connection string for the default device 
         /// </summary>
         /// <returns></returns>
         public abstract string GetConnectionString();
@@ -152,23 +163,23 @@ namespace Contensive.BaseClasses {
         /// Execute a query and return a datatable.
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="startRecord"></param>
+        /// <param name="startRecord">0 based start record</param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
         public abstract DataTable ExecuteQuery(string sql, int startRecord, int maxRecords);
         //
         //====================================================================================================
         /// <summary>
-        /// Execute an sql query and return a datatable.
+        /// Execute an sql query and return a datatable. Max records returned is 10M. 
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="startRecord"></param>
+        /// <param name="startRecord">0 based start record</param>
         /// <returns></returns>
         public abstract DataTable ExecuteQuery(string sql, int startRecord);
         //
         //====================================================================================================
         /// <summary>
-        /// Execute an sql query and return a datatable.
+        /// Execute an sql query and return a datatable. Start at record 0,  max records returned is 10M. 
         /// </summary>
         /// <param name="sql"></param>
         /// <returns></returns>
@@ -207,11 +218,16 @@ namespace Contensive.BaseClasses {
         /// To give a remote method the ability to run an arbitrary query, store it as a remote query and executeRemoteQuery()
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="DataSourceName"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
         public abstract string GetRemoteQueryKey(string sql, int pageSize);
         //
+        //====================================================================================================
+        /// <summary>
+        /// To give a remote method the ability to run an arbitrary query, store it as a remote query and executeRemoteQuery()
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public abstract string GetRemoteQueryKey(string sql);
         //
         //====================================================================================================

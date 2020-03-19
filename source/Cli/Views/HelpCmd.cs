@@ -11,6 +11,8 @@ namespace Contensive.CLI {
         /// <param name="cpServer"></param>
         public static void consoleWriteAll(Contensive.Processor.CPClass cpServer) {
             Console.Write(helpText);
+            Console.Write(AddAdminCmd.helpText);
+            Console.Write(AddRootCmd.helpText);
             Console.Write(ConfigureCmd.helpText);
             Console.Write(NewAppCmd.helpText);
             Console.Write(DeleteAppCmd.helpText);

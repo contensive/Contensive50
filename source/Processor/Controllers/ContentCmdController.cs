@@ -192,11 +192,12 @@ namespace Contensive.Processor.Controllers {
         public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context) {
             try {
                 //
-                // -- work-around for users putting content-cmds in with a wysiwyg editor
-                src = src.replace("&nbsp;", " ", StringComparison.InvariantCultureIgnoreCase);
-                //
                 // -- exit if no src to process
                 if (string.IsNullOrWhiteSpace(src)) { return src; }
+                //
+                // -- work-around for users putting content-cmds in with a wysiwyg editor
+                src = src.replace("{%&nbsp;", "{%", StringComparison.InvariantCultureIgnoreCase);
+                src = src.replace("&nbsp;%}", "%}", StringComparison.InvariantCultureIgnoreCase);
                 //
                 bool badCmd = false;
                 bool notFound = false;

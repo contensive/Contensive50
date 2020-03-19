@@ -932,7 +932,7 @@ namespace Contensive.Processor.Controllers {
                     { "name", DbController.encodeSQLText(Name) },
                     { "CreatedBy", "0" },
                     { "OrderByClause", DbController.encodeSQLText(OrderByCriteria) },
-                    { "active", SQLTrue },
+                    { "active", DbController.SQLTrue },
                     { "contentControlId", ContentMetadataModel.getContentId(core, "Sort Methods").ToString() }
                 };
                 //

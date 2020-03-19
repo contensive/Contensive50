@@ -252,46 +252,32 @@ namespace Contensive.Processor.Controllers {
             bool result = false;
             returnUserMessage = "";
             try {
-                string sqlCriteria = null;
-                string Message = "";
-                string workingEmail = null;
-                string FromAddress = "";
-                string subject = "";
-                bool allowEmailLogin = false;
-                string Password = null;
-                string Username = null;
-                bool updateUser = false;
-                int atPtr = 0;
-                int Index = 0;
-                string EMailName = null;
-                bool usernameOK = false;
-                int recordCnt = 0;
-                int Ptr = 0;
-                //
                 const string passwordChrs = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ012345678999999";
                 const int passwordChrsLength = 62;
                 //
-                workingEmail = GenericController.encodeText(Email);
+                string workingEmail = GenericController.encodeText(Email);
                 //
-                result = false;
+                string Message = "";
+                string FromAddress = "";
+                string subject = "";
                 if (string.IsNullOrEmpty(workingEmail)) {
                     ErrorController.addUserError(core, "Please enter your email address before requesting your username and password.");
                 } else {
-                    atPtr = GenericController.strInstr(1, workingEmail, "@");
+                    int atPtr = GenericController.strInstr(1, workingEmail, "@");
                     if (atPtr < 2) {
                         //
                         // email not valid
                         //
                         ErrorController.addUserError(core, "Please enter a valid email address before requesting your username and password.");
                     } else {
-                        EMailName = strMid(workingEmail, 1, atPtr - 1);
+                        string EMailName = strMid(workingEmail, 1, atPtr - 1);
                         //
                         LogController.addSiteActivity(core, "password request for email " + workingEmail, core.session.user.id, core.session.user.organizationId);
                         //
-                        allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
-                        recordCnt = 0;
+                        bool allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin", false);
+                        int recordCnt = 0;
                         using (var csData = new CsModel(core)) {
-                            sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
+                            string sqlCriteria = "(email=" + DbController.encodeSQLText(workingEmail) + ")";
                             sqlCriteria = sqlCriteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
                             csData.open("People", sqlCriteria, "ID", true, core.session.user.id, "username,password", 1);
                             if (!csData.ok()) {
@@ -332,20 +318,21 @@ namespace Contensive.Processor.Controllers {
                                 subject = "Password Request at " + core.webServer.requestDomain;
                                 Message = "";
                                 while (csData.ok()) {
-                                    updateUser = false;
+                                    bool updateUser = false;
                                     if (string.IsNullOrEmpty(Message)) {
                                         Message = "This email was sent in reply to a request at " + core.webServer.requestDomain + " for the username and password associated with this email address. ";
-                                        Message = Message + "If this request was made by you, please return to the login screen and use the following:\r\n";
-                                        Message = Message + Environment.NewLine;
+                                        Message += "If this request was made by you, please return to the login screen and use the following:\r\n";
+                                        Message += Environment.NewLine;
                                     } else {
-                                        Message = Message + Environment.NewLine;
-                                        Message = Message + "Additional user accounts with the same email address: \r\n";
+                                        Message += Environment.NewLine;
+                                        Message += "Additional user accounts with the same email address: \r\n";
                                     }
                                     //
                                     // username
                                     //
-                                    Username = csData.getText("Username");
-                                    usernameOK = true;
+                                    string Username = csData.getText("Username");
+                                    bool usernameOK = true;
+                                    int Ptr = 0;
                                     if (!allowEmailLogin) {
                                         if (Username != Username.Trim()) {
                                             Username = Username.Trim();
@@ -363,25 +350,25 @@ namespace Contensive.Processor.Controllers {
                                                 updateUser = true;
                                             }
                                         }
-                                        Message = Message + " username: " + Username + Environment.NewLine;
+                                        Message += " username: " + Username + Environment.NewLine;
                                     }
                                     if (usernameOK) {
                                         //
                                         // password
                                         //
-                                        Password = csData.getText("Password");
+                                        string Password = csData.getText("Password");
                                         if (Password.Trim() != Password) {
                                             Password = Password.Trim();
                                             updateUser = true;
                                         }
                                         if (string.IsNullOrEmpty(Password)) {
                                             for (Ptr = 0; Ptr <= 8; Ptr++) {
-                                                Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
+                                                int Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
                                                 Password = Password + strMid(passwordChrs, Index, 1);
                                             }
                                             updateUser = true;
                                         }
-                                        Message = Message + " password: " + Password + Environment.NewLine;
+                                        Message += " password: " + Password + Environment.NewLine;
                                         result = true;
                                         if (updateUser) {
                                             csData.set("username", Username);

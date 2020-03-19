@@ -819,7 +819,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     if (serverConfig != null) {
                         if (appConfig != null) {
-                            if (appConfig.appStatus == AppConfigModel.AppStatusEnum.ok) {
+                            if (appConfig.appStatus == AppConfigBaseModel.AppStatusEnum.ok) {
                                 if (deleteSessionOnExit) {
                                     if ((session != null)) {
                                         if ((session.visit != null) && (session.visit.id > 0)) {

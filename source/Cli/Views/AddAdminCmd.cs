@@ -11,7 +11,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static readonly string  helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--addAdmin adminEmail adminPassword"
             + Environment.NewLine + "    Create an admin account with email, username and password."
@@ -25,7 +25,7 @@ namespace Contensive.CLI {
         /// <param name="adminEmail"></param>
         /// <param name="adminPassword">the argument following the command</param>
         public static void execute(Processor.CPClass cpServer, string appName, string adminEmail, string adminPassword) {
-            using( var cp = new Contensive.Processor.CPClass(appName)) {
+            using (var cp = new Contensive.Processor.CPClass(appName)) {
                 string criteria = "(email=" + cp.Db.EncodeSQLText(adminEmail) + ")";
                 List<PersonModel> adminUserList = DbBaseModel.createList<Models.Db.PersonModel>(cp, criteria);
                 if (!adminUserList.Count.Equals(0)) {

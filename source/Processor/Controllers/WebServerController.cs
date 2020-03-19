@@ -508,23 +508,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 //--------------------------------------------------------------------------
                 //
-                if (core.appConfig.appStatus != AppConfigModel.AppStatusEnum.ok) {
-                    //
-                    // did not initialize correctly
-                    //
-                } else {
-                    //
-                    // continue
+                if (core.appConfig.appStatus.Equals(BaseModels.AppConfigBaseModel.AppStatusEnum.ok)) {
                     //
                     core.html.enableOutputBuffer(true);
                     core.doc.continueProcessing = true;
                     setResponseContentType("text/html");
                     //
-                    //--------------------------------------------------------------------------
-                    // ----- Process QueryString to core.doc.main_InStreamArray
-                    //       Do this first to set core.main_ReadStreamJSForm, core.main_ReadStreamJSProcess, core.main_ReadStreamBinaryRead (must be in QS)
-                    //--------------------------------------------------------------------------
-                    //
+                    // -- Process QueryString to core.doc.main_InStreamArray
+                    // -- Do this first to set core.main_ReadStreamJSForm, core.main_ReadStreamJSProcess, core.main_ReadStreamBinaryRead (must be in QS)
                     linkForwardSource = "";
                     linkForwardError = "";
                     //
@@ -535,7 +526,7 @@ namespace Contensive.Processor.Controllers {
                     core.doc.blockExceptionReporting = false;
                     //
                     //   javascript cookie detect on page1 of all visits
-                    string CookieDetectKey = core.docProperties.getText(RequestNameCookieDetectVisitId);
+                    string CookieDetectKey = core.docProperties.getText(rnCookieDetect);
                     if (!string.IsNullOrEmpty(CookieDetectKey)) {
                         //
                         SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
@@ -569,7 +560,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string domain in core.appConfig.domainList) {
                         if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
                             LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
-                            var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent, 0);
+                            var newDomain = DbBaseModel.addEmpty<DomainModel>(core.cpParent, 0);
                             newDomain.name = domain;
                             newDomain.rootPageId = 0;
                             newDomain.noFollow = false;
@@ -758,13 +749,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// set cookie in iis response
         /// </summary>
-        /// <param name="cookieName"></param>
-        /// <param name="iCookieValue"></param>
-        /// <param name="DateExpires"></param>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        /// <param name="dateExpires"></param>
         /// <param name="domain"></param>
-        /// <param name="Path"></param>
-        /// <param name="Secure"></param>
-        public void addResponseCookie(string cookieName, string iCookieValue, DateTime DateExpires, string domain, string Path, bool Secure) {
+        /// <param name="path"></param>
+        /// <param name="secure"></param>
+        public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
             try {
                 string s = null;
                 //
@@ -773,51 +764,51 @@ namespace Contensive.Processor.Controllers {
                         if (iisContext != null) {
                             //
                             // Pass cookie to iis
-                            iisContext.Response.Cookies[cookieName].Value = iCookieValue;
-                            if (!isMinDate(DateExpires)) {
-                                iisContext.Response.Cookies[cookieName].Expires = DateExpires;
+                            iisContext.Response.Cookies[name].Value = value;
+                            if (!isMinDate(dateExpires)) {
+                                iisContext.Response.Cookies[name].Expires = dateExpires;
                             }
                             if (!string.IsNullOrEmpty(domain)) {
-                                iisContext.Response.Cookies[cookieName].Domain = domain;
+                                iisContext.Response.Cookies[name].Domain = domain;
                             }
-                            if (!string.IsNullOrEmpty(Path)) {
-                                iisContext.Response.Cookies[cookieName].Path = Path;
+                            if (!string.IsNullOrEmpty(path)) {
+                                iisContext.Response.Cookies[name].Path = path;
                             }
-                            if (Secure) {
-                                iisContext.Response.Cookies[cookieName].Secure = Secure;
+                            if (secure) {
+                                iisContext.Response.Cookies[name].Secure = secure;
                             }
                         } else {
                             //
                             // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
                             if (bufferCookies != "") {
-                                bufferCookies = bufferCookies + Environment.NewLine;
+                                bufferCookies += Environment.NewLine;
                             }
-                            bufferCookies = bufferCookies + cookieName;
-                            bufferCookies = bufferCookies + Environment.NewLine + iCookieValue;
+                            bufferCookies += name;
+                            bufferCookies += Environment.NewLine + value;
                             //
                             s = "";
-                            if (!isMinDate(DateExpires)) {
-                                s = DateExpires.ToString(CultureInfo.InvariantCulture);
+                            if (!isMinDate(dateExpires)) {
+                                s = dateExpires.ToString(CultureInfo.InvariantCulture);
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies += Environment.NewLine + s;
                             //
                             s = "";
                             if (!string.IsNullOrEmpty(domain)) {
                                 s = domain;
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies += Environment.NewLine + s;
                             //
                             s = "/";
-                            if (!string.IsNullOrEmpty(Path)) {
-                                s = Path;
+                            if (!string.IsNullOrEmpty(path)) {
+                                s = path;
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies += Environment.NewLine + s;
                             //
                             s = "false";
-                            if (Secure) {
+                            if (secure) {
                                 s = "true";
                             }
-                            bufferCookies = bufferCookies + Environment.NewLine + s;
+                            bufferCookies += Environment.NewLine + s;
                         }
                     }
                 }

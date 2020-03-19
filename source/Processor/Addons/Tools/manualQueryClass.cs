@@ -53,14 +53,14 @@ namespace Contensive.Processor.Addons.Tools {
                     Timeout = 30;
                 }
                 //
-                int PageSize = core.docProperties.getInteger("PageSize");
-                if (PageSize == 0) {
-                    PageSize = 10;
+                int pageSize = core.docProperties.getInteger("PageSize");
+                if (pageSize == 0) {
+                    pageSize = 10;
                 }
                 //
-                int PageNumber = core.docProperties.getInteger("PageNumber");
-                if (PageNumber == 0) {
-                    PageNumber = 1;
+                int pageNumber = core.docProperties.getInteger("PageNumber");
+                if (pageNumber == 0) {
+                    pageNumber = 1;
                 }
                 //
                 string SQL = core.docProperties.getText("SQL");
@@ -97,7 +97,7 @@ namespace Contensive.Processor.Addons.Tools {
                         Stream.add("<p>" + core.dateTimeNowMockable + " Executing sql [" + SQL + "] on DataSource [" + datasource.name + "]");
                         DataTable dt = null;
                         try {
-                            dt = core.db.executeQuery(SQL, PageSize * (PageNumber - 1), PageSize);
+                            dt = core.db.executeQuery(SQL, DbController.getStartRecord( pageSize, pageNumber ), pageSize);
                         } catch (Exception ex) {
                             //
                             // ----- error
@@ -191,12 +191,12 @@ namespace Contensive.Processor.Addons.Tools {
                 }
                 //
                 // -- page size
-                if (isNull(PageSize)) PageSize = 100;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIEditorController.getTextEditor(core, "PageSize", PageSize.ToString())));
+                if (isNull(pageSize)) pageSize = 100;
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Size", AdminUIEditorController.getTextEditor(core, "PageSize", pageSize.ToString())));
                 //
                 // -- page number
-                if (isNull(PageNumber)) PageNumber = 1;
-                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIEditorController.getTextEditor(core, "PageNumber", PageNumber.ToString())));
+                if (isNull(pageNumber)) pageNumber = 1;
+                Stream.add(AdminUIController.getToolFormInputRow(core, "Page Number", AdminUIEditorController.getTextEditor(core, "PageNumber", pageNumber.ToString())));
                 //
                 // -- timeout
                 if (isNull(Timeout)) Timeout = 30;

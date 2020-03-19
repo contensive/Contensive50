@@ -475,7 +475,7 @@ namespace Contensive.Processor.Controllers {
             var result = new StringBuilder();
             try {
                 string RQS = null;
-                int RowBAse = 0;
+                int RowBase = 0;
                 StringBuilderLegacyController Content = new StringBuilderLegacyController();
                 int ColumnCount = 0;
                 int ColumnPtr = 0;
@@ -486,18 +486,18 @@ namespace Contensive.Processor.Controllers {
                 int PageCount = 0;
                 int PagePointer = 0;
                 int LinkCount = 0;
-                int ReportPageNumber = 0;
-                int ReportPageSize = 0;
+                int reportPageNumber = 0;
+                int reportPageSize = 0;
                 int SortColPtr = 0;
                 int SortColType = 0;
                 //
-                ReportPageNumber = PageNumber;
-                if (ReportPageNumber == 0) {
-                    ReportPageNumber = 1;
+                reportPageNumber = PageNumber;
+                if (reportPageNumber == 0) {
+                    reportPageNumber = 1;
                 }
-                ReportPageSize = PageSize;
-                if (ReportPageSize < 1) {
-                    ReportPageSize = 50;
+                reportPageSize = PageSize;
+                if (reportPageSize < 1) {
+                    reportPageSize = 50;
                 }
                 ColumnCount = Cells.GetUpperBound(1);
                 RQS = core.doc.refreshQueryString;
@@ -536,14 +536,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (RowCount == 0) {
                     Content.add(Environment.NewLine + "<tr>");
-                    Content.add(getReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                    Content.add(getReport_Cell((RowBase + RowPointer).ToString(), "right", 1, RowPointer));
                     Content.add(getReport_Cell("-- End --", "left", ColumnCount, 0));
                     Content.add(Environment.NewLine + "</tr>");
                 } else {
-                    RowBAse = (ReportPageSize * (ReportPageNumber - 1)) + 1;
+                    RowBase = DbController.getStartRecord(reportPageSize, reportPageNumber) + 1;
                     for (RowPointer = 0; RowPointer < RowCount; RowPointer++) {
                         Content.add(Environment.NewLine + "<tr>");
-                        Content.add(getReport_Cell((RowBAse + RowPointer).ToString(), "right", 1, RowPointer));
+                        Content.add(getReport_Cell((RowBase + RowPointer).ToString(), "right", 1, RowPointer));
                         for (ColumnPtr = 0; ColumnPtr < ColumnCount; ColumnPtr++) {
                             Content.add(getReport_Cell(Cells[RowPointer, ColumnPtr], ColAlign[ColumnPtr], 1, RowPointer));
                         }
@@ -558,15 +558,15 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Post Table copy
                 //
-                if ((DataRowCount / (double)ReportPageSize) != Math.Floor((DataRowCount / (double)ReportPageSize))) {
-                    PageCount = encodeInteger((DataRowCount / (double)ReportPageSize) + 0.5);
+                if ((DataRowCount / (double)reportPageSize) != Math.Floor((DataRowCount / (double)reportPageSize))) {
+                    PageCount = encodeInteger((DataRowCount / (double)reportPageSize) + 0.5);
                 } else {
-                    PageCount = encodeInteger(DataRowCount / (double)ReportPageSize);
+                    PageCount = encodeInteger(DataRowCount / (double)reportPageSize);
                 }
                 if (PageCount > 1) {
-                    result.Append("<br>Page " + ReportPageNumber + " (Row " + (RowBAse) + " of " + DataRowCount + ")");
+                    result.Append("<br>Page " + reportPageNumber + " (Row " + (RowBase) + " of " + DataRowCount + ")");
                     if (PageCount > 20) {
-                        PagePointer = ReportPageNumber - 10;
+                        PagePointer = reportPageNumber - 10;
                     }
                     if (PagePointer < 1) {
                         PagePointer = 1;
@@ -579,9 +579,9 @@ namespace Contensive.Processor.Controllers {
                             result.Append("<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">1</A>...&nbsp;");
                         }
                         WorkingQS = core.doc.refreshQueryString;
-                        WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageSize, ReportPageSize.ToString(), true);
+                        WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageSize, reportPageSize.ToString(), true);
                         while ((PagePointer <= PageCount) && (LinkCount < 20)) {
-                            if (PagePointer == ReportPageNumber) {
+                            if (PagePointer == reportPageNumber) {
                                 result.Append(PagePointer + "&nbsp;");
                             } else {
                                 WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PagePointer.ToString(), true);
@@ -594,8 +594,8 @@ namespace Contensive.Processor.Controllers {
                             WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, PageCount.ToString(), true);
                             result.Append("...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">" + PageCount + "</A>&nbsp;");
                         }
-                        if (ReportPageNumber < PageCount) {
-                            WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (ReportPageNumber + 1).ToString(), true);
+                        if (reportPageNumber < PageCount) {
+                            WorkingQS = GenericController.modifyQueryString(WorkingQS, RequestNamePageNumber, (reportPageNumber + 1).ToString(), true);
                             result.Append("...<a href=\"" + core.webServer.requestPage + "?" + WorkingQS + "\">next</A>&nbsp;");
                         }
                         result.Append("<br>&nbsp;");

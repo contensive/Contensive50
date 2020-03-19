@@ -19,7 +19,11 @@ namespace Contensive.Processor.Addons.ExportSql {
                 //
                 LogController.logTrace(core, "ExportCsvClass.execute, sql [" + cp.Doc.GetText("sql") + "]");
                 //
-                using ( var db = cp.DbNew(cp.Doc.GetText("datasource"))) {
+                string dataSource = cp.Doc.GetText("datasource");
+                using ( var db = cp.DbNew(dataSource)) {
+                    //
+                    // -- no way to know how big this is. 30 minute timeout
+                    db.SQLTimeout = 1800;
                     using (DataTable dt = db.ExecuteQuery(cp.Doc.GetText("sql"))) {
                         string result = dt.toCsv();
                         //

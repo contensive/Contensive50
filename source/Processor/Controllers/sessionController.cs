@@ -48,7 +48,7 @@ namespace Contensive.Processor.Controllers {
         /// If the session was initialize without visit tracking, use verifyUser to initialize a user.
         /// This is called automatically when an addon references cp.user.id
         /// </summary>
-        public void verifyUser()  {
+        public void verifyUser() {
             if (user.id == 0) {
                 var user = DbBaseModel.addDefault<PersonModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, PersonModel.tableMetadata.contentName));
                 user.createdByVisit = true;
@@ -364,7 +364,7 @@ namespace Contensive.Processor.Controllers {
                                 }
                             }
                         }
-                        if (core.webServer.requestBrowser == "") {
+                        if (string.IsNullOrEmpty(core.webServer.requestBrowser)) {
                             //
                             // blank browser, Blank-Browser-Bot
                             //
@@ -372,9 +372,11 @@ namespace Contensive.Processor.Controllers {
                             resultSessionContext.visit.bot = true;
                             resultSessionContext.visitBadBot = false;
                             resultSessionContext.visit.mobile = false;
+                            resultSessionContext.visit.browser = string.Empty;
                         } else {
                             //
                             // -- mobile detect
+                            resultSessionContext.visit.browser = core.webServer.requestBrowser;
                             switch (resultSessionContext.visitor.forceBrowserMobile) {
                                 case 1: {
                                         resultSessionContext.visit.mobile = true;
@@ -619,7 +621,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedAdmin()  {
+        public bool isAuthenticatedAdmin() {
             bool result = false;
             try {
                 result = visit.visitAuthenticated && (user.admin || user.developer);
@@ -636,7 +638,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
-        public bool isAuthenticatedDeveloper()  {
+        public bool isAuthenticatedDeveloper() {
             bool result = false;
             try {
                 result = visit.visitAuthenticated && (user.admin || user.developer);
@@ -706,7 +708,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAuthenticatedContentManager()  {
+        public bool isAuthenticatedContentManager() {
             bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin()) { return true; }
@@ -747,7 +749,7 @@ namespace Contensive.Processor.Controllers {
         /// logout user
         /// </summary>
         /// <param name="core"></param>
-        public void logout()  {
+        public void logout() {
             try {
                 //
                 LogController.addSiteActivity(core, "logout", user.id, user.organizationId);
@@ -1069,7 +1071,7 @@ namespace Contensive.Processor.Controllers {
         //   true if the user is authenticated and is a trusted people (member content)
         //========================================================================
         //
-        public bool isAuthenticatedMember()  {
+        public bool isAuthenticatedMember() {
             var userPeopleMetadata = ContentMetadataModel.create(core, user.contentControlId);
             if (userPeopleMetadata == null) { return false; }
             if (userPeopleMetadata.name.ToLower(CultureInfo.InvariantCulture) == "members") { return true; }
@@ -1082,7 +1084,7 @@ namespace Contensive.Processor.Controllers {
         /// is Guest
         /// </summary>
         /// <returns></returns>
-        public bool isGuest()  {
+        public bool isGuest() {
             return !isRecognized();
         }
         //
@@ -1091,7 +1093,7 @@ namespace Contensive.Processor.Controllers {
         /// Is Recognized (not new and not authenticted)
         /// </summary>
         /// <returns></returns>
-        public bool isRecognized()  {
+        public bool isRecognized() {
             return !visit.memberNew;
         }
         //
@@ -1195,7 +1197,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentName"></param>
         /// <returns></returns>
-        public bool isAdvancedEditing()  {
+        public bool isAdvancedEditing() {
             // -- todo consider advancedEditing only for developers
             if ((!user.admin) && (!user.developer)) { return false; }
             return core.visitProperty.getBoolean("AllowAdvancedEditor");
@@ -1247,7 +1249,7 @@ namespace Contensive.Processor.Controllers {
         /// True if the current visitor is a content manager in workflow rendering mode
         /// </summary>
         /// <returns></returns>
-        public bool isWorkflowRendering()  {
+        public bool isWorkflowRendering() {
             return false;
         }
     }

@@ -2851,9 +2851,11 @@ jQuery(document).ready(function () {
 /*
 * cp.AdminUI referenced js
 */
+/*
 if (typeof google !== 'object') {
     document.write('<scr' + 'ipt type="text/javascript" src="https://www.google.com/jsapi"></scr' + 'ipt>');
 }
+*/
 if (typeof cj.frame !== 'object') {
     //
     // -- wrap in test to block if legacy code installed

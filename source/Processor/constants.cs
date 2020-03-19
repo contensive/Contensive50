@@ -52,14 +52,6 @@ namespace Contensive.Processor {
         public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/";
         //
         //========================================================================
-        // Sql/Db
-        //
-        internal const string SQLTrue = "1";
-        internal const string SQLFalse = "0";
-        //
-        internal const int sqlPageSizeDefault = 9999;
-        //
-        //========================================================================
         // cache names
         //
         internal const string cacheName_addonCachePersistent = "addonCache";
@@ -863,9 +855,9 @@ namespace Contensive.Processor {
         internal const string rnEmailClickFlag = "ecf34Msi";
         internal const string rnEmailBlockRecipientEmail = "9dq8Nh61";
         internal const string rnEmailBlockRequestDropId = "BlockEmailRequest";
-        internal const string RequestNameVisitTracking = "s9lD1088";
-        internal const string RequestNameBlockContentTracking = "BlockContentTracking";
-        internal const string RequestNameCookieDetectVisitId = "f92vo2a8d";
+        internal const string rnVisitTracking = "s9lD1088";
+        internal const string rnBlockContentTracking = "BlockContentTracking";
+        internal const string rnCookieDetect = "f92vo2a8d";
 
         internal const string RequestNamePageNumber = "PageNumber";
         internal const string RequestNamePageSize = "PageSize";

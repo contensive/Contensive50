@@ -94,27 +94,27 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList)
-            => Open(contentName, sqlCriteria, sortFieldList, activeOnly, selectFieldList, Constants.sqlPageSizeDefault, 1);
+            => Open(contentName, sqlCriteria, sortFieldList, activeOnly, selectFieldList, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => Open(contentName, sqlCriteria, sortFieldList, activeOnly, "", Constants.sqlPageSizeDefault, 1);
+            => Open(contentName, sqlCriteria, sortFieldList, activeOnly, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool Open(string contentName, string sqlCriteria, string sortFieldList) 
-            => Open(contentName, sqlCriteria, sortFieldList, true, "", Constants.sqlPageSizeDefault, 1);
+            => Open(contentName, sqlCriteria, sortFieldList, true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool Open(string contentName, string sqlCriteria) 
-            => Open(contentName, sqlCriteria, "", true, "", Constants.sqlPageSizeDefault, 1);
+            => Open(contentName, sqlCriteria, "", true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool Open(string contentName) 
-            => Open(contentName, "", "", true, "", Constants.sqlPageSizeDefault, 1);
+            => Open(contentName, "", "", true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
@@ -135,22 +135,22 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => OpenGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList)
-            => OpenGroupUsers(groupList, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(groupList, sqlCriteria, sortFieldList, true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(List<string> groupList, string sqlCriteria)
-            => OpenGroupUsers(groupList, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(groupList, sqlCriteria, "", true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(List<string> groupList)
-            => OpenGroupUsers(groupList, "", "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(groupList, "", "", true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
@@ -165,22 +165,22 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly)
-            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, activeOnly, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, activeOnly, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList)
-            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, sortFieldList, true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName, string sqlCriteria)
-            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, sqlCriteria, "", true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenGroupUsers(string groupName)
-            => OpenGroupUsers(new List<string> { groupName }, "", "", true, Constants.sqlPageSizeDefault, 1);
+            => OpenGroupUsers(new List<string> { groupName }, "", "", true, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
@@ -207,12 +207,12 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override bool OpenSQL(string sql, string dataSourcename)
-            => OpenSQL(sql, dataSourcename, Constants.sqlPageSizeDefault, 1);
+            => OpenSQL(sql, dataSourcename, DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
         public override bool OpenSQL(string sql)
-            => OpenSQL(sql, "", Constants.sqlPageSizeDefault, 1);
+            => OpenSQL(sql, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //

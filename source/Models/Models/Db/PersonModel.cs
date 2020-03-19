@@ -33,6 +33,7 @@ namespace Contensive.Models.Db {
         public string billPhone { get; set; }
         public string billState { get; set; }
         public string billZip { get; set; }
+        public string bio { get; set; }
         public int birthdayDay { get; set; }
         public int birthdayMonth { get; set; }
         public int birthdayYear { get; set; }
@@ -55,7 +56,6 @@ namespace Contensive.Models.Db {
         public int organizationId { get; set; }
         public string password { get; set; }
         public string phone { get; set; }
-        public string resumeFilename { get; set; }
         public string shipAddress { get; set; }
         public string shipAddress2 { get; set; }
         public string shipCity { get; set; }
@@ -71,6 +71,9 @@ namespace Contensive.Models.Db {
         public string username { get; set; }
         public int visits { get; set; }
         public string zip { get; set; }
+        //
+        // -- to be deprecated
+        public string resumeFilename { get; set; }
         //
         //====================================================================================================
         /// <summary>
