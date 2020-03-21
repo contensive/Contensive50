@@ -89,7 +89,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     ColCaption[ColumnPtr] = "For";
                     ColAlign[ColumnPtr] = "left";
-                    ColWidth[ColumnPtr] = "100px";
+                    ColWidth[ColumnPtr] = "200px";
                     ColumnPtr = ColumnPtr + 1;
                     //
                     ColCaption[ColumnPtr] = "Requested";

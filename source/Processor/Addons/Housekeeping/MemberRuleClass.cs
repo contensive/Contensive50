@@ -31,7 +31,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " LEFT JOIN ccgroups on ccgroups.ID=ccmemberrules.GroupID"
                     + " WHERE (ccgroups.ID is null)";
                 core.db.executeNonQuery(sql);
-
+                //
+                // -- delete duplicates (very slow query)
+                sql = "delete from ccmemberrules where id in ("
+                        + " select distinct b.id"
+                        + " from ccmemberrules a, ccmemberrules b"
+                        + " where ((a.memberid=b.memberid)and(a.groupid=b.groupid)and(a.id<b.id))"
+                        + ")";
+                core.db.executeNonQuery(sql);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
