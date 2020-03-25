@@ -247,10 +247,18 @@ namespace Contensive.Processor.Controllers {
                                 AddonCollectionModel collection = AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, collectionGuid);
                                 if ((collection != null) && !CollectionUpdatable) {
                                     //
-                                    // -- ERROR, collection is marked not-updateable, but the collection already exists on this site
-                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
-                                    return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the collection is marked not-updateable and the collection is already installed.</P>";
-                                    return false;
+                                    // -- New collection Not Updateable and collection already exists
+                                    string message = "The collection [" + CollectionName + "] was not installed because the new collection is marked not-updateable and the current collection is already installed";
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], " + message);
+                                    return_ErrorMessage += "<P>" + message + "</P>";
+                                    return true;
+                                } else if ((collection != null) && !collection.updatable) {
+                                    //
+                                    // -- Current collection is not updateable
+                                    string message = "The collection [" + CollectionName + "] was not installed because the current collection is marked not-updateable";
+                                    LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], " + message);
+                                    return_ErrorMessage += "<P>" + message + "</P>";
+                                    return true;
                                 }
                                 //
                                 //-------------------------------------------------------------------------------

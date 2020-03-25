@@ -221,9 +221,6 @@ namespace Contensive.BaseClasses {
         public abstract string Hidden(string htmlName, DateTime htmlValue, string htmlClass, string htmlId);
         public abstract string Hidden(string htmlName, DateTime htmlValue, string htmlClass);
         public abstract string Hidden(string htmlName, DateTime htmlValue);
-        //
-        //
-        //
     }
 }
 

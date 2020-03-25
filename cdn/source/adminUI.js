@@ -66,6 +66,17 @@ window.size = function () {
     return { width: w, height: h };
 }
 //
+//-- Admin Find row search on enter-key
+//
+function KeyCheck(e){
+    var code = e.keyCode;
+    if(code==13){
+      document.getElementById('FindButton').focus();
+      document.getElementById('FindButton').click();
+      return false;
+    }
+  } 
+//
 //----------
 //
 function DeleteCheck() {

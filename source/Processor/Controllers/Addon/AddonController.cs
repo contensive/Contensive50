@@ -1722,7 +1722,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="AddonGuid"></param>
         /// <param name="IsInline"></param>
         /// <returns></returns>
-        public static string getDefaultAddonOptions(CoreController core, string ArgumentList, string AddonGuid, bool IsInline) {
+        public static string getDefaultAddonOptions(CoreController core, string ArgumentList, string AddonGuid, bool IsInline, string AddonName, ref string jsonCommand) {
+            var argList = new List<NameValueModel>();
             ArgumentList = GenericController.strReplace(ArgumentList, Environment.NewLine, "\r");
             ArgumentList = GenericController.strReplace(ArgumentList, "\n", "\r");
             ArgumentList = GenericController.strReplace(ArgumentList, "\r", Environment.NewLine);
@@ -1784,6 +1785,12 @@ namespace Contensive.Processor.Controllers {
                         OptionName = GenericController.decodeAddonConstructorArgument(OptionName);
                         OptionValue = GenericController.decodeAddonConstructorArgument(OptionValue);
                         //
+                        // -- add to json format
+                        argList.Add(new NameValueModel() {
+                            name = OptionName,
+                            value = OptionValue
+                        });
+                        //
                         // Encode AddonOption format
                         OptionValue = GenericController.encodeNvaArgument(OptionValue);
                         //
@@ -1796,8 +1803,23 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
+                //
+                // -- cleanup htmlId command
                 if (!string.IsNullOrEmpty(result)) {
                     result = result.Substring(1);
+                }
+                //
+                // -- create json command
+                string jsonArgs = "";
+                foreach (var arg in argList) {
+                    if (!string.IsNullOrEmpty(arg.value)) {
+                        jsonArgs += (string.IsNullOrEmpty(jsonArgs) ? "" : ",") + "{" + "\"" + encodeJavascriptStringSingleQuote(arg.name) + "\":\"" + encodeJavascriptStringSingleQuote(arg.value) + "\"" + "}";
+                    }
+                }
+                if (string.IsNullOrEmpty(jsonArgs)) {
+                    jsonCommand = "{%\"" + encodeJavascriptStringSingleQuote(AddonName) + "\"%}";
+                } else {
+                    jsonCommand = "{%{\"" + encodeJavascriptStringSingleQuote(AddonName) + "\":" + jsonArgs + "}%}";
                 }
             }
             return result;

@@ -793,46 +793,215 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlClass"></param>
         /// <param name="htmlId"></param>
         /// <returns></returns>
-        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
-            return formMultipart_start(core, actionQueryString, htmlName, htmlClass, htmlId) + innerHtml + "</form>";
+        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass, string htmlId) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                name = htmlName,
+                @class = htmlClass,
+                id = htmlId
+            });
+        }
+        //        
+        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                name = htmlName,
+                @class = htmlClass
+            });
+        }
+        //        
+        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                name = htmlName
+            });
+        }
+        //        
+        public static string formMultipart(CoreController core, string innerHtml, string actionQueryString) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
+            });
+        }
+        //        
+        public static string formMultipart(CoreController core, string innerHtml) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
+            });
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// Starts an HTML form for uploads, Should be closed with main_GetUploadFormEnd
-        /// </summary>
-        /// <param name="actionQueryString"></param>
-        /// <returns></returns>
-        public static string formMultipart_start(CoreController core, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "") {
-            string result = "<form action=\"?" + ((actionQueryString == "") ? core.doc.refreshQueryString : actionQueryString) + "\" ENCTYPE=\"MULTIPART/FORM-DATA\" method=\"post\" style=\"display: inline;\"";
-            if (!string.IsNullOrWhiteSpace(htmlName)) result += " name=\"" + htmlName + "\"";
-            if (!string.IsNullOrWhiteSpace(htmlClass)) result += " class=\"" + htmlClass + "\"";
-            if (!string.IsNullOrWhiteSpace(htmlId)) result += " id=\"" + htmlId + "\"";
-            return result + ">";
+        //
+        public static string getHtmlAttributes(CoreController core, Contensive.CPBase.BaseModels.HtmlAttributesForm attributes) {
+            var result = new StringBuilder();
+            result.Append((string.IsNullOrWhiteSpace(attributes.acceptcharset)) ? "" : "" + " accept-charset=\"" + attributes.acceptcharset + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.accesskey)) ? "" : "" + " accesskey=\"" + attributes.accesskey + "\"");
+            string action = (string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : " action=\"" + attributes.action + "\"";
+            result.Append(" action=\"" + action + "\"");
+            result.Append((!attributes.autocomplete) ? "" : "" + " autocomplete=\"on\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.@class)) ? "" : "" + " class=\"" + attributes.@class + "\"");
+            result.Append((!attributes.contenteditable) ? "" : "" + " contenteditable=\"true\"");
+            if ((attributes.data != null) && (!attributes.data.Count.Equals(0))) {
+                var dataAttr = new StringBuilder();
+                foreach (var keyValue in attributes.data) { dataAttr.Append(" data-" + keyValue.Key + "=\"" + keyValue.Value + "\""); }
+                result.Append(dataAttr);
+            }
+            result.Append((string.IsNullOrWhiteSpace(attributes.dir)) ? "" : "" + " dir=\"" + attributes.dir + "\"");
+            result.Append((!attributes.draggable) ? "" : "" + " draggable=\"true\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.dropzone)) ? "" : "" + " dropzone=\"" + attributes.dropzone + "\"");
+            if (!attributes.enctype.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.none)) {
+                string encType;
+                switch (attributes.enctype) {
+                    case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
+                            encType = "application/x-www-form-urlencoded";
+                            break;
+                        }
+                    case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data: {
+                            encType = "multipart/form-data";
+                            break;
+                        }
+                    default: {
+                            encType = "text/plain";
+                            break;
+                        }
+                }
+                result.Append(" enctype=\"" + encType + "\"");
+            }
+            result.Append((!attributes.hidden) ? "" : "" + " hidden");
+            result.Append((string.IsNullOrWhiteSpace(attributes.id)) ? "" : "" + " id=\"" + attributes.id + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.lang)) ? "" : "" + " lang=\"" + attributes.lang + "\"");
+            result.Append(" method=" + ((attributes.method.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.get)) ? "\"get\"" : "\"post\""));
+            result.Append((string.IsNullOrWhiteSpace(attributes.name)) ? "" : "" + " name=\"" + attributes.name + "\"");
+            result.Append((!attributes.novalidate) ? "" : "" + " novalidate");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onabort)) ? "" : "" + " onabort=\"" + attributes.onabort + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onafterprint)) ? "" : "" + " onafterprint=\"" + attributes.onafterprint + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onbeforeprint)) ? "" : "" + " onbeforeprint=\"" + attributes.onbeforeprint + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onbeforeunload)) ? "" : "" + " onbeforeunload=\"" + attributes.onbeforeunload + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onblur)) ? "" : "" + " onblur=\"" + attributes.onblur + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncanplay)) ? "" : "" + " oncanplay=\"" + attributes.oncanplay + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncanplaythrough)) ? "" : "" + " oncanplaythrough=\"" + attributes.oncanplaythrough + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onchange)) ? "" : "" + " onchange=\"" + attributes.onchange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onclick)) ? "" : "" + " onclick=\"" + attributes.onclick + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncontextmenu)) ? "" : "" + " oncontextmenu=\"" + attributes.oncontextmenu + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncopy)) ? "" : "" + " oncopy=\"" + attributes.oncopy + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncuechange)) ? "" : "" + " oncuechange=\"" + attributes.oncuechange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oncut)) ? "" : "" + " oncut=\"" + attributes.oncut + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondblclick)) ? "" : "" + " ondblclick=\"" + attributes.ondblclick + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondrag)) ? "" : "" + " ondrag=\"" + attributes.ondrag + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondragend)) ? "" : "" + " ondragend=\"" + attributes.ondragend + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondragenter)) ? "" : "" + " ondragenter=\"" + attributes.ondragenter + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondragleave)) ? "" : "" + " ondragleave=\"" + attributes.ondragleave + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondragover)) ? "" : "" + " ondragover=\"" + attributes.ondragover + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondragstart)) ? "" : "" + " ondragstart=\"" + attributes.ondragstart + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondrop)) ? "" : "" + " ondrop=\"" + attributes.ondrop + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ondurationchange)) ? "" : "" + " ondurationchange=\"" + attributes.ondurationchange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onemptied)) ? "" : "" + " onemptied=\"" + attributes.onemptied + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onended)) ? "" : "" + " onended=\"" + attributes.onended + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onerror)) ? "" : "" + " onerror=\"" + attributes.onerror + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onfocus)) ? "" : "" + " onfocus=\"" + attributes.onfocus + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onhashchange)) ? "" : "" + " onhashchange=\"" + attributes.onhashchange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oninput)) ? "" : "" + " oninput=\"" + attributes.oninput + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.oninvalid)) ? "" : "" + " oninvalid=\"" + attributes.oninvalid + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onkeydown)) ? "" : "" + " onkeydown=\"" + attributes.onkeydown + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onkeypress)) ? "" : "" + " onkeypress=\"" + attributes.onkeypress + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onkeyup)) ? "" : "" + " onkeyup=\"" + attributes.onkeyup + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onload)) ? "" : "" + " onload=\"" + attributes.onload + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onloadeddata)) ? "" : "" + " onloadeddata=\"" + attributes.onloadeddata + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onloadedmetadata)) ? "" : "" + " onloadedmetadata=\"" + attributes.onloadedmetadata + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onloadstart)) ? "" : "" + " onloadstart=\"" + attributes.onloadstart + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmessage)) ? "" : "" + " onmessage=\"" + attributes.onmessage + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmousedown)) ? "" : "" + " onmousedown=\"" + attributes.onmousedown + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmousemove)) ? "" : "" + " onmousemove=\"" + attributes.onmousemove + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmouseout)) ? "" : "" + " onmouseout=\"" + attributes.onmouseout + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmouseover)) ? "" : "" + " onmouseover=\"" + attributes.onmouseover + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmouseup)) ? "" : "" + " onmouseup=\"" + attributes.onmouseup + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onmousewheel)) ? "" : "" + " onmousewheel=\"" + attributes.onmousewheel + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onoffline)) ? "" : "" + " onoffline=\"" + attributes.onoffline + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ononline)) ? "" : "" + " ononline=\"" + attributes.ononline + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onpagehide)) ? "" : "" + " onpagehide=\"" + attributes.onpagehide + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onpageshow)) ? "" : "" + " onpageshow=\"" + attributes.onpageshow + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onpaste)) ? "" : "" + " onpaste=\"" + attributes.onpaste + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onpause)) ? "" : "" + " onpause=\"" + attributes.onpause + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onplay)) ? "" : "" + " onplay=\"" + attributes.onplay + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onplaying)) ? "" : "" + " onplaying=\"" + attributes.onplaying + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onpopstate)) ? "" : "" + " onpopstate=\"" + attributes.onpopstate + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onprogress)) ? "" : "" + " onprogress=\"" + attributes.onprogress + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onratechange)) ? "" : "" + " onratechange=\"" + attributes.onratechange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onreset)) ? "" : "" + " onreset=\"" + attributes.onreset + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onresize)) ? "" : "" + " onresize=\"" + attributes.onresize + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onscroll)) ? "" : "" + " onscroll=\"" + attributes.onscroll + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onsearch)) ? "" : "" + " onsearch=\"" + attributes.onsearch + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onseeked)) ? "" : "" + " onseeked=\"" + attributes.onseeked + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onseeking)) ? "" : "" + " onseeking=\"" + attributes.onseeking + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onselect)) ? "" : "" + " onselect=\"" + attributes.onselect + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onstalled)) ? "" : "" + " onstalled=\"" + attributes.onstalled + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onstorage)) ? "" : "" + " onstorage=\"" + attributes.onstorage + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onsubmit)) ? "" : "" + " onsubmit=\"" + attributes.onsubmit + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onsuspend)) ? "" : "" + " onsuspend=\"" + attributes.onsuspend + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ontimeupdate)) ? "" : "" + " ontimeupdate=\"" + attributes.ontimeupdate + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onunload)) ? "" : "" + " onunload=\"" + attributes.onunload + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onvolumechange)) ? "" : "" + " onvolumechange=\"" + attributes.onvolumechange + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onwaiting)) ? "" : "" + " onwaiting=\"" + attributes.onwaiting + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.onwheel)) ? "" : "" + " onwheel=\"" + attributes.onwheel + "\"");
+            result.Append((!attributes.spellcheck) ? "" : "" + " spellcheck");
+            result.Append((string.IsNullOrWhiteSpace(attributes.style)) ? "" : "" + " style=\"" + attributes.style + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.tabindex)) ? "" : "" + " tabindex=\"" + attributes.tabindex + "\"");
+            result.Append((attributes.target.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlAttributeTarget.none)) ? "" : "" + " enctype=\"" + attributes.target + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.title)) ? "" : "" + " title=\"" + attributes.title + "\"");
+            result.Append((!attributes.translate) ? "" : "" + " translate");
+            return result.ToString();
         }
         //
         //====================================================================================================
-        /// <summary>
-        /// create an html form
-        /// </summary>
-        /// <param name="innerHtml"></param>
-        /// <param name="actionQueryString"></param>
-        /// <param name="htmlName"></param>
-        /// <param name="htmlId"></param>
-        /// <param name="htmlMethod"></param>
-        /// <returns></returns>
-        public static string form(CoreController core, string innerHtml, string actionQueryString = "", string htmlName = "", string htmlClass = "", string htmlId = "", string htmlMethod = "post") {
-            if (string.IsNullOrEmpty(actionQueryString)) actionQueryString = core.doc.refreshQueryString;
-            //
-            // todo - remove comments if this is correct
-            // -- I dont think serverActionForm is correct. Form action, if not provided should be refreshQueryString
-            string action = "?" + actionQueryString;
-            string result = "<form name=\"" + htmlName + "\" action=\"" + action + "\" method=\"" + htmlMethod + "\" style=\"display: inline;\"";
-            result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
-            result += (string.IsNullOrWhiteSpace(htmlId)) ? "" : "" + " id=\"" + htmlId + "\"";
-            result += (string.IsNullOrWhiteSpace(htmlClass)) ? "" : "" + " class=\"" + htmlClass + "\"";
-            result += ">";
-            return result + innerHtml + "</form>";
+        //
+        public static string form(CoreController core, string innerHtml, Contensive.CPBase.BaseModels.HtmlAttributesForm attributes) {
+            StringBuilder result = new StringBuilder("<form");
+            result.Append(getHtmlAttributes(core, attributes));
+            return result + ">" + innerHtml + "</form>";
+        }
+        //
+        public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass, string htmlId) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = actionQueryString,
+                style = "display: inline",
+                name = htmlName,
+                @class = htmlClass,
+                id = htmlId,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+            });
+        }
+        //
+        public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = actionQueryString,
+                style = "display: inline",
+                name = htmlName,
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+            });
+        }
+        //
+        public static string form(CoreController core, string innerHtml, string actionQueryString) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = actionQueryString,
+                style = "display: inline",
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+            });
+        }
+        //
+        public static string form(CoreController core, string innerHtml) {
+            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+                action = "?" + core.doc.refreshQueryString,
+                style = "display: inline",
+                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+            });
         }
         //
         //====================================================================================================
@@ -1325,7 +1494,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- AC Tags, Would like to replace these with Add-ons eventually
                     int ItemsSize = 100;
-                    string[] Items = new string[101];
+                    string[] ItemsHtmlId = new string[101];
+                    string[] ItemsJson = new string[101];
                     int ItemsCnt = 0;
                     var Index = new KeyPtrController();
                     //
@@ -1333,7 +1503,8 @@ namespace Contensive.Processor.Controllers {
                     string IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text,";
                     string IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block Start", "Block text to all except selected groups starting at this point", "", 0);
                     IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                    Items[ItemsCnt] = "['Block Text','" + IconImg + "']";
+                    ItemsHtmlId[ItemsCnt] = "['Block Text','{%{\"Block Text\":{\"Group\":\"EnterGroupName\"}}%}']";
+                    ItemsJson[ItemsCnt] = "['Block Text','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
                     ItemsCnt += 1;
                     //
@@ -1342,7 +1513,8 @@ namespace Contensive.Processor.Controllers {
                     IconIDControlString = "AC," + ACTypeAggregateFunction + ",0,Block Text End,";
                     IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Text Block End", "End of text block", "", 0);
                     IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                    Items[ItemsCnt] = "['Block Text End','" + IconImg + "']";
+                    ItemsHtmlId[ItemsCnt] = "['Block Text End','{%{\"Block Text End\"%}']";
+                    ItemsJson[ItemsCnt] = "['Block Text End','" + IconImg + "']";
                     Index.setPtr("Block Text", ItemsCnt);
                     ItemsCnt += 1;
                     //
@@ -1360,7 +1532,8 @@ namespace Contensive.Processor.Controllers {
                         IconIDControlString = "AC,PERSONALIZATION,0,Personalization,field=[" + selectOptions + "]";
                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, "Any Personalization Field", "Renders as any Personalization Field", "", 0);
                         IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                        Items[ItemsCnt] = "['Personalization','" + IconImg + "']";
+                        ItemsHtmlId[ItemsCnt] = "['Personalization','" + IconImg + "']";
+                        ItemsJson[ItemsCnt] = "['Personalization','{%{\"Personalization\":{\"name\":\"firstName\"}}%}']";
                         Index.setPtr("Personalization", ItemsCnt);
                         ItemsCnt += 1;
                         //
@@ -1375,45 +1548,48 @@ namespace Contensive.Processor.Controllers {
                             IconIDControlString = "AC," + ACTypeTemplateContent + ",0,Template Content,";
                             IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 64, 0, false, IconIDControlString, "" + cdnPrefix + "images/ACTemplateContentIcon.gif", core.appConfig.cdnFileUrl, "Content Box", "Renders as the content for a template", "", 0);
                             IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                            Items[ItemsCnt] = "['Content Box','" + IconImg + "']";
+                            ItemsHtmlId[ItemsCnt] = "['Content Box','" + IconImg + "']";
+                            ItemsJson[ItemsCnt] = "['Content Box','{%{\"ContentBox\"%}']";
                             Index.setPtr("Content Box", ItemsCnt);
                             ItemsCnt += 1;
                             //
                             IconIDControlString = "AC," + ACTypeTemplateText + ",0,Template Text,Name=Default";
                             IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 52, 52, 0, false, IconIDControlString, "" + cdnPrefix + "images/ACTemplateTextIcon.gif", core.appConfig.cdnFileUrl, "Template Text", "Renders as a template text block", "", 0);
-                            IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                            Items[ItemsCnt] = "['Template Text','" + IconImg + "']";
+                            IconImg = encodeJavascriptStringSingleQuote(IconImg);
+                            ItemsHtmlId[ItemsCnt] = "['Template Text','" + IconImg + "']";
+                            ItemsJson[ItemsCnt] = "['Template Text','{%{\"TemplateText\"%}']";
                             Index.setPtr("Template Text", ItemsCnt);
                             ItemsCnt += 1;
                         }
                     } else {
-                        //
-                        // ----- Web Only AC Tags
-                        //
-                        // Watch Lists
-                        //
-                        using (var csData = new CsModel(core)) {
-                            if (csData.open("Content Watch Lists", "", "Name,ID", false, 0, "Name,ID", 20, 1)) {
-                                while (csData.ok()) {
-                                    string FieldName = encodeText(csData.getText("name")).Trim(' ');
-                                    if (!string.IsNullOrEmpty(FieldName)) {
-                                        string FieldCaption = "Watch List [" + FieldName + "]";
-                                        IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
-                                        IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
-                                        IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
-                                        FieldCaption = GenericController.encodeJavascriptStringSingleQuote(FieldCaption);
-                                        Items[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
-                                        Index.setPtr(FieldCaption, ItemsCnt);
-                                        ItemsCnt += 1;
-                                        if (ItemsCnt >= ItemsSize) {
-                                            ItemsSize = ItemsSize + 100;
-                                            Array.Resize(ref Items, ItemsSize + 1);
-                                        }
-                                    }
-                                    csData.goNext();
-                                }
-                            }
-                        }
+                        ////
+                        //// ----- Web Only AC Tags
+                        ////
+                        //// Watch Lists
+                        ////
+                        //using (var csData = new CsModel(core)) {
+                        //    if (csData.open("Content Watch Lists", "", "Name,ID", false, 0, "Name,ID", 20, 1)) {
+                        //        while (csData.ok()) {
+                        //            string FieldName = encodeText(csData.getText("name")).Trim(' ');
+                        //            if (!string.IsNullOrEmpty(FieldName)) {
+                        //                string FieldCaption = "Watch List [" + FieldName + "]";
+                        //                IconIDControlString = "AC,WATCHLIST,0," + FieldName + ",ListName=" + FieldName + "&SortField=[DateAdded|Link|LinkLabel|Clicks|WhatsNewDateExpires]&SortDirection=Z-A[A-Z|Z-A]";
+                        //                IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, 0, 0, 0, true, IconIDControlString, "", core.appConfig.cdnFileUrl, FieldCaption, "Rendered as the " + FieldCaption, "", 0);
+                        //                IconImg = GenericController.encodeJavascriptStringSingleQuote(IconImg);
+                        //                FieldCaption = GenericController.encodeJavascriptStringSingleQuote(FieldCaption);
+                        //                ItemsHtmlId[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
+                        //                ItemsJson[ItemsCnt] = "['" + FieldCaption + "','" + IconImg + "']";
+                        //                Index.setPtr(FieldCaption, ItemsCnt);
+                        //                ItemsCnt += 1;
+                        //                if (ItemsCnt >= ItemsSize) {
+                        //                    ItemsSize = ItemsSize + 100;
+                        //                    Array.Resize(ref ItemsHtmlId, ItemsSize + 1);
+                        //                }
+                        //            }
+                        //            csData.goNext();
+                        //        }
+                        //    }
+                        //}
                     }
                     //
                     // -- addons
@@ -1466,45 +1642,48 @@ namespace Contensive.Processor.Controllers {
                                         // Calculate DefaultAddonOption_String
                                         //
                                         string ArgumentList = csData.getText("ArgumentList").Trim(' ');
-                                        string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline);
+                                        string jsonCommand = "";
+                                        string defaultAddonOptions = AddonController.getDefaultAddonOptions(core, ArgumentList, addonGuid, IsInline, addonName, ref jsonCommand);
                                         defaultAddonOptions = encodeHtml(defaultAddonOptions);
                                         LastAddonName = addonName;
                                         IconIDControlString = "AC,AGGREGATEFUNCTION,0," + addonName + "," + defaultAddonOptions + "," + addonGuid;
                                         IconImg = AddonController.getAddonIconImg("/" + core.appConfig.adminRoute, IconWidth, IconHeight, IconSprites, IsInline, IconIDControlString, IconFilename, core.appConfig.cdnFileUrl, addonName, "Rendered as the Add-on [" + addonName + "]", "", 0);
-                                        Items[ItemsCnt] = "['" + GenericController.encodeJavascriptStringSingleQuote(addonName) + "','" + GenericController.encodeJavascriptStringSingleQuote(IconImg) + "']";
+                                        ItemsHtmlId[ItemsCnt] = "['" + encodeJavascriptStringSingleQuote(addonName) + "','" + encodeJavascriptStringSingleQuote(IconImg) + "']";
+                                        ItemsJson[ItemsCnt] = "['" + encodeJavascriptStringSingleQuote(addonName) + "','" + encodeJavascriptStringSingleQuote(jsonCommand) + "']";
                                         Index.setPtr(addonName, ItemsCnt);
                                         ItemsCnt += 1;
                                         if (ItemsCnt >= ItemsSize) {
                                             ItemsSize = ItemsSize + 100;
-                                            Array.Resize(ref Items, ItemsSize + 1);
+                                            Array.Resize(ref ItemsHtmlId, ItemsSize + 1);
+                                            Array.Resize(ref ItemsJson, ItemsSize + 1);
                                         }
                                     }
                                 }
                                 csData.goNext();
+                                
                             }
                         }
                     }
                     //
                     // Build output sting in alphabetical order by name
                     //
-                    string s = "";
                     int ItemsPtr = Index.getFirstPtr();
                     int LoopPtr = 0;
+                    bool useJson = core.siteProperties.getBoolean("wysiwyg clips use JSON commands", true);
                     while ((ItemsPtr >= 0) && (LoopPtr < ItemsCnt)) {
-                        s = s + Environment.NewLine + "," + Items[ItemsPtr];
+                        result += Environment.NewLine + "," + ((useJson) ? ItemsJson[ItemsPtr] : ItemsHtmlId[ItemsPtr]);
                         int PtrTest = Index.getNextPtr();
                         if (PtrTest < 0) {
                             break;
                         } else {
                             ItemsPtr = PtrTest;
                         }
-                        LoopPtr = LoopPtr + 1;
+                        LoopPtr += 1;
                     }
-                    if (!string.IsNullOrEmpty(s)) {
-                        s = "[" + s.Substring(3) + "]";
+                    if (!string.IsNullOrEmpty(result)) {
+                        result = "[" + result.Substring(3) + "]";
                     }
                     //
-                    result = s;
                     core.doc.wysiwygAddonList.Add(contentType, result);
                 }
             } catch (Exception ex) {

@@ -186,17 +186,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // Print common form elements
                 var Stream = new StringBuilderLegacyController();
-                Stream.add(getForm_EditFormStart(core, adminData, AdminFormEdit));
-                //
-                // -- custom fieldEditors
-                //   Editor Preference
-                //   any addon can be an editor for a fieldtype with a checkbox in the addon
-                //   the editor in any field can be over-ridden by just a single member with a popup next to the editor
-                //       that popup (fancybox) sets the hidden fieldEditorPreference to fieldid:addonid and submits the form
-                //       the edit form does a refresh action after setting the members property "editorPreferencesForContent:99"
-                //   if no editor preference, the default editor is used from a drop-down selection in fieldtypes
-                //   if nothing in field types, Contensive handles it internally
-                //
                 Stream.add("\r<input type=\"hidden\" name=\"fieldEditorPreference\" id=\"fieldEditorPreference\" value=\"\">");
                 string editSectionButtonBar = AdminUIController.getSectionButtonBarForEdit(core, editButtonBarInfo);
                 Stream.add(editSectionButtonBar);
@@ -222,8 +211,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 Stream.add(editSectionButtonBar);
                 Stream.add(HtmlController.inputHidden("FormFieldList", editorEnv.formFieldList));
-                Stream.add("</form>");
-                returnHtml = Stream.text;
+                returnHtml = wrapForm(core, Stream.text, adminData, AdminFormEdit);
                 //
                 // -- update page title
                 if (adminData.editRecord.id == 0) {
@@ -242,22 +230,24 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //========================================================================
         //
-        public static string getForm_EditFormStart(CoreController core, AdminDataModel adminData, int AdminFormID) {
-            string result = "";
+        private static string wrapForm( CoreController core, string innerHtml, AdminDataModel adminData, int AdminFormID) {
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");
-                result = HtmlController.formMultipart_start(core, core.doc.refreshQueryString, "", "ccForm", "adminEditForm");
-                result = GenericController.strReplace(result, ">", " onSubmit=\"cj.admin.saveEmptyFieldList('FormEmptyFieldList');\" autocomplete=\"off\">");
-                result += Environment.NewLine + "<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
+                string result = Environment.NewLine + "<!-- block --><div class=\"d-none\"><input type=password name=\"password_block\" value=\"\"><input type=text name=\"username_block\" value=\"\"></div><!-- end block -->";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + rnAdminSourceForm + "\" VALUE=\"" + AdminFormID + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameTitleExtension + "\" VALUE=\"" + adminData.titleExtension + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"" + RequestNameAdminDepth + "\" VALUE=\"" + adminData.ignore_legacyMenuDepth + "\">";
                 result += Environment.NewLine + "<input TYPE=\"hidden\" NAME=\"FormEmptyFieldList\" ID=\"FormEmptyFieldList\" VALUE=\",\">";
+                result += innerHtml;
+                return HtmlController.form(core, result, new CPBase.BaseModels.HtmlAttributesForm() {
+                    onsubmit = "cj.admin.saveEmptyFieldList('FormEmptyFieldList')",
+                    autocomplete = false
+                });
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return innerHtml;
             }
-            return result;
         }
         //
         //====================================================================================================

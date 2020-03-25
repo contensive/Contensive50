@@ -23,7 +23,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if (csData.ok()) {
                             string addonArgumentList = csData.getText("argumentlist");
                             bool addonIsInline = csData.getBoolean("IsInline");
-                            returnHtml = AddonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline);
+                            string jsonCommand = "";
+                            returnHtml = AddonController.getDefaultAddonOptions(core, addonArgumentList, AddonGuid, addonIsInline, csData.getText("name"), ref jsonCommand);
                         }
                     }
                 }

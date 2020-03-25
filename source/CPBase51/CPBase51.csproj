@@ -78,6 +78,15 @@
     <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\HtmlAttributesForm.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsClipboard.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsDrag.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsForm.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsGlobal.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsKeyboard.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsMedia.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsMouse.cs" />
     <Compile Include="BaseModels\NameValueBaseModel.cs" />
     <Compile Include="BaseModels\ServerConfigBaseModel.cs" />
     <Compile Include="BaseModels\CaseInsensitiveDictionaryBaseModel.cs" />
