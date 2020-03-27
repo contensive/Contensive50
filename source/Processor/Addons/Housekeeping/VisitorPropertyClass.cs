@@ -25,10 +25,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // Visitor Properties with no visitor
                 //
                 LogController.logInfo(core, "Deleting visitor properties with no visitor record.");
-                sql = "delete ccProperties"
-                    + " from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID"
-                    + " where ccproperties.typeid=2"
-                    + " and ccvisitors.id is null";
+                sql = "delete ccProperties from ccProperties LEFT JOIN ccvisitors on ccvisitors.ID=ccProperties.KeyID where ccproperties.typeid=2 and ccvisitors.id is null";
                 Task.Run(() => core.db.executeNonQueryAsync(sql));
 
             } catch (Exception ex) {

@@ -13,7 +13,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Send email by SMTP. return 'ok' if success, else return a user compatible error message
         /// </summary>
-        public static bool send(CoreController core, EmailController.EmailClass email, ref string reasonForFail, string awsAccessKeyId, string awsSecretAccessKey) {
+        public static bool send(CoreController core, EmailSendDomainModel email, ref string reasonForFail, string awsAccessKeyId, string awsSecretAccessKey) {
             string logShortDetail = ", subject [" + email.subject + "], toMemberId [" + email.toMemberId + "], toAddress [" + email.toAddress + "], fromAddress [" + email.fromAddress + "]";
             string logLongDetail = logShortDetail + ", BounceAddress [" + email.bounceAddress + "], replyToAddress [" + email.replyToAddress + "]";
             reasonForFail = "";

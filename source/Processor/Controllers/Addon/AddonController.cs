@@ -580,11 +580,20 @@ namespace Contensive.Processor.Controllers {
                     // -- restore the forceJavascriptToHead value of the caller
                     executeContext.forceJavascriptToHead = save_forceJavascriptToHead;
                     //
-                    // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
-                    if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
-                        resultString = core.html.getHtmlDoc(resultString, "<body>");
-                        if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
-                            resultString = NUglify.Uglify.Html(resultString).Code;
+                    // -- html-only addons
+                    if (executeContext.forceHtmlDocument || addon.htmlDocument) {
+                        //
+                        // -- if the executed content includes content cmds, we cant guarantee it didnt come from user data
+                        if (core.siteProperties.beta200327_BlockCCmdCodeAfterAddonExec) {
+                            resultString = resultString.Replace("{%", "{_%").Replace("%}", "%_}");
+                        }
+                        //
+                        // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
+                        if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                            resultString = core.html.getHtmlDoc(resultString, "<body>");
+                            if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
+                                resultString = NUglify.Uglify.Html(resultString).Code;
+                            }
                         }
                     }
                     //

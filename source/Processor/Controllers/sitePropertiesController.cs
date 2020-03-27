@@ -591,6 +591,51 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private Dictionary<string, string> _nameValueDict = null;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// While rendering page content, the legacy content from the page content record needs to be {%%} rendered, but newer addonList rendering should not be
+        /// because it can contain user submitted data on forms, etc.
+        /// This change moves the execution down to a lower level method, and conditions it on the type of content.
+        /// </summary>
+        public bool beta200327_BlockCCmdPostPageRender {
+            get {
+                if (_beta200327_BlockCCmdPostPageRender == null) {
+                    _beta200327_BlockCCmdPostPageRender = getBoolean("Beta200327 block content cmd post page render", true);
+                }
+                return encodeBoolean(_beta200327_BlockCCmdPostPageRender);
+            }
+        }
+        private bool? _beta200327_BlockCCmdPostPageRender = null;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// After the execution of an addon, if the resulting content inludes {%%}, it could have come from
+        /// user submitted data (contact us form). remove {%%} during addon execution post processing
+        /// </summary>
+        public bool beta200327_BlockCCmdCodeAfterAddonExec {
+            get {
+                if (_beta200327_BlockCCmdCodeAfterAddonExec == null) {
+                    _beta200327_BlockCCmdCodeAfterAddonExec = getBoolean("Beta200327 block content cmd after addon execute", true);
+                }
+                return encodeBoolean(_beta200327_BlockCCmdCodeAfterAddonExec);
+            }
+        }
+        private bool? _beta200327_BlockCCmdCodeAfterAddonExec = null;
 
+        //
+        //====================================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool beta200327_BlockCCmdForJSONRemoteMethods {
+            get {
+                if (_beta200327_BlockCCmdForJSONRemoteMethods == null) {
+                    _beta200327_BlockCCmdForJSONRemoteMethods = getBoolean("Beta200327 block content cmd For JSON Remote Methods", true);
+                }
+                return encodeBoolean(_beta200327_BlockCCmdForJSONRemoteMethods);
+            }
+        }
+        private bool? _beta200327_BlockCCmdForJSONRemoteMethods = null;
     }
 }

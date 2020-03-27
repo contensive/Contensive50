@@ -844,8 +844,7 @@ namespace Contensive.Processor.Controllers {
             var result = new StringBuilder();
             result.Append((string.IsNullOrWhiteSpace(attributes.acceptcharset)) ? "" : "" + " accept-charset=\"" + attributes.acceptcharset + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.accesskey)) ? "" : "" + " accesskey=\"" + attributes.accesskey + "\"");
-            string action = (string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : " action=\"" + attributes.action + "\"";
-            result.Append(" action=\"" + action + "\"");
+            result.Append(" action=\"" + ((string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : attributes.action) + "\"");
             result.Append((!attributes.autocomplete) ? "" : "" + " autocomplete=\"on\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.@class)) ? "" : "" + " class=\"" + attributes.@class + "\"");
             result.Append((!attributes.contenteditable) ? "" : "" + " contenteditable=\"true\"");
@@ -857,23 +856,23 @@ namespace Contensive.Processor.Controllers {
             result.Append((string.IsNullOrWhiteSpace(attributes.dir)) ? "" : "" + " dir=\"" + attributes.dir + "\"");
             result.Append((!attributes.draggable) ? "" : "" + " draggable=\"true\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.dropzone)) ? "" : "" + " dropzone=\"" + attributes.dropzone + "\"");
+            switch (attributes.enctype) {
+                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
+                        result.Append(" enctype=\"application/x-www-form-urlencoded\"");
+                        break;
+                    }
+                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.text_plain: {
+                        result.Append(" enctype=\"text/plain\"");
+                        break;
+                    }
+                default: {
+                        //
+                        // -- none and multipart, use multi-part -- should be the default so a simple form call works with file uploads
+                        result.Append(" enctype=\"multipart/form-data\"");
+                        break;
+                    }
+            }
             if (!attributes.enctype.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.none)) {
-                string encType;
-                switch (attributes.enctype) {
-                    case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
-                            encType = "application/x-www-form-urlencoded";
-                            break;
-                        }
-                    case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data: {
-                            encType = "multipart/form-data";
-                            break;
-                        }
-                    default: {
-                            encType = "text/plain";
-                            break;
-                        }
-                }
-                result.Append(" enctype=\"" + encType + "\"");
             }
             result.Append((!attributes.hidden) ? "" : "" + " hidden");
             result.Append((string.IsNullOrWhiteSpace(attributes.id)) ? "" : "" + " id=\"" + attributes.id + "\"");

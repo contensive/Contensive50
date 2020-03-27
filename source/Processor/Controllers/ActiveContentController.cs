@@ -1264,6 +1264,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addonContext"></param>
         /// <returns></returns>
         public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int deprecated_ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
+            if (core.siteProperties.beta200327_BlockCCmdForJSONRemoteMethods) { return Source; }
             string result = Source;
             result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin);
             result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());

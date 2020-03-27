@@ -779,7 +779,11 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- encode the copy
-                    result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    if (!core.siteProperties.beta200327_BlockCCmdPostPageRender) {
+                        //
+                        // -- {%%} execution should be limited to legacy pagecontent.copy only so this was moved down to _contentbox_renderelements
+                        result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                    }
                     if (!string.IsNullOrWhiteSpace(result) && !string.IsNullOrWhiteSpace(core.doc.refreshQueryString)) {
                         result = result.Replace("?method=login", "?method=Login&" + core.doc.refreshQueryString);
                     }
@@ -812,7 +816,11 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         //
                         // Live content
-                        result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                        if (!core.siteProperties.beta200327_BlockCCmdPostPageRender) {
+                            //
+                            // -- {%%} execution should be limited to legacy pagecontent.copy only so this was moved down to _contentbox_renderelements
+                            result = ActiveContentController.renderHtmlForWeb(core, result, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
+                        }
                         if (!core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
                             //
                             // -- tracking
@@ -1045,6 +1053,13 @@ namespace Contensive.Processor.Controllers {
                             if (core.session.isEditing(PageContentModel.tableMetadata.contentName)) {
                                 htmlPageContent = "\r<p><!-- Empty Content Placeholder --></p>";
                             }
+                        }
+                        if (core.siteProperties.beta200327_BlockCCmdPostPageRender) {
+                            //
+                            // -- page content, directly from the record can be {%%} rendered.
+                            // -- if the content includes {%%} executables, render them
+                            // -- if those executables return content containing executables, those are block by post-processing executeaddon result to remove {%%}
+                            htmlPageContent = ActiveContentController.renderHtmlForWeb(core, htmlPageContent, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id, core.doc.pageController.page.contactMemberId, "http://" + core.webServer.requestDomain, core.siteProperties.defaultWrapperID, CPUtilsBaseClass.addonContext.ContextPage);
                         }
                         resultInnerContent.Append(htmlPageContent);
                     }
