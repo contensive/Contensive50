@@ -703,8 +703,10 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                 case "date": {
                                                                         //
-                                                                        if (!string.IsNullOrEmpty(fieldValue)) {
-                                                                            fieldValue = GenericController.encodeDate(fieldValue).ToString();
+                                                                        if(encodeDateMinValue(encodeDate(fieldValue)).Equals(DateTime.MinValue)) {
+                                                                            //
+                                                                            // -- value is not a valid date, save empty
+                                                                            fieldValue = "";
                                                                         }
                                                                         core.siteProperties.setProperty(fieldName, fieldValue);
                                                                         break;

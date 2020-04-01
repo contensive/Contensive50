@@ -31,6 +31,18 @@ namespace Contensive.Processor.Controllers {
         public ServerConfigModel serverConfig { get; set; }
         //
         //===================================================================================================
+        //
+        public AwsCredentialsModel awsCredentials {
+            get {
+                if(_awsCredentials==null) {
+                    _awsCredentials = new AwsCredentialsModel(this);
+                }
+                return _awsCredentials;
+            }
+        }
+        private AwsCredentialsModel _awsCredentials = null;
+        //
+        //===================================================================================================
         /// <summary>
         /// An instance of the sessionController, populated for the current session (user state, visit state, etc)
         /// </summary>

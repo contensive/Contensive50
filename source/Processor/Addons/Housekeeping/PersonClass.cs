@@ -10,7 +10,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 LogController.logInfo(core, "Housekeep, people");
                 //
-                //
                 // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
                 core.db.executeNonQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
                 //
@@ -59,6 +58,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     + " and(m.dateadded=m.lastvisit)"
                     + " and(v.id is null)";
                 core.db.executeNonQuery(sql);
+                //
+                // -- mark all people allowbulkemail if their email address is in the emailbouncelist
+                sql = "update ccmembers set allowbulkemail=0 from ccmembers m left join emailbouncelist b on b.name LIKE CONCAT('%', m.[email], '%') where b.id is not null and m.email is not null";
+                core.cpParent.Db.ExecuteNonQuery(sql);
+                //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

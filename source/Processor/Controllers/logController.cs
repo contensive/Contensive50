@@ -27,8 +27,8 @@ namespace Contensive.Processor.Controllers {
             var awsTarget = new AWSTarget {
                 Layout = "${longdate}|${level:uppercase=true}|${callsite}|${message}",
                 LogGroup = core.serverConfig.awsCloudWatchLogGroup,
-                Region = core.serverConfig.awsRegionName,
-                Credentials = new Amazon.Runtime.BasicAWSCredentials(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey),
+                Region = core.awsCredentials.awsRegion.DisplayName,
+                Credentials = new Amazon.Runtime.BasicAWSCredentials(core.awsCredentials.awsAccessKeyId, core.awsCredentials.awsSecretAccessKey),
                 LogStreamNamePrefix = core.appConfig.name,
                 LogStreamNameSuffix = "NLog",
                 MaxQueuedMessages = 5000

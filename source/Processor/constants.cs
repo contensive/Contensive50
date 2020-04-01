@@ -904,8 +904,6 @@ namespace Contensive.Processor {
         //
         // -- AWS key to use for this site, for SES email and related Queue access
         internal const string spSendEmailWithAmazonSES = "AWS Use Amazon SES";
-        internal const string spAwsSecretAccessKey = "AWS Secret Access Key";
-        internal const string spAwsAccessKeyId = "AWS Access Key Id";
         //
         //=======================================================================
         //   content replacements

@@ -8,7 +8,7 @@
     <owners>Contensive</owners>
     <license type="expression">MIT</license>
     <projectUrl>http://contensive.io</projectUrl>
-    <iconUrl>http://contensive.io/cio/files/cclibraryfiles/filename/000000000003/ContensiveLogo-64x64.png</iconUrl>
+    <iconUrl>http://contensive.io/cio/files/cclibraryfiles/filename/000000000005/LogoBalls.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
 	<summary>The models shared between Contensive modules and available for addon assemblies.</summary>
     <description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.

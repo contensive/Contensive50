@@ -870,115 +870,100 @@ namespace Contensive.Processor.Controllers {
                 // -- read back the marked record and if it is there, then no other process is likely looking at it so it can be sent
                 // -- this will help prevent duplicate sends, and if the process aborts, only one queued email per queue will be stuck
                 List<EmailQueueModel> queueSampleList = DbBaseModel.createList<EmailQueueModel>(core.cpParent, "", "immediate,id desc", 100, 1);
-                //
-                // -- site property sendWithSES lets the system send SMTP
-                string awsSecretAccessKey="";
-                string awsAccessKeyId = "";
                 bool sendWithSES = core.siteProperties.getBoolean(Constants.spSendEmailWithAmazonSES);
-                if (sendWithSES) {
-                    //
-                    // -- site properties for aws credentials lets the system override the system credentials
-                    awsSecretAccessKey = core.siteProperties.getText(Constants.spAwsSecretAccessKey);
-                    awsAccessKeyId = core.siteProperties.getText(Constants.spAwsAccessKeyId);
-                    if (string.IsNullOrWhiteSpace(spAwsSecretAccessKey) && string.IsNullOrWhiteSpace(spAwsAccessKeyId)) {
-                        //
-                        // -- if both override account entries are blank, use the server account
-                        LogController.logInfo(core, "app overrides server AWS credentials with site properties name [" + Constants.spAwsAccessKeyId + "], secret [" + Constants.spAwsSecretAccessKey + "]");
-                        awsAccessKeyId = core.serverConfig.awsAccessKey;
-                        awsSecretAccessKey = core.serverConfig.awsSecretAccessKey;
-                    }
-                }
                 //
                 LogController.logInfo(core, "sending queued email with " + (sendWithSES ? "AWS SES" : "SMTP") + ", based on site property [" + Constants.spSendEmailWithAmazonSES + "]");
                 //
-                foreach (EmailQueueModel queueSample in queueSampleList) {
-                    //
-                    // -- mark the current sample and select back asa target if it marked, send or skip
-                    string targetGuid = GenericController.getGUID();
-                    core.db.update(EmailQueueModel.tableMetadata.tableNameLower, "(ccguid=" + DbController.encodeSQLText(queueSample.ccguid) + ")", new System.Collections.Specialized.NameValueCollection() { { "ccguid", targetGuid } });
-                    EmailQueueModel targetQueueRecord = DbBaseModel.create<EmailQueueModel>(core.cpParent, targetGuid);
-                    if(targetQueueRecord!=null) {
+                using (var sesClient = AwsSesController.getSesClient(core)) {
+                    foreach (EmailQueueModel queueSample in queueSampleList) {
                         //
-                        // -- this queue record is not shared with another process, send it
-                        DbBaseModel.delete<EmailQueueModel>(core.cpParent, targetQueueRecord.id);
-                        int emailDropId = 0;
-                        EmailSendDomainModel emailData = DeserializeObject<EmailSendDomainModel>(targetQueueRecord.content);
-                        List<EmailDropModel> DropList = DbBaseModel.createList<EmailDropModel>(core.cpParent, "(emailId=" + emailData.emailId + ")", "id desc");
-                        if (DropList.Count > 0) {
-                            emailDropId = DropList.First().id;
-                        }
-                        string reasonForFail = "";
-                        bool sendSuccess = false;
-                        if (sendWithSES) {
+                        // -- mark the current sample and select back asa target if it marked, send or skip
+                        string targetGuid = GenericController.getGUID();
+                        core.db.update(EmailQueueModel.tableMetadata.tableNameLower, "(ccguid=" + DbController.encodeSQLText(queueSample.ccguid) + ")", new System.Collections.Specialized.NameValueCollection() { { "ccguid", targetGuid } });
+                        EmailQueueModel targetQueueRecord = DbBaseModel.create<EmailQueueModel>(core.cpParent, targetGuid);
+                        if (targetQueueRecord != null) {
                             //
-                            // -- send with Amazon SES
-                            sendSuccess = EmailAmazonSESController.send(core, emailData, ref reasonForFail, awsAccessKeyId, awsSecretAccessKey);
-                        } else {
-                            //
-                            // --fall back to SMTP
-                            sendSuccess = EmailSmtpController.send(core, emailData, ref reasonForFail);
-                        }
-
-                        if (sendSuccess) {
-                            //
-                            // -- success, log the send
-                            var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
-                            log.name = "Successfully sent: " + targetQueueRecord.name;
-                            log.toAddress = emailData.toAddress;
-                            log.fromAddress = emailData.fromAddress;
-                            log.subject = emailData.subject;
-                            log.body = emailData.htmlBody;
-                            log.sendStatus = "ok";
-                            log.logType = EmailLogTypeImmediateSend;
-                            log.emailId = emailData.emailId;
-                            log.memberId = emailData.toMemberId;
-                            log.emailDropId = emailDropId;
-                            log.save(core.cpParent);
-                            LogController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "]");
-                        } else {
-                            //
-                            // -- fail, retry
-                            if (emailData.attempts >= 3) {
+                            // -- this queue record is not shared with another process, send it
+                            DbBaseModel.delete<EmailQueueModel>(core.cpParent, targetQueueRecord.id);
+                            int emailDropId = 0;
+                            EmailSendDomainModel emailData = DeserializeObject<EmailSendDomainModel>(targetQueueRecord.content);
+                            List<EmailDropModel> DropList = DbBaseModel.createList<EmailDropModel>(core.cpParent, "(emailId=" + emailData.emailId + ")", "id desc");
+                            if (DropList.Count > 0) {
+                                emailDropId = DropList.First().id;
+                            }
+                            string reasonForFail = "";
+                            bool sendSuccess = false;
+                            if (sendWithSES) {
                                 //
-                                // -- too many retries, log error
-                                string sendStatus = "Failed after 3 retries, reason [" + reasonForFail + "]";
-                                sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
-                                var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
-                                log.name = "Aborting unsuccessful send: " + targetQueueRecord.name;
-                                log.toAddress = emailData.toAddress;
-                                log.fromAddress = emailData.fromAddress;
-                                log.subject = emailData.subject;
-                                log.body = emailData.htmlBody;
-                                log.sendStatus = sendStatus;
-                                log.logType = EmailLogTypeImmediateSend;
-                                log.emailId = emailData.emailId;
-                                log.memberId = emailData.toMemberId;
-                                log.save(core.cpParent);
-                                LogController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
+                                // -- send with Amazon SES
+                                sendSuccess = AwsSesController.send(core, sesClient, emailData, ref reasonForFail);
                             } else {
                                 //
-                                // -- fail, add back to end of queue for retry
-                                string sendStatus = "Retrying unsuccessful send (" + emailData.attempts + " of 3), reason [" + reasonForFail + "]";
-                                sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
-                                emailData.attempts += 1;
+                                // --fall back to SMTP
+                                sendSuccess = EmailSmtpController.send(core, emailData, ref reasonForFail);
+                            }
+
+                            if (sendSuccess) {
+                                //
+                                // -- success, log the send
                                 var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
-                                log.name = "Failed send queued for retry: " + targetQueueRecord.name;
+                                log.name = "Successfully sent: " + targetQueueRecord.name;
                                 log.toAddress = emailData.toAddress;
                                 log.fromAddress = emailData.fromAddress;
                                 log.subject = emailData.subject;
                                 log.body = emailData.htmlBody;
-                                log.sendStatus = sendStatus;
+                                log.sendStatus = "ok";
                                 log.logType = EmailLogTypeImmediateSend;
                                 log.emailId = emailData.emailId;
                                 log.memberId = emailData.toMemberId;
+                                log.emailDropId = emailDropId;
                                 log.save(core.cpParent);
-                                queueEmail(core, false, targetQueueRecord.name, emailData);
-                                LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + emailData.attempts + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
+                                LogController.logInfo(core, "sendEmailInQueue, send successful, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "]");
+                            } else {
+                                //
+                                // -- fail, retry
+                                if (emailData.attempts >= 3) {
+                                    //
+                                    // -- too many retries, log error
+                                    string sendStatus = "Failed after 3 retries, reason [" + reasonForFail + "]";
+                                    sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
+                                    var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
+                                    log.name = "Aborting unsuccessful send: " + targetQueueRecord.name;
+                                    log.toAddress = emailData.toAddress;
+                                    log.fromAddress = emailData.fromAddress;
+                                    log.subject = emailData.subject;
+                                    log.body = emailData.htmlBody;
+                                    log.sendStatus = sendStatus;
+                                    log.logType = EmailLogTypeImmediateSend;
+                                    log.emailId = emailData.emailId;
+                                    log.memberId = emailData.toMemberId;
+                                    log.save(core.cpParent);
+                                    LogController.logInfo(core, "sendEmailInQueue, send FAILED [" + reasonForFail + "], NOT resent because too many retries, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
+                                } else {
+                                    //
+                                    // -- fail, add back to end of queue for retry
+                                    string sendStatus = "Retrying unsuccessful send (" + emailData.attempts + " of 3), reason [" + reasonForFail + "]";
+                                    sendStatus = sendStatus.Substring(0, (sendStatus.Length > 254) ? 254 : sendStatus.Length);
+                                    emailData.attempts += 1;
+                                    var log = EmailLogModel.addDefault<EmailLogModel>(core.cpParent);
+                                    log.name = "Failed send queued for retry: " + targetQueueRecord.name;
+                                    log.toAddress = emailData.toAddress;
+                                    log.fromAddress = emailData.fromAddress;
+                                    log.subject = emailData.subject;
+                                    log.body = emailData.htmlBody;
+                                    log.sendStatus = sendStatus;
+                                    log.logType = EmailLogTypeImmediateSend;
+                                    log.emailId = emailData.emailId;
+                                    log.memberId = emailData.toMemberId;
+                                    log.save(core.cpParent);
+                                    queueEmail(core, false, targetQueueRecord.name, emailData);
+                                    LogController.logInfo(core, "sendEmailInQueue, failed attempt (" + emailData.attempts + " of 3), reason [" + reasonForFail + "], added to end of queue, toAddress [" + emailData.toAddress + "], fromAddress [" + emailData.fromAddress + "], subject [" + emailData.subject + "], attempts [" + emailData.attempts + "]");
+                                }
                             }
                         }
                     }
+                    return;
                 }
-                return;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }

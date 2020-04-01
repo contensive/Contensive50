@@ -88,6 +88,18 @@ namespace Contensive.BaseModels {
         /// if true, the command line delete cannot delete this app
         /// </summary>
         public abstract bool deleteProtection { get; set; }
+        /// <summary>
+        /// Emails per month. if 0 unlimited
+        /// </summary>
+        public abstract int emailLimit { get; set; }
+        /// <summary>
+        /// limit to members (accounts with membership, users, ?)
+        /// </summary>
+        public abstract int memberLimit { get; set; }
+        /// <summary>
+        /// limit to the number of content managers
+        /// </summary>
+        public abstract int adminLimit { get; set; }
         //
         //====================================================================================================
         /// <summary>

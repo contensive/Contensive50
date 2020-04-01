@@ -54,8 +54,8 @@ namespace Contensive.Processor.Controllers {
             get {
                 if (_s3Client == null) {
                     LogController.logInfo(core, "construct Amazon S3 client");
-                    Amazon.RegionEndpoint awsRegionEndpoint = RegionEndpoint.GetBySystemName(core.serverConfig.awsRegionName);
-                    _s3Client = new AmazonS3Client(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey, awsRegionEndpoint);
+                    
+                    _s3Client = new AmazonS3Client(core.serverConfig.awsAccessKey, core.serverConfig.awsSecretAccessKey, core.awsCredentials.awsRegion);
                 };
                 return _s3Client;
             }

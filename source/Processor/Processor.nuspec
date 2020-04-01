@@ -8,26 +8,30 @@
         <owners>Contensive</owners>
         <license type="expression">MIT</license>
         <projectUrl>http://contensive.io/</projectUrl>
-        <iconUrl>http://contensive.io/cio/files/cclibraryfiles/filename/000000000003/ContensiveLogo-64x64.png</iconUrl>
+        <iconUrl>http://contensive.io/cio/files/cclibraryfiles/filename/000000000005/LogoBalls.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <description>This package installs the library files required to create an instance of cp within an application.</description>
         <releaseNotes></releaseNotes>
         <copyright>Copyright 2019</copyright>
         <tags>Contensive</tags>
 		<dependencies>
-			<dependency id="Contensive.CPBaseClass" version="5.1.190821.8" />
-			<dependency id="Contensive.DbModels" version="5.1.190821.8" />
-			<dependency id="Amazon.ElastiCacheCluster" version="1.0.1" />
-			<dependency id="AWS.Logger.NLog" version="1.4.0" />
-			<dependency id="AWSSDK.CloudWatchLogs" version="3.3.101.15" />
-			<dependency id="AWSSDK.S3" version="3.3.104.19" />
-			<dependency id="AWSSDK.SimpleEmail" version="3.3.101.37" />
+      <dependency id="Amazon.ElastiCacheCluster" version="1.0.1" />
+      <dependency id="AWS.Logger.Core" version="1.6.0" />
+      <dependency id="AWS.Logger.NLog" version="1.5.2" />
+      <dependency id="AWSSDK.CloudWatchLogs" version="3.3.101.101" />
+      <dependency id="AWSSDK.Core" version="3.3.105.5" />
+      <dependency id="AWSSDK.S3" version="3.3.110.42" />
+      <dependency id="AWSSDK.SimpleEmail" version="3.3.101.122" />
+      <dependency id="AWSSDK.SimpleNotificationService" version="3.3.101.140" />
+      <dependency id="AWSSDK.SQS" version="3.3.102.83" />
+      <dependency id="Contensive.CPBaseClass" version="5.2003.30.1" />      
+      <dependency id="Contensive.DbModels" version="5.2003.30.1" />      
 			<dependency id="EnyimMemcached" version="2.16.0" />
-			<dependency id="EnyimMemcached-NLog" version="2.16.0" />
-			<dependency id="Microsoft.ClearScript" version="5.6.0" />
-			<dependency id="Newtonsoft.Json" version="12.0.2" />
-			<dependency id="NLog" version="4.6.6" />
-			<dependency id="NUglify" version="1.5.13" />
+			<dependency id="EnyimMemcached-NLog" version="2.16.0" />      
+			<dependency id="Microsoft.ClearScript" version="6.0.0" />      
+			<dependency id="Newtonsoft.Json" version="12.0.3" />      
+			<dependency id="NLog" version="4.7.0" />      
+			<dependency id="NUglify" version="1.5.14" />      
 			<dependency id="Nustache" version="1.16.0.10" />
 			<dependency id="SharpZipLib" version="1.2.0" />
 		</dependencies>    </metadata>

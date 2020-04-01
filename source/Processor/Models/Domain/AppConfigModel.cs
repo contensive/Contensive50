@@ -89,7 +89,20 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// if true, the command line delete cannot delete this app
         /// </summary>
-        public override bool deleteProtection { get; set; } 
+        public override bool deleteProtection { get; set; }
+        /// <summary>
+        /// limit to monthly emails. 0 is unlimited
+        /// </summary>
+        public override int emailLimit { get; set; }
+        /// <summary>
+        /// limit to number of members
+        /// </summary>
+        public override int memberLimit { get; set; }
+        /// <summary>
+        /// limit to number of content managers or any kind
+        /// </summary>
+        public override int adminLimit { get; set; }
+
         //
         //====================================================================================================
         /// <summary>
