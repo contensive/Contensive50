@@ -48,16 +48,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// Group Rules
-        /// </summary>
-        public class GroupRuleType {
-            public int GroupID;
-            public bool AllowAdd;
-            public bool AllowDelete;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// 
         /// </summary>
         public int fancyBoxPtr { get; set; }

@@ -865,70 +865,73 @@ namespace Contensive.Processor.Controllers {
                                     }
                                 }
                             }
-                            //
+                            //        
                             // -- Process Trigger Conditions
-                            int ConditionGroupId = core.doc.pageController.page.triggerConditionGroupId;
-                            int addGroupId = core.doc.pageController.page.triggerAddGroupId;
-                            int removeGroupId = core.doc.pageController.page.triggerRemoveGroupId;
-                            int systemEmailId = core.doc.pageController.page.triggerSendSystemEmailId;
-                            switch (core.doc.pageController.page.triggerConditionId) {
-                                case 1: {
-                                        //
-                                        // Always
-                                        //
-                                        if (systemEmailId != 0) {
-                                            EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", systemEmailId), "", core.session.user.id);
-                                        }
-                                        if (addGroupId != 0) {
-                                            GroupController.addUser(core, GroupController.getGroupName(core, addGroupId));
-                                        }
-                                        if (removeGroupId != 0) {
-                                            GroupController.removeUser(core, GroupController.getGroupName(core, removeGroupId));
-                                        }
-                                        break;
-                                    }
-                                case 2: {
-                                        //
-                                        // If in Condition Group
-                                        //
-                                        if (ConditionGroupId != 0) {
-                                            if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
-                                                if (systemEmailId != 0) {
-                                                    EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", systemEmailId), "", core.session.user.id);
+                            if (!core.doc.pageController.page.triggerConditionId.Equals(0)) {
+                                string pageTriggerName = "page" + core.doc.pageController.page.id + "trigger";
+                                if (!core.visitProperty.getBoolean(pageTriggerName, false)) {
+                                    core.visitProperty.setProperty(pageTriggerName, true);
+                                    switch (core.doc.pageController.page.triggerConditionId) {
+                                        case 1: {
+                                                //
+                                                // Always
+                                                //
+                                                if (core.doc.pageController.page.triggerSendSystemEmailId != 0) {
+                                                    EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", core.doc.pageController.page.triggerSendSystemEmailId), "", core.session.user.id);
                                                 }
-                                                if (addGroupId != 0) {
-                                                    GroupController.addUser(core, GroupController.getGroupName(core, addGroupId));
+                                                if (core.doc.pageController.page.triggerAddGroupId != 0) {
+                                                    GroupController.addUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerAddGroupId));
                                                 }
-                                                if (removeGroupId != 0) {
-                                                    GroupController.removeUser(core, GroupController.getGroupName(core, removeGroupId));
+                                                if (core.doc.pageController.page.triggerRemoveGroupId != 0) {
+                                                    GroupController.removeUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerRemoveGroupId));
                                                 }
+                                                break;
                                             }
-                                        }
-                                        break;
-                                    }
-                                case 3: {
-                                        //
-                                        // If not in Condition Group
-                                        //
-                                        if (ConditionGroupId != 0) {
-                                            if (!GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, ConditionGroupId))) {
-                                                if (addGroupId != 0) {
-                                                    GroupController.addUser(core, GroupController.getGroupName(core, addGroupId));
+                                        case 2: {
+                                                //
+                                                // If in Condition Group
+                                                //
+                                                if (core.doc.pageController.page.triggerConditionGroupId != 0) {
+                                                    if (GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerConditionGroupId))) {
+                                                        if (core.doc.pageController.page.triggerSendSystemEmailId != 0) {
+                                                            EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", core.doc.pageController.page.triggerSendSystemEmailId), "", core.session.user.id);
+                                                        }
+                                                        if (core.doc.pageController.page.triggerAddGroupId != 0) {
+                                                            GroupController.addUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerAddGroupId));
+                                                        }
+                                                        if (core.doc.pageController.page.triggerRemoveGroupId != 0) {
+                                                            GroupController.removeUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerRemoveGroupId));
+                                                        }
+                                                    }
                                                 }
-                                                if (removeGroupId != 0) {
-                                                    GroupController.removeUser(core, GroupController.getGroupName(core, removeGroupId));
-                                                }
-                                                if (systemEmailId != 0) {
-                                                    EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", systemEmailId), "", core.session.user.id);
-                                                }
+                                                break;
                                             }
-                                        }
-                                        break;
+                                        case 3: {
+                                                //
+                                                // If not in Condition Group
+                                                //
+                                                if (core.doc.pageController.page.triggerConditionGroupId != 0) {
+                                                    if (!GroupController.isMemberOfGroup(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerConditionGroupId))) {
+                                                        if (core.doc.pageController.page.triggerAddGroupId != 0) {
+                                                            GroupController.addUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerAddGroupId));
+                                                        }
+                                                        if (core.doc.pageController.page.triggerRemoveGroupId != 0) {
+                                                            GroupController.removeUser(core, GroupController.getGroupName(core, core.doc.pageController.page.triggerRemoveGroupId));
+                                                        }
+                                                        if (core.doc.pageController.page.triggerSendSystemEmailId != 0) {
+                                                            EmailController.queueSystemEmail(core, MetadataController.getRecordName(core, "System Email", core.doc.pageController.page.triggerSendSystemEmailId), "", core.session.user.id);
+                                                        }
+                                                    }
+                                                }
+                                                break;
+                                            }
+                                        default: {
+                                                // do nothing
+                                                break;
+                                            }
                                     }
-                                default: {
-                                        // do nothing
-                                        break;
-                                    }
+
+                                }
                             }
                         }
                     }
@@ -2196,7 +2199,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public string getWatchList(CoreController core, string ListName, string SortField, bool SortReverse) {
+        public static string getWatchList(CoreController core, string ListName, string SortField, bool SortReverse) {
             string result = "";
             try {
                 using (var csData = new CsModel(core)) {
@@ -2369,7 +2372,7 @@ namespace Contensive.Processor.Controllers {
         //   Prints a linked list of new content
         //========================================================================
         //
-        public string getWhatsNewList(CoreController core, string SortFieldList = "") {
+        public static string getWhatsNewList(CoreController core, string SortFieldList = "") {
             string result = "";
             try {
                 int ContentId = 0;
@@ -2435,7 +2438,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentID"></param>
         /// <param name="pageId"></param>
         /// <returns></returns>
-        public bool allowThroughPageBlock(CoreController core, int pageId) {
+        public static bool allowThroughPageBlock(CoreController core, int pageId) {
             bool result = false;
             try {
                 if (core.session.isAuthenticatedAdmin()) { return true; }

@@ -166,7 +166,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- application error if no server config
                     LogController.logError(core, new GenericException("authorization context cannot be created without a server configuration."));
-                    return default(SessionController);
+                    return default;
                 }
                 resultSessionContext = new SessionController(core);
                 if (core.appConfig == null) {
@@ -301,6 +301,7 @@ namespace Contensive.Processor.Controllers {
                                 resultSessionContext.visit.refererPathPage = WorkingReferer.Substring(SlashPosition - 1);
                                 resultSessionContext.visit.http_referer = WorkingReferer.left(SlashPosition - 1);
                             }
+                            resultSessionContext.visit.refererPathPage = resultSessionContext.visit.refererPathPage.substringSafe(0, 255);
                         }
                         //
                         if (resultSessionContext.visitor.id == 0) {
@@ -603,7 +604,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logTrace(core, "write visit cookie");
                 visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime.AddMinutes(60));
                 // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
-                core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default(DateTime), "", @"/", false);
+                core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default, "", @"/", false);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -1249,7 +1250,7 @@ namespace Contensive.Processor.Controllers {
         /// True if the current visitor is a content manager in workflow rendering mode
         /// </summary>
         /// <returns></returns>
-        public bool isWorkflowRendering() {
+        public static bool isWorkflowRendering() {
             return false;
         }
     }

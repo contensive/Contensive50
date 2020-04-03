@@ -746,33 +746,25 @@ namespace Contensive.Processor.Controllers {
             string returnType = "";
             try {
                 switch (fieldType) {
-                    case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
-                            returnType = "Int NULL";
+                    case CPContentBaseClass.FieldTypeIdEnum.Boolean:
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer: 
+                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
+                            returnType = "int null";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.Currency: {
-                            returnType = "Float NULL";
+                            returnType = "float null";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.Date: {
-                            returnType = "DateTime2(7) NULL";
+                            returnType = "datetime2(7) null";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.Float: {
-                            returnType = "Float NULL";
+                            returnType = "float null";
                             break;
                         }
-                    case CPContentBaseClass.FieldTypeIdEnum.Integer: {
-                            returnType = "Int NULL";
-                            break;
-                        }
-                    case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                    case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
-                            returnType = "Int NULL";
-                            break;
-                        }
-                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                    case CPContentBaseClass.FieldTypeIdEnum.Redirect:
                     case CPContentBaseClass.FieldTypeIdEnum.FileImage:
                     case CPContentBaseClass.FieldTypeIdEnum.Link:
                     case CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
@@ -784,7 +776,7 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
                     case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
-                            returnType = "VarChar(255) NULL";
+                            returnType = "nvarchar(255) NULL";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.LongText:
@@ -792,14 +784,21 @@ namespace Contensive.Processor.Controllers {
                     case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
                             //
                             // ----- Longtext, depends on datasource
-                            returnType = "varchar(max) Null";
+                            returnType = "nvarchar(max) Null";
                             break;
                         }
                     case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
                             //
                             // ----- autoincrement type, depends on datasource
                             //
-                            returnType = "INT IDENTITY PRIMARY KEY";
+                            returnType = "int identity primary key";
+                            break;
+                        }
+                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
+                    case CPContentBaseClass.FieldTypeIdEnum.Redirect: {
+                            //
+                            // -- types with no db data, 200402 changed from varchar(255)
+                            returnType = "int null";
                             break;
                         }
                     default: {

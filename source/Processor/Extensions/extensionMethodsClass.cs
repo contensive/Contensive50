@@ -271,4 +271,8 @@ public static class ExtensionMethods {
         }
         return returnPairs;
     }
+    //
+    public static string substringSafe(this string value, int startIndex, int length) {
+        return new string((value ?? string.Empty).Skip(startIndex).Take(length).ToArray());
+    }
 }

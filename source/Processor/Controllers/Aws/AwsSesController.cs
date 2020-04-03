@@ -41,8 +41,10 @@ namespace Contensive.Processor.Controllers {
                 using (var cs = core.cpParent.CSNew()) {
                     string sql = "select count(*) as cnt from EmailBounceList where name like" + DbController.encodeSqlTextLike(email.toAddress) + " and transient=0";
                     if (cs.OpenSQL(sql)) {
-                        reasonForFail = "Recipient email address is on the email block list";
-                        return false;
+                        if (!cs.GetInteger("cnt").Equals(0)) {
+                            reasonForFail = "Recipient email address is on the email block list";
+                            return false;
+                        }
                     }
                 }
                 //

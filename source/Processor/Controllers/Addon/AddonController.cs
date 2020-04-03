@@ -1520,13 +1520,13 @@ namespace Contensive.Processor.Controllers {
                 string ConstructorSelector = null;
                 string ConstructorName = null;
                 int ConstructorPtr = 0;
-                string[] ConstructorNames = { };
-                string[] ConstructorSelectors = { };
-                string[] ConstructorValues = { };
+                string[] ConstructorNames = Array.Empty<string>();
+                string[] ConstructorSelectors = Array.Empty<string>();
+                string[] ConstructorValues = Array.Empty<string>();
                 int ConstructorCnt = 0;
                 if (!string.IsNullOrEmpty(addonArgumentListFromRecord)) {
                     //
-                    string[] ConstructorNameValues = { };
+                    string[] ConstructorNameValues = Array.Empty<string>();
                     //
                     // Initially Build Constructor from AddonOptions
                     //

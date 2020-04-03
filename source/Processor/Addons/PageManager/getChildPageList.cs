@@ -91,7 +91,7 @@ namespace Contensive.Processor.Addons.PageManager {
                         }
                         bool blockContentComposite = false;
                         if (childPage.blockContent || childPage.blockPage) {
-                            blockContentComposite = !core.doc.pageController.allowThroughPageBlock(core, childPage.id);
+                            blockContentComposite = !PageContentController.allowThroughPageBlock(core, childPage.id);
                         }
                         string LinkedText = GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(link) + "\">", pageMenuHeadline);
                         if ((string.IsNullOrEmpty(UcaseRequestedListName)) && (childPage.parentListName != "") && (!isAuthoring)) {

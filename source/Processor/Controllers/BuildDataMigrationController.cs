@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                         core.wwwFiles.deleteFolder("admin");
                         //
                         // -- delete .asp and .php files
-                        foreach (CPFileSystemClass.FileDetail file in core.wwwFiles.getFileList("")) {
+                        foreach (BaseClasses.CPFileSystemBaseClass.FileDetail file in core.wwwFiles.getFileList("")) {
                             if (file == null) { continue; }
                             if (string.IsNullOrWhiteSpace(file.Name)) { continue; }
                             if (file.Name.Length < 4) { continue; }

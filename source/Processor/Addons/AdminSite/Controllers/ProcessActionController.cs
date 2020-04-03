@@ -865,7 +865,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     // record exists, and it is needed, update the DateExpires if changed
                                     //
                                     bool RuleActive = csData.getBoolean("active");
-                                    DateTime RuleDateExpires = default(DateTime);
+                                    DateTime RuleDateExpires = default;
                                     RuleDateExpires = csData.getDate("DateExpires");
                                     if ((!RuleActive) || (RuleDateExpires != DateExpires)) {
                                         csData.set("Active", true);

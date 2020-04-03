@@ -520,7 +520,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="PropertyName"></param>
         /// <param name="DefaultValue"></param>
         /// <returns></returns>
-        public DateTime getDate(string PropertyName, DateTime DefaultValue = default(DateTime)) {
+        public DateTime getDate(string PropertyName, DateTime DefaultValue = default) {
             return encodeDate(getText(PropertyName, DefaultValue.ToString()));
         }
         //
@@ -611,12 +611,13 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// After the execution of an addon, if the resulting content inludes {%%}, it could have come from
-        /// user submitted data (contact us form). remove {%%} during addon execution post processing
+        /// user submitted data (contact us form). remove {%%} during addon execution post processing.
+        /// *** turned off default because admin editors are addons and editing a copy block changes the content {% to {_%
         /// </summary>
         public bool beta200327_BlockCCmdCodeAfterAddonExec {
             get {
                 if (_beta200327_BlockCCmdCodeAfterAddonExec == null) {
-                    _beta200327_BlockCCmdCodeAfterAddonExec = getBoolean("Beta200327 block content cmd after addon execute", true);
+                    _beta200327_BlockCCmdCodeAfterAddonExec = getBoolean("Beta200327 block content cmd after addon execute", false);
                 }
                 return encodeBoolean(_beta200327_BlockCCmdCodeAfterAddonExec);
             }

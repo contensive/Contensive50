@@ -508,7 +508,7 @@ namespace Contensive.Processor.Controllers {
                                                     int ImageIDArrayCount = 0;
                                                     string ACQueryString = "";
                                                     int Ptr = 0;
-                                                    string[] ImageIDArray = { };
+                                                    string[] ImageIDArray = Array.Empty<string>();
                                                     if (0 != GenericController.strInstr(1, ImageId, ",")) {
                                                         ImageIDArray = ImageId.Split(',');
                                                         ImageIDArrayCount = ImageIDArray.GetUpperBound(0) + 1;
