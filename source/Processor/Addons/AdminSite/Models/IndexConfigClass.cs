@@ -26,6 +26,16 @@ namespace Contensive.Processor.Addons.AdminSite {
         public string[] groupList { get; set; }
         public List<IndexConfigColumnClass> columns { get; set; }
         public int subCDefID { get; set; }
+        /// <summary>
+        /// if true, the listgrid includes a delete checkbox row
+        /// </summary>
+        public bool allowDelete { get; set; }
+        //
+        public bool allowFind { get; set; }
+        //
+        public bool allowAddRow { get; set; }
+        //
+        public bool allowColumnSort { get; set; }
         //
         //=================================================================================
         /// <summary>
@@ -51,7 +61,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                 groupListCnt = 0,
                 columns = new List<IndexConfigColumnClass>(),
                 sorts = new Dictionary<string, IndexConfigSortClass>(),
-                findWords = new Dictionary<string, IndexConfigFindWordClass>()
+                findWords = new Dictionary<string, IndexConfigFindWordClass>(),
+                allowDelete = true,
+                allowFind = true,
+                allowAddRow = false,
+                allowColumnSort= true
             };
             try {
                 //

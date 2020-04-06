@@ -44,23 +44,23 @@ namespace Contensive.CPBase.BaseModels {
             /// <summary>
             /// 
             /// </summary>
-            none,
+            none = 0,
             /// <summary>
             /// 
             /// </summary>
-            _blank,
+            _blank = 1,
             /// <summary>
             /// 
             /// </summary>
-            _self,
+            _self = 2,
             /// <summary>
             /// 
             /// </summary>
-            _parent,
+            _parent = 3,
             /// <summary>
             /// 
             /// </summary>
-            _top
+            _top = 4
         }
         /// <summary>
         /// values for html form encodetype
@@ -69,19 +69,19 @@ namespace Contensive.CPBase.BaseModels {
             /// <summary>
             /// 
             /// </summary>
-            none,
+            none = 0,
             /// <summary>
             /// 
             /// </summary>
-            application_x_www_form_urlencoded,
+            application_x_www_form_urlencoded = 1,
             /// <summary>
             /// 
             /// </summary>
-            multipart_form_data,
+            multipart_form_data = 2,
             /// <summary>
             /// 
             /// </summary>
-            text_plain
+            text_plain = 3
         }
         /// <summary>
         /// values for html form method
@@ -90,11 +90,11 @@ namespace Contensive.CPBase.BaseModels {
             /// <summary>
             /// 
             /// </summary>
-            post,
+            post = 0,
             /// <summary>
             /// 
             /// </summary>
-            get
+            get = 1
         }
     }
 }

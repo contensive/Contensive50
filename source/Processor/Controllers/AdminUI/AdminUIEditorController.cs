@@ -9,6 +9,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
+using Contensive.Processor.Addons.AdminSite;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -65,7 +66,7 @@ namespace Contensive.Processor.Controllers {
             if (FieldValueTime != null) {
                 // if time is 12:00 AM, display a blank in the time field
                 DateTime testTime = (DateTime)FieldValueTime;
-                if(testTime.Hour.Equals(0) && testTime.Minute.Equals(0) && testTime.Second.Equals(0)) { FieldValueTime = null; }
+                if (testTime.Hour.Equals(0) && testTime.Minute.Equals(0) && testTime.Second.Equals(0)) { FieldValueTime = null; }
             }
             string inputTime = HtmlController.inputTime(core, fieldName + "-time", FieldValueTime, "component-" + htmlId + "-time", "form-control", readOnly, fieldRequired, false);
             string dateTimeString = (FieldValueDate != null) ? ((DateTime)FieldValueDate).ToString("o", CultureInfo.InvariantCulture) : "";
@@ -135,10 +136,10 @@ namespace Contensive.Processor.Controllers {
             return HtmlController.inputTextarea(core, fieldName, fieldValue, 10, -1, htmlId, false, readOnly, "text form-control", false, 0, required);
         }
         //
+        // ====================================================================================================
+        //
         public static string getHtmlEditor(CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readONly)
             => getHtmlEditor(core, fieldName, fieldValue, editorAddonListJSON, styleList, styleOptionList, readONly, "");
-        //
-        // ====================================================================================================
         //
         public static string getHtmlEditor(CoreController core, string fieldName, string fieldValue, string editorAddonListJSON, string styleList, string styleOptionList, bool readOnly, string htmlId) {
             string result = "";
@@ -205,7 +206,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getLinkEditor(CoreController core, string fieldName, string fieldValue, bool readOnly, string htmlId, bool required) {
-            return HtmlController.inputText_Legacy(core, fieldName, fieldValue, 1, 80, htmlId, false, readOnly, "resourceLink form-control", 255, false, "", required) + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + fieldName + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>";
+            return getTextEditor(core, fieldName, fieldValue, readOnly, htmlId, required);
         }
         //
         // ====================================================================================================
@@ -284,8 +285,6 @@ namespace Contensive.Processor.Controllers {
             return getLookupContentEditor(core, fieldName, fieldValue, lookupContentMetacontent, ref IsEmptyList, readOnly, htmlId, WhyReadOnlyMsg, fieldRequired, sqlFilter);
         }
         //
-        // ====================================================================================================
-        //
         public static string getLookupContentEditor(CoreController core, string fieldName, int fieldValue, string lookupContentName, ref bool IsEmptyList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired, string sqlFilter) {
             ContentMetadataModel lookupContentMetacontent = ContentMetadataModel.createByUniqueName(core, lookupContentName);
             if (lookupContentMetacontent == null) {
@@ -332,8 +331,6 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        //
-        // ====================================================================================================
         //
         public static string getLookupListEditor(CoreController core, string htmlName, string currentValue, List<string> lookupList, bool readOnly, string htmlId, string WhyReadOnlyMsg, bool fieldRequired) {
             string result = "";
@@ -437,8 +434,6 @@ namespace Contensive.Processor.Controllers {
             }
             return getMemberSelectEditor(core, htmlName, selectedRecordId, group, readOnly, htmlId, fieldRequired, WhyReadOnlyMsg);
         }
-        //
-        // ====================================================================================================
         //
         public static string getMemberSelectEditor(CoreController core, string htmlName, int selectedRecordId, string groupGuid, string groupName, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
             GroupModel group = null;
@@ -619,16 +614,6 @@ namespace Contensive.Processor.Controllers {
         }
         //
         // ====================================================================================================
-        //
-        public static string getTextEditor(CoreController core, string fieldName, string fieldValue)
-            => getTextEditor(core, fieldName, fieldValue, false, "", false);
-        //
-        // ====================================================================================================
-        //
-        public static string getTextEditor(CoreController core, string fieldName, string fieldValue, bool readOnly)
-            => getTextEditor(core, fieldName, fieldValue, readOnly, "", false);
-        //
-        // ====================================================================================================
         /// <summary>
         /// return the default admin editor for this field type
         /// </summary>
@@ -648,6 +633,115 @@ namespace Contensive.Processor.Controllers {
             return AdminUIEditorController.getHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, required);
         }
         //
+        public static string getTextEditor(CoreController core, string fieldName, string fieldValue)
+            => getTextEditor(core, fieldName, fieldValue, false, "", false);
         //
+        public static string getTextEditor(CoreController core, string fieldName, string fieldValue, bool readOnly)
+            => getTextEditor(core, fieldName, fieldValue, readOnly, "", false);
+        //
+        // ====================================================================================================
+        //
+        public static string getRedirectEditor(CoreController core, ContentFieldMetadataModel field, AdminDataModel adminData, EditRecordModel editRecord, string fieldValue, bool readOnly, string htmlId, bool required) {
+            //
+            // -- if hardcoded redirect link, create open-in-new-windows
+            if(!string.IsNullOrEmpty( field.redirectPath)) {
+                return HtmlController.a("Open in New Window", field.redirectPath, "", "", "", "_blank");
+            }
+            //
+            // -- redirect goes to a list of records (one-to-many or many-to-many
+            var gridData = new AdminDataModel(core, new AdminDataRequest() {
+                adminAction = 0,
+                adminButton = "",
+                adminForm = 0,
+                adminSourceForm = 0,
+                contentId = field.redirectContentId,
+                fieldEditorPreference = "",
+                guid = "",
+                id = 0,
+                ignore_legacyMenuDepth = 0,
+                recordsPerPage = 100,
+                recordTop = 0,
+                titleExtension = "",
+                wherePairDict = new Dictionary<string, string>()
+            });
+            IndexConfigClass indexConfig = IndexConfigClass.get(core, gridData);
+            var userContentPermissions = PermissionController.getUserContentPermissions(core, ContentMetadataModel.create(core, field.redirectContentId));
+            List<string> tmp = default;
+            DataSourceModel datasource = DataSourceModel.create(core.cpParent, gridData.adminContent.dataSourceId, ref tmp);
+            //
+            // Get the SQL parts
+            bool AllowAccessToContent = false;
+            string ContentAccessLimitMessage = "";
+            bool IsLimitedToSubContent = false;
+            string sqlWhere = "";
+            string sqlOrderBy = "";
+            string sqlFieldList = "";
+            string sqlFrom = "";
+            Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
+            Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
+            ListView.setIndexSQL(core, gridData, indexConfig, ref AllowAccessToContent, ref sqlFieldList, ref sqlFrom, ref sqlWhere, ref sqlOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
+            bool allowAdd = gridData.adminContent.allowAdd && (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
+            bool allowDelete = (gridData.adminContent.allowDelete) && (userContentPermissions.allowDelete);
+            if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
+                //
+                // two conditions should be the same -- but not time to check - This user does not have access to this content
+                ErrorController.addUserError(core, "Your account does not have access to any records in '" + gridData.adminContent.name + "'.");
+                return "Your account does not have access to the requested content";
+            } else {
+                //
+                // -- for redirect fields, only include connected records that match the redirect criteria
+                sqlWhere += (string.IsNullOrEmpty(field.redirectId)) ? "" : "and(" + field.redirectId + "=" + editRecord.id + ")";
+                //
+                // Get the total record count
+                string sql = "select count(" + gridData.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
+                if (!string.IsNullOrEmpty(sqlWhere)) {
+                    sql += " where " + sqlWhere;
+                }
+                int recordCnt = 0;
+                using (var csData = new CsModel(core)) {
+                    if (csData.openSql(sql, datasource.name)) {
+                        recordCnt = csData.getInteger("cnt");
+                    }
+                }
+                if (recordCnt < 100) {
+                    //
+                    // -- under 100 records, show them here
+                    sql = "select";
+                    if (datasource.dbTypeId != DataSourceTypeODBCMySQL) {
+                        sql += " Top " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                    }
+                    sql += " " + sqlFieldList + " From " + sqlFrom;
+                    if (!string.IsNullOrEmpty(sqlWhere)) {
+                        sql += " WHERE " + sqlWhere;
+                    }
+                    if (!string.IsNullOrEmpty(sqlOrderBy)) {
+                        sql += " Order By" + sqlOrderBy;
+                    }
+                    if (datasource.dbTypeId == DataSourceTypeODBCMySQL) {
+                        sql += " Limit " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                    }
+                    indexConfig.allowDelete = false;
+                    indexConfig.allowFind = false;
+                    indexConfig.allowAddRow = true;
+                    indexConfig.allowColumnSort = false;
+                    return ListGridController.get(core, gridData, indexConfig, userContentPermissions, sql, datasource, FieldUsedInColumns, IsLookupFieldValid);
+                } else {
+                    //
+                    // -- too many rows, setup a redirect
+                    if (editRecord.id == 0) {
+                        return "[available after save]";
+                    }
+                    string RedirectPath = (string.IsNullOrEmpty(field.redirectPath)) ? core.appConfig.adminRoute : field.redirectPath;
+                    RedirectPath += "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
+                    if (field.redirectContentId != 0) {
+                        RedirectPath += "&cid=" + field.redirectContentId;
+                    } else {
+                        RedirectPath += "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
+                    }
+                    RedirectPath = strReplace(RedirectPath, "'", "\\'");
+                    return HtmlController.a("Open in New Window", RedirectPath, "", "", "", "_blank");
+                }
+            }
+        }
     }
 }

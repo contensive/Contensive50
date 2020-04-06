@@ -37,6 +37,8 @@ namespace Contensive.Processor.Addons.AdminSite {
             //
             // Read only Special Cases
             if (editorEnv.isRootPage) {
+                //
+                // -- page content metadata, these are the special fields
                 switch (GenericController.toLCase(field.nameLc)) {
                     case "active": {
                             //
@@ -164,25 +166,27 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                     //
                     // ----- Default Editor, Redirect fields (the same for normal/readonly/spelling)
-                    string RedirectPath = core.appConfig.adminRoute;
-                    if (field.redirectPath != "") {
-                        RedirectPath = field.redirectPath;
-                    }
-                    RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
-                    if (field.redirectContentId != 0) {
-                        RedirectPath = RedirectPath + "&cid=" + field.redirectContentId;
-                    } else {
-                        RedirectPath = RedirectPath + "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
-                    }
-                    if (editRecord.id == 0) {
-                        EditorString += ("[available after save]");
-                    } else {
-                        RedirectPath = GenericController.strReplace(RedirectPath, "'", "\\'");
-                        EditorString += ("<a href=\"#\"");
-                        EditorString += (" onclick=\" window.open('" + RedirectPath + "', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes'); return false;\"");
-                        EditorString += (">");
-                        EditorString += ("Open in New Window</A>");
-                    }
+
+                    EditorString = AdminUIEditorController.getRedirectEditor(core, field, adminData, editRecord, fieldValue_text, editorReadOnly, fieldHtmlId, field.required);
+                    //string RedirectPath = core.appConfig.adminRoute;
+                    //if (field.redirectPath != "") {
+                    //    RedirectPath = field.redirectPath;
+                    //}
+                    //RedirectPath = RedirectPath + "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
+                    //if (field.redirectContentId != 0) {
+                    //    RedirectPath = RedirectPath + "&cid=" + field.redirectContentId;
+                    //} else {
+                    //    RedirectPath = RedirectPath + "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
+                    //}
+                    //if (editRecord.id == 0) {
+                    //    EditorString += ("[available after save]");
+                    //} else {
+                    //    RedirectPath = GenericController.strReplace(RedirectPath, "'", "\\'");
+                    //    EditorString += ("<a href=\"#\"");
+                    //    EditorString += (" onclick=\" window.open('" + RedirectPath + "', '_blank', 'scrollbars=yes,toolbar=no,status=no,resizable=yes'); return false;\"");
+                    //    EditorString += (">");
+                    //    EditorString += ("Open in New Window</A>");
+                    //}
                 } else if (editorReadOnly) {
                     //
                     //--------------------------------------------------------------------------------------------
@@ -383,7 +387,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
                                 //
                                 // ----- Boolean
-                                EditorString += AdminUIEditorController.getBooleanEditor(core, field.nameLc, GenericController.encodeBoolean(fieldValueObject), false, fieldHtmlId);
+                                EditorString += AdminUIEditorController.getBooleanEditor(core, field.nameLc, encodeBoolean(fieldValueObject), false, fieldHtmlId);
                                 editorEnv.formFieldList += "," + field.nameLc;
                                 editorWrapperSyle = "max-width:400px";
                                 break;
@@ -473,9 +477,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 // ----- Link (href value
                                 //
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = ""
-                                    + HtmlController.inputText_Legacy(core, field.nameLc, fieldValue_text, 1, 80, fieldHtmlId, false, false, "link form-control") + "&nbsp;<a href=\"#\" onClick=\"OpenResourceLinkWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/ResourceLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a resource\" title=\"Link to a resource\"></a>"
-                                    + "&nbsp;<a href=\"#\" onClick=\"OpenSiteExplorerWindow( '" + field.nameLc + "' ) ;return false;\"><img src=\"" + cdnPrefix + "images/PageLink1616.gif\" width=16 height=16 border=0 alt=\"Link to a page\" title=\"Link to a page\"></a>";
+                                EditorString = AdminUIEditorController.getLinkEditor(core, field.nameLc, fieldValue_text, editorReadOnly, fieldHtmlId, field.required);
                                 break;
                             }
                         case CPContentBaseClass.FieldTypeIdEnum.ResourceLink: {

@@ -1002,12 +1002,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="contentName"></param>
         /// <param name="presetNameValueList"></param>
         /// <param name="allowPaste"></param>
-        /// <param name="IsEditing"></param>
+        /// <param name="allowUserAdd"></param>
         /// <returns></returns>
-        public static List<string> getRecordAddAnchorTag(CoreController core, string contentName, string presetNameValueList, bool allowPaste, bool IsEditing) {
-            List<string> result = new List<string>();
+        public static List<string> getRecordAddAnchorTag(CoreController core, string contentName, string presetNameValueList, bool allowPaste, bool allowUserAdd) {
             try {
-                if (!IsEditing) { return result; }
+                List<string> result = new List<string>();
+                if (!allowUserAdd) { return result; }
                 if (string.IsNullOrWhiteSpace(contentName)) { throw (new GenericException("ContentName [" + contentName + "] is invalid")); }
                 //
                 // -- convert older QS format to command delimited format
@@ -1049,10 +1049,11 @@ namespace Contensive.Processor.Controllers {
                         result.Add(HtmlController.div(pasteLinkAnchor + HtmlController.div("&nbsp;", "ccEditLinkEndCap"), "ccRecordLinkCon"));
                     }
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                return new List<string>();
             }
-            return result;
         }
         //
         public static List<string> getRecordAddAnchorTag(CoreController core, string ContentName, string PresetNameValueList, bool AllowPaste) => getRecordAddAnchorTag(core, ContentName, PresetNameValueList, AllowPaste, core.session.isEditing(ContentName));

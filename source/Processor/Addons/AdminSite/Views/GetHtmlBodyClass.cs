@@ -8,6 +8,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor.Addons.Tools;
+using System.Collections.Generic;
 
 namespace Contensive.Processor.Addons.AdminSite {
     public class GetHtmlBodyClass : AddonBaseClass {
@@ -56,10 +57,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // todo - convert admin addon to use cpbase to help understand cp api requirements
                 //
-                    //
-                    // get admin content
-                    result += getHtmlBody(cp);
-                    result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
+                //
+                // get admin content
+                result += getHtmlBody(cp);
+                result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
                 //
                 // -- on body end addons
                 cp.core.doc.body = result;
@@ -88,7 +89,49 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // check for member login, if logged in and no admin, lock out, Do CheckMember here because we need to know who is there to create proper blocked menu
                 if (cp.core.doc.continueProcessing) {
-                    var adminData = new AdminDataModel(cp.core);
+                    //
+                    // -- read wl+wr values into wherePair dictionary
+                    Dictionary<string, string> wherePairs = new Dictionary<string, string>();
+                    for (int WCount = 0; WCount <= 99; WCount++) {
+                        string key = cp.Doc.GetText("WL" + WCount);
+                        if (string.IsNullOrEmpty(key)) { break; }
+                        wherePairs.Add(key, cp.Doc.GetText("WL" + WCount));
+                    }
+                    //
+                    // -- read wc (whereclause) into wherepair dictionary
+                    string WhereClauseContent = GenericController.encodeText(cp.Doc.GetText("wc"));
+                    if (!string.IsNullOrEmpty(WhereClauseContent)) {
+                        string[] QSSplit = WhereClauseContent.Split(',');
+                        for (int QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
+                            string NameValue = QSSplit[QSPointer];
+                            if (!string.IsNullOrEmpty(NameValue)) {
+                                if ((NameValue.left(1) == "(") && (NameValue.Substring(NameValue.Length - 1) == ")") && (NameValue.Length > 2)) {
+                                    NameValue = NameValue.Substring(1, NameValue.Length - 2);
+                                }
+                                string[] NVSplit = NameValue.Split('=');
+                                if (NVSplit.GetUpperBound(0) > 0) {
+                                    wherePairs.Add(NVSplit[0], NVSplit[1]);
+                                }
+                            }
+                        }
+                    }
+
+                    int adminForm = cp.Doc.GetInteger(rnAdminForm);
+                    var adminData = new AdminDataModel(cp.core, new AdminDataRequest() {
+                        contentId = cp.Doc.GetInteger("cid"),
+                        id = cp.Doc.GetInteger("id"),
+                        guid = cp.Doc.GetText("guid"),
+                        titleExtension = cp.Doc.GetText(RequestNameTitleExtension),
+                        recordTop = cp.Doc.GetInteger("RT"),
+                        recordsPerPage = cp.Doc.GetInteger("RS"),
+                        wherePairDict = wherePairs,
+                        adminAction = cp.Doc.GetInteger(rnAdminAction),
+                        adminSourceForm = cp.Doc.GetInteger(rnAdminSourceForm),
+                        adminForm = adminForm,
+                        adminButton = cp.Doc.GetText(RequestNameButton),
+                        ignore_legacyMenuDepth = (adminForm == AdminFormEdit) ? 0 : cp.Doc.GetInteger(RequestNameAdminDepth),
+                        fieldEditorPreference = cp.Doc.GetText("fieldEditorPreference")
+                    });
                     cp.core.db.sqlCommandTimeout = 300;
                     adminData.buttonObjectCount = 0;
                     adminData.javaScriptString = "";

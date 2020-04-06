@@ -614,90 +614,10 @@ function getPageOffsetTop(el) {
 //
 //----------
 //
-function updateClipboardLinks() {
-    if (!browser.isIE) {
-        return;
-    }
-    var SelectedObject;
-    var TextRange;
-    setAnchorTagsToColor("ccPaste", "#000000");
-    lastClipCheck = true;
-    SelectedObject = document.selection;
-    TextRange = SelectedObject.createRange();
-    if (TextRange.text) {
-        if (TextRange.text.length !== 0) {
-            if (!lastSelCheck) {
-                setAnchorTagsToColor("ccSelect", "#000000");
-                lastSelCheck = true;
-            }
-        }
-        else {
-            if (lastSelCheck) {
-                setAnchorTagsToColor("ccSelect", "#FFFFFF");
-                lastSelCheck = false;
-            }
-        }
-    }
-
-}
-//
-//----------
-//
-function updateClipboardLinksInit() {
-    if (!browser.isIE) {
-        return;
-    }
-    setAnchorTagsToColor("ccPaste", "#000000");
-    lastClipCheck = true;
-    setAnchorTagsToColor("ccSelect", "#FFFFFF");
-}
-//
-//----------
-//
 function SaveFieldPlus(ObjectName) {
     var RefreshTemp;
     RefreshTemp = document.all.tags("div")[ObjectName].innerHTML;
     document.all[ObjectName + "Field"].value = RefreshTemp;
-}
-//
-//----------
-//
-var DialogObject;
-function OpenImagePropertyWindow(EditorObject, ImageObject) {
-    DialogObject = ImageObject;
-    showModalDialog("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/ActiveEditorImageProperties.htm", window, "status:false;dialogWidth:32em;dialogHeight:25em");
-}
-//
-//----------
-//
-var ACPropertyObject;
-function OpenACPropertyWindow(EditorObject, ACObject) {
-    ACPropertyObject = ACObject;
-    showModalDialog("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/ActiveEditorACProperties.htm", window, "status:false;dialogWidth:18em;dialogHeight:14em");
-}
-//
-//----------
-//
-function OpenSiteExplorerWindow(TargetInputID) {
-    window.open("?ccIPage=kdif3318sd&LinkObjectName=" + TargetInputID, "PageSelector", "menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable")
-}
-//
-//----------
-//
-function OpenResourceLinkWindow(TargetInputID) {
-    window.open("/admin/index.asp?ccIPage=s033l8dm15&SourceMode=0&LinkObjectName=" + TargetInputID, "ResourceSelector", "menubar=no,toolbar=no,location=no,status=no,scrollbars=yes,resizable")
-}
-//
-//----------
-//
-function OpenTablePropertyWindow(EditorObject, TableObject, TableBodyObject) {
-    TablePropertyObject = TableObject;
-    TableBodyPropertyObject = TableBodyObject;
-    ClearMenu();
-    var h = new Object();
-    h.win = window;
-    h.fieldName = EditorObject;
-    showModalDialog("https://s3.amazonaws.com/cdn.contensive.com/assets/20190729/Popup/tablepop.htm", h, "status:false;dialogWidth:315px;dialogHeight:380px;");
 }
 //
 //----------
@@ -842,52 +762,6 @@ function InsertActiveChildList(ACType, ObjectName) {
     var RandomNumber;
     RandomNumber = Math.floor(Math.random() * 1000000);
     InsertActiveContentPlus(ACType, "", RandomNumber, ObjectName);
-}
-//
-//----------
-//
-function OpenPropertiesWindowPlus(ObjectName) {
-    var EditorObject;
-    var SelectionObject;
-    var TextRangeObject;
-    var ControlRangeObject;
-    var Message;
-    var ElementObject;
-    var Pointer;
-    var t;
-    // Locate the object being clicked 
-    SelectionObject = document.selection;
-
-    if (SelectionObject.type === "Text") {
-        // Text Object Found
-    } else if (SelectionObject.type === "Control") {
-        ControlRangeObject = SelectionObject.createRange();
-        for (Pointer = 0; Pointer < ControlRangeObject.length; Pointer++) {
-            ElementObject = ControlRangeObject(Pointer);
-            if (ElementObject.tagName === "IMG") {
-                if (ElementObject.id.substring(0, 3) === "AC,") {
-                    if (ElementObject.id.substring(0, 8) === "AC,IMAGE") {
-                        OpenImagePropertyWindow(document.all[ObjectName], ElementObject);
-                    } else if (ElementObject.id.substring(0, 20) === "AC,AGGREGATEFUNCTION") {
-                        OpenAggregateFunctionPropertyWindow(document.all[ObjectName], ElementObject);
-                    } else {
-                        OpenACPropertyWindow(document.all[ObjectName], ElementObject);
-                    }
-                } else {
-                    OpenImagePropertyWindow(document.all[ObjectName], ElementObject);
-                }
-            }
-            else if (ElementObject.tagName === "TABLE") {
-                var tBody = ElementObject.getElementsByTagName("TBODY");
-                OpenTablePropertyWindow(ObjectName, ElementObject, tBody[0]);
-            }
-            else {
-                // Non-Image found in Control Object
-            }
-        }
-    } else {
-        // SelectObject is not Control or Text
-    }
 }
 //
 //----------

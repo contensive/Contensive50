@@ -78,6 +78,7 @@
     <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\HtmlAttributesA.cs" />
     <Compile Include="BaseModels\HtmlAttributesForm.cs" />
     <Compile Include="BaseModels\HtmlAttributesGlobal.cs" />
     <Compile Include="BaseModels\HtmlAttributesGlobal_EventsClipboard.cs" />

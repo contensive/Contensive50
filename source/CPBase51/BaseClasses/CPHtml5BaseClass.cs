@@ -1,6 +1,7 @@
 ﻿
 
 using Contensive.BaseModels;
+using Contensive.CPBase.BaseModels;
 using System;
 using System.Collections.Generic;
 
@@ -29,6 +30,77 @@ namespace Contensive.BaseClasses {
             PublicUser = 4,
             CurrentUser = 5
         }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, HtmlAttributesForm attributes);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="actionQueryString"></param>
+        /// <param name="method"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString, string method);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="actionQueryString"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, string htmlName, string htmlClass);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="htmlName"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml, string htmlName);
+        /// <summary>
+        /// Form tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <returns></returns>
+        public abstract string Form(string innerHtml);
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// Anchore tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
+        public abstract string A(string innerHtml, HtmlAttributesA attributes);
+        //
+        // ====================================================================================================
         //
         public abstract string Div(string innerHtml, string htmlClass, string htmlId);
         public abstract string Div(string innerHtml, string htmlClass);
@@ -78,13 +150,6 @@ namespace Contensive.BaseClasses {
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria, string captionFieldName);
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName, string secondaryContentSelectSQLCriteria);
         public abstract string CheckList(string htmlName, string primaryContentName, int primaryRecordId, string secondaryContentName, string rulesContentName, string rulesPrimaryFieldname, string rulesSecondaryFieldName);
-        //
-        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString, string method);
-        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId, string actionQueryString);
-        public abstract string Form(string innerHtml, string htmlName, string htmlClass, string htmlId);
-        public abstract string Form(string innerHtml, string htmlName, string htmlClass);
-        public abstract string Form(string innerHtml, string htmlName);
-        public abstract string Form(string innerHtml);
         //
         public abstract string H1(string innerHtml, string htmlClass, string htmlId);
         public abstract string H1(string innerHtml, string htmlClass);

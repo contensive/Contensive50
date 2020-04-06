@@ -105,36 +105,36 @@ namespace Contensive.Processor.Addons.AdminSite {
                         if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
                             //
                             // two conditions should be the same -- but not time to check - This user does not have access to this content
-                            Processor.Controllers.ErrorController.addUserError(core, "Your account does not have access to any records in '" + adminData.adminContent.name + "'.");
+                            ErrorController.addUserError(core, "Your account does not have access to any records in '" + adminData.adminContent.name + "'.");
                         } else {
                             //
                             // Get the total record count
-                            string SQL = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
+                            string sql = "select count(" + adminData.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
                             if (!string.IsNullOrEmpty(sqlWhere)) {
-                                SQL += " where " + sqlWhere;
+                                sql += " where " + sqlWhere;
                             }
                             int recordCnt = 0;
                             using (var csData = new CsModel(core)) {
-                                if (csData.openSql(SQL, datasource.name)) {
+                                if (csData.openSql(sql, datasource.name)) {
                                     recordCnt = csData.getInteger("cnt");
                                 }
                             }
                             //
                             // Assumble the SQL
                             //
-                            SQL = "select";
+                            sql = "select";
                             if (datasource.dbTypeId != DataSourceTypeODBCMySQL) {
-                                SQL += " Top " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                                sql += " Top " + (indexConfig.recordTop + indexConfig.recordsPerPage);
                             }
-                            SQL += " " + sqlFieldList + " From " + sqlFrom;
+                            sql += " " + sqlFieldList + " From " + sqlFrom;
                             if (!string.IsNullOrEmpty(sqlWhere)) {
-                                SQL += " WHERE " + sqlWhere;
+                                sql += " WHERE " + sqlWhere;
                             }
                             if (!string.IsNullOrEmpty(sqlOrderBy)) {
-                                SQL += " Order By" + sqlOrderBy;
+                                sql += " Order By" + sqlOrderBy;
                             }
                             if (datasource.dbTypeId == DataSourceTypeODBCMySQL) {
-                                SQL += " Limit " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                                sql += " Limit " + (indexConfig.recordTop + indexConfig.recordsPerPage);
                             }
                             //
                             // Refresh Query String
@@ -216,230 +216,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     + Environment.NewLine + "</script>";
                             }
                             //
-                            // Calculate total width
-                            int ColumnWidthTotal = 0;
-                            foreach (var column in indexConfig.columns) {
-                                if (column.Width < 1) {
-                                    column.Width = 1;
-                                }
-                                ColumnWidthTotal += column.Width;
-                            }
-                            var DataTable_HdrRow = new StringBuilder("<tr>");
-                            //
-                            // Row Number Column
-                            DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Row</td>");
-                            //
-                            // Edit Column
-                            DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\">Edit</td>");
-                            //
-                            // Delete Select Box Columns
-                            if (!allowDelete) {
-                                DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox disabled=\"disabled\"></td>");
-                            } else {
-                                DataTable_HdrRow.Append("<td width=20 align=center valign=bottom class=\"small ccAdminListCaption\"><input TYPE=CheckBox OnClick=\"CheckInputs('DelCheck',this.checked);\"></td>");
-                            }
-                            //
-                            // field columns
-                            foreach (var column in indexConfig.columns) {
-                                //
-                                // ----- print column headers - anchored so they sort columns
-                                //
-                                int ColumnWidth = encodeInteger((100 * column.Width) / (double)ColumnWidthTotal);
-                                string FieldName = column.Name;
-                                //
-                                // if this is a current sort ,add the reverse flag
-                                //
-                                StringBuilder ButtonHref = new StringBuilder();
-                                ButtonHref.Append("/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormIndex + "&SetSortField=" + FieldName + "&RT=0&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&cid=" + adminData.adminContent.id + "&ad=" + adminData.ignore_legacyMenuDepth);
-                                if (!indexConfig.sorts.ContainsKey(FieldName)) {
-                                    ButtonHref.Append("&SetSortDirection=1");
-                                } else {
-                                    switch (indexConfig.sorts[FieldName].direction) {
-                                        case 1: {
-                                                ButtonHref.Append("&SetSortDirection=2");
-                                                break;
-                                            }
-                                        case 2: {
-                                                ButtonHref.Append("&SetSortDirection=0");
-                                                break;
-                                            }
-                                        default: {
-                                                // nothing
-                                                break;
-                                            }
-                                    }
-                                }
-                                //
-                                //----- column header includes WherePairCount
-                                //
-                                if (adminData.wherePairCount > 0) {
-                                    for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
-                                        if (adminData.wherePair[0, WhereCount] != "") {
-                                            ButtonHref.Append("&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]));
-                                            ButtonHref.Append("&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]));
-                                        }
-                                    }
-                                }
-                                string ButtonFace = adminData.adminContent.fields[FieldName.ToLowerInvariant()].caption;
-                                ButtonFace = GenericController.strReplace(ButtonFace, " ", "&nbsp;");
-                                string SortTitle = "Sort A-Z";
-                                //
-                                if (indexConfig.sorts.ContainsKey(FieldName)) {
-                                    string sortSuffix = ((indexConfig.sorts.Count < 2) ? "" : indexConfig.sorts[FieldName].order.ToString());
-                                    switch (indexConfig.sorts[FieldName].direction) {
-                                        case 1: {
-                                                ButtonFace = iconArrowDown + sortSuffix + "&nbsp;" + ButtonFace;
-                                                SortTitle = "Sort Z-A";
-                                                break;
-                                            }
-                                        case 2: {
-                                                ButtonFace = iconArrowUp + sortSuffix + "&nbsp;" + ButtonFace;
-                                                SortTitle = "Remove Sort";
-                                                break;
-                                            }
-                                        default: {
-                                                // nothing
-                                                break;
-                                            }
-                                    }
-                                }
-                                adminData.buttonObjectCount += 1;
-                                DataTable_HdrRow.Append("<td width=\"" + ColumnWidth + "%\" valign=bottom align=left class=\"small ccAdminListCaption\">");
-                                DataTable_HdrRow.Append("<a title=\"" + SortTitle + "\" href=\"" + HtmlController.encodeHtml(ButtonHref.ToString()) + "\" class=\"ccAdminListCaption\">" + ButtonFace + "</A>");
-                                DataTable_HdrRow.Append("</td>");
-                            }
-                            DataTable_HdrRow.Append("</tr>");
-                            //
-                            //   select and print Records
-                            //
-                            var dataTableRows = new StringBuilder();
-                            string rowColor = "";
-                            int rowNumber = 0;
-                            int rowNumberLast = 0;
-                            using (var csData = new CsModel(core)) {
-                                if (csData.openSql(SQL, datasource.name, indexConfig.recordsPerPage, indexConfig.pageNumber)) {
-                                    rowNumber = indexConfig.recordTop;
-                                    rowNumberLast = indexConfig.recordTop + indexConfig.recordsPerPage;
-                                    //
-                                    // --- Print out the records
-                                    while ((csData.ok()) && (rowNumber < rowNumberLast)) {
-                                        int recordId = csData.getInteger("ID");
-                                        if (rowColor == "class=\"ccAdminListRowOdd\"") {
-                                            rowColor = "class=\"ccAdminListRowEven\"";
-                                        } else {
-                                            rowColor = "class=\"ccAdminListRowOdd\"";
-                                        }
-                                        //
-                                        // -- new row
-                                        dataTableRows.Append(Environment.NewLine + "<tr>");
-                                        //
-                                        // --- row number column
-                                        dataTableRows.Append("<td align=right " + rowColor + ">" + (rowNumber + 1).ToString() + "</td>");
-                                        //
-                                        // --- edit column
-                                        dataTableRows.Append("<td align=center " + rowColor + ">");
-                                        string URI = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&id=" + recordId + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.adminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
-                                        if (adminData.wherePairCount > 0) {
-                                            for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
-                                                URI = URI + "&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
-                                            }
-                                        }
-                                        dataTableRows.Append(AdminUIController.getRecordEditAnchorTag(URI));
-                                        dataTableRows.Append(("</td>"));
-                                        //
-                                        // --- Delete Checkbox Columns
-                                        if (allowDelete) {
-                                            dataTableRows.Append("<td align=center " + rowColor + "><input TYPE=CheckBox NAME=row" + rowNumber + " VALUE=1 ID=\"DelCheck\"><input type=hidden name=rowid" + rowNumber + " VALUE=" + recordId + "></span></td>");
-                                        } else {
-                                            dataTableRows.Append("<td align=center " + rowColor + "><input TYPE=CheckBox disabled=\"disabled\" NAME=row" + rowNumber + " VALUE=1><input type=hidden name=rowid" + rowNumber + " VALUE=" + recordId + "></span></td>");
-                                        }
-                                        //
-                                        // --- field columns
-                                        foreach (var column in indexConfig.columns) {
-                                            string columnNameLc = column.Name.ToLowerInvariant();
-                                            if (FieldUsedInColumns.ContainsKey(columnNameLc)) {
-                                                if (FieldUsedInColumns[columnNameLc]) {
-                                                    dataTableRows.Append((Environment.NewLine + "<td valign=\"middle\" " + rowColor + " align=\"left\">" + SpanClassAdminNormal));
-                                                    dataTableRows.Append(getForm_Index_GetCell(core, adminData, column.Name, csData, IsLookupFieldValid[columnNameLc], GenericController.toLCase(adminData.adminContent.tableName) == "ccemail"));
-                                                    dataTableRows.Append(("&nbsp;</span></td>"));
-                                                }
-                                            }
-                                        }
-                                        dataTableRows.Append(("\n    </tr>"));
-                                        csData.goNext();
-                                        rowNumber = rowNumber + 1;
-                                    }
-                                    dataTableRows.Append("<input type=hidden name=rowcnt value=" + rowNumber + ">");
-                                    //
-                                    // --- print out the stuff at the bottom
-                                    //
-                                    int RecordTop_NextPage = indexConfig.recordTop;
-                                    if (csData.ok()) {
-                                        RecordTop_NextPage = rowNumber;
-                                    }
-                                    int RecordTop_PreviousPage = indexConfig.recordTop - indexConfig.recordsPerPage;
-                                    if (RecordTop_PreviousPage < 0) {
-                                        RecordTop_PreviousPage = 0;
-                                    }
-                                }
-                            }
-                            //
-                            // Header at bottom
-                            //
-                            if (rowColor == "class=\"ccAdminListRowOdd\"") {
-                                rowColor = "class=\"ccAdminListRowEven\"";
-                            } else {
-                                rowColor = "class=\"ccAdminListRowOdd\"";
-                            }
-                            string blankRow = "<tr><td " + rowColor + " align=center>-</td><td " + rowColor + " align=center>-</td><td " + rowColor + " align=center>-</td><td colspan=" + indexConfig.columns.Count + " " + rowColor + " style=\"text-align:left ! important;\">{msg}</td></tr>";
-                            if (rowNumber == 0) {
-                                //
-                                // No records found
-                                //
-                                dataTableRows.Append(blankRow.Replace("{msg}", "no records were found"));
-                            } else {
-                                if (rowNumber < rowNumberLast) {
-                                    //
-                                    // End of list
-                                    //
-                                    dataTableRows.Append(blankRow.Replace("{msg}", "----- end of list"));
-                                }
-                                //
-                                // Add another header to the data rows
-                                //
-                                dataTableRows.Append(DataTable_HdrRow.ToString());
-                            }
-                            //
-                            // ----- DataTable_FindRow
-                            //
-                            var DataTable_FindRow = new StringBuilder("<tr><td colspan=" + (3 + indexConfig.columns.Count) + " style=\"background-color:black;height:1;\"></td></tr>");
-                            DataTable_FindRow.Append("<tr>");
-                            DataTable_FindRow.Append("<td valign=\"middle\" colspan=3 width=\"60\" class=\"ccPanel\" align=center style=\"vertical-align:middle;padding:8px;text-align:center ! important;\">");
-                            DataTable_FindRow.Append(AdminUIController.getButtonPrimary(ButtonFind, "", false, "FindButton") + "</td>");
-                            int ColumnPointer = 0;
-                            var listOfMatches = new List<FindWordMatchEnum> { FindWordMatchEnum.matchincludes, FindWordMatchEnum.MatchEquals, FindWordMatchEnum.MatchTrue, FindWordMatchEnum.MatchFalse };
-                            foreach (var column in indexConfig.columns) {
-                                string FieldName = GenericController.toLCase(column.Name);
-                                string FindWordValue = "";
-                                if (indexConfig.findWords.ContainsKey(FieldName)) {
-                                    var findWord = indexConfig.findWords[FieldName];
-                                    if (listOfMatches.Any(s => findWord.MatchOption.Equals(s))) {
-                                        FindWordValue = findWord.Value;
-                                    }
-                                }
-                                DataTable_FindRow.Append(Environment.NewLine + "<td valign=\"middle\" align=\"center\" class=\"ccPanel3DReverse\" style=\"padding:8px;\">"
-                                    + "<input type=hidden name=\"FindName" + ColumnPointer + "\" value=\"" + FieldName + "\">"
-                                    + "<input class=\"form-control findInput\"  onkeypress=\"KeyCheck(event);\"  type=text id=\"F" + ColumnPointer + "\" name=\"FindValue" + ColumnPointer + "\" value=\"" + FindWordValue + "\" style=\"padding-right:.2rem;padding-left:.2rem;\">"
-                                    + "</td>");
-                                ColumnPointer += 1;
-                            }
-                            DataTable_FindRow.Append("</tr>");
-                            //
-                            // Assemble DataTable
-                            //
-                            string grid = ""
-                                + "<table ID=\"DataTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
-                                + DataTable_HdrRow + dataTableRows + DataTable_FindRow + "</table>";
+                            // -- beta test moving grid to controller to be used for many-to-many data in teh redirect field types
+                            string grid = ListGridController.get(core, adminData, indexConfig, userContentPermissions, sql, datasource, FieldUsedInColumns, IsLookupFieldValid);
                             string formContent = ""
                                 + "<table ID=\"DataFilterTable\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"Background-Color:white;\">"
                                 + "<tr>"
@@ -905,7 +683,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 Return_AllowAccess = true;
                 //
                 // ----- Workflow Fields
-                return_sqlFieldList = return_sqlFieldList + adminData.adminContent.tableName + ".ID";
+                return_sqlFieldList +=  adminData.adminContent.tableName + ".ID";
                 //
                 // ----- From Clause - build joins for Lookup fields in columns, in the findwords, and in sorts
                 return_sqlFrom = adminData.adminContent.tableName;
@@ -977,7 +755,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (lookupContentMetadata != null) {
                                 FieldUsedInColumns[field.nameLc] = true;
                                 IsLookupFieldValid[field.nameLc] = true;
-                                return_sqlFieldList = return_sqlFieldList + ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
+                                return_sqlFieldList +=  ", LookupTable" + FieldPtr + ".Name AS LookupTable" + FieldPtr + "Name";
                                 return_sqlFrom = "(" + return_sqlFrom + " LEFT JOIN " + lookupContentMetadata.tableName + " AS LookupTable" + FieldPtr + " ON " + adminData.adminContent.tableName + "." + field.nameLc + " = LookupTable" + FieldPtr + ".ID)";
                             }
                         }
@@ -986,7 +764,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (IncludedInColumns) {
                         //
                         // This field is included in the columns, so include it in the select
-                        return_sqlFieldList = return_sqlFieldList + " ," + adminData.adminContent.tableName + "." + field.nameLc;
+                        return_sqlFieldList +=  " ," + adminData.adminContent.tableName + "." + field.nameLc;
                         FieldUsedInColumns[field.nameLc] = true;
                     }
                 }
@@ -1018,7 +796,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 // Add Name into Return_sqlFieldList
-                return_sqlFieldList = return_sqlFieldList + " ," + adminData.adminContent.tableName + ".Name";
+                return_sqlFieldList +=  " ," + adminData.adminContent.tableName + ".Name";
                 //
                 // paste sections together and do where clause
                 if (AdminDataModel.userHasContentAccess(core, adminData.adminContent.id)) {
@@ -1695,139 +1473,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 throw;
             }
             return returnContent;
-        }
-        //   
-        //========================================================================
-        /// <summary>
-        /// Display a field in the admin index form
-        /// </summary>
-        /// <param name="core"></param>
-        /// <param name="adminData"></param>
-        /// <param name="fieldName"></param>
-        /// <param name="CS"></param>
-        /// <param name="IsLookupFieldValid"></param>
-        /// <param name="IsEmailContent"></param>
-        /// <returns></returns>
-        public static string getForm_Index_GetCell(CoreController core, AdminDataModel adminData, string fieldName, CsModel csData, bool IsLookupFieldValid, bool IsEmailContent) {
-            try {
-                var Stream = new StringBuilderLegacyController();
-                var field = adminData.adminContent.fields[fieldName.ToLowerInvariant()];
-                if (field.password) {
-                    //
-                    // -- do not list password fields
-                    Stream.add("****");
-                } else {
-                    int Pos = 0;
-                    switch (field.fieldTypeId) {
-                        case CPContentBaseClass.FieldTypeIdEnum.File:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
-                                string filename = csData.getText(field.nameLc);
-                                filename = GenericController.strReplace(filename, "\\", "/");
-                                Pos = filename.LastIndexOf("/") + 1;
-                                if (Pos != 0) {
-                                    filename = filename.Substring(Pos);
-                                }
-                                Stream.add(filename);
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
-                                if (IsLookupFieldValid) {
-                                    Stream.add(csData.getText("LookupTable" + field.id + "Name"));
-                                } else if (field.lookupList != "") {
-                                    string[] lookups = field.lookupList.Split(',');
-                                    int LookupPtr = csData.getInteger(field.nameLc) - 1;
-                                    if (LookupPtr <= lookups.GetUpperBound(0)) {
-                                        if (LookupPtr >= 0) {
-                                            Stream.add(lookups[LookupPtr]);
-                                        }
-                                    }
-                                } else {
-                                    Stream.add(" ");
-                                }
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
-                                if (IsLookupFieldValid) {
-                                    Stream.add(csData.getText("LookupTable" + field.id + "Name"));
-                                } else {
-                                    Stream.add(csData.getText(field.nameLc));
-                                }
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
-                                if (csData.getBoolean(field.nameLc)) {
-                                    Stream.add("yes");
-                                } else {
-                                    Stream.add("no");
-                                }
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.Currency: {
-                                string fieldValueText = csData.getText(field.nameLc);
-                                if (string.IsNullOrWhiteSpace(fieldValueText)) {
-                                    Stream.add(fieldValueText);
-                                    break;
-                                }
-                                Stream.add(string.Format("{0:C}", csData.getNumber(field.nameLc)));
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.LongText:
-                        case CPContentBaseClass.FieldTypeIdEnum.HTML:
-                        case CPContentBaseClass.FieldTypeIdEnum.HTMLCode: {
-                                string fieldValueText = csData.getText(field.nameLc);
-                                if (fieldValueText.Length > 50) {
-                                    fieldValueText = fieldValueText.left(50) + "[more]";
-                                }
-                                Stream.add(fieldValueText);
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.FileText:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTML:
-                        case CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
-                                string filename = csData.getText(field.nameLc);
-                                if (!string.IsNullOrEmpty(filename)) {
-                                    string Copy = core.cdnFiles.readFileText(filename);
-                                    Stream.add(Copy);
-                                }
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                        case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
-                                Stream.add("n/a");
-                                break;
-                            }
-                        case CPContentBaseClass.FieldTypeIdEnum.Date: {
-                                //
-                                // -- if minvalue, use blank, if no time-part, do short-date
-                                DateTime cellValueDate = csData.getDate(field.nameLc);
-                                if (cellValueDate.Equals(DateTime.MinValue)) {
-                                    Stream.add("");
-                                } else if (cellValueDate.Equals(cellValueDate.Date)) {
-                                    Stream.add(cellValueDate.ToShortDateString());
-                                } else {
-                                    Stream.add(cellValueDate.ToString());
-                                }
-                                break;
-                            }
-                        default: {
-                                string valueString = csData.getText(field.nameLc);
-                                if (string.IsNullOrWhiteSpace(valueString)) {
-                                    Stream.add(valueString);
-                                    break;
-                                }
-                                Stream.add(csData.getText(field.nameLc));
-                                break;
-                            }
-                    }
-                }
-                return HtmlController.encodeHtml(Stream.text);
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
         }
     }
 }

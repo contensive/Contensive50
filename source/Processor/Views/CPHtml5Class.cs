@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Contensive.BaseClasses;
 using Contensive.BaseModels;
+using Contensive.CPBase.BaseModels;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {
@@ -23,6 +24,10 @@ namespace Contensive.Processor {
         public CPHtml5Class(CPClass cpParent) {
             cp = cpParent;
         }
+        //
+        // ====================================================================================================
+        //
+        public override string A(string innerHtml, HtmlAttributesA attributes) => HtmlController.a(innerHtml, attributes);
         //
         // ====================================================================================================
         //
@@ -84,6 +89,8 @@ namespace Contensive.Processor {
         public override string Div(string innerHtml, string htmlClass, string htmlId) => HtmlController.div(innerHtml, htmlClass, htmlId);
         //
         // ====================================================================================================
+        //
+        public override string Form(string innerHtml, HtmlAttributesForm attributes) => HtmlController.form(cp.core, innerHtml, attributes);
         //
         public override string Form(string innerHtml) => Form(innerHtml, "", "", "", "", "post");
         //
@@ -363,6 +370,5 @@ namespace Contensive.Processor {
         public override string SelectUser(string htmlName, int htmlValue, int groupId, string noneCaption, string htmlClass, string htmlId) {
             return cp.core.html.selectUserFromGroup(htmlName, htmlValue, groupId, noneCaption, htmlId);
         }
-
     }
 }

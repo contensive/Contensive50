@@ -384,19 +384,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (javascript file field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
-                                    // long text can not be search
+                                    // can not be search
                                     Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.HTML) {
                                     //
-                                    // long text can not be search
-                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (long text field)"));
+                                    // can not be search
+                                    Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (html field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
-                                    // long text can not be search
+                                    // can not be search
                                     Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (image field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
-                                    // long text can not be search
+                                    // can not be search
                                     Stream.add(HtmlController.div(iconNotAvailable + "&nbsp;" + field.caption + " (redirect field)"));
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.ManyToMany) {
                                     //

@@ -13,6 +13,7 @@ using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.BaseModels;
 using System.Linq;
+using Contensive.CPBase.BaseModels;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -21,6 +22,62 @@ namespace Contensive.Processor.Controllers {
     public class HtmlController {
         //
         private readonly CoreController core;
+        //
+        // ====================================================================================================
+        //
+        public static string a(string innerHtml, HtmlAttributesA attributes) {
+            StringBuilder result = new StringBuilder("<a");
+            result.Append((string.IsNullOrWhiteSpace(attributes.download)) ? "" : "" + " download=\"" + encodeHtml(attributes.download) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.href)) ? "" : "" + " href=\"" + encodeHtml(attributes.href) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.hreflang)) ? "" : "" + " href=\"" + encodeHtml(attributes.hreflang) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.media)) ? "" : "" + " media=\"" + encodeHtml(attributes.media) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.ping)) ? "" : "" + " ping=\"" + encodeHtml(attributes.ping) + "\"");
+            switch (attributes.referrerpolicy) {
+                case HtmlAttributesA.HtmlAttributeReferrerPolicy.no_referrer: {
+                        result.Append(" referrerpolicy=\"no-referrer\"");
+                        break;
+                    }
+                case HtmlAttributesA.HtmlAttributeReferrerPolicy.no_referrer_when_downgrade: {
+                        result.Append(" referrerpolicy=\"no-referrer-when-downgrade\"");
+                        break;
+                    }
+                case HtmlAttributesA.HtmlAttributeReferrerPolicy.origin: {
+                        result.Append(" referrerpolicy=\"origin\"");
+                        break;
+                    }
+                case HtmlAttributesA.HtmlAttributeReferrerPolicy.origin_when_cross_origin: {
+                        result.Append(" referrerpolicy=\"origin-when-cross-origin\"");
+                        break;
+                    }
+                case HtmlAttributesA.HtmlAttributeReferrerPolicy.unsafe_url: {
+                        result.Append(" referrerpolicy=\"unsafe-url\"");
+                        break;
+                    }
+                default: {
+                        break;
+                    }
+            }
+            result.Append((attributes.rel.Equals(HtmlAttributesA.HtmlAttributeRel.none)) ? "" : "" + " ping=\"" + encodeHtml(attributes.rel.ToString()) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.target)) ? "" : "" + " ping=\"" + encodeHtml(attributes.target) + "\"");
+            result.Append((string.IsNullOrWhiteSpace(attributes.type)) ? "" : "" + " ping=\"" + encodeHtml(attributes.type) + "\"");
+            result.Append(getHtmlAttributesGlobal(attributes));
+            return result + ">" + innerHtml + "</a>";
+        }
+        //
+        public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "", "");
+        public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "", "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "", "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) => a(innerHtml, href, htmlClass, htmlId, tabIndex, "");
+        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex, string target) {
+            var tag = new StringBuilder("<a");
+            if (!String.IsNullOrWhiteSpace(href)) { tag.Append(" href=\"").Append(href).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(htmlClass)) { tag.Append(" class=\"").Append(htmlClass).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(htmlId)) { tag.Append(" id=\"").Append(htmlId).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(tabIndex)) { tag.Append(" tabindex=\"").Append(tabIndex).Append("\""); }
+            if (!String.IsNullOrWhiteSpace(target)) { tag.Append(" target=\"").Append(target).Append("\""); }
+            tag.Append(">").Append(innerHtml).Append("</a>");
+            return tag.ToString();
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -840,12 +897,9 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string getHtmlAttributes(CoreController core, Contensive.CPBase.BaseModels.HtmlAttributesForm attributes) {
+        public static string getHtmlAttributesGlobal(Contensive.CPBase.BaseModels.HtmlAttributesGlobal attributes) {
             var result = new StringBuilder();
-            result.Append((string.IsNullOrWhiteSpace(attributes.acceptcharset)) ? "" : "" + " accept-charset=\"" + attributes.acceptcharset + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.accesskey)) ? "" : "" + " accesskey=\"" + attributes.accesskey + "\"");
-            result.Append(" action=\"" + ((string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : attributes.action) + "\"");
-            result.Append((!attributes.autocomplete) ? "" : "" + " autocomplete=\"on\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.@class)) ? "" : "" + " class=\"" + attributes.@class + "\"");
             result.Append((!attributes.contenteditable) ? "" : "" + " contenteditable=\"true\"");
             if ((attributes.data != null) && (!attributes.data.Count.Equals(0))) {
@@ -856,30 +910,9 @@ namespace Contensive.Processor.Controllers {
             result.Append((string.IsNullOrWhiteSpace(attributes.dir)) ? "" : "" + " dir=\"" + attributes.dir + "\"");
             result.Append((!attributes.draggable) ? "" : "" + " draggable=\"true\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.dropzone)) ? "" : "" + " dropzone=\"" + attributes.dropzone + "\"");
-            switch (attributes.enctype) {
-                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
-                        result.Append(" enctype=\"application/x-www-form-urlencoded\"");
-                        break;
-                    }
-                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.text_plain: {
-                        result.Append(" enctype=\"text/plain\"");
-                        break;
-                    }
-                default: {
-                        //
-                        // -- none and multipart, use multi-part -- should be the default so a simple form call works with file uploads
-                        result.Append(" enctype=\"multipart/form-data\"");
-                        break;
-                    }
-            }
-            if (!attributes.enctype.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.none)) {
-            }
             result.Append((!attributes.hidden) ? "" : "" + " hidden");
             result.Append((string.IsNullOrWhiteSpace(attributes.id)) ? "" : "" + " id=\"" + attributes.id + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.lang)) ? "" : "" + " lang=\"" + attributes.lang + "\"");
-            result.Append(" method=" + ((attributes.method.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.get)) ? "\"get\"" : "\"post\""));
-            result.Append((string.IsNullOrWhiteSpace(attributes.name)) ? "" : "" + " name=\"" + attributes.name + "\"");
-            result.Append((!attributes.novalidate) ? "" : "" + " novalidate");
             result.Append((string.IsNullOrWhiteSpace(attributes.onabort)) ? "" : "" + " onabort=\"" + attributes.onabort + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.onafterprint)) ? "" : "" + " onafterprint=\"" + attributes.onafterprint + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.onbeforeprint)) ? "" : "" + " onbeforeprint=\"" + attributes.onbeforeprint + "\"");
@@ -953,7 +986,6 @@ namespace Contensive.Processor.Controllers {
             result.Append((!attributes.spellcheck) ? "" : "" + " spellcheck");
             result.Append((string.IsNullOrWhiteSpace(attributes.style)) ? "" : "" + " style=\"" + attributes.style + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.tabindex)) ? "" : "" + " tabindex=\"" + attributes.tabindex + "\"");
-            result.Append((attributes.target.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlAttributeTarget.none)) ? "" : "" + " enctype=\"" + attributes.target + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.title)) ? "" : "" + " title=\"" + attributes.title + "\"");
             result.Append((!attributes.translate) ? "" : "" + " translate");
             return result.ToString();
@@ -961,9 +993,34 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static string form(CoreController core, string innerHtml, Contensive.CPBase.BaseModels.HtmlAttributesForm attributes) {
+        public static string form(CoreController core, string innerHtml, HtmlAttributesForm attributes) {
             StringBuilder result = new StringBuilder("<form");
-            result.Append(getHtmlAttributes(core, attributes));
+            result.Append((string.IsNullOrWhiteSpace(attributes.acceptcharset)) ? "" : "" + " accept-charset=\"" + attributes.acceptcharset + "\"");
+            result.Append(" action=\"" + ((string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : attributes.action) + "\"");
+            result.Append((!attributes.autocomplete) ? "" : "" + " autocomplete=\"on\"");
+            switch (attributes.enctype) {
+                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
+                        result.Append(" enctype=\"application/x-www-form-urlencoded\"");
+                        break;
+                    }
+                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.text_plain: {
+                        result.Append(" enctype=\"text/plain\"");
+                        break;
+                    }
+                default: {
+                        //
+                        // -- none and multipart, use multi-part -- should be the default so a simple form call works with file uploads
+                        result.Append(" enctype=\"multipart/form-data\"");
+                        break;
+                    }
+            }
+            if (!attributes.enctype.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.none)) {
+            }
+            result.Append(" method=" + ((attributes.method.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.get)) ? "\"get\"" : "\"post\""));
+            result.Append((string.IsNullOrWhiteSpace(attributes.name)) ? "" : "" + " name=\"" + attributes.name + "\"");
+            result.Append((!attributes.novalidate) ? "" : "" + " novalidate");
+            result.Append((attributes.target.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlAttributeTarget.none)) ? "" : "" + " enctype=\"" + attributes.target + "\"");
+            result.Append(getHtmlAttributesGlobal(attributes));
             return result + ">" + innerHtml + "</form>";
         }
         //
@@ -3755,23 +3812,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string decodeHtml(string Source) {
             return WebUtility.HtmlDecode(Source);
-        }
-        //
-        // ====================================================================================================
-        //
-        public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "", "");
-        public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "", "");
-        public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "", "");
-        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) => a(innerHtml, href, htmlClass, htmlId, tabIndex, "");
-        public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex, string target) {
-            var tag = new StringBuilder("<a");
-            if (!String.IsNullOrWhiteSpace(href)) { tag.Append(" href=\"").Append(href).Append("\""); }
-            if (!String.IsNullOrWhiteSpace(htmlClass)) { tag.Append(" class=\"").Append(htmlClass).Append("\""); }
-            if (!String.IsNullOrWhiteSpace(htmlId)) { tag.Append(" id=\"").Append(htmlId).Append("\""); }
-            if (!String.IsNullOrWhiteSpace(tabIndex)) { tag.Append(" tabindex=\"").Append(tabIndex).Append("\""); }
-            if (!String.IsNullOrWhiteSpace(target)) { tag.Append(" target=\"").Append(target).Append("\""); }
-            tag.Append(">").Append(innerHtml).Append("</a>");
-            return tag.ToString();
         }
         //
         // ====================================================================================================

@@ -478,12 +478,12 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// constructor - load the context for the admin site, controlled by request inputs like rnContent (cid) and rnRecordId (id)
         /// </summary>
         /// <param name="core"></param>
-        public AdminDataModel(CoreController core) {
+        public AdminDataModel(CoreController core, AdminDataRequest request) {
             try {
                 this.core = core;
                 //
                 // adminContext.content init
-                requestedContentId = core.docProperties.getInteger("cid");
+                requestedContentId = request.contentId;
                 if (requestedContentId != 0) {
                     adminContent = ContentMetadataModel.create(core, requestedContentId);
                     if (adminContent == null) {
@@ -512,7 +512,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     loaded = false
                 };
                 if (userAllowContentEdit && !adminContent.id.Equals(0)) {
-                    int requestedRecordId = core.docProperties.getInteger("id");
+                    int requestedRecordId = request.id;
                     if (!requestedRecordId.Equals(0)) {
                         using (var csData = new CsModel(core)) {
                             csData.openRecord(adminContent.name, requestedRecordId, "id,contentControlId");
@@ -529,7 +529,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     if (editRecord.id.Equals(0)) {
-                        string requestedGuid = core.docProperties.getText("guid");
+                        string requestedGuid = request.guid;
                         if (!string.IsNullOrWhiteSpace(requestedGuid) && isGuid(requestedGuid)) {
                             using (var csData = new CsModel(core)) {
                                 csData.open(adminContent.name, "(ccguid=" + DbController.encodeSQLText(requestedGuid) + ")", "id", false, core.session.user.id, "id,contentControlId");
@@ -550,73 +550,34 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 // Other page control fields
                 //
-                titleExtension = core.docProperties.getText(RequestNameTitleExtension);
-                recordTop = core.docProperties.getInteger("RT");
-                recordsPerPage = core.docProperties.getInteger("RS");
+                titleExtension = request.titleExtension;
+                recordTop = request.recordTop;
+                recordsPerPage = request.recordsPerPage;
                 if (recordsPerPage == 0) {
                     recordsPerPage = Constants.RecordsPerPageDefault;
                 }
                 //
                 // Read WherePairCount
                 //
-                wherePairCount = 99;
-                int WCount = 0;
-                for (WCount = 0; WCount <= 99; WCount++) {
-                    wherePair[0, WCount] = GenericController.encodeText(core.docProperties.getText("WL" + WCount));
-                    if (wherePair[0, WCount] == "") {
-                        wherePairCount = WCount;
-                        break;
-                    } else {
-                        wherePair[1, WCount] = GenericController.encodeText(core.docProperties.getText("WR" + WCount));
-                        core.doc.addRefreshQueryString("wl" + WCount, GenericController.encodeRequestVariable(wherePair[0, WCount]));
-                        core.doc.addRefreshQueryString("wr" + WCount, GenericController.encodeRequestVariable(wherePair[1, WCount]));
-                    }
-                }
-                //
-                // Read WhereClauseContent to WherePairCount
-                //
-                string WhereClauseContent = GenericController.encodeText(core.docProperties.getText("wc"));
-                if (!string.IsNullOrEmpty(WhereClauseContent)) {
-                    //
-                    // ***** really needs a server.URLDecode() function
-                    //
-                    core.doc.addRefreshQueryString("wc", WhereClauseContent);
-                    if (!string.IsNullOrEmpty(WhereClauseContent)) {
-                        string[] QSSplit = WhereClauseContent.Split(',');
-                        int QSPointer = 0;
-                        for (QSPointer = 0; QSPointer <= QSSplit.GetUpperBound(0); QSPointer++) {
-                            string NameValue = QSSplit[QSPointer];
-                            if (!string.IsNullOrEmpty(NameValue)) {
-                                if ((NameValue.left(1) == "(") && (NameValue.Substring(NameValue.Length - 1) == ")") && (NameValue.Length > 2)) {
-                                    NameValue = NameValue.Substring(1, NameValue.Length - 2);
-                                }
-                                string[] NVSplit = NameValue.Split('=');
-                                wherePair[0, wherePairCount] = NVSplit[0];
-                                if (NVSplit.GetUpperBound(0) > 0) {
-                                    wherePair[1, wherePairCount] = NVSplit[1];
-                                }
-                                wherePairCount = wherePairCount + 1;
-                            }
-                        }
-                    }
+                int wherePairCount = 0;
+                foreach ( var nvp in request.wherePairDict ) {
+                    core.doc.addRefreshQueryString("wl" + wherePairCount,  GenericController.encodeRequestVariable(nvp.Key));
+                    core.doc.addRefreshQueryString("wr" + wherePairCount, GenericController.encodeRequestVariable(nvp.Value));
+                    wherePairCount += 1;
                 }
                 //
                 // ----- Other
                 //
-                admin_Action = core.docProperties.getInteger(rnAdminAction);
-                adminSourceForm = core.docProperties.getInteger(rnAdminSourceForm);
-                adminForm = core.docProperties.getInteger(rnAdminForm);
-                requestButton = core.docProperties.getText(RequestNameButton);
-                if (adminForm == AdminFormEdit) {
-                    ignore_legacyMenuDepth = 0;
-                } else {
-                    ignore_legacyMenuDepth = core.docProperties.getInteger(RequestNameAdminDepth);
-                }
+                admin_Action = request.adminAction;
+                adminSourceForm = request.adminSourceForm;
+                adminForm = request.adminForm;
+                requestButton = request.adminButton;
+                ignore_legacyMenuDepth = request.ignore_legacyMenuDepth;
                 //
                 // ----- convert fieldEditorPreference change to a refresh action
                 //
                 if (adminContent.id != 0) {
-                    fieldEditorPreference = core.docProperties.getText("fieldEditorPreference");
+                    fieldEditorPreference = request.fieldEditorPreference;
                     if (fieldEditorPreference != "") {
                         //
                         // Editor Preference change attempt. Set new preference and set this as a refresh
@@ -672,10 +633,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                 }
-                //
-                // --- Spell Check
-                //SpellCheckSupported = false;
-                //SpellCheckRequest = false;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -1649,5 +1606,21 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
         }
         private List<FieldTypeEditorAddonModel> _fieldTypeDefaultEditors = null;
+        //
+    }
+    public class AdminDataRequest {
+        public int contentId;
+        public int id;
+        public string guid;
+        public string titleExtension;
+        public int recordTop;
+        public int recordsPerPage;
+        public Dictionary<string, string> wherePairDict;
+        public int adminAction;
+        public int adminSourceForm;
+        public int adminForm;
+        public string adminButton;
+        public int ignore_legacyMenuDepth;
+        public string fieldEditorPreference;
     }
 }

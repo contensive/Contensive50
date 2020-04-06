@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor.Addons.AdminSite {
@@ -22,7 +23,21 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (ContentId == 0) {
                     result = "No filter is available";
                 } else {
-                    result = ListView.getForm_IndexFilterContent(core, new AdminDataModel(core));
+                    result = ListView.getForm_IndexFilterContent(core, new AdminDataModel(core, new AdminDataRequest() {
+                        adminAction = 0,
+                        adminButton = "",
+                        adminForm = 0,
+                        adminSourceForm = 0,
+                        contentId = 0,
+                        fieldEditorPreference = "",
+                        guid = "",
+                        id = 0,
+                        ignore_legacyMenuDepth = 0,
+                        recordsPerPage = 100,
+                        recordTop = 0,
+                        titleExtension = "",
+                        wherePairDict = new Dictionary<string, string>()
+                    }));
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
