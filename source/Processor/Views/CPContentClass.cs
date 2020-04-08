@@ -6,11 +6,20 @@ using Contensive.BaseClasses;
 using Contensive.Processor.Models.Domain;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using Contensive.CPBase.BaseModels;
 
 namespace Contensive.Processor {
     public class CPContentClass : CPContentBaseClass {
         //
         private readonly CPClass cp;
+
+        public override LastestDateTrackerBaseModel LatestContentModifiedDate {
+            get {
+                return _LatestContentModifiedDate;
+            }
+            set { } 
+        }
+        private readonly LastestDateTracker _LatestContentModifiedDate = new LastestDateTracker();
         //
         //====================================================================================================
         //

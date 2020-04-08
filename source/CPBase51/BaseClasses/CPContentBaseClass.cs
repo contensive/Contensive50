@@ -1,9 +1,15 @@
 ﻿
 using System;
+using Contensive.CPBase.BaseModels;
 
 namespace Contensive.BaseClasses {
     public abstract class CPContentBaseClass {
-        // todo - expose a MetaModel to expose properties
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Track the latest modified date
+        /// </summary>
+        public abstract LastestDateTrackerBaseModel LatestContentModifiedDate { get; set; }
         //
         //====================================================================================================
         /// <summary>

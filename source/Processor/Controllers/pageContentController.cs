@@ -1126,7 +1126,9 @@ namespace Contensive.Processor.Controllers {
                         string editAnchorTag = AdminUIController.getRecordEditAndCutAnchorTag(core, contentMetadata, page.id, true, pageName);
                         string pageAnchorTag = GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(pageLink) + "\">", pageMenuHeadline);
                         editItemList.Append("\r<li name=\"page" + page.id + "\"  id=\"page" + page.id + "\" class=\"ccEditWrapper ccListItem allowSort\">");
-                        if (!string.IsNullOrEmpty(editAnchorTag)) { editItemList.Append(HtmlController.div(iconGrip, "ccListItemDragHandle") + editAnchorTag + "&nbsp;"); }
+                        if (!string.IsNullOrEmpty(editAnchorTag)) {
+                            editItemList.Append(HtmlController.div(iconGrip, "ccListItemDragHandle") + editAnchorTag + "&nbsp;");
+                        }
                         editItemList.Append(pageAnchorTag);
                         editItemList.Append("</li>");
                     }
@@ -1150,21 +1152,26 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- Last Modified line
-                if ((core.doc.pageController.page.modifiedDate != DateTime.MinValue) && core.doc.pageController.page.allowLastModifiedFooter) {
-                    result.Append("\r<p>This page was last modified " + encodeDate(core.doc.pageController.page.modifiedDate).ToString("G"));
-                    if (core.session.isAuthenticatedAdmin()) {
-                        if (core.doc.pageController.page.modifiedBy == 0) {
-                            result.Append(" (admin only: modified by unknown)");
-                        } else {
-                            string personName = MetadataController.getRecordName(core, "people", encodeInteger(core.doc.pageController.page.modifiedBy));
-                            if (string.IsNullOrEmpty(personName)) {
-                                result.Append(" (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")");
-                            } else {
-                                result.Append(" (admin only: modified by " + personName + ")");
-                            }
-                        }
+                if (core.doc.pageController.page.allowLastModifiedFooter) {
+                    DateTime pageModifiedDate = (core.doc.pageController.page.modifiedDate != null) ? encodeDate(core.doc.pageController.page.modifiedDate) : DateTime.MinValue;
+                    core.cpParent.Content.LatestContentModifiedDate.Track(pageModifiedDate);
+                    pageModifiedDate = core.cpParent.Content.LatestContentModifiedDate.Get();
+                    if (pageModifiedDate != DateTime.MinValue)  {
+                        result.Append("\r<p>This page was last modified " + encodeDate(pageModifiedDate).ToString("G"));
+                        //if (core.session.isAuthenticatedAdmin()) {
+                        //    if (core.doc.pageController.page.modifiedBy == 0) {
+                        //        result.Append(" (admin only: modified by unknown)");
+                        //    } else {
+                        //        string personName = MetadataController.getRecordName(core, "people", encodeInteger(core.doc.pageController.page.modifiedBy));
+                        //        if (string.IsNullOrEmpty(personName)) {
+                        //            result.Append(" (admin only: modified by person with unnamed or deleted record #" + core.doc.pageController.page.modifiedBy + ")");
+                        //        } else {
+                        //            result.Append(" (admin only: modified by " + personName + ")");
+                        //        }
+                        //    }
+                        //}
+                        result.Append("</p>");
                     }
-                    result.Append("</p>");
                 }
                 //
                 // -- Last Reviewed line
@@ -1421,8 +1428,11 @@ namespace Contensive.Processor.Controllers {
                 // ----- Set Headers
                 //---------------------------------------------------------------------------------
                 //
-                if (core.doc.pageController.page.modifiedDate != DateTime.MinValue) {
-                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.getRFC1123PatternDateFormat(encodeDate(core.doc.pageController.page.modifiedDate)));
+                DateTime pageModifiedDate = (core.doc.pageController.page.modifiedDate != null) ? encodeDate(core.doc.pageController.page.modifiedDate) : DateTime.MinValue;
+                core.cpParent.Content.LatestContentModifiedDate.Track(pageModifiedDate);
+                pageModifiedDate = core.cpParent.Content.LatestContentModifiedDate.Get();
+                if (pageModifiedDate != DateTime.MinValue) {
+                    core.webServer.addResponseHeader("LAST-MODIFIED", GenericController.getRFC1123PatternDateFormat(encodeDate(pageModifiedDate)));
                 }
                 //
                 //---------------------------------------------------------------------------------

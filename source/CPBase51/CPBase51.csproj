@@ -78,6 +78,7 @@
     <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
     <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
     <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\LastestDateTrackerBaseModel.cs" />
     <Compile Include="BaseModels\HtmlAttributesA.cs" />
     <Compile Include="BaseModels\HtmlAttributesForm.cs" />
     <Compile Include="BaseModels\HtmlAttributesGlobal.cs" />
