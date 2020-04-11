@@ -91,14 +91,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                 if (cp.core.doc.continueProcessing) {
                     //
                     // -- read wl+wr values into wherePair dictionary
+                    // -- wherepairs are used to:
+                    // ---- prepopulate inserted records
+                    // ---- create filters for gridList
+                    // -- wherepair wr0=id, wl=1 (means id=1)
                     Dictionary<string, string> wherePairs = new Dictionary<string, string>();
-                    for (int WCount = 0; WCount <= 99; WCount++) {
-                        string key = cp.Doc.GetText("WL" + WCount);
+                    for (int wpCnt = 0; wpCnt <= 99; wpCnt++) {
+                        string key = cp.Doc.GetText("wl" + wpCnt);
                         if (string.IsNullOrEmpty(key)) { break; }
-                        wherePairs.Add(key, cp.Doc.GetText("WL" + WCount));
+                        wherePairs.Add(key.ToLower(), cp.Doc.GetText("wr" + wpCnt));
                     }
                     //
-                    // -- read wc (whereclause) into wherepair dictionary
+                    // -- read wc (whereclause) into wherepair dictionary also
+                    // -- whereclause wc=id%3D1 (means id=1)
                     string WhereClauseContent = GenericController.encodeText(cp.Doc.GetText("wc"));
                     if (!string.IsNullOrEmpty(WhereClauseContent)) {
                         string[] QSSplit = WhereClauseContent.Split(',');
@@ -110,7 +115,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                                 string[] NVSplit = NameValue.Split('=');
                                 if (NVSplit.GetUpperBound(0) > 0) {
-                                    wherePairs.Add(NVSplit[0], NVSplit[1]);
+                                    wherePairs.Add(NVSplit[0].ToLower(), NVSplit[1]);
                                 }
                             }
                         }

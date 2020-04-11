@@ -724,6 +724,7 @@ namespace Contensive.Processor.Controllers {
                     indexConfig.allowFind = false;
                     indexConfig.allowAddRow = true;
                     indexConfig.allowColumnSort = false;
+                    gridData.wherePair.Add(field.redirectId.ToLower(), editRecord.id.ToString());
                     return ListGridController.get(core, gridData, indexConfig, userContentPermissions, sql, datasource, FieldUsedInColumns, IsLookupFieldValid);
                 } else {
                     //

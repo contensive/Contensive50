@@ -15,6 +15,15 @@ namespace Contensive.Processor {
             this.cp = cp;
         }
         //
+        //=======================================================================================================
+        /// <summary>
+        /// Clear a property
+        /// </summary>
+        /// <param name="key"></param>
+        public override void ClearProperty(string key) {
+            cp.core.siteProperties.clearProperty(key);
+        }
+        //
         //====================================================================================================
         //
         public override string Name {

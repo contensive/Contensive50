@@ -17,6 +17,13 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// remove the property
+        /// </summary>
+        /// <param name="key"></param>
+        public abstract void ClearProperty(string key);
+        //
+        //====================================================================================================
+        /// <summary>
         /// set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
         /// </summary>
         /// <param name="key"></param>

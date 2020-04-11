@@ -9,6 +9,15 @@ namespace Contensive.Processor {
         //
         //=======================================================================================================
         /// <summary>
+        /// Clear a property
+        /// </summary>
+        /// <param name="key"></param>
+        public override void ClearProperty(string key) {
+            cp.core.visitorProperty.clearProperty(key);
+        }
+        //
+        //=======================================================================================================
+        /// <summary>
         /// constructor
         /// </summary>
         /// <param name="cp"></param>

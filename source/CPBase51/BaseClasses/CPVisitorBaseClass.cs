@@ -6,6 +6,13 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// remove the property
+        /// </summary>
+        /// <param name="key"></param>
+        public abstract void ClearProperty(string key);
+        //
+        //====================================================================================================
+        /// <summary>
         /// set the visit property to force the mobile state true
         /// </summary>
         public abstract bool ForceBrowserMobile { get; set; }

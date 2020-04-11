@@ -12,6 +12,15 @@ namespace Contensive.Processor {
         /// </summary>
         private readonly CPClass cp;
         //
+        //=======================================================================================================
+        /// <summary>
+        /// Clear a property
+        /// </summary>
+        /// <param name="key"></param>
+        public override void ClearProperty(string key) {
+            cp.core.userProperty.clearProperty(key);
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// constructor

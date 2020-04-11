@@ -71,11 +71,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                     }
                     //
                     // -- column header includes WherePairCount
-                    if (adminData.wherePairCount > 0) {
-                        for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
-                            if (!string.IsNullOrEmpty(adminData.wherePair[0, WhereCount])) {
-                                buttonHref.Append("&wl" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[0, WhereCount]));
-                                buttonHref.Append("&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]));
+                    if (!adminData.wherePair.Count.Equals(0)) {
+                        int ptr = 0;
+                        foreach ( var kvp in adminData.wherePair) {
+                            if(!string.IsNullOrWhiteSpace(kvp.Key)) {
+                                buttonHref.Append("&wl" + ptr + "=" + GenericController.encodeRequestVariable(kvp.Value));
+                                buttonHref.Append("&wr" + ptr + "=" + GenericController.encodeRequestVariable(kvp.Value));
+                                ptr++;
                             }
                         }
                     }
@@ -119,13 +121,23 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // -- generic admin url for edit and add links
                 string adminEditPresetArgQsList = "";
                 string adminUrlBase = "\\" + core.appConfig.adminRoute + "?" + rnAdminAction + "=" + Constants.AdminActionNop + "&cid=" + adminData.adminContent.id + "&" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(adminData.titleExtension) + "&ad=" + adminData.ignore_legacyMenuDepth + "&" + rnAdminSourceForm + "=" + adminData.adminForm + "&" + rnAdminForm + "=" + AdminFormEdit;
-                if (adminData.wherePairCount > 0) {
-                    for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
-                        adminEditPresetArgQsList += "&wl" + WhereCount + "=" + encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
+                if(!adminData.wherePair.Count.Equals(0)) {
+                    int WhereCount = 0;
+                    foreach (var kvp in adminData.wherePair) {
+                        adminEditPresetArgQsList += "&" + encodeRequestVariable(kvp.Key) + "=" + GenericController.encodeRequestVariable(kvp.Value);
+                        //adminEditPresetArgQsList += "&wl" + WhereCount + "=" + encodeRequestVariable(kvp.Key) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(kvp.Value);
+                        WhereCount++;
                     }
                     adminEditPresetArgQsList = adminEditPresetArgQsList.Substring(1);
                     adminUrlBase += adminEditPresetArgQsList;
                 }
+                //if (adminData.wherePairCount > 0) {
+                //    for (int WhereCount = 0; WhereCount < adminData.wherePairCount; WhereCount++) {
+                //        adminEditPresetArgQsList += "&wl" + WhereCount + "=" + encodeRequestVariable(adminData.wherePair[0, WhereCount]) + "&wr" + WhereCount + "=" + GenericController.encodeRequestVariable(adminData.wherePair[1, WhereCount]);
+                //    }
+                //    adminEditPresetArgQsList = adminEditPresetArgQsList.Substring(1);
+                //    adminUrlBase += adminEditPresetArgQsList;
+                //}
                 //
                 // -- output data rows
                 var dataTableRows = new StringBuilder();

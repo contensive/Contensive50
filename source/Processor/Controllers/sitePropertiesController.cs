@@ -28,6 +28,21 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// clear a value from the database
+        /// </summary>
+        /// <param name="key"></param>
+        public void clearProperty(string key) {
+            if (string.IsNullOrWhiteSpace(key)) return;
+            //
+            // -- clear local cache
+            setProperty(key, string.Empty);
+            //
+            // -- remove from db 
+            core.db.executeNonQuery("Delete from ccsetup where (name=" + DbController.encodeSQLText(key) + ")");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// if true, add a login icon to the lower right corner
         /// </summary>
         public bool allowLoginIcon {

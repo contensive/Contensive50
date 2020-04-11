@@ -60,6 +60,21 @@ namespace Contensive.Processor.Models.Domain {
         //
         //====================================================================================================
         /// <summary>
+        /// clear a value from the database
+        /// </summary>
+        /// <param name="key"></param>
+        public void clearProperty( string key ) {
+            if (string.IsNullOrWhiteSpace(key)) return;
+            //
+            // -- clear local cache
+            setProperty(key, string.Empty);
+            //
+            // -- remove from db 
+            core.db.executeNonQuery("Delete from ccProperties where (TypeID=" + (int)propertyType + ")and(KeyID=" + propertyKeyId + ")and(name=" + DbController.encodeSQLText(key) + ")");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// set property
         /// </summary>
         /// <param name="propertyName"></param>

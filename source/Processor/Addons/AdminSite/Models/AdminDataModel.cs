@@ -78,15 +78,15 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// for passing where clause values from page to page
+        /// for passing where clause values from page to page, key should be lowercase
         /// </summary>
-        public string[,] wherePair = new string[3, 11];
+        public Dictionary<string, string> wherePair = new Dictionary<string, string>();
         //
         //====================================================================================================
         /// <summary>
         /// the current number of WherePairCount in use
         /// </summary>
-        public int wherePairCount { get; set; }
+        //public int wherePairCount { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -450,29 +450,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             return false;
         }
         //
-        //========================================================================
-        /// <summary>
-        /// Get the Wherepair value for a fieldname, If there is a match with the left side, return the right,If no match, return ""
-        /// </summary>
-        /// <param name="FieldName"></param>
-        /// <returns></returns>
-        public string getWherePairValue(string FieldName) {
-            try {
-                FieldName = FieldName.ToLowerInvariant();
-                if (wherePairCount > 0) {
-                    for (int WhereCount = 0; WhereCount < wherePairCount; WhereCount++) {
-                        if (FieldName == wherePair[0, WhereCount].ToLowerInvariant()) {
-                            return wherePair[1, WhereCount];
-                        }
-                    }
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return "";
-        }
-        //
         // ====================================================================================================
         /// <summary>
         /// constructor - load the context for the admin site, controlled by request inputs like rnContent (cid) and rnRecordId (id)
@@ -558,10 +535,10 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 //
                 // Read WherePairCount
-                //
                 int wherePairCount = 0;
-                foreach ( var nvp in request.wherePairDict ) {
-                    core.doc.addRefreshQueryString("wl" + wherePairCount,  GenericController.encodeRequestVariable(nvp.Key));
+                foreach (var nvp in request.wherePairDict) {
+                    wherePair.Add(nvp.Key.ToLower(), nvp.Value);
+                    core.doc.addRefreshQueryString("wl" + wherePairCount, GenericController.encodeRequestVariable(nvp.Key));
                     core.doc.addRefreshQueryString("wr" + wherePairCount, GenericController.encodeRequestVariable(nvp.Value));
                     wherePairCount += 1;
                 }
@@ -866,47 +843,47 @@ namespace Contensive.Processor.Addons.AdminSite {
         public void loadEditRecord_WherePairs(CoreController core) {
             try {
                 // todo refactor out
-                string DefaultValueText = null;
-                foreach (var keyValuePair in adminContent.fields) {
-                    ContentFieldMetadataModel field = keyValuePair.Value;
-                    DefaultValueText = getWherePairValue(field.nameLc);
-                    if (field.active && (!string.IsNullOrEmpty(DefaultValueText))) {
-                        switch (field.fieldTypeId) {
-                            case CPContentBaseClass.FieldTypeIdEnum.Integer:
-                            case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                            case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(DefaultValueText);
-                                    break;
-                                }
-                            case CPContentBaseClass.FieldTypeIdEnum.Currency:
-                            case CPContentBaseClass.FieldTypeIdEnum.Float: {
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(DefaultValueText);
-                                    break;
-                                }
-                            case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(DefaultValueText);
-                                    break;
-                                }
-                            case CPContentBaseClass.FieldTypeIdEnum.Date: {
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(DefaultValueText);
-                                    break;
-                                }
-                            case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
-                                    //
-                                    // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
-                                    break;
-                                }
-                            default: {
-                                    //
-                                    editRecord.fieldsLc[field.nameLc].value = DefaultValueText;
-                                    break;
-                                }
+                if (!wherePair.Count.Equals(0)) {
+                    foreach (var keyValuePair in adminContent.fields) {
+                        ContentFieldMetadataModel field = keyValuePair.Value;
+                        if (field.active && wherePair.ContainsKey(field.nameLc)) {
+                            switch (field.fieldTypeId) {
+                                case CPContentBaseClass.FieldTypeIdEnum.Integer:
+                                case CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                                case CPContentBaseClass.FieldTypeIdEnum.AutoIdIncrement: {
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = GenericController.encodeInteger(wherePair[field.nameLc]);
+                                        break;
+                                    }
+                                case CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                case CPContentBaseClass.FieldTypeIdEnum.Float: {
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = GenericController.encodeNumber(wherePair[field.nameLc]);
+                                        break;
+                                    }
+                                case CPContentBaseClass.FieldTypeIdEnum.Boolean: {
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = GenericController.encodeBoolean(wherePair[field.nameLc]);
+                                        break;
+                                    }
+                                case CPContentBaseClass.FieldTypeIdEnum.Date: {
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = GenericController.encodeDate(wherePair[field.nameLc]);
+                                        break;
+                                    }
+                                case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                        //
+                                        // Many to Many can capture a list of ID values representing the 'secondary' values in the Many-To-Many Rules table
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = wherePair[field.nameLc];
+                                        break;
+                                    }
+                                default: {
+                                        //
+                                        editRecord.fieldsLc[field.nameLc].value = wherePair[field.nameLc];
+                                        break;
+                                    }
+                            }
                         }
                     }
                 }

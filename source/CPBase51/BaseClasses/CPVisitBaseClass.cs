@@ -6,6 +6,13 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// remove the property
+        /// </summary>
+        /// <param name="key"></param>
+        public abstract void ClearProperty(string key);
+        //
+        //====================================================================================================
+        /// <summary>
         /// return true if the visit supports cookies
         /// </summary>
         public abstract bool CookieSupport { get; }

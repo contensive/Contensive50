@@ -5,7 +5,14 @@ namespace Contensive.BaseClasses {
     /// <summary>
     /// properties and methods that relate to the current user identity.
     /// </summary>
-    public abstract class CPUserBaseClass {
+    public abstract class CPUserBaseClass {        
+        //
+        //====================================================================================================
+        /// <summary>
+        /// remove the property
+        /// </summary>
+        /// <param name="key"></param>
+        public abstract void ClearProperty(string key);
         //
         //====================================================================================================
         /// <summary>
