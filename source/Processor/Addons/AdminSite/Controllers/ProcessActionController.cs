@@ -827,8 +827,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // ----- Read Response
                         int GroupId = cp.core.docProperties.getInteger("MemberRules." + GroupPointer + ".ID");
                         bool RuleNeeded = cp.core.docProperties.getBoolean("MemberRules." + GroupPointer);
-                        DateTime DateExpires = default;
-                        DateExpires = cp.core.docProperties.getDate("MemberRules." + GroupPointer + ".DateExpires");
+                        DateTime DateExpires = cp.core.docProperties.getDate("MemberRules." + GroupPointer + ".DateExpires");
+                        int groupRoleId = cp.core.docProperties.getInteger("MemberRules." + GroupPointer + ".RoleId");
                         object DateExpiresVariant = null;
                         if (DateExpires == DateTime.MinValue) {
                             DateExpiresVariant = DBNull.Value;
@@ -839,42 +839,34 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // ----- Update Record
                         //
                         using (var csData = new CsModel(cp.core)) {
-                            csData.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupId + ")", "", false, 0, "Active,MemberID,GroupID,DateExpires");
+                            csData.open("Member Rules", "(MemberID=" + PeopleID + ")and(GroupID=" + GroupId + ")", "", false, 0);
                             if (!csData.ok()) {
                                 //
                                 // No record exists
-                                //
                                 if (RuleNeeded) {
                                     //
                                     // No record, Rule needed, add it
-                                    //
                                     csData.insert("Member Rules");
                                     if (csData.ok()) {
                                         csData.set("Active", true);
                                         csData.set("MemberID", PeopleID);
                                         csData.set("GroupID", GroupId);
                                         csData.set("DateExpires", DateExpires);
+                                        csData.set("GroupRoleId", groupRoleId);
                                     }
                                 }
                             } else {
                                 //
                                 // Record exists
-                                //
                                 if (RuleNeeded) {
                                     //
                                     // record exists, and it is needed, update the DateExpires if changed
-                                    //
-                                    bool RuleActive = csData.getBoolean("active");
-                                    DateTime RuleDateExpires = default;
-                                    RuleDateExpires = csData.getDate("DateExpires");
-                                    if ((!RuleActive) || (RuleDateExpires != DateExpires)) {
-                                        csData.set("Active", true);
-                                        csData.set("DateExpires", DateExpires);
-                                    }
+                                    csData.set("Active", true);
+                                    csData.set("DateExpires", DateExpires);
+                                    csData.set("GroupRoleId", groupRoleId);
                                 } else {
                                     //
                                     // record exists and it is not needed, delete it
-                                    //
                                     int MemberRuleId = csData.getInteger("ID");
                                     cp.core.db.delete(MemberRuleId, "ccMemberRules");
                                 }

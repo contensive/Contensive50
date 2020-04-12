@@ -10,6 +10,8 @@ using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 using Contensive.Processor.Addons.AdminSite;
+using Nustache.Core;
+using Contensive.Processor.Properties;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -61,6 +63,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getDateTimeEditor(CoreController core, string fieldName, DateTime? FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
+            htmlId = !string.IsNullOrEmpty(htmlId) ? htmlId : "id" + getRandomInteger(core).ToString();
             string inputDate = HtmlController.inputDate(core, fieldName + "-date", FieldValueDate, "", "component-" + htmlId + "-date", "form-control", readOnly, fieldRequired, false);
             DateTime? FieldValueTime = FieldValueDate;
             if (FieldValueTime != null) {
@@ -633,8 +636,12 @@ namespace Contensive.Processor.Controllers {
             return AdminUIEditorController.getHtmlCodeEditor(core, fieldName, fieldValue, readOnly, htmlId, required);
         }
         //
+        // ====================================================================================================
+        //
         public static string getTextEditor(CoreController core, string fieldName, string fieldValue)
             => getTextEditor(core, fieldName, fieldValue, false, "", false);
+        //
+        // ====================================================================================================
         //
         public static string getTextEditor(CoreController core, string fieldName, string fieldValue, bool readOnly)
             => getTextEditor(core, fieldName, fieldValue, readOnly, "", false);
@@ -644,7 +651,7 @@ namespace Contensive.Processor.Controllers {
         public static string getRedirectEditor(CoreController core, ContentFieldMetadataModel field, AdminDataModel adminData, EditRecordModel editRecord, string fieldValue, bool readOnly, string htmlId, bool required) {
             //
             // -- if hardcoded redirect link, create open-in-new-windows
-            if(!string.IsNullOrEmpty( field.redirectPath)) {
+            if (!string.IsNullOrEmpty(field.redirectPath)) {
                 return HtmlController.a("Open in New Window", field.redirectPath, "", "", "", "_blank");
             }
             //
@@ -743,6 +750,142 @@ namespace Contensive.Processor.Controllers {
                     return HtmlController.a("Open in New Window", RedirectPath, "", "", "", "_blank");
                 }
             }
+        }
+        //
+        // ====================================================================================================
+        //
+        public static string getGroupRuleEditor(CoreController core, AdminDataModel adminData) {
+            try {
+                //
+                var groupRuleEditor = new GroupRuleEditorModel {
+                    listCaption = "Groups",
+                    rowList = new List<GroupRuleEditorRowModel>()
+                };
+                //
+                // -- build default Role select
+                bool isEmpty = false;
+                string RoleSelectDefault = core.html.selectFromContent("{htmlName}", -1, "Group Roles", "", "No Role", "", ref isEmpty, "pt-2 select form-control");
+                //
+                int GroupCount = 0;
+                {
+                    //
+                    // ----- read in the groups that this member has subscribed (exclude new member records)
+                    int[] membershipListGroupId = Array.Empty<int>();
+                    DateTime[] membershipListDateExpires = Array.Empty<DateTime>();
+                    bool[] membershipListActive = Array.Empty<bool>();
+                    int[] membershipListRoleId = Array.Empty<int>();
+                    //
+                    int membershipCount = 0;
+                    if (adminData.editRecord.id != 0) {
+                        var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "memberid=" + adminData.editRecord.id);
+                        int membershipSize = 0;
+                        foreach (var memberRule in memberRuleList) {
+                            if (membershipCount >= membershipSize) {
+                                membershipSize = membershipSize + 100;
+                                Array.Resize(ref membershipListGroupId, membershipSize + 1);
+                                Array.Resize(ref membershipListDateExpires, membershipSize + 1);
+                                Array.Resize(ref membershipListActive, membershipSize + 1);
+                                Array.Resize(ref membershipListRoleId, membershipSize + 1);
+                            }
+                            membershipListGroupId[membershipCount] = memberRule.groupId;
+                            membershipListDateExpires[membershipCount] = GenericController.encodeDate(memberRule.dateExpires);
+                            membershipListActive[membershipCount] = memberRule.active;
+                            membershipListRoleId[membershipCount] = memberRule.groupRoleId;
+                            membershipCount += 1;
+                        }
+                    }
+                    //
+                    // ----- read in all the groups, sorted by ContentName
+                    using (var csGroups = new CsModel(core)) {
+                        bool canSeeHiddenGroups = core.session.isAuthenticatedDeveloper();
+                        csGroups.openSql("select id,name as groupName,caption as groupCaption from ccgroups where (active>0) order by caption,name,id");
+                        while (csGroups.ok()) {
+                            string GroupName = csGroups.getText("GroupName");
+                            if ((GroupName.left(1) != "_") || canSeeHiddenGroups) {
+                                string GroupCaption = csGroups.getText("GroupCaption");
+                                int GroupID = csGroups.getInteger("ID");
+                                if (string.IsNullOrEmpty(GroupCaption)) {
+                                    GroupCaption = GroupName;
+                                    if (string.IsNullOrEmpty(GroupCaption)) {
+                                        GroupCaption = "Group&nbsp;" + GroupID;
+                                    }
+                                }
+                                bool GroupActive = false;
+                                DateTime? DateExpire = default;
+                                string DateExpireValue = "";
+                                int groupRoleId = 0;
+                                if (membershipCount != 0) {
+                                    for (int MembershipPointer = 0; MembershipPointer < membershipCount; MembershipPointer++) {
+                                        if (membershipListGroupId[MembershipPointer] == GroupID) {
+                                            GroupActive = membershipListActive[MembershipPointer];
+                                            if (membershipListDateExpires[MembershipPointer] > DateTime.MinValue) {
+                                                DateExpire = membershipListDateExpires[MembershipPointer];
+                                                DateExpireValue = GenericController.encodeText(DateExpire);
+                                            }
+                                            groupRoleId = membershipListRoleId[MembershipPointer];
+                                            break;
+                                        }
+                                    }
+                                }
+                                string relatedButtonList = "";
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Edit", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Groups") + "&id=" + GroupID);
+                                relatedButtonList += AdminUIController.getButtonPrimaryAnchor("Members", "?af=1&cid=" + ContentMetadataModel.getContentId(core, "people") + "&IndexFilterAddGroup=" + GenericController.encodeURL(GroupName));
+                                //
+                                var row = new GroupRuleEditorRowModel {
+                                    idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
+                                    checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
+                                    groupCaption = GroupCaption,
+                                    expiresInput = getDateTimeEditor(core, "MemberRules." + GroupCount + ".DateExpires", DateExpire,false,"",false,""),
+                                    //expiresInput = HtmlController.inputDate(core, "MemberRules." + GroupCount + ".DateExpires", DateExpire, "","", "text form-control", false,false,false),
+                                    //expiresInput = HtmlController.inputText_Legacy(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20, "", false, false, "text form-control", -1, false, "expires"),
+                                    relatedButtonList = relatedButtonList,
+                                    roleInput = getRoleSelect(core, RoleSelectDefault, groupRoleId, GroupCount)
+                                };
+                                groupRuleEditor.rowList.Add(row);
+                                GroupCount += 1;
+                            }
+                            csGroups.goNext();
+                        }
+                    }
+                }
+                //
+                // -- add a row for group count and Add Group button
+                groupRuleEditor.rowList.Add(new GroupRuleEditorRowModel {
+                    idHidden = HtmlController.inputHidden("MemberRules.RowCount", GroupCount),
+                    checkboxInput = AdminUIController.getButtonPrimaryAnchor("Add Group", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Groups")),
+                    groupCaption = "",
+                    expiresInput = "",
+                    relatedButtonList = "",
+                    roleInput = AdminUIController.getButtonPrimaryAnchor("Add Role", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Group Roles"))
+                });
+                return Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        // ====================================================================================================
+        //
+        private static string getRoleSelect(CoreController core, string RoleSelectDefault, int groupRoleId, int GroupCount) {
+            string find = "value=\"" + groupRoleId + "\"";
+            return RoleSelectDefault
+                .Replace("{htmlName}", "MemberRules." + GroupCount + ".RoleId")
+                .Replace(find, find + " selected");
+        }
+        //
+        public class GroupRuleEditorRowModel {
+            public string idHidden;
+            public string checkboxInput;
+            public string groupCaption;
+            public string expiresInput;
+            public string roleInput;
+            public string relatedButtonList;
+        }
+        public class GroupRuleEditorModel {
+            public string listCaption;
+            public string helpText;
+            public List<GroupRuleEditorRowModel> rowList;
         }
     }
 }

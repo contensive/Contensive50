@@ -776,10 +776,50 @@ namespace Contensive.Processor.Controllers {
         /// Wrap an edit region in a dotted border
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="content"></param>
+        /// <param name="innerHtml"></param>
         /// <returns></returns>
-        public static string getEditWrapper(CoreController core, string content)
-            => getEditWrapper(core, "", content);
+        public static string getEditWrapper(CoreController core, string innerHtml)
+            => getEditWrapper(core, "", innerHtml);
+        //
+        //===================================================================================================
+        /// <summary>
+        /// Wrap an edit region in a dotted border
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static string getEditWrapper(CoreController core, string innerHtml, string contentName, int recordId)
+            => getEditWrapper(core, "", getRecordEditAndCutAnchorTag(core, contentName, recordId, false) + innerHtml);
+        //
+        //===================================================================================================
+        /// <summary>
+        /// Wrap an edit region in a dotted border
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentId"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public static string getEditWrapper(CoreController core, string innerHtml, int contentId, int recordId) {
+            var metadata = ContentMetadataModel.create(core, contentId);
+            return getEditWrapper(core, "", getRecordEditAndCutAnchorTag(core, metadata, recordId, false, "") + innerHtml);
+        }
+        //
+        //===================================================================================================
+        //
+        public static string getEditWrapper(CoreController core, string innerHtml, string contentName, string recordGuid) {
+            var metadata = ContentMetadataModel.createByUniqueName(core, contentName);
+            return getEditWrapper(core, "", getRecordEditAndCutAnchorTag(core, metadata, recordGuid) + innerHtml);
+        }
+        //
+        //===================================================================================================
+        //
+        public static string getEditWrapper(CoreController core, string innerHtml, int contentId, string recordGuid) {
+            var metadata = ContentMetadataModel.create(core, contentId);
+            return getEditWrapper(core, "", getRecordEditAndCutAnchorTag(core, metadata, recordGuid) + innerHtml);
+        }
         //
         // ====================================================================================================
         /// <summary>

@@ -323,7 +323,15 @@ namespace Contensive.Processor {
             }
         }
         //
+        //====================================================================================================
+        //
         public override string GetEditLink() => GetEditLink(false);
+        //
+        //====================================================================================================
+        //
+        public override string GetEditWrapper(string innerHtml) {
+            return AdminUIController.getEditWrapper(cp.core, "", GetEditLink() + innerHtml);
+        }
         //
         //====================================================================================================
         //

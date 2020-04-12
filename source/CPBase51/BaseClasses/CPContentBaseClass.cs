@@ -203,7 +203,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Get an icon linked to the administration site which edits the referenced record. The record is identified by its ID. The recordname is only used for the display caption.
+        /// Get the system edit link
         /// </summary>
         /// <param name="contentName"></param>
         /// <param name="recordId"></param>
@@ -213,14 +213,74 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract string GetEditLink(string contentName, string recordId, bool allowCut, string recordLabel, bool IsEditing);
-        //
+        /// <summary>
+        /// Get the system edit link
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         public abstract string GetEditLink(string contentName, int recordId);
-        //
+        /// <summary>
+        /// Get the system edit link
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
         public abstract string GetEditLink(string contentName, string recordGuid);
-        //
+        /// <summary>
+        /// Get the system edit link
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         public abstract string GetEditLink(int contentId, int recordId);
-        //
+        /// <summary>
+        /// Get the system edit link
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
         public abstract string GetEditLink(int contentId, string recordGuid);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// wrap content in system editing region style.
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <returns></returns>
+        public abstract string GetEditWrapper(string innerHtml);
+        /// <summary>
+        /// wrap content in system editing region style with an edit link.
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public abstract string GetEditWrapper(string innerHtml, string contentName, int recordId);
+        /// <summary>
+        /// wrap content in system editing region style with an edit link.
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
+        public abstract string GetEditWrapper(string innerHtml, string contentName, string recordGuid);
+        /// <summary>
+        /// wrap content in system editing region style with an edit link.
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentId"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public abstract string GetEditWrapper(string innerHtml, int contentId, int recordId);
+        /// <summary>
+        /// wrap content in system editing region style with an edit link.
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="contentId"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
+        public abstract string GetEditWrapper(string innerHtml, int contentId, string recordGuid);
         //
         //====================================================================================================
         /// <summary>
@@ -313,6 +373,15 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract string getLayout(string layoutName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Returns the html layout field of a layout record
+        /// </summary>
+        /// <param name="layoutId"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract string GetLayout(int layoutId);
         //
         //====================================================================================================
         /// <summary>

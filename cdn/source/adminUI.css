@@ -603,11 +603,11 @@ styles used publicly by Contensive
 
 .ccCon .ccBubbleCon {
     position: absolute;
+    z-index: 1;
     border: 2px solid #444;
     margin: 0;
     padding: 0;
     background-color: rgb(240,240,240);
-    z-index: 1;
 }
 
 .ccCon .ccBubbleCon .ccHeaderCon {
@@ -979,10 +979,10 @@ A.ccFlyoutButtonDown {
 }
 
 .ccFlyoutPanel {
-    BORDER: white 1px solid;
-    Z-INDEX: 101;
-    VISIBILITY: hidden;
     POSITION: absolute;
+    Z-INDEX: 101;
+    BORDER: white 1px solid;
+    VISIBILITY: hidden;
     background-color: #e0e0e0;
 }
 
@@ -1278,12 +1278,13 @@ li.ccExceptionListRow {
 * edit addon link wrapper
 */
 .ccAddonEditLinkCon {
+    position: relative;
     z-index: 999;
     display: block;
     white-space: nowrap;
     /* padding: 0 8px 0 4px; */
     color: white;
-    z-index: 1;
+    /* z-index: 1; */
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
     background-color: #333;
     background: -moz-linear-gradient(top, #888, #333);
@@ -1323,8 +1324,9 @@ a.ccRecordEditLink, a.ccRecordCutLink,
 a.ccRecordAddLink, a.ccRecordPasteLink,
 .ccEditWrapperContent .dbSettingHeader a,
 .ccEditWrapperContent .dbSettingHeader a:hover {
+    position: relative;
+    z-index: 999;
     color: white !important;
-    z-index: 1;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5) !important;
     text-decoration: none !important;
     background-color: #333 !important;
@@ -1346,7 +1348,8 @@ a.ccRecordAddLink, a.ccRecordPasteLink,
 * Record edit link endcap
 */
 .ccEditLinkEndCap {
-    z-index: 1;
+    position: relative;
+    z-index: 999;
     background-color: #333;
     background: -moz-linear-gradient(top, #888, #333);
     background: -moz-linear-gradient(to bottom, #888, #333);
@@ -1365,15 +1368,12 @@ a.ccRecordAddLink, a.ccRecordPasteLink,
 * edit record link wrapper
 */
 .ccRecordLinkCon {
+    position: relative;
     z-index: 999;
     display: block;
     white-space: nowrap;
     overflow: hidden;
     text-align: left;
-    /*
-    border: 1px dashed #808080;
-    border-bottom: none;
-    */
 }
 
 .ccRecordLinkCon a.ccRecordCutLink {
@@ -1421,9 +1421,10 @@ div.ccDialogPageNotFound {
 }
 
 .ccEditWrapperContent .dbSettingHeader {
+    position: relative;
+    z-index: 999;
     padding: 0;
     color: white;
-    z-index: 1;
     text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);
     background-color: none;
     background: transparent;
@@ -1436,11 +1437,12 @@ div.ccDialogPageNotFound {
 /*
     Edit Wrapper
 */
-.ccEditWrapper {
+.ccEditWrapper { 
+    position: relative;
+    z-index: 999;
     border: 1px dashed #808080;
-    margin: 1px;
+    margin: 1px;   
 }
-
 .ccEditWrapperCaption {
     text-align: left;
     border-bottom: 1px solid #808080;
@@ -1448,7 +1450,6 @@ div.ccDialogPageNotFound {
     color: black;
     background-color: #4c4;
 }
-
 .ccEditWrapper .ccChildList li {
     /* padding-left: 5px !important; */
     border-top: 1px dashed #262;

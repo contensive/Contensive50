@@ -17,7 +17,7 @@ namespace Contensive.Processor {
             get {
                 return _LatestContentModifiedDate;
             }
-            set { } 
+            set { }
         }
         private readonly LastestDateTracker _LatestContentModifiedDate = new LastestDateTracker();
         //
@@ -31,7 +31,7 @@ namespace Contensive.Processor {
         //
         public override int GetTableID(string tableName) {
             var table = DbBaseModel.createByUniqueName<TableModel>(cp, tableName);
-            if ( table == null ) { return 0;  }
+            if (table == null) { return 0; }
             return table.id;
         }
         //
@@ -166,6 +166,36 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override string GetEditWrapper(string innerHtml) {
+            return AdminUIController.getEditWrapper(cp.core, innerHtml);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditWrapper(string innerHtml, string contentName, int recordId) {
+            return AdminUIController.getEditWrapper(cp.core, innerHtml, contentName, recordId);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditWrapper(string innerHtml, string contentName, string recordGuid) {
+            return AdminUIController.getEditWrapper(cp.core, innerHtml, contentName, recordGuid);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditWrapper(string innerHtml, int contentId, int recordId) {
+            return AdminUIController.getEditWrapper(cp.core, innerHtml, contentId, recordId);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetEditWrapper(string innerHtml, int contentId, string recordGuid) {
+            return AdminUIController.getEditWrapper(cp.core, innerHtml, contentId, recordGuid);
+        }
+        //
+        //====================================================================================================
+        //
         public override string GetPageLink(int pageID, string queryStringSuffix, bool allowLinkAlias) {
             return PageContentController.getPageLink(cp.core, pageID, queryStringSuffix, allowLinkAlias, false);
         }
@@ -235,19 +265,32 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string getLayout(string layoutName) {
-            string result = "";
             try {
+                if (string.IsNullOrWhiteSpace(layoutName)) { return string.Empty; }
                 using (var cs = new CsModel(cp.core)) {
-                    cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
-                    if (cs.ok()) {
-                        result = cs.getText("layout");
-                    }
+                    string sql = "select layout from ccLayouts where name=" + DbController.encodeSQLText(layoutName);
+                    cs.openSql(sql);
+                    if (cs.ok()) { return cs.getText("layout"); }
                 }
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
-                throw;
             }
-            return result;
+            return string.Empty;
+        }
+        //
+        //====================================================================================================
+        //
+        public override string GetLayout(int layoutid) {
+            try {
+                using (var cs = new CsModel(cp.core)) {
+                    string sql = "select layout from ccLayouts where id=" + layoutid;
+                    cs.openSql(sql);
+                    if (cs.ok()) { return cs.getText("layout"); }
+                }
+            } catch (Exception ex) {
+                LogController.logError(cp.core, ex);
+            }
+            return string.Empty;
         }
         //
         //====================================================================================================
@@ -398,7 +441,7 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, access model properties instead", false)]
         public override string GetProperty(string ContentName, string PropertyName) {
             var contentMetadata = ContentMetadataModel.createByUniqueName(cp.core, ContentName);
-            if(contentMetadata==null) { return string.Empty;  }
+            if (contentMetadata == null) { return string.Empty; }
             return contentMetadata.getContentProperty(cp.core, PropertyName);
         }
         //

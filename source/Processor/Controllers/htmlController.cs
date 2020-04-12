@@ -1026,37 +1026,36 @@ namespace Contensive.Processor.Controllers {
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass, string htmlId) {
             return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
-                action = actionQueryString,
+                action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0,1).Equals("?") ? "" : "?") + actionQueryString ,
                 style = "display: inline",
                 name = htmlName,
                 @class = htmlClass,
                 id = htmlId,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+                method = HtmlAttributesForm.HtmlMethodEnum.post
             });
         }
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName) {
             return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
-                action = actionQueryString,
+                action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0, 1).Equals("?") ? "" : "?") + actionQueryString,
                 style = "display: inline",
                 name = htmlName,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+                method = HtmlAttributesForm.HtmlMethodEnum.post
             });
         }
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString) {
             return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
-                action = actionQueryString,
+                action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0,1).Equals("?") ? "" : "?") + actionQueryString ,
                 style = "display: inline",
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+                method = HtmlAttributesForm.HtmlMethodEnum.post
             });
         }
         //
         public static string form(CoreController core, string innerHtml) {
             return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
-                action = "?" + core.doc.refreshQueryString,
                 style = "display: inline",
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post
+                method = HtmlAttributesForm.HtmlMethodEnum.post
             });
         }
         //

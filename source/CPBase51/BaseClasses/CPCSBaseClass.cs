@@ -187,13 +187,26 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Returns an icon linked to the edit function in the admin site for this content
+        /// get a system edit link
         /// </summary>
         /// <param name="allowCut"></param>
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract string GetEditLink(bool allowCut);
+        /// <summary>
+        /// get a system edit link
+        /// </summary>
+        /// <returns></returns>
         public abstract string GetEditLink();
+        //
+        //====================================================================================================
+        /// <summary>
+        /// wrap content in system editing region style with an edit link
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract string GetEditWrapper(string innerHtml);
         //
         //====================================================================================================
         /// <summary>

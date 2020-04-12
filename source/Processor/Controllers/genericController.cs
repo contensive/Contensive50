@@ -654,7 +654,7 @@ namespace Contensive.Processor.Controllers {
         //
         //=================================================================================
         /// <summary>
-        /// Get a Random Long Value
+        /// Get a Random integer Value
         /// </summary>
         /// <param name="core"></param>
         /// <returns></returns>
