@@ -71,8 +71,23 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool OpenRecord(string contentName, int recordId, string SelectFieldList) 
-            => OpenRecord(contentName, recordId, SelectFieldList, true);
+        public override bool OpenRecord(string contentName, int recordId, string selectFieldList) 
+            => OpenRecord(contentName, recordId, selectFieldList, true);
+        //
+        //====================================================================================================
+        //
+        public override bool OpenRecord(string contentName, string recordGuid, string selectFieldList, bool activeOnly)
+            => OpenRecord(contentName, recordGuid, selectFieldList, activeOnly);
+        //
+        //====================================================================================================
+        //
+        public override bool OpenRecord(string contentName, string recordGuid, string selectFieldList)
+            => OpenRecord(contentName, recordGuid, selectFieldList, true);
+        //
+        //====================================================================================================
+        //
+        public override bool OpenRecord(string contentName, string recordGuid)
+            => OpenRecord(contentName, recordGuid, "", true);
         //
         //====================================================================================================
         //
@@ -663,6 +678,7 @@ namespace Contensive.Processor {
             }
             this.disposed_cs = true;
         }
+
         ~CPCSClass()  {
             Dispose(false);
         }

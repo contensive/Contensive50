@@ -32,8 +32,47 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool OpenRecord(string contentName, int recordId, string selectFieldList, bool activeOnly);
+        /// <summary>
+        /// Opens a record set with the record specified by the recordId
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
         public abstract bool OpenRecord(string contentName, int recordId, string selectFieldList);
+        /// <summary>
+        /// Opens a record set with the record specified by the recordId
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         public abstract bool OpenRecord(string contentName, int recordId);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Opens a record set with the record specified by the recordGuid
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <param name="selectFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
+        public abstract bool OpenRecord(string contentName, string recordGuid, string selectFieldList, bool activeOnly);
+        /// <summary>
+        /// Opens a record set with the record specified by the recordGuid
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
+        public abstract bool OpenRecord(string contentName, string recordGuid, string selectFieldList);
+        /// <summary>
+        /// Opens a record set with the record specified by the recordGuid
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
+        public abstract bool OpenRecord(string contentName, string recordGuid);
         //
         //====================================================================================================
         /// <summary>

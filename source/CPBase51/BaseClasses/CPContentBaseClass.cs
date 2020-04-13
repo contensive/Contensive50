@@ -437,7 +437,13 @@ namespace Contensive.BaseClasses {
         /// <param name="FieldType"></param>
         /// <returns></returns>
         public abstract int AddContentField(string ContentName, string FieldName, int FieldType);
-        //
+        /// <summary>
+        /// Create a new field in an existing content, return the fieldid
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="FieldName"></param>
+        /// <param name="fieldTypeId"></param>
+        /// <returns></returns>
         public abstract int AddContentField(string ContentName, string FieldName, FieldTypeIdEnum fieldTypeId);
         //
         //====================================================================================================
