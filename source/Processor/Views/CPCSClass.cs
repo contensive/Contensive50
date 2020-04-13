@@ -38,14 +38,14 @@ namespace Contensive.Processor {
             try {
                 return cs.insert(contentName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         /// <summary>
-        /// Open a ContentSet object with a single record
+        /// Open dataset for the record specified
         /// </summary>
         /// <param name="contentName"></param>
         /// <param name="recordId"></param>
@@ -54,38 +54,77 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool OpenRecord(string contentName, int recordId, string selectFieldList, bool activeOnly) {
             try {
-                if (!cs.openRecord(contentName, recordId,selectFieldList)) { return false; }
-                if ( !activeOnly || cs.getBoolean("active")) { return true; }
+                if (!cs.openRecord(contentName, recordId, selectFieldList)) { return false; }
+                if (!activeOnly || cs.getBoolean("active")) { return true; }
                 cs.close();
                 return false;
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex );
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
-        //
-        public override bool OpenRecord(string contentName, int recordId) 
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public override bool OpenRecord(string contentName, int recordId)
             => OpenRecord(contentName, recordId, "", true);
         //
         //====================================================================================================
-        //
-        public override bool OpenRecord(string contentName, int recordId, string selectFieldList) 
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
+        public override bool OpenRecord(string contentName, int recordId, string selectFieldList)
             => OpenRecord(contentName, recordId, selectFieldList, true);
         //
         //====================================================================================================
-        //
-        public override bool OpenRecord(string contentName, string recordGuid, string selectFieldList, bool activeOnly)
-            => OpenRecord(contentName, recordGuid, selectFieldList, activeOnly);
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <param name="selectFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
+        public override bool OpenRecord(string contentName, string recordGuid, string selectFieldList, bool activeOnly) {
+            try {
+                if (!cs.openRecord(contentName, recordGuid, selectFieldList)) { return false; }
+                if (!activeOnly || cs.getBoolean("active")) { return true; }
+                cs.close();
+                return false;
+            } catch (Exception ex) {
+                LogController.logError(cp.core, ex);
+                throw;
+            }
+
+        }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
         public override bool OpenRecord(string contentName, string recordGuid, string selectFieldList)
-            => OpenRecord(contentName, recordGuid, selectFieldList, true);
+                    => OpenRecord(contentName, recordGuid, selectFieldList, true);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
         public override bool OpenRecord(string contentName, string recordGuid)
             => OpenRecord(contentName, recordGuid, "", true);
         //
@@ -95,7 +134,7 @@ namespace Contensive.Processor {
             try {
                 return cs.open(contentName, sqlCriteria, sortFieldList, activeOnly, 0, selectFieldList, pageSize, pageNumber);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -118,17 +157,17 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override bool Open(string contentName, string sqlCriteria, string sortFieldList) 
+        public override bool Open(string contentName, string sqlCriteria, string sortFieldList)
             => Open(contentName, sqlCriteria, sortFieldList, true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
-        public override bool Open(string contentName, string sqlCriteria) 
+        public override bool Open(string contentName, string sqlCriteria)
             => Open(contentName, sqlCriteria, "", true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
         //
-        public override bool Open(string contentName) 
+        public override bool Open(string contentName)
             => Open(contentName, "", "", true, "", DbController.sqlPageSizeDefault, 1);
         //
         //====================================================================================================
@@ -137,7 +176,7 @@ namespace Contensive.Processor {
             try {
                 return cs.openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, pageNumber);
             } catch (Exception ex) {
-                LogController.logError( cp.core, ex );
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -231,11 +270,11 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Close()  {
+        public override void Close() {
             try {
                 cs.close();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -257,11 +296,11 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override void Delete()  {
+        public override void Delete() {
             try {
                 cs.deleteRecord();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -272,18 +311,18 @@ namespace Contensive.Processor {
             try {
                 return cs.isFieldSupported(fieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override void GoFirst()  {
+        public override void GoFirst() {
             try {
                 cs.goFirst(false);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -294,7 +333,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getRecordAddLink(presetNameValueList, allowPaste);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -311,7 +350,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getBoolean(FieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -322,7 +361,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getDate(FieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -333,7 +372,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getRecordEditLink(allowCut);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -354,7 +393,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getFilename(fieldName, originalFilename, contentName, 0);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -383,7 +422,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getInteger(FieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -394,29 +433,29 @@ namespace Contensive.Processor {
             try {
                 return cs.getNumber(FieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override int GetRowCount()  {
+        public override int GetRowCount() {
             try {
                 return cs.getRowCount();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override string GetSQL()  {
+        public override string GetSQL() {
             try {
                 return cs.getSql();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -427,7 +466,7 @@ namespace Contensive.Processor {
             try {
                 return cs.getText(fieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -438,52 +477,52 @@ namespace Contensive.Processor {
             try {
                 return cs.getText(fieldName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override void GoNext()  {
+        public override void GoNext() {
             try {
                 cs.goNext();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override bool NextOK()  {
+        public override bool NextOK() {
             try {
                 cs.goNext();
                 return cs.ok();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override bool OK()  {
+        public override bool OK() {
             try {
                 return cs.ok();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
         //
-        public override void Save()  {
+        public override void Save() {
             try {
                 cs.save();
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -540,7 +579,7 @@ namespace Contensive.Processor {
             try {
                 cs.setFormInput(cp.core, fieldName, requestName);
             } catch (Exception ex) {
-                LogController.logError( cp.core,ex);
+                LogController.logError(cp.core, ex);
                 throw;
             }
         }
@@ -614,7 +653,7 @@ namespace Contensive.Processor {
         public override object GetFormInput(string contentName, string fieldName, string height)
             => GetFormInput(contentName, fieldName, GenericController.encodeInteger(height));
         //
-        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)",false)]
+        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)", false)]
         public override void SetFile(string FieldName, string Copy, string ContentName) {
             try {
                 cs.setTextFile(FieldName, Copy, ContentName);
@@ -655,7 +694,7 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public override void Dispose()  {
+        public override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -667,7 +706,7 @@ namespace Contensive.Processor {
                 if (disposing_cs) {
                     //
                     // ----- call .dispose for managed objects
-                    if ( cs != null ) {
+                    if (cs != null) {
                         cs.Dispose();
                         cs = null;
                     }
@@ -679,7 +718,7 @@ namespace Contensive.Processor {
             this.disposed_cs = true;
         }
 
-        ~CPCSClass()  {
+        ~CPCSClass() {
             Dispose(false);
         }
         protected bool disposed_cs;

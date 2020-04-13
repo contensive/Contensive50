@@ -1847,13 +1847,45 @@ namespace Contensive.Processor {
             => openContentWatchList(listName, "", true, DbController.sqlPageSizeDefault, 1);
         //
         //========================================================================
-        //
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
         public bool openRecord(string contentName, int recordId, string selectFieldList) {
             return open(contentName, "(ID=" + DbController.encodeSQLNumber(recordId) + ")", "", false, core.session.user.id, selectFieldList);
         }
-        //
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
         public bool openRecord(string contentName, int recordId) {
             return open(contentName, "(ID=" + DbController.encodeSQLNumber(recordId) + ")", "", false, core.session.user.id);
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
+        public bool openRecord(string contentName, string recordGuid, string selectFieldList) {
+            return open(contentName, "(ccguid=" + DbController.encodeSQLText(recordGuid) + ")", "", false, core.session.user.id, selectFieldList);
+        }
+        /// <summary>
+        /// Open dataset for the record specified
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="recordGuid"></param>
+        /// <returns></returns>
+        public bool openRecord(string contentName, string recordGuid) {
+            return open(contentName, "(ID=" + DbController.encodeSQLText(recordGuid) + ")", "", false, core.session.user.id);
         }
         //
         //========================================================================
