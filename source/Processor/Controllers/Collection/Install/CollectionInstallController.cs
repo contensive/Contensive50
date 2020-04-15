@@ -728,6 +728,13 @@ namespace Contensive.Processor.Controllers {
                                                     if (!result) { return result; }
                                                     break;
                                                 }
+                                            case "template": {
+                                                    //
+                                                    // -- template
+                                                    CollectionInstallTemplateController.installNode(core, metaDataSection, collection.id, ref result, ref return_ErrorMessage, ref collectionIncludesDiagnosticAddon);
+                                                    if (!result) { return result; }
+                                                    break;
+                                                }
                                             default: {
                                                     // do nothing
                                                     break;

@@ -1788,16 +1788,6 @@ namespace Contensive.Processor.Controllers {
             return encodeURL(Source).ToLowerInvariant();
         }
         //
-        // ====================================================================================================
-        public static string main_GetYesNo(bool InputValue) {
-            if (InputValue) {
-                return "Yes";
-            } else {
-                return "No";
-            }
-        }
-        //
-        //
         //=============================================================================
         // ----- Return the value associated with the name given
         //   NameValueString is a string of Name=Value pairs, separated by spaces or "&"

@@ -976,19 +976,19 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public static double getXMLAttributeNumber(CoreController core, bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
+        public static double getXMLAttributeNumber(CoreController core, ref bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             return encodeNumber(getXMLAttribute(core, ref Found, Node, Name, DefaultIfNotFound));
         }
         //
         //====================================================================================================
         //
-        public static bool getXMLAttributeBoolean(CoreController core, bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
+        public static bool getXMLAttributeBoolean(CoreController core, ref bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
             return GenericController.encodeBoolean(getXMLAttribute(core, ref Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
         //
-        public static int getXMLAttributeInteger(CoreController core, bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
+        public static int getXMLAttributeInteger(CoreController core, ref bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
             return GenericController.encodeInteger(getXMLAttribute(core, ref Found, Node, Name, DefaultIfNotFound.ToString()));
         }
 

@@ -52,9 +52,9 @@ namespace Contensive.Processor.Controllers {
                     collectionXml += "\r\n" + "<Collection";
                     collectionXml += " name=\"" + CollectionName + "\"";
                     collectionXml += " guid=\"" + CollectionGuid + "\"";
-                    collectionXml += " system=\"" + getYesNo( CS.GetBoolean("system")) + "\"";
-                    collectionXml += " updatable=\"" + getYesNo( CS.GetBoolean("updatable")) + "\"";
-                    collectionXml += " blockNavigatorNode=\"" + getYesNo( CS.GetBoolean("blockNavigatorNode")) + "\"";
+                    collectionXml += " system=\"" + GenericController.getYesNo( CS.GetBoolean("system")) + "\"";
+                    collectionXml += " updatable=\"" + GenericController.getYesNo( CS.GetBoolean("updatable")) + "\"";
+                    collectionXml += " blockNavigatorNode=\"" + GenericController.getYesNo( CS.GetBoolean("blockNavigatorNode")) + "\"";
                     collectionXml += " onInstallAddonGuid=\"" + onInstallAddonGuid + "\"";
                     collectionXml += ">";
                     cdnExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
@@ -88,6 +88,11 @@ namespace Contensive.Processor.Controllers {
                     // Layouts
                     foreach (var layout in DbBaseModel.createList<LayoutModel>(cp, "(installedByCollectionId=" + collection.id + ")")) {
                         collectionXml += ExportLayoutController.get(cp, layout);
+                    }
+                    // 
+                    // Templates
+                    foreach (var template in DbBaseModel.createList<PageTemplateModel>(cp, "(collectionId=" + collection.id + ")")) {
+                        collectionXml += ExportTemplateController.get(cp, template);
                     }
                     // 
                     // Data Records
@@ -332,7 +337,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getNode(string NodeName, bool NodeContent, bool deprecated) {
-            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + getYesNo(NodeContent) + "</" + NodeName + ">";
+            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + GenericController.getYesNo(NodeContent) + "</" + NodeName + ">";
         }
         //
         public static string getNode(string NodeName, bool NodeContent)
@@ -457,12 +462,6 @@ namespace Contensive.Processor.Controllers {
         public static string EncodeCData(string source) {
             if (string.IsNullOrWhiteSpace(source)) return "";
             return "<![CDATA[" + Strings.Replace(source, "]]>", "]]]]><![CDATA[>") + "]]>";
-        }
-        // 
-        // ====================================================================================================
-        //
-        public static string getYesNo(bool Key) {
-            return Key ? "Yes" : "No";
         }
         // 
         // =======================================================================================

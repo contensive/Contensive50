@@ -13,7 +13,7 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// 
         /// </summary>
-        public DbBaseModel.FieldTypeTextFile layout { get; set; }
+        public FieldTypeTextFile layout { get; set; }
         /// <summary>
         /// the addon collection that installed this record
         /// </summary>

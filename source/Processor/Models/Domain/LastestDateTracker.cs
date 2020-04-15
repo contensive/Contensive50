@@ -18,13 +18,12 @@ namespace Contensive.Processor.Models.Domain {
             latestDate = DateTime.MinValue;
         }
 
-        public override void Track(DateTime modifiedDate) {
+        public override void Track(DateTime? modifiedDate) {
             int hint = 1;
             try {
                 if (modifiedDate == null) { return; }
-                hint = 2;
-                latestDate = (modifiedDate.CompareTo(latestDate).Equals(1)) ? modifiedDate : latestDate;
-                hint = 3;
+                DateTime workingDate = (DateTime)modifiedDate;
+                latestDate = (workingDate.CompareTo(latestDate).Equals(1)) ? workingDate : latestDate;
             } catch (Exception ex) {
                 throw new ApplicationException("hint [" + hint + "]", ex);
             }

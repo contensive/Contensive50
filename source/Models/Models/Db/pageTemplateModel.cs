@@ -13,5 +13,6 @@ namespace Contensive.Models.Db {
         public string addonList { get; set; }
         public string bodyHTML { get; set; }
         public bool isSecure { get; set; }
+        public int collectionId { get; set; }
     }
 }

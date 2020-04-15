@@ -19,7 +19,7 @@ namespace Contensive.CPBase.BaseModels {
         /// include this modified date and save if it is the latest
         /// </summary>
         /// <param name="ModifiedDate"></param>
-        public abstract void Track(DateTime ModifiedDate);
+        public abstract void Track(DateTime? ModifiedDate);
         /// <summary>
         /// Get the latest date added to the tracker since the last reset
         /// </summary>
