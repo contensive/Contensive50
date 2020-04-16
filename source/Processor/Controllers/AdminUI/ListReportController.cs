@@ -7,8 +7,8 @@ namespace Contensive.Processor.Controllers {
     public class ListReportController {
         const int columnSize = 99;
         const int rowSize = 19999;
-        const string cr = "\r\n\t";
-        const string cr2 = cr + "\t";
+        public static readonly string cr = System.Environment.NewLine + "\t";
+        public static readonly string cr2 = cr + "\t";
         //
         struct ColumnStruct {
             public string name;

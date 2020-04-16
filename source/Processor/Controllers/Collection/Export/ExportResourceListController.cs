@@ -9,7 +9,67 @@ namespace Contensive.Processor.Controllers {
         // 
         // ====================================================================================================
         // 
-        public static string getResourceList(CPBaseClass cp, string execFileList, string CollectionGuid, List<string> tempPathFileList, string tempExportPath) {
+        public static List<string> getResourceFileList(CPBaseClass cp, string execFileCrlfList, string CollectionGuid) {
+            try {
+                var result = new List<string>();
+                if (!execFileCrlfList.Length.Equals(0)) {
+                    string[] files = Strings.Split(execFileCrlfList, System.Environment.NewLine);
+                    for (int Ptr = 0; Ptr <= Information.UBound(files); Ptr++) {
+                        string pathFilename = files[Ptr];
+                        if (!result.Contains(pathFilename)) {
+                            result.Add(pathFilename);
+                        }
+                    }
+                }
+                return result;
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+                return new List<string>();
+            }
+        }
+
+        // 
+        // ====================================================================================================
+        // 
+        public static string getResourceNodeList(CPBaseClass cp, List<string> execFileList, string CollectionGuid, List<string> tempPathFileList, string tempExportPath) {
+            try {
+                string nodeList = "";
+                foreach (var PathFilename in execFileList) {
+                    if (!PathFilename.Length.Equals(0)) {
+                        string fixedPathFilename = Strings.Replace(PathFilename, @"\", "/");
+                        string path = "";
+                        string filename = fixedPathFilename;
+                        int pos = Strings.InStrRev(fixedPathFilename, "/");
+                        if (pos > 0) {
+                            filename = Strings.Mid(fixedPathFilename, pos + 1);
+                            path = Strings.Mid(fixedPathFilename, 1, pos - 1);
+                        }
+                        string CollectionPath = "";
+                        DateTime LastChangeDate = default;
+                        ExportController.GetLocalCollectionArgs(cp, CollectionGuid, ref CollectionPath, ref LastChangeDate);
+                        if (!CollectionPath.Length.Equals(0)) {
+                            CollectionPath += @"\";
+                        }
+                        string AddonPath = @"addons\";
+                        // AddFilename = AddonPath & CollectionPath & Filename
+                        cp.PrivateFiles.Copy(AddonPath + CollectionPath + filename, tempExportPath + filename, cp.TempFiles);
+                        if (!tempPathFileList.Contains(tempExportPath + filename)) {
+                            tempPathFileList.Add(tempExportPath + filename);
+                            nodeList = nodeList + System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"executable\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                        }
+                    }
+
+                }
+                return nodeList;
+            } catch (Exception ex) {
+                cp.Site.ErrorReport(ex);
+                return string.Empty;
+            }
+        }
+        // 
+        // ====================================================================================================
+        // 
+        public static string getResourceNodeList(CPBaseClass cp, string execFileList, string CollectionGuid, List<string> tempPathFileList, string tempExportPath) {
             try {
                 string nodeList = "";
                 if (!execFileList.Length.Equals(0)) {
@@ -24,7 +84,7 @@ namespace Contensive.Processor.Controllers {
                     if (!CollectionPath.Length.Equals(0)) {
                         CollectionPath += @"\";
                     }
-                    string[] Files = Strings.Split(execFileList, "\r\n");
+                    string[] Files = Strings.Split(execFileList, System.Environment.NewLine);
                     for (int Ptr = 0; Ptr <= Information.UBound(Files); Ptr++) {
                         string PathFilename = Files[Ptr];
                         if (!PathFilename.Length.Equals(0)) {
@@ -43,7 +103,7 @@ namespace Contensive.Processor.Controllers {
                                 cp.PrivateFiles.Copy(AddonPath + CollectionPath + Filename, tempExportPath + Filename, cp.TempFiles);
                                 if (!tempPathFileList.Contains(tempExportPath + Filename)) {
                                     tempPathFileList.Add(tempExportPath + Filename);
-                                    nodeList = nodeList + "\r\n" + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"executable\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />";
+                                    nodeList = nodeList + System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"executable\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />";
                                 }
                             }
                         }

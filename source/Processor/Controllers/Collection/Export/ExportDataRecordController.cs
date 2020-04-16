@@ -12,8 +12,8 @@ namespace Contensive.Processor.Controllers {
             try {
                 string result = "";
                 if (DataRecordList != "") {
-                    result += "\r\n" + "\t" + "<DataRecordList>" + ExportController.EncodeCData( DataRecordList) + "</DataRecordList>";
-                    string[] DataRecords = Strings.Split(DataRecordList, "\r\n");
+                    result += System.Environment.NewLine + "\t" + "<DataRecordList>" + ExportController.EncodeCData( DataRecordList) + "</DataRecordList>";
+                    string[] DataRecords = Strings.Split(DataRecordList, System.Environment.NewLine);
                     string RecordNodes = "";
                     for (var Ptr = 0; Ptr <= Information.UBound(DataRecords); Ptr++) {
                         string FieldNodes = "";
@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
                                 if (DataContentId <= 0)
                                     RecordNodes = ""
                                         + RecordNodes
-                                        + "\r\n" + "\t" + "<!-- data missing, content not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
+                                        + System.Environment.NewLine + "\t" + "<!-- data missing, content not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
                                 else {
                                     bool supportsGuid = cp.Content.IsField(DataContentName, "ccguid");
                                     string Criteria;
@@ -84,7 +84,7 @@ namespace Contensive.Processor.Controllers {
                                         if (!CSData.Open(DataContentName, Criteria, "id"))
                                             RecordNodes = ""
 + RecordNodes
-+ "\r\n" + "\t" + "<!-- data missing, record not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
++ System.Environment.NewLine + "\t" + "<!-- data missing, record not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
                                         else {
                                             // 
                                             // determine all valid fields
@@ -225,7 +225,7 @@ namespace Contensive.Processor.Controllers {
                                                                         tempPathFileList.Add(tempExportPath + pathFilename);
                                                                         string path =  FileController.getPath(pathFilename);
                                                                         string filename = FileController.getFilename(pathFilename);
-                                                                        result += "\r\n" + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                                                                        result += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
                                                                     }
                                                                 }
 
@@ -322,13 +322,13 @@ namespace Contensive.Processor.Controllers {
                                                                 break;
                                                             }
                                                     }
-                                                    FieldNodes = FieldNodes + "\r\n" + "\t" + "<field name=\"" + System.Net.WebUtility.HtmlEncode(FieldName) + "\">" + FieldValue + "</field>";
+                                                    FieldNodes = FieldNodes + System.Environment.NewLine + "\t" + "<field name=\"" + System.Net.WebUtility.HtmlEncode(FieldName) + "\">" + FieldValue + "</field>";
                                                 }
                                                 RecordNodes = ""
                                                         + RecordNodes
-                                                        + "\r\n" + "\t" + "<record content=\"" + System.Net.WebUtility.HtmlEncode(DataContentName) + "\" guid=\"" + DataRecordGuid + "\" name=\"" + System.Net.WebUtility.HtmlEncode(DataRecordName) + "\">"
+                                                        + System.Environment.NewLine + "\t" + "<record content=\"" + System.Net.WebUtility.HtmlEncode(DataContentName) + "\" guid=\"" + DataRecordGuid + "\" name=\"" + System.Net.WebUtility.HtmlEncode(DataRecordName) + "\">"
                                                         + ExportController.tabIndent(cp, FieldNodes)
-                                                        + "\r\n" + "\t" + "</record>";
+                                                        + System.Environment.NewLine + "\t" + "</record>";
                                                 CSData.GoNext();
                                             }
                                         }
@@ -341,9 +341,9 @@ namespace Contensive.Processor.Controllers {
                     if (RecordNodes != "")
                         result = ""
 + result
-+ "\r\n" + "\t" + "<data>"
++ System.Environment.NewLine + "\t" + "<data>"
 + ExportController.tabIndent(cp, RecordNodes)
-+ "\r\n" + "\t" + "</data>";
++ System.Environment.NewLine + "\t" + "</data>";
                 }
                 return result;
             } catch (Exception ex) {

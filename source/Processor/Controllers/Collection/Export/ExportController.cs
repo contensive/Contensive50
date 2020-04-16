@@ -49,12 +49,12 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     string CollectionName = CS.GetText("name");
-                    collectionXml += "\r\n" + "<Collection";
+                    collectionXml += System.Environment.NewLine + "<Collection";
                     collectionXml += " name=\"" + CollectionName + "\"";
                     collectionXml += " guid=\"" + CollectionGuid + "\"";
-                    collectionXml += " system=\"" + GenericController.getYesNo( CS.GetBoolean("system")) + "\"";
-                    collectionXml += " updatable=\"" + GenericController.getYesNo( CS.GetBoolean("updatable")) + "\"";
-                    collectionXml += " blockNavigatorNode=\"" + GenericController.getYesNo( CS.GetBoolean("blockNavigatorNode")) + "\"";
+                    collectionXml += " system=\"" + GenericController.getYesNo(CS.GetBoolean("system")) + "\"";
+                    collectionXml += " updatable=\"" + GenericController.getYesNo(CS.GetBoolean("updatable")) + "\"";
+                    collectionXml += " blockNavigatorNode=\"" + GenericController.getYesNo(CS.GetBoolean("blockNavigatorNode")) + "\"";
                     collectionXml += " onInstallAddonGuid=\"" + onInstallAddonGuid + "\"";
                     collectionXml += ">";
                     cdnExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
@@ -62,27 +62,40 @@ namespace Contensive.Processor.Controllers {
                     string tempExportPath = "CollectionExport" + Guid.NewGuid().ToString() + @"\";
                     // 
                     // --resource executable files
-                    string resourceNodeList = ExportResourceListController.getResourceList(cp, CS.GetText("execFileList"), CollectionGuid, tempPathFileList, tempExportPath);
+                    string wwwFileList = CS.GetText("wwwFileList");
+                    string ContentFileList = CS.GetText("ContentFileList");
+                    List<string> execFileList = ExportResourceListController.getResourceFileList(cp, CS.GetText("execFileList"), CollectionGuid);
+                    string execResourceNodeList = ExportResourceListController.getResourceNodeList(cp, execFileList, CollectionGuid, tempPathFileList, tempExportPath);
                     // 
                     // helpLink
                     // 
                     if (CS.FieldOK("HelpLink"))
-                        collectionXml += "\r\n" + "\t" + "<HelpLink>" + System.Net.WebUtility.HtmlEncode(CS.GetText("HelpLink")) + "</HelpLink>";
+                        collectionXml += System.Environment.NewLine + "\t" + "<HelpLink>" + System.Net.WebUtility.HtmlEncode(CS.GetText("HelpLink")) + "</HelpLink>";
                     // 
                     // Help
                     // 
-                    collectionXml += "\r\n" + "\t" + "<Help>" + System.Net.WebUtility.HtmlEncode(CS.GetText("Help")) + "</Help>";
+                    collectionXml += System.Environment.NewLine + "\t" + "<Help>" + System.Net.WebUtility.HtmlEncode(CS.GetText("Help")) + "</Help>";
                     // 
                     // Addons
                     // 
                     string IncludeSharedStyleGuidList = "";
                     string IncludeModuleGuidList = "";
-                    using (CPCSBaseClass CS2 = cp.CSNew()) {
-                        CS2.Open("Add-ons", "collectionid=" + collection.id, "name", true, "id");
-                        while (CS2.OK()) {
-                            collectionXml += ExportAddonController.getAddonNode(cp, CS2.GetInteger("id"), ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
-                            CS2.GoNext();
+                    foreach (var addon in DbBaseModel.createList<AddonModel>(cp, "collectionid=" + collection.id)) {
+                        //
+                        // -- style sheet is in the wwwroot
+                        if (!string.IsNullOrEmpty(addon.stylesLinkHref)) {
+                            if(cp.WwwFiles.FileExists(addon.stylesLinkHref) || cp.WwwFiles.FileExists("/" + addon.stylesLinkHref)) {
+                                wwwFileList += System.Environment.NewLine + addon.stylesLinkHref;
+                            }
                         }
+                        //
+                        // -- js is in the wwwroot
+                        if (!string.IsNullOrEmpty(addon.jsHeadScriptSrc)) {
+                            if (cp.WwwFiles.FileExists(addon.jsHeadScriptSrc) || cp.WwwFiles.FileExists("/" + addon.jsHeadScriptSrc)) {
+                                wwwFileList += System.Environment.NewLine + addon.jsHeadScriptSrc;
+                            }
+                        }
+                        collectionXml += ExportAddonController.getAddonNode(cp, addon.id, ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
                     }
                     // 
                     // Layouts
@@ -116,14 +129,14 @@ namespace Contensive.Processor.Controllers {
                             Pos = Strings.InStr(1, Node, "</cdef>", CompareMethod.Text);
                             if (Pos > 0) {
                                 Node = Strings.Mid(Node, 1, Pos + 6);
-                                collectionXml += "\r\n" + "\t" + Node;
+                                collectionXml += System.Environment.NewLine + "\t" + Node;
                             }
                         }
                     }
                     // 
                     // Scripting Modules
                     if (IncludeModuleGuidList != "") {
-                        string[] Modules = Strings.Split(IncludeModuleGuidList, "\r\n");
+                        string[] Modules = Strings.Split(IncludeModuleGuidList, System.Environment.NewLine);
                         for (var Ptr = 0; Ptr <= Information.UBound(Modules); Ptr++) {
                             string ModuleGuid = Modules[Ptr];
                             if (ModuleGuid != "") {
@@ -132,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                                     if (CS2.OK()) {
                                         string Code = CS2.GetText("code").Trim();
                                         Code = EncodeCData(Code);
-                                        collectionXml += "\r\n" + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>";
+                                        collectionXml += System.Environment.NewLine + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>";
                                     }
                                     CS2.Close();
                                 }
@@ -144,14 +157,14 @@ namespace Contensive.Processor.Controllers {
                     string[] recordGuids;
                     string recordGuid;
                     if ((IncludeSharedStyleGuidList != "")) {
-                        recordGuids = Strings.Split(IncludeSharedStyleGuidList, "\r\n");
+                        recordGuids = Strings.Split(IncludeSharedStyleGuidList, System.Environment.NewLine);
                         for (var Ptr = 0; Ptr <= Information.UBound(recordGuids); Ptr++) {
                             recordGuid = recordGuids[Ptr];
                             if (recordGuid != "") {
                                 using (CPCSBaseClass CS2 = cp.CSNew()) {
                                     CS2.Open("Shared Styles", "ccguid=" + cp.Db.EncodeSQLText(recordGuid));
                                     if (CS2.OK())
-                                        collectionXml += "\r\n" + "\t" + "<SharedStyle"
+                                        collectionXml += System.Environment.NewLine + "\t" + "<SharedStyle"
                                             + " Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\""
                                             + " guid=\"" + recordGuid + "\""
                                             + " alwaysInclude=\"" + CS2.GetBoolean("alwaysInclude") + "\""
@@ -168,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     // 
                     // Import Collections
-                    if (true) {
+                    {
                         string Node = "";
                         using (CPCSBaseClass CS3 = cp.CSNew()) {
                             if (CS3.Open("Add-on Collection Parent Rules", "parentid=" + collection.id)) {
@@ -181,7 +194,7 @@ namespace Contensive.Processor.Controllers {
                                                 CS2.SetField("ccGuid", Guid);
                                             }
 
-                                            Node = Node + "\r\n" + "\t" + "<ImportCollection name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\">" + Guid + "</ImportCollection>";
+                                            Node = Node + System.Environment.NewLine + "\t" + "<ImportCollection name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\">" + Guid + "</ImportCollection>";
                                         }
 
                                         CS2.Close();
@@ -197,52 +210,49 @@ namespace Contensive.Processor.Controllers {
                     }
                     // 
                     // wwwFileList
-                    if (true) {
-                        string wwwFileList = CS.GetText("wwwFileList");
-                        if (wwwFileList != "") {
-                            string[] Files = Strings.Split(wwwFileList, "\r\n");
-                            for (int Ptr = 0; Ptr <= Information.UBound(Files); Ptr++) {
-                                string pathFilename = Files[Ptr];
-                                if (pathFilename != "") {
-                                    pathFilename = Strings.Replace(pathFilename, @"\", "/");
-                                    string path = "";
-                                    string filename = pathFilename;
-                                    int Pos = Strings.InStrRev(pathFilename, "/");
-                                    if (Pos > 0) {
-                                        filename = Strings.Mid(pathFilename, Pos + 1);
-                                        path = Strings.Mid(pathFilename, 1, Pos - 1);
-                                    }
-                                    string fileExtension = System.IO.Path.GetExtension(filename);
-                                    pathFilename = Strings.Replace(pathFilename, "/", @"\");
-                                    if (tempPathFileList.Contains(tempExportPath + filename)) {
+                    if (wwwFileList != "") {
+                        string[] Files = Strings.Split(wwwFileList, System.Environment.NewLine);
+                        for (int Ptr = 0; Ptr <= Information.UBound(Files); Ptr++) {
+                            string pathFilename = Files[Ptr];
+                            if (pathFilename != "") {
+                                pathFilename = Strings.Replace(pathFilename, @"\", "/");
+                                string path = "";
+                                string filename = pathFilename;
+                                int Pos = Strings.InStrRev(pathFilename, "/");
+                                if (Pos > 0) {
+                                    filename = Strings.Mid(pathFilename, Pos + 1);
+                                    path = Strings.Mid(pathFilename, 1, Pos - 1);
+                                }
+                                string fileExtension = System.IO.Path.GetExtension(filename);
+                                pathFilename = Strings.Replace(pathFilename, "/", @"\");
+                                if (tempPathFileList.Contains(tempExportPath + filename)) {
+                                    //
+                                    // -- the path already has a file with this name
+                                    cp.UserError.Add("There was an error exporting this collection because there were multiple files with the same filename [" + filename + "]");
+                                } else if (fileExtension.ToUpperInvariant().Equals(".ZIP")) {
+                                    //
+                                    // -- zip files come from the collection folder
+                                    CoreController core = ((CPClass)cp).core;
+                                    string addonPath = AddonController.getPrivateFilesAddonPath();
+                                    string collectionPath = CollectionFolderController.getCollectionConfigFolderPath(core, collection.ccguid);
+                                    if (!cp.PrivateFiles.FileExists(addonPath + collectionPath + filename)) {
                                         //
-                                        // -- the path already has a file with this name
-                                        cp.UserError.Add("There was an error exporting this collection because there were multiple files with the same filename [" + filename + "]");
-                                    } else if (fileExtension.ToUpperInvariant().Equals(".ZIP")) {
-                                        //
-                                        // -- zip files come from the collection folder
-                                        CoreController core = ((CPClass)cp).core;
-                                        string addonPath = AddonController.getPrivateFilesAddonPath();
-                                        string collectionPath = CollectionFolderController.getCollectionConfigFolderPath(core, collection.ccguid);
-                                        if (!cp.PrivateFiles.FileExists(addonPath + collectionPath + filename)) {
-                                            //
-                                            // - not there
-                                            cp.UserError.Add("There was an error exporting this collection because the zip file [" + pathFilename + "] was not found in the collection path [" + collectionPath + "].");
-                                        } else {
-                                            // 
-                                            // -- copy file from here
-                                            cp.PrivateFiles.Copy(addonPath + collectionPath + filename, tempExportPath + filename, cp.TempFiles);
-                                            tempPathFileList.Add(tempExportPath + filename);
-                                            collectionXml += "\r\n" + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
-                                        }
-                                    } else if ((!cp.WwwFiles.FileExists(pathFilename))) {
-                                        cp.UserError.Add("There was an error exporting this collection because the www file [" + pathFilename + "] was not found.");
-
+                                        // - not there
+                                        cp.UserError.Add("There was an error exporting this collection because the zip file [" + pathFilename + "] was not found in the collection path [" + collectionPath + "].");
                                     } else {
-                                        cp.WwwFiles.Copy(pathFilename, tempExportPath + filename, cp.TempFiles);
+                                        // 
+                                        // -- copy file from here
+                                        cp.PrivateFiles.Copy(addonPath + collectionPath + filename, tempExportPath + filename, cp.TempFiles);
                                         tempPathFileList.Add(tempExportPath + filename);
-                                        collectionXml += "\r\n" + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                                        collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
                                     }
+                                } else if ((!cp.WwwFiles.FileExists(pathFilename))) {
+                                    cp.UserError.Add("There was an error exporting this collection because the www file [" + pathFilename + "] was not found.");
+
+                                } else {
+                                    cp.WwwFiles.Copy(pathFilename, tempExportPath + filename, cp.TempFiles);
+                                    tempPathFileList.Add(tempExportPath + filename);
+                                    collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
                                 }
                             }
                         }
@@ -251,9 +261,8 @@ namespace Contensive.Processor.Controllers {
                     // ContentFileList
                     // 
                     if (true) {
-                        string ContentFileList = CS.GetText("ContentFileList");
                         if (ContentFileList != "") {
-                            string[] Files = Strings.Split(ContentFileList, "\r\n");
+                            string[] Files = Strings.Split(ContentFileList, System.Environment.NewLine);
                             for (var Ptr = 0; Ptr <= Information.UBound(Files); Ptr++) {
                                 string PathFilename = Files[Ptr];
                                 if (PathFilename != "") {
@@ -272,7 +281,7 @@ namespace Contensive.Processor.Controllers {
                                     else {
                                         cp.CdnFiles.Copy(PathFilename, tempExportPath + Filename, cp.TempFiles);
                                         tempPathFileList.Add(tempExportPath + Filename);
-                                        collectionXml += "\r\n" + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />";
+                                        collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />";
                                     }
                                 }
                             }
@@ -281,15 +290,15 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // ExecFileListNode
                     // 
-                    collectionXml += resourceNodeList;
+                    collectionXml += execResourceNodeList;
                     // 
                     // Other XML
                     // 
                     string OtherXML;
                     OtherXML = CS.GetText("otherxml");
                     if (Strings.Trim(OtherXML) != "")
-                        collectionXml += "\r\n" + OtherXML;
-                    collectionXml += "\r\n" + "</Collection>";
+                        collectionXml += System.Environment.NewLine + OtherXML;
+                    collectionXml += System.Environment.NewLine + "</Collection>";
                     CS.Close();
                     string tempExportXml_Filename = encodeFilename(cp, CollectionName + ".xml");
                     // 
@@ -319,7 +328,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static string getNode(string NodeName, string NodeContent, bool deprecated) {
             if (string.IsNullOrWhiteSpace(NodeContent)) return string.Empty;
-            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + EncodeCData(NodeContent) + "</" + NodeName + ">";
+            return System.Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + EncodeCData(NodeContent) + "</" + NodeName + ">";
         }
         //
         public static string getNode(string NodeName, string NodeContent)
@@ -328,7 +337,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getNode(string NodeName, int NodeContent, bool deprecated) {
-            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + NodeContent + "</" + NodeName + ">";
+            return System.Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + NodeContent + "</" + NodeName + ">";
         }
         //
         public static string getNode(string NodeName, int NodeContent)
@@ -337,7 +346,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getNode(string NodeName, bool NodeContent, bool deprecated) {
-            return "\r\n\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + GenericController.getYesNo(NodeContent) + "</" + NodeName + ">";
+            return System.Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + GenericController.getYesNo(NodeContent) + "</" + NodeName + ">";
         }
         //
         public static string getNode(string NodeName, bool NodeContent)
@@ -537,7 +546,7 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // no textarea
                     // 
-                    return Strings.Replace(Source, "\r\n" + "\t", "\r\n" + "\t" + "\t");
+                    return Strings.Replace(Source, System.Environment.NewLine + "\t", System.Environment.NewLine + "\t" + "\t");
                 else {
                     // 
                     // text area found, isolate it and indent before and after

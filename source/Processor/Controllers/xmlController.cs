@@ -251,7 +251,7 @@ namespace Contensive.Processor.Controllers {
                         IsBaseContent = (csContent.GetBoolean("isBaseContent"));
                         iContentName = GetRSXMLAttribute(csContent, "Name");
                         ContentID = (csContent.GetInteger("ID"));
-                        sb.Append("\r\n" + "\t" + "<CDef");
+                        sb.Append(System.Environment.NewLine + "\t" + "<CDef");
                         sb.Append(" Name=\"" + iContentName + "\"");
                         if ((!IsBaseContent) | IncludeBaseFields) {
                             sb.Append(" Active=\"" + GetRSXMLAttribute(csContent, "Active") + "\"");
@@ -367,7 +367,7 @@ namespace Contensive.Processor.Controllers {
                                     if (IncludeBaseFields | (Strings.InStr(1, ",id,ContentCategoryID,dateadded,createdby,modifiedby,EditBlank,EditArchive,EditSourceID,ContentControlID,CreateKey,ModifiedDate,ccguid,", "," + FieldName + ",", CompareMethod.Text) == 0)) {
                                         int memberSelectGroupId = CFields.GetInteger("MemberSelectGroupID");
                                         string memberSelectGroup = memberSelectGroupId <= 0 ? "" : cp.Group.GetName(memberSelectGroupId.ToString());
-                                        sb.Append("\r\n" + "\t" + "\t" + "<Field");
+                                        sb.Append(System.Environment.NewLine + "\t" + "\t" + "<Field");
                                         fieldType = csv_GetFieldDescriptorByType(CFields.GetInteger("Type"));
                                         sb.Append(" Name=\"" + FieldName + "\"");
                                         sb.Append(" active=\"" + CFields.GetBoolean("Active") + "\"");
@@ -434,7 +434,7 @@ namespace Contensive.Processor.Controllers {
                                         if (HelpDefault == "")
                                             HelpDefault = CFields.GetText("helpdefault");
                                         if (HelpDefault != "") {
-                                            sb.Append("\r\n" + "\t" + "\t" + "\t" + "<HelpDefault>" + EncodeCData(HelpDefault) + "</HelpDefault>");
+                                            sb.Append(System.Environment.NewLine + "\t" + "\t" + "\t" + "<HelpDefault>" + EncodeCData(HelpDefault) + "</HelpDefault>");
                                             HelpCnt = HelpCnt + 1;
                                         }
                                         // HelpCustom = cfields.getText("helpcustom")
@@ -443,7 +443,7 @@ namespace Contensive.Processor.Controllers {
                                         // HelpCnt = HelpCnt + 1
                                         // End If
                                         if (HelpCnt > 0)
-                                            sb.Append("\r\n" + "\t" + "\t");
+                                            sb.Append(System.Environment.NewLine + "\t" + "\t");
                                         sb.Append("</Field>");
                                     }
 
@@ -457,7 +457,7 @@ namespace Contensive.Processor.Controllers {
                         CFields.Close();
                         // 
                         if (FieldCnt > 0)
-                            sb.Append("\r\n" + "\t");
+                            sb.Append(System.Environment.NewLine + "\t");
                         sb.Append("</CDef>");
                     }
                     csContent.Close();
@@ -471,7 +471,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     const string ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}";
                     const string CollectionFileRootNode = "collection";
-                    return "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + "\r\n" + "</" + CollectionFileRootNode + ">";
+                    return "<" + CollectionFileRootNode + " name=\"Application\" guid=\"" + ApplicationCollectionGuid + "\">" + sb.ToString() + System.Environment.NewLine + "</" + CollectionFileRootNode + ">";
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex, "GetXMLContentDefinition3");
@@ -511,7 +511,7 @@ namespace Contensive.Processor.Controllers {
                         // IndexList = cpCore.app.csv_GetSQLIndexList(DataSourceName, TableName)
                         // 
                         if (IndexList != "") {
-                            ListRows = Strings.Split(IndexList, "\r\n");
+                            ListRows = Strings.Split(IndexList, System.Environment.NewLine);
                             IndexName = "";
                             for (Ptr = 0; Ptr <= Information.UBound(ListRows) + 1; Ptr++) {
                                 if (Ptr <= Information.UBound(ListRows))
@@ -548,7 +548,7 @@ namespace Contensive.Processor.Controllers {
                                                 sb.Append(" DataSourceName=\"" + EncodeXMLattribute(DataSourceName) + "\"");
                                                 sb.Append(" TableName=\"" + EncodeXMLattribute(TableName) + "\"");
                                                 sb.Append(" FieldNameList=\"" + EncodeXMLattribute(IndexFields) + "\"");
-                                                sb.Append("></SQLIndex>" + "\r\n");
+                                                sb.Append("></SQLIndex>" + System.Environment.NewLine);
                                             }
                                             // 
                                             IndexName = ListRowSplit[0];
@@ -625,7 +625,7 @@ namespace Contensive.Processor.Controllers {
                         if ((SplitIndex >= 0) & (SplitIndex <= Information.UBound(SplitArray))) { sb.Append(" NavIconType=\"" + SplitArray[SplitIndex] + "\""); }
                         sb.Append(" guid=\"" + GetRSXMLAttribute(dt, "ccGuid") + "\"");
                         // 
-                        sb.Append("></NavigatorEntry>" + "\r\n");
+                        sb.Append("></NavigatorEntry>" + System.Environment.NewLine);
                         dt.GoNext();
                     }
                     while (dt.OK());
@@ -662,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                         sb.Append(" Active=\"" + GetRSXMLAttribute(dr, "Active") + "\"");
                         if (true)
                             sb.Append(" AddonName=\"" + GetRSXMLLookupAttribute(dr, "AddonID", "ccAggregateFunctions") + "\"");
-                        sb.Append("/>" + "\r\n");
+                        sb.Append("/>" + System.Environment.NewLine);
                         dr.GoNext();
                     }
                     while (dr.OK());
@@ -694,7 +694,7 @@ namespace Contensive.Processor.Controllers {
                         sb.Append(" SortOrder=\"" + GetRSXMLAttribute(rs, "SortOrder") + "\"");
                         sb.Append(" >");
                         sb.Append(GetRSXMLAttribute(rs, "Copy"));
-                        sb.Append("</Addon>" + "\r\n");
+                        sb.Append("</Addon>" + System.Environment.NewLine);
                         rs.GoNext();
                     }
                     while (rs.OK());
@@ -711,7 +711,7 @@ namespace Contensive.Processor.Controllers {
         // 
         private string EncodeXMLattribute(string Source) {
             string result = System.Net.WebUtility.HtmlEncode(Source);
-            result = Strings.Replace(result, "\r\n", " ");
+            result = Strings.Replace(result, System.Environment.NewLine, " ");
             result = Strings.Replace(result, "\n", "");
             result = Strings.Replace(result, "\r", "");
             return result;

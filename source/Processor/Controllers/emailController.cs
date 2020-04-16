@@ -722,7 +722,7 @@ namespace Contensive.Processor.Controllers {
                         if (GenericController.toUCase(tempVar.value) == "ON") {
                             Message += tempVar.name + ": Yes\r\n\r\n";
                         } else {
-                            Message += tempVar.name + ": " + tempVar.value + Environment.NewLine + "\r\n";
+                            Message += tempVar.name + ": " + tempVar.value + Environment.NewLine + System.Environment.NewLine;
                         }
                     }
                 }

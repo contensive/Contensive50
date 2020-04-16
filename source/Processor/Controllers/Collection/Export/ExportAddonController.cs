@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
                         result += ExportController.getNode( "Filter", CS.GetBoolean("Filter"));
                         result += ExportController.getNode( "Help", CS.GetText("Help"));
                         result += ExportController.getNode( "HelpLink", CS.GetText("HelpLink"));
-                        result += "\r\n" + "\t" + "<Icon Link=\"" + CS.GetText("iconfilename") + "\" width=\"" + CS.GetInteger("iconWidth") + "\" height=\"" + CS.GetInteger("iconHeight") + "\" sprites=\"" + CS.GetInteger("iconSprites") + "\" />";
+                        result += System.Environment.NewLine + "\t" + "<Icon Link=\"" + CS.GetText("iconfilename") + "\" width=\"" + CS.GetInteger("iconWidth") + "\" height=\"" + CS.GetInteger("iconHeight") + "\" sprites=\"" + CS.GetInteger("iconSprites") + "\" />";
                         result += ExportController.getNode( "InIframe", CS.GetBoolean("InFrame"));
                         result += ExportController.getNode("BlockEditTools", CS.GetBoolean("BlockEditTools"));
                         result += ExportController.getNode( "AliasList", CS.GetText("aliasList"));
@@ -57,7 +57,7 @@ namespace Contensive.Processor.Controllers {
                                             Guid = cp.Utils.CreateGuid();
                                             CS3.SetField("ccGuid", Guid);
                                         }
-                                        result += "\r\n" + "\t" + "<IncludeAddon name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
+                                        result += System.Environment.NewLine + "\t" + "<IncludeAddon name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
                                     }
                                     CS3.Close();
                                 }
@@ -109,7 +109,7 @@ namespace Contensive.Processor.Controllers {
                         string StylesTest = CS.GetText("CustomStylesFilename").Trim();
                         if (StylesTest != "") {
                             if (Styles != "")
-                                Styles = Styles + "\r\n" + StylesTest;
+                                Styles = Styles + System.Environment.NewLine + StylesTest;
                             else
                                 Styles = StylesTest;
                         }
@@ -121,7 +121,7 @@ namespace Contensive.Processor.Controllers {
                         // 
                         string NodeInnerText = CS.GetText("ScriptingCode").Trim();
                         if (NodeInnerText != "")
-                            NodeInnerText = "\r\n" + "\t" + "\t" + "<Code>" + ExportController.EncodeCData(NodeInnerText) + "</Code>";
+                            NodeInnerText = System.Environment.NewLine + "\t" + "\t" + "<Code>" + ExportController.EncodeCData(NodeInnerText) + "</Code>";
                         using (CPCSBaseClass CS2 = cp.CSNew()) {
                             CS2.Open("Add-on Scripting Module Rules", "addonid=" + addonid);
                             while (CS2.OK()) {
@@ -134,8 +134,8 @@ namespace Contensive.Processor.Controllers {
                                             Guid = cp.Utils.CreateGuid();
                                             CS3.SetField("ccGuid", Guid);
                                         }
-                                        Return_IncludeModuleGuidList = Return_IncludeModuleGuidList + "\r\n" + Guid;
-                                        NodeInnerText = NodeInnerText + "\r\n" + "\t" + "\t" + "<IncludeModule name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
+                                        Return_IncludeModuleGuidList = Return_IncludeModuleGuidList + System.Environment.NewLine + Guid;
+                                        NodeInnerText = NodeInnerText + System.Environment.NewLine + "\t" + "\t" + "<IncludeModule name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
                                     }
                                     CS3.Close();
                                 }
@@ -144,9 +144,9 @@ namespace Contensive.Processor.Controllers {
                             CS2.Close();
                         }
                         if (NodeInnerText == "")
-                            result += "\r\n" + "\t" + "<Scripting Language=\"" + CS.GetText("ScriptingLanguageID") + "\" EntryPoint=\"" + CS.GetText("ScriptingEntryPoint") + "\" Timeout=\"" + CS.GetText("ScriptingTimeout") + "\"/>";
+                            result += System.Environment.NewLine + "\t" + "<Scripting Language=\"" + CS.GetText("ScriptingLanguageID") + "\" EntryPoint=\"" + CS.GetText("ScriptingEntryPoint") + "\" Timeout=\"" + CS.GetText("ScriptingTimeout") + "\"/>";
                         else
-                            result += "\r\n" + "\t" + "<Scripting Language=\"" + CS.GetText("ScriptingLanguageID") + "\" EntryPoint=\"" + CS.GetText("ScriptingEntryPoint") + "\" Timeout=\"" + CS.GetText("ScriptingTimeout") + "\">" + NodeInnerText + "\r\n" + "\t" + "</Scripting>";
+                            result += System.Environment.NewLine + "\t" + "<Scripting Language=\"" + CS.GetText("ScriptingLanguageID") + "\" EntryPoint=\"" + CS.GetText("ScriptingEntryPoint") + "\" Timeout=\"" + CS.GetText("ScriptingTimeout") + "\">" + NodeInnerText + System.Environment.NewLine + "\t" + "</Scripting>";
                         // 
                         // Shared Styles
                         // 
@@ -162,8 +162,8 @@ namespace Contensive.Processor.Controllers {
                                             Guid = cp.Utils.CreateGuid();
                                             CS3.SetField("ccGuid", Guid);
                                         }
-                                        Return_IncludeSharedStyleGuidList = Return_IncludeSharedStyleGuidList + "\r\n" + Guid;
-                                        result += "\r\n" + "\t" + "<IncludeSharedStyle name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
+                                        Return_IncludeSharedStyleGuidList = Return_IncludeSharedStyleGuidList + System.Environment.NewLine + Guid;
+                                        result += System.Environment.NewLine + "\t" + "<IncludeSharedStyle name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
                                     }
                                     CS3.Close();
                                 }
@@ -187,7 +187,7 @@ namespace Contensive.Processor.Controllers {
                                             Guid = cp.Utils.CreateGuid();
                                             CS3.SetField("ccGuid", Guid);
                                         }
-                                        NodeInnerText = NodeInnerText + "\r\n" + "\t" + "\t" + "<ContentChange name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
+                                        NodeInnerText = NodeInnerText + System.Environment.NewLine + "\t" + "\t" + "<ContentChange name=\"" + System.Net.WebUtility.HtmlEncode(CS3.GetText("name")) + "\" guid=\"" + Guid + "\"/>";
                                     }
                                     CS3.Close();
                                 }
@@ -196,7 +196,7 @@ namespace Contensive.Processor.Controllers {
                             CS2.Close();
                         }
                         if (NodeInnerText != "")
-                            result += "\r\n" + "\t" + "<ProcessTriggers>" + NodeInnerText + "\r\n" + "\t" + "</ProcessTriggers>";
+                            result += System.Environment.NewLine + "\t" + "<ProcessTriggers>" + NodeInnerText + System.Environment.NewLine + "\t" + "</ProcessTriggers>";
                         // 
                         // Editors
                         // 
@@ -208,13 +208,13 @@ namespace Contensive.Processor.Controllers {
                                     int fieldTypeID = CS2.GetInteger("contentFieldTypeID");
                                     string fieldType = cp.Content.GetRecordName("Content Field Types", fieldTypeID);
                                     if (fieldType != "")
-                                        NodeInnerText = NodeInnerText + "\r\n" + "\t" + "\t" + "<type>" + fieldType + "</type>";
+                                        NodeInnerText = NodeInnerText + System.Environment.NewLine + "\t" + "\t" + "<type>" + fieldType + "</type>";
                                     CS2.GoNext();
                                 }
                                 CS2.Close();
                             }
                             if (NodeInnerText != "")
-                                result += "\r\n" + "\t" + "<Editors>" + NodeInnerText + "\r\n" + "\t" + "</Editors>";
+                                result += System.Environment.NewLine + "\t" + "<Editors>" + NodeInnerText + System.Environment.NewLine + "\t" + "</Editors>";
                         }
                         // 
                         string addonGuid = CS.GetText("ccGuid");
@@ -226,9 +226,9 @@ namespace Contensive.Processor.Controllers {
                         if ((NavType == ""))
                             NavType = "Add-on";
                         result = ""
-                        + "\r\n" + "\t" + "<Addon name=\"" + System.Net.WebUtility.HtmlEncode(addonName) + "\" guid=\"" + addonGuid + "\" type=\"" + NavType + "\">"
+                        + System.Environment.NewLine + "\t" + "<Addon name=\"" + System.Net.WebUtility.HtmlEncode(addonName) + "\" guid=\"" + addonGuid + "\" type=\"" + NavType + "\">"
                         + ExportController.tabIndent(cp, result)
-                        + "\r\n" + "\t" + "</Addon>";
+                        + System.Environment.NewLine + "\t" + "</Addon>";
                     }
                     CS.Close();
                 }

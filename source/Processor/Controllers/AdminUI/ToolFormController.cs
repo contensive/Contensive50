@@ -5,8 +5,8 @@ using Contensive.BaseClasses;
 namespace Contensive.Processor.Controllers {
     public class ToolFormController {
         //
-        const string cr = "\r\n\t";
-        const string cr2 = cr + "\t";
+        public readonly static string cr = System.Environment.NewLine + "\t";
+        public readonly static string cr2 = cr + "\t";
         string localHiddenList = "";
         string localButtonList = "";
         string localFormId = "";
