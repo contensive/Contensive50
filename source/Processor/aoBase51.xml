@@ -3354,6 +3354,7 @@
   <ImportCollection name="Form Wizard">{B5D1FE5B-71EC-403D-90E8-01AE7F8E18AD}</ImportCollection>
   <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
   <ImportCollection name="CodeMirror Editors">{73121366-107D-4C4B-8F89-A4DE518FA316}</ImportCollection>
+  <ImportCollection name="Personalization">{1339F712-17F7-408A-B021-92DF846BD486}</ImportCollection>
   <!-- blocked until upgrade
   <ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>
   <ImportCollection name="Site Explorer">{5426E6D5-05A8-4A87-B535-CD0FABA04F29}</ImportCollection>
