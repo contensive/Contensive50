@@ -1245,6 +1245,9 @@ namespace Contensive.Processor.Controllers {
         public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId, string caption)
             => getRecordEditAnchorTag("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, "ccRecordEditLink");
         //
+        public static string getRecordEditAnchorTag(CoreController core, ContentMetadataModel cdef, int recordId, string caption, string htmlClass)
+            => getRecordEditAnchorTag("/" + core.appConfig.adminRoute + "?af=4&aa=2&ad=1&cid=" + cdef.id + "&id=" + recordId, caption, htmlClass);
+        //
         //====================================================================================================
         /// <summary>
         /// get record edit tag based on guid

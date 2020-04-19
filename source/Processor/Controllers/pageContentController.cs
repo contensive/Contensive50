@@ -1112,7 +1112,7 @@ namespace Contensive.Processor.Controllers {
                     if (!string.IsNullOrWhiteSpace(usedPageidList)) {
                         sqlCriteria += "and(id not in (" + usedPageidList + "))";
                     }
-                    foreach (var page in DbBaseModel.createList<PageContentModel>(core.cpParent, sqlCriteria)) {
+                    foreach (var page in DbBaseModel.createList<PageContentModel>(core.cpParent, sqlCriteria,"sortorder")) {
                         ContentMetadataModel contentMetadata;
                         if (page.contentControlId == 0) {
                             contentMetadata = ContentMetadataModel.createByUniqueName(core, "page content");

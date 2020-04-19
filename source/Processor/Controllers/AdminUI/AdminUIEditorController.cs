@@ -649,106 +649,111 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getRedirectEditor(CoreController core, ContentFieldMetadataModel field, AdminDataModel adminData, EditRecordModel editRecord, string fieldValue, bool readOnly, string htmlId, bool required) {
-            //
-            // -- if hardcoded redirect link, create open-in-new-windows
-            if (!string.IsNullOrEmpty(field.redirectPath)) {
-                return HtmlController.a("Open in New Window", field.redirectPath, "", "", "", "_blank");
-            }
-            //
-            // -- redirect goes to a list of records (one-to-many or many-to-many
-            var gridData = new AdminDataModel(core, new AdminDataRequest() {
-                adminAction = 0,
-                adminButton = "",
-                adminForm = 0,
-                adminSourceForm = 0,
-                contentId = field.redirectContentId,
-                fieldEditorPreference = "",
-                guid = "",
-                id = 0,
-                ignore_legacyMenuDepth = 0,
-                recordsPerPage = 100,
-                recordTop = 0,
-                titleExtension = "",
-                wherePairDict = new Dictionary<string, string>()
-            });
-            IndexConfigClass indexConfig = IndexConfigClass.get(core, gridData);
-            var userContentPermissions = PermissionController.getUserContentPermissions(core, ContentMetadataModel.create(core, field.redirectContentId));
-            List<string> tmp = default;
-            DataSourceModel datasource = DataSourceModel.create(core.cpParent, gridData.adminContent.dataSourceId, ref tmp);
-            //
-            // Get the SQL parts
-            bool AllowAccessToContent = false;
-            string ContentAccessLimitMessage = "";
-            bool IsLimitedToSubContent = false;
-            string sqlWhere = "";
-            string sqlOrderBy = "";
-            string sqlFieldList = "";
-            string sqlFrom = "";
-            Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
-            Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
-            ListView.setIndexSQL(core, gridData, indexConfig, ref AllowAccessToContent, ref sqlFieldList, ref sqlFrom, ref sqlWhere, ref sqlOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
-            bool allowAdd = gridData.adminContent.allowAdd && (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
-            bool allowDelete = (gridData.adminContent.allowDelete) && (userContentPermissions.allowDelete);
-            if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
-                //
-                // two conditions should be the same -- but not time to check - This user does not have access to this content
-                ErrorController.addUserError(core, "Your account does not have access to any records in '" + gridData.adminContent.name + "'.");
-                return "Your account does not have access to the requested content";
-            } else {
-                //
-                // -- for redirect fields, only include connected records that match the redirect criteria
-                sqlWhere += (string.IsNullOrEmpty(field.redirectId)) ? "" : "and(" + field.redirectId + "=" + editRecord.id + ")";
-                //
-                // Get the total record count
-                string sql = "select count(" + gridData.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
-                if (!string.IsNullOrEmpty(sqlWhere)) {
-                    sql += " where " + sqlWhere;
-                }
-                int recordCnt = 0;
-                using (var csData = new CsModel(core)) {
-                    if (csData.openSql(sql, datasource.name)) {
-                        recordCnt = csData.getInteger("cnt");
-                    }
-                }
-                if (recordCnt < 100) {
+            try {
+                if (!string.IsNullOrEmpty(field.redirectPath)) {
                     //
-                    // -- under 100 records, show them here
-                    sql = "select";
-                    if (datasource.dbTypeId != DataSourceTypeODBCMySQL) {
-                        sql += " Top " + (indexConfig.recordTop + indexConfig.recordsPerPage);
-                    }
-                    sql += " " + sqlFieldList + " From " + sqlFrom;
-                    if (!string.IsNullOrEmpty(sqlWhere)) {
-                        sql += " WHERE " + sqlWhere;
-                    }
-                    if (!string.IsNullOrEmpty(sqlOrderBy)) {
-                        sql += " Order By" + sqlOrderBy;
-                    }
-                    if (datasource.dbTypeId == DataSourceTypeODBCMySQL) {
-                        sql += " Limit " + (indexConfig.recordTop + indexConfig.recordsPerPage);
-                    }
-                    indexConfig.allowDelete = false;
-                    indexConfig.allowFind = false;
-                    indexConfig.allowAddRow = true;
-                    indexConfig.allowColumnSort = false;
-                    gridData.wherePair.Add(field.redirectId.ToLower(), editRecord.id.ToString());
-                    return ListGridController.get(core, gridData, indexConfig, userContentPermissions, sql, datasource, FieldUsedInColumns, IsLookupFieldValid);
+                    // -- if hardcoded redirect link, create open-in-new-windows
+                    return HtmlController.a("Open in New Window", field.redirectPath, "", "", "", "_blank");
+                }
+                //
+                // -- redirect goes to a list of records (one-to-many or many-to-many
+                var gridData = new AdminDataModel(core, new AdminDataRequest() {
+                    adminAction = 0,
+                    adminButton = "",
+                    adminForm = 0,
+                    adminSourceForm = 0,
+                    contentId = field.redirectContentId,
+                    fieldEditorPreference = "",
+                    guid = "",
+                    id = 0,
+                    ignore_legacyMenuDepth = 0,
+                    recordsPerPage = 100,
+                    recordTop = 0,
+                    titleExtension = "",
+                    wherePairDict = new Dictionary<string, string>()
+                });
+                IndexConfigClass indexConfig = IndexConfigClass.get(core, gridData);
+                var userContentPermissions = PermissionController.getUserContentPermissions(core, ContentMetadataModel.create(core, field.redirectContentId));
+                List<string> tmp = default;
+                DataSourceModel datasource = DataSourceModel.create(core.cpParent, gridData.adminContent.dataSourceId, ref tmp);
+                //
+                // Get the SQL parts
+                bool AllowAccessToContent = false;
+                string ContentAccessLimitMessage = "";
+                bool IsLimitedToSubContent = false;
+                string sqlWhere = "";
+                string sqlOrderBy = "";
+                string sqlFieldList = "";
+                string sqlFrom = "";
+                Dictionary<string, bool> FieldUsedInColumns = new Dictionary<string, bool>(); // used to prevent select SQL from being sorted by a field that does not appear
+                Dictionary<string, bool> IsLookupFieldValid = new Dictionary<string, bool>();
+                ListView.setIndexSQL(core, gridData, indexConfig, ref AllowAccessToContent, ref sqlFieldList, ref sqlFrom, ref sqlWhere, ref sqlOrderBy, ref IsLimitedToSubContent, ref ContentAccessLimitMessage, ref FieldUsedInColumns, IsLookupFieldValid);
+                bool allowAdd = gridData.adminContent.allowAdd && (!IsLimitedToSubContent) && (userContentPermissions.allowAdd);
+                bool allowDelete = (gridData.adminContent.allowDelete) && (userContentPermissions.allowDelete);
+                if ((!userContentPermissions.allowEdit) || (!AllowAccessToContent)) {
+                    //
+                    // two conditions should be the same -- but not time to check - This user does not have access to this content
+                    ErrorController.addUserError(core, "Your account does not have access to any records in '" + gridData.adminContent.name + "'.");
+                    return "Your account does not have access to the requested content";
                 } else {
                     //
-                    // -- too many rows, setup a redirect
-                    if (editRecord.id == 0) {
-                        return "[available after save]";
+                    // -- for redirect fields, only include connected records that match the redirect criteria
+                    sqlWhere += (string.IsNullOrEmpty(field.redirectId)) ? "" : "and(" + field.redirectId + "=" + editRecord.id + ")";
+                    //
+                    // Get the total record count
+                    string sql = "select count(" + gridData.adminContent.tableName + ".ID) as cnt from " + sqlFrom;
+                    if (!string.IsNullOrEmpty(sqlWhere)) {
+                        sql += " where " + sqlWhere;
                     }
-                    string RedirectPath = (string.IsNullOrEmpty(field.redirectPath)) ? core.appConfig.adminRoute : field.redirectPath;
-                    RedirectPath += "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
-                    if (field.redirectContentId != 0) {
-                        RedirectPath += "&cid=" + field.redirectContentId;
+                    int recordCnt = 0;
+                    using (var csData = new CsModel(core)) {
+                        if (csData.openSql(sql, datasource.name)) {
+                            recordCnt = csData.getInteger("cnt");
+                        }
+                    }
+                    if (recordCnt < 100) {
+                        //
+                        // -- under 100 records, show them here
+                        sql = "select";
+                        if (datasource.dbTypeId != DataSourceTypeODBCMySQL) {
+                            sql += " Top " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                        }
+                        sql += " " + sqlFieldList + " From " + sqlFrom;
+                        if (!string.IsNullOrEmpty(sqlWhere)) {
+                            sql += " WHERE " + sqlWhere;
+                        }
+                        if (!string.IsNullOrEmpty(sqlOrderBy)) {
+                            sql += " Order By" + sqlOrderBy;
+                        }
+                        if (datasource.dbTypeId == DataSourceTypeODBCMySQL) {
+                            sql += " Limit " + (indexConfig.recordTop + indexConfig.recordsPerPage);
+                        }
+                        indexConfig.allowDelete = false;
+                        indexConfig.allowFind = false;
+                        indexConfig.allowAddRow = true;
+                        indexConfig.allowColumnSort = false;
+                        gridData.wherePair.Add(field.redirectId.ToLower(), editRecord.id.ToString());
+                        return ListGridController.get(core, gridData, indexConfig, userContentPermissions, sql, datasource, FieldUsedInColumns, IsLookupFieldValid);
                     } else {
-                        RedirectPath += "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
+                        //
+                        // -- too many rows, setup a redirect
+                        if (editRecord.id == 0) {
+                            return "[available after save]";
+                        }
+                        string RedirectPath = (string.IsNullOrEmpty(field.redirectPath)) ? core.appConfig.adminRoute : field.redirectPath;
+                        RedirectPath += "?" + RequestNameTitleExtension + "=" + GenericController.encodeRequestVariable(" For " + editRecord.nameLc + adminData.titleExtension) + "&" + RequestNameAdminDepth + "=" + (adminData.ignore_legacyMenuDepth + 1) + "&wl0=" + field.redirectId + "&wr0=" + editRecord.id;
+                        if (field.redirectContentId != 0) {
+                            RedirectPath += "&cid=" + field.redirectContentId;
+                        } else {
+                            RedirectPath += "&cid=" + ((editRecord.contentControlId.Equals(0)) ? adminData.adminContent.id : editRecord.contentControlId);
+                        }
+                        RedirectPath = strReplace(RedirectPath, "'", "\\'");
+                        return HtmlController.a("Open in New Window", RedirectPath, "", "", "", "_blank");
                     }
-                    RedirectPath = strReplace(RedirectPath, "'", "\\'");
-                    return HtmlController.a("Open in New Window", RedirectPath, "", "", "", "_blank");
                 }
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                return HtmlController.div("Ther was an error displaying the related data for this field.");
             }
         }
         //

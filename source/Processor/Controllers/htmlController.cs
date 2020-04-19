@@ -2602,6 +2602,8 @@ namespace Contensive.Processor.Controllers {
                                     int DivCheckBoxCnt = 0;
                                     bool CanSeeHiddenFields = core.session.isAuthenticatedDeveloper();
                                     string DivName = htmlNamePrefix + ".All";
+                                    bool isAdmin = !core.webServer.requestPathPage.IndexOf(core.siteProperties.getText("adminUrl"), System.StringComparison.OrdinalIgnoreCase).Equals(-1);
+                                    string editLinkTemplate = !isAdmin ? "" : AdminUIController.getRecordEditAnchorTag(core, SecondaryMetaData,-1,"","");
                                     while (csData.ok()) {
                                         string OptionName = csData.getText("OptionName");
                                         if ((OptionName.left(1) != "_") || CanSeeHiddenFields) {
@@ -2609,17 +2611,18 @@ namespace Contensive.Processor.Controllers {
                                             // Current checkbox is visible
                                             //
                                             int RecordID = csData.getInteger("ID");
+                                            //string editLink = !isAdmin ? "" : editLinkTemplate.Replace("-1", RecordID.ToString());
                                             bool AllowRuleCopy = csData.getBoolean("AllowRuleCopy");
                                             string RuleCopyCaption = csData.getText("RuleCopyCaption");
                                             string OptionCaption = csData.getText("OptionCaption");
                                             if (string.IsNullOrEmpty(OptionCaption)) {
                                                 OptionCaption = OptionName;
                                             }
-                                            string optionCaptionHtmlEncoded = null;
+                                            string optionCaptionHtmlEncoded = (!isAdmin ? "" : "&nbsp;&nbsp;" + editLinkTemplate.Replace("-1", RecordID.ToString())); 
                                             if (string.IsNullOrEmpty(OptionCaption)) {
-                                                optionCaptionHtmlEncoded = SingularPrefixHtmlEncoded + RecordID;
+                                                optionCaptionHtmlEncoded += "&nbsp;" + SingularPrefixHtmlEncoded + RecordID;
                                             } else {
-                                                optionCaptionHtmlEncoded = HtmlController.encodeHtml(OptionCaption);
+                                                optionCaptionHtmlEncoded += "&nbsp;" + encodeHtml(OptionCaption);
                                             }
                                             string RuleCopy = "";
                                             bool Found = false;
@@ -2636,14 +2639,14 @@ namespace Contensive.Processor.Controllers {
                                             // must leave the first hidden with the value in this form - it is searched in the admin pge
                                             returnHtml += "<input type=hidden name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".id\" value=" + RecordID + ">";
                                             if (readOnlyfield && !Found) {
-                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled>" + optionCaptionHtmlEncoded + "</label></div>";
                                             } else if (readOnlyfield) {
-                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox disabled checked>" + optionCaptionHtmlEncoded + "</label></div>";
                                                 returnHtml += "<input type=\"hidden\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + ".ID\" value=" + RecordID + ">";
                                             } else if (Found) {
-                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=checkbox name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\" checked>" + optionCaptionHtmlEncoded + "</label></div>";
                                             } else {
-                                                returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">&nbsp;" + optionCaptionHtmlEncoded + "</label></div>";
+                                                returnHtml += "<div class=\"checkbox\"><label><input type=\"checkbox\" name=\"" + htmlNamePrefix + "." + CheckBoxCnt + "\" value=\"1\">" + optionCaptionHtmlEncoded + "</label></div>";
                                             }
                                             CheckBoxCnt = CheckBoxCnt + 1;
                                             DivCheckBoxCnt = DivCheckBoxCnt + 1;
