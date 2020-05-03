@@ -4,9 +4,9 @@ using Contensive.Processor.Controllers;
 using System;
 
 namespace Contensive.Processor.AdminUI {
-    public class CPAdminUIListReportBaseClass : BaseClasses.AdminUI.ListReportBaseClass {
+    public class CPAdminUIListReportClass : BaseClasses.AdminUI.ListReportBaseClass {
         //
-        public CPAdminUIListReportBaseClass(CoreController core) {
+        public CPAdminUIListReportClass(CoreController core) {
             this.core = core;
             this.form = new ListReportController();
         }

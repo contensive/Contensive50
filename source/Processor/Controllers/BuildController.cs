@@ -716,6 +716,7 @@ namespace Contensive.Processor.Controllers {
                     core.db.createSQLTableField("ccDataSources", "connString", CPContentBaseClass.FieldTypeIdEnum.Text);
                     core.db.createSQLTableField("ccDataSources", "endpoint", CPContentBaseClass.FieldTypeIdEnum.Text);
                     core.db.createSQLTableField("ccDataSources", "dbTypeId", CPContentBaseClass.FieldTypeIdEnum.Lookup);
+                    core.db.createSQLTableField("ccDataSources", "secure", CPContentBaseClass.FieldTypeIdEnum.Boolean);
                     //
                     core.db.createSQLTable("ccTables");
                     core.db.createSQLTableField("ccTables", "DataSourceID", CPContentBaseClass.FieldTypeIdEnum.Lookup);

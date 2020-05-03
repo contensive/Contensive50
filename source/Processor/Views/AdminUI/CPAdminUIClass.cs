@@ -361,9 +361,13 @@ namespace Contensive.Processor {
         public override string GetTextEditor(string htmlName, string htmlValue) {
             return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue);
         }
-
+        //
         public override ToolFormBaseClass NewToolForm() {
             return new CPAdminUIToolFormClass(core);
+        }
+        //
+        public override ListReportBaseClass NewListReport() {
+            return new CPAdminUIListReportClass(core);
         }
     }
 }

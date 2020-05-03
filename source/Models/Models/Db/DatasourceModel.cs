@@ -20,6 +20,7 @@ namespace Contensive.Models.Db {
         public string username { get; set; }
         public string password { get; set; }
         public int dbTypeId { get; set; }
+        public bool secure { get; set; }
         //
         //====================================================================================================
         /// <summary>

@@ -127,12 +127,17 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- found in local cache
-                            var tempVar = core.dataSourceDictionary[normalizedDataSourceName];
+                            var datasource = core.dataSourceDictionary[normalizedDataSourceName];
                             returnConnString = ""
-                            + "server=tcp:" + tempVar.endpoint + ";"
-                            + "User Id=" + tempVar.username + ";"
-                            + "Password=" + tempVar.password + ";"
+                            + "server=tcp:" + datasource.endpoint + ";"
+                            + "User Id=" + datasource.username + ";"
+                            + "Password=" + datasource.password + ";"
                             + "Database=" + catalogName + ";";
+                            //
+                            // -- add certificate requirement, if true, set yes, if false, no not add it
+                            if (datasource.secure) {
+                                returnConnString += "Encrypt=yes;";
+                            }
                         }
                     }
                     connectionStringDict.Add(key, returnConnString);

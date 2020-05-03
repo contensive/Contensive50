@@ -15,6 +15,7 @@ namespace Contensive.Processor.Controllers {
     public class ContentController : IDisposable {
         //
         public static string pluralToSingular( string pluralContentName ) {
+            if (pluralContentName.Equals("quizzes",StringComparison.InvariantCultureIgnoreCase)) { return pluralContentName.Substring(0, 4); }
             var pluralization = System.Data.Entity.Design.PluralizationServices.PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
             return pluralization.Singularize(pluralContentName);
         }

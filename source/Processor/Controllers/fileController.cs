@@ -1415,7 +1415,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public static string getVirtualTableFieldIdUnixPath(string tableName, string fieldName, int recordID) {
+        public static string getVirtualRecordUnixPath(string tableName, string fieldName, int recordID) {
             return getVirtualTableFieldUnixPath(tableName, fieldName) + recordID.ToString().PadLeft(12, '0') + "/";
         }
         //
@@ -1425,7 +1425,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public static string getVirtualRecordUnixPathFilename(string tableName, string fieldName, int recordID, string originalFilename) {
             string iOriginalFilename = originalFilename.Replace(" ", "_").Replace(".", "_");
-            return getVirtualTableFieldIdUnixPath(tableName, fieldName, recordID) + originalFilename;
+            return getVirtualRecordUnixPath(tableName, fieldName, recordID) + originalFilename;
         }
         //
         //========================================================================

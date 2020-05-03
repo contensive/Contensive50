@@ -74,6 +74,8 @@ namespace Contensive.Processor.Models.Domain {
         //
         // -- List of all apps on this server
         public Dictionary <string, AppConfigModel> apps { get; set; }
+        public override bool defaultDataSourceSecure { get; set; }
+
         //
         //====================================================================================================
         /// <summary>

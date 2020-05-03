@@ -24,15 +24,24 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// creates a pathFilename for a field that stores the path of an uploaded file
+        /// creates the pathFilename for a field that holds the path and filename of an uploaded file (Only type=file and type=image)
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="fieldName"></param>
         /// <param name="recordId"></param>
         /// <param name="filename"></param>
-        /// <param name="fieldTypeId"></param>
         /// <returns></returns>
-        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldTypeId);
+        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// creates a path for a field that holds the path and filename of an uploaded file (Only type=file and type=image)
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="recordId"></param>
+        /// <returns></returns>
+        public abstract string CreateUploadFieldPath(string tableName, string fieldName, int recordId);
         //
         //====================================================================================================
         /// <summary>
@@ -246,84 +255,233 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         // deprecated
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SQL"></param>
+        /// <param name="DataSourcename"></param>
+        /// <param name="Retries"></param>
+        /// <param name="PageSize"></param>
+        /// <param name="PageNumber"></param>
+        /// <returns></returns>
         [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize, string PageNumber);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SQL"></param>
+        /// <param name="DataSourcename"></param>
+        /// <param name="Retries"></param>
+        /// <param name="PageSize"></param>
+        /// <returns></returns>
         [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries, string PageSize);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SQL"></param>
+        /// <param name="DataSourcename"></param>
+        /// <param name="Retries"></param>
+        /// <returns></returns>
         [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename, string Retries);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SQL"></param>
+        /// <param name="DataSourcename"></param>
+        /// <returns></returns>
         [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL, string DataSourcename);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SQL"></param>
+        /// <returns></returns>
         [Obsolete("Convert to datatables and use executeQuery(), executeNonQuery(), or executeNonQueryAsync()", false)]
         public abstract object ExecuteSQL(string SQL);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="DataSourcename"></param>
+        /// <returns></returns>
         [Obsolete("Use GetConnectionString( dataSourceName )")]
         public abstract string DbGetConnectionString(string DataSourcename);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="DataSourcename"></param>
+        /// <returns></returns>
         [Obsolete("Use GetDataSourceType( dataSourceName )")]
         public abstract int DbGetDataSourceType(string DataSourcename);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <returns></returns>
         [Obsolete("Use GetTableId instead.", false)]
         public abstract int DbGetTableID(string TableName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="DataSourcename"></param>
+        /// <param name="TableName"></param>
+        /// <returns></returns>
         [Obsolete("Use isTable instead", false)]
         public abstract bool DbIsTable(string DataSourcename, string TableName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="DataSourcename"></param>
+        /// <param name="TableName"></param>
+        /// <param name="FieldName"></param>
+        /// <returns></returns>
         [Obsolete("Use isTableField instead", false)]
         public abstract bool DbIsTableField(string DataSourcename, string TableName, string FieldName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use CP.Content.GetTableId().", false)]
         public abstract int GetTableID(string tableName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="DataSourcename"></param>
+        /// <returns></returns>
         [Obsolete("Only Sql Server currently supported", false)]
         public abstract int GetDataSourceType(string DataSourcename);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
+        /// <param name="recordId"></param>
 		[Obsolete("Deprecated. Use methods without datasource reference. Instead create non-default datasource with CP.DbNew(datasourcename).", false)]
         public abstract void Delete(string dataSourcename, string tableName, int recordId);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="dataSourcename"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract string GetConnectionString(string dataSourcename);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract bool IsTable(string dataSourcename, string tableName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="dataSourcename"></param>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract bool IsTableField(string dataSourcename, string tableName, string fieldName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="startRecord"></param>
+        /// <param name="maxRecords"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord, int maxRecords);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="startRecord"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract DataTable ExecuteQuery(string sql, string dataSourceName, int startRecord);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract DataTable ExecuteQuery(string sql, string dataSourceName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
+        /// <param name="recordsAffected"></param>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract void ExecuteNonQuery(string sql, string dataSourceName, ref int recordsAffected);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract void ExecuteNonQuery(string sql, string dataSourceName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourceName"></param>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract void ExecuteNonQueryAsync(string sql, string dataSourceName);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="DataSourceName"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract string GetRemoteQueryKey(string sql, string DataSourceName, int pageSize);
-        //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="DataSourceName"></param>
+        /// <returns></returns>
         [Obsolete("Deprecated. Use methods without datasource.", false)]
         public abstract string GetRemoteQueryKey(string sql, string DataSourceName);
-        //
-        [Obsolete("Deprecated. Use methods with FieldTypeIdEnum.", false)]
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="fieldType"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. Use CreateUploadFieldPathFilename with no fieldType or FileType", false)]
         public abstract string CreateFieldPathFilename(string tableName, string fieldName, int recordId, CPContentBaseClass.fileTypeIdEnum fieldType);
-        //
-        [Obsolete("Deprecated. Use methods with FieldTypeIdEnum.", false)]
-        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fieldType);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="filename"></param>
+        /// <param name="fileType"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. Use CreateUploadFieldPathFilename with no fieldType or FileType", false)]
+        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.fileTypeIdEnum fileType);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="recordId"></param>
+        /// <param name="filename"></param>
+        /// <param name="fieldTypeId"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. Use CreateUploadFieldPathFilename with no fieldType or FileType", false)]
+        public abstract string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldTypeId);
     }
 
 }

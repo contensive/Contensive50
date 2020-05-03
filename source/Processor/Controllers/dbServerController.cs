@@ -59,6 +59,11 @@ namespace Contensive.Processor.Controllers {
                     + "User Id=" + core.serverConfig.defaultDataSourceUsername + ";"
                     + "Password=" + core.serverConfig.defaultDataSourcePassword + ";"
                     + "";
+                //
+                // -- add certificate requirement, if true, set yes, if false, no not add it
+                if (core.serverConfig.defaultDataSourceSecure) {
+                    returnConnString += "Encrypt=yes;";
+                }
             } catch (Exception ex) {
                 LogController.logError( core,ex);
                 throw;

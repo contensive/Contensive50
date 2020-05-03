@@ -169,10 +169,6 @@ namespace Contensive.Models.Db {
         /// <param name="derivedType"></param>
         /// <returns></returns>
         private static DbBaseTableMetadataModel getTableMetadata(Type derivedType) {
-            //if (derivedType.BaseType != typeof( Contensive.Models.Db.DbBaseModel)) {
-            //    if (derivedType.BaseType==null) { throw new GenericException("Class must declare [public static DbBaseTableMetadataModel tableMetadata]."); }
-            //    return getTableMetadata(derivedType.BaseType);
-            //}
             PropertyInfo tableMetadataProperty = derivedType.GetProperty("tableMetadata");
 
             if (tableMetadataProperty == null) {

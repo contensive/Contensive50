@@ -15,13 +15,54 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
+        /// Create a new instance of a List Report. List reports have a list of data rows with filters on the left
+        /// </summary>
+        /// <returns></returns>
+        public abstract AdminUI.ListReportBaseClass NewListReport();
+        //
+        //==========================================================================================
+        /// <summary>
         /// Create an html row that includes a caption, editor and optional help content
         /// </summary>
         /// <returns></returns>
         public abstract string GetEditRow(string caption, string editor);
+        /// <summary>
+        /// Create an html row that includes a caption, editor and optional help content
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="editor"></param>
+        /// <param name="help"></param>
+        /// <returns></returns>
         public abstract string GetEditRow(string caption, string editor, string help);
+        /// <summary>
+        /// Create an html row that includes a caption, editor and optional help content
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="editor"></param>
+        /// <param name="help"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetEditRow(string caption, string editor, string help, string htmlId);
+        /// <summary>
+        /// Create an html row that includes a caption, editor and optional help content
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="editor"></param>
+        /// <param name="help"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
         public abstract string GetEditRow(string caption, string editor, string help, string htmlId, bool required);
+        /// <summary>
+        /// Create an html row that includes a caption, editor and optional help content
+        /// </summary>
+        /// <param name="caption"></param>
+        /// <param name="editor"></param>
+        /// <param name="help"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="required"></param>
+        /// <param name="blockBottomRule"></param>
+        /// <returns></returns>
         public abstract string GetEditRow(string caption, string editor, string help, string htmlId, bool required, bool blockBottomRule);
         //
         //==========================================================================================
@@ -30,8 +71,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetBooleanEditor(string htmlName, bool htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetBooleanEditor(string htmlName, bool htmlValue);
         //
         //==========================================================================================
@@ -40,8 +102,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetCurrencyEditor(string htmlName, double? htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a boolean field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetCurrencyEditor(string htmlName, double? htmlValue);
         //
         //==========================================================================================
@@ -50,8 +133,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetDateTimeEditor(string htmlName, DateTime? htmlValue);
         //
         //==========================================================================================
@@ -60,9 +164,35 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetFileEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetFileEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetFileEditor(string htmlName, string currentPathFilename, string htmlId);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <returns></returns>
         public abstract string GetFileEditor(string htmlName, string currentPathFilename);
+        /// <summary>
+        /// Create an input for a datetime field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <returns></returns>
         public abstract string GetFileEditor(string htmlName);
         //
         //==========================================================================================
@@ -71,8 +201,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a htmlcode field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a htmlcode field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetHtmlCodeEditor(string htmlName, string htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a htmlcode field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetHtmlCodeEditor(string htmlName, string htmlValue);
         //
         //==========================================================================================
@@ -81,8 +232,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetHtmlEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetHtmlEditor(string htmlName, string htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetHtmlEditor(string htmlName, string htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetHtmlEditor(string htmlName, string htmlValue);
         //
         //==========================================================================================
@@ -91,8 +263,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetImageEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetImageEditor(string htmlName, string currentPathFilename, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetImageEditor(string htmlName, string currentPathFilename, string htmlId);
+        /// <summary>
+        /// Create an input for a html field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="currentPathFilename"></param>
+        /// <returns></returns>
         public abstract string GetImageEditor(string htmlName, string currentPathFilename);
         //
         //==========================================================================================

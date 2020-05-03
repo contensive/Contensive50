@@ -205,10 +205,30 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override string CreateUploadFieldPath(string tableName, string fieldName, int recordId) {
+            //
+            // -- the only two valid fieldtypes. All the other file-field types are text fields backed with a file, like .css
+            return FileController.getVirtualRecordUnixPath(tableName, fieldName, recordId);
+        }
+        //
+        //====================================================================================================
+        //
+        public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename) {
+            //
+            // -- the only two valid fieldtypes. All the other file-field types are text fields backed with a file, like .css
+            return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, filename);
+        }
+        //
+        //====================================================================================================
+        //
         public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldType) {
-            if ((fieldType==CPContentBaseClass.FieldTypeIdEnum.File)|| (fieldType == CPContentBaseClass.FieldTypeIdEnum.FileImage)) {
+            if ((fieldType == CPContentBaseClass.FieldTypeIdEnum.File) || (fieldType == CPContentBaseClass.FieldTypeIdEnum.FileImage)) {
+                //
+                // -- the only two valid fieldtypes. All the other file-field types are text fields backed with a file, like .css
                 return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, filename);
             }
+            //
+            // -- techically, this is a mistake the developer made calling this method. These types do not upload
             return FileController.getVirtualRecordUnixPathFilename(tableName, fieldName, recordId, fieldType);
         }
         //
