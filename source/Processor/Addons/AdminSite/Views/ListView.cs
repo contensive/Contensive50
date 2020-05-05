@@ -182,7 +182,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 IndexFilterJS = ""
                                     + Environment.NewLine + "<script Language=\"JavaScript\" type=\"text/javascript\">"
                                     + Environment.NewLine + "function CloseIndexFilter()  {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','none');SetDisplay('IndexFilterContentOpened','none');SetDisplay('IndexFilterHeadClosed','block');SetDisplay('IndexFilterContentClosed','block');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxCloseIndexFilter + "','','')}"
-                                    + Environment.NewLine + "function OpenIndexFilter()  {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentClosed','none');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "','','')}"
+                                    + Environment.NewLine + "function OpenIndexFilter()  {SetDisplay('IndexFilterHeCursorTypeEnum.ADOPENed','block');SetDisplay('IndexFilterContentOpened','block');SetDisplay('IndexFilterHeadClosed','none');SetDisplay('IndexFilterContentClosed','none');cj.ajax.qs('" + RequestNameAjaxFunction + "=" + AjaxOpenIndexFilter + "&cid=" + adminData.adminContent.id.ToString() + "','','')}"
                                     + Environment.NewLine + "</script>";
                             } else {
                                 //

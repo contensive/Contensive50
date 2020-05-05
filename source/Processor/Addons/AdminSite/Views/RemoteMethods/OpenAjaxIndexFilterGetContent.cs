@@ -28,7 +28,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         adminButton = "",
                         adminForm = 0,
                         adminSourceForm = 0,
-                        contentId = 0,
+                        contentId = ContentId,
                         fieldEditorPreference = "",
                         guid = "",
                         id = 0,

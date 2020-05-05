@@ -444,7 +444,7 @@ namespace Contensive.Processor.Controllers {
                     // This field is default true, and non-authorable
                     // It will be true in all cases, except a possible unforseen exception
                     //
-                    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml("http://" + core.appConfig.domainList[0] + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(getRootRelativeUrlPlusSlash(core) + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
                 }
                 string confirmationMessage = "";
                 //
@@ -1025,12 +1025,12 @@ namespace Contensive.Processor.Controllers {
             string recipientEmail = (recipient == null) ? "" : recipient.email;
             //
             // -- hotfix - move template merge before link conversion to update template links also
-            string rootUrl = "http://" + core.appConfig.domainList[0] + "/";
+            string rootUrlPlusSlash = getRootRelativeUrlPlusSlash(core);
             //
             // -- subject
             if (!string.IsNullOrWhiteSpace(subject)) {
                 subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
-                subject = GenericController.convertLinksToAbsolute(subject, rootUrl);
+                subject = GenericController.convertLinksToAbsolute(subject, rootUrlPlusSlash);
                 try {
                     subject = HtmlController.convertHtmlToText(core, "<body>" + subject + "</body>");
                 } catch (Exception ex) {
@@ -1044,7 +1044,7 @@ namespace Contensive.Processor.Controllers {
             // -- body
             if (!string.IsNullOrWhiteSpace(body)) {
                 body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend);
-                body = GenericController.convertLinksToAbsolute(body, rootUrl);
+                body = GenericController.convertLinksToAbsolute(body, rootUrlPlusSlash);
                 body = GenericController.strReplace(body, "#member_id#", recipientId.ToString());
                 body = GenericController.strReplace(body, "#member_email#", recipientEmail);
             }
@@ -1071,12 +1071,9 @@ namespace Contensive.Processor.Controllers {
             // -- Spam Footer under template, remove the marker for any other place in the email then add it as needed
             bool AllowSpamFooter = true;
             if (AllowSpamFooter) {
-                string protocolHostLink = "http://" + core.appConfig.domainList[0];
-                string urlProtocolDomainSlash = protocolHostLink + "/";
-                string defaultPage = core.siteProperties.serverPageDefault;
                 //
                 // non-authorable, default true - leave it as an option in case there is an important exception
-                body += "<div style=\"padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                body += "<div style=\"padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + rootUrlPlusSlash + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
             }
 
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
@@ -1089,7 +1086,7 @@ namespace Contensive.Processor.Controllers {
             return "<html>"
                 + "<head>"
                 + "<Title>" + subject + "</Title>"
-                + "<Base href=\"" + rootUrl + "\" >"
+                + "<Base href=\"" + rootUrlPlusSlash + "\" >"
                 + "</head>"
                 + "<body class=\"ccBodyEmail\">" + body + "</body>"
                 + "</html>";
@@ -1117,7 +1114,6 @@ namespace Contensive.Processor.Controllers {
                         string SQLTableMemberRules = MetadataController.getContentTablename(core, "Member Rules");
                         string SQLTableGroups = MetadataController.getContentTablename(core, "Groups");
                         string BounceAddress = getBounceAddress(core, "");
-                        string PrimaryLink = "http://" + core.appConfig.domainList[0];
                         while (CSEmail.ok()) {
                             int emailId = CSEmail.getInteger("ID");
                             int EmailMemberId = CSEmail.getInteger("ModifiedBy");
@@ -1190,7 +1186,7 @@ namespace Contensive.Processor.Controllers {
                             // Send the confirmation
                             //
                             int ConfirmationMemberId = CSEmail.getInteger("testmemberid");
-                            queueConfirmationEmail(core, ConfirmationMemberId, EmailDropId, EmailTemplate, EmailAddLinkEid, PrimaryLink, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
+                            queueConfirmationEmail(core, ConfirmationMemberId, EmailDropId, EmailTemplate, EmailAddLinkEid, EmailSubject, EmailCopy, "", EmailFrom, EmailStatusList, "Group Email");
                             CSEmail.goNext();
                         }
                     }
@@ -1240,7 +1236,7 @@ namespace Contensive.Processor.Controllers {
                             string EmailSubject = csEmail.getText("Subject");
                             string EmailCopy = csEmail.getText("CopyFilename");
                             string EmailStatus = queueEmailRecord(core, "Conditional Email", EmailMemberId, emailId, EmailDateExpires, 0, bounceAddress, FromAddress, EmailTemplate, FromAddress, EmailSubject, EmailCopy, csEmail.getBoolean("AllowSpamFooter"), EmailAddLinkEid, "");
-                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
+                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, EmailSubject, EmailCopy, "", FromAddress, EmailStatus + "<BR>", "Conditional Email");
                             emailsEffected++;
                         }
                         csEmail.close();
@@ -1317,7 +1313,7 @@ namespace Contensive.Processor.Controllers {
                             emailsEffected++;
                             //
                             // -- send confirmation for this send
-                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, "", EmailSubject, EmailCopy, "", fromAddress, EmailStatus + "<BR>", "Conditional Email");
+                            queueConfirmationEmail(core, ConfirmationMemberId, 0, EmailTemplate, EmailAddLinkEid, EmailSubject, EmailCopy, "", fromAddress, EmailStatus + "<BR>", "Conditional Email");
                         }
                         csEmail.close();
                     }
@@ -1387,15 +1383,14 @@ namespace Contensive.Processor.Controllers {
             //
             // -- open detect
             if (emailDropID != 0) {
-                string protocolHostLink = "http://" + core.appConfig.domainList[0];
-                string urlProtocolDomainSlash = protocolHostLink + "/";
+                string urlProtocolDomainSlash = getRootRelativeUrlPlusSlash(core);
                 string defaultPage = core.siteProperties.serverPageDefault;
                 switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
                     case 1:
-                        EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
                         break;
                     default:
-                        EmailBody += "<img src=\"" + urlProtocolDomainSlash + defaultPage + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        EmailBody += "<img src=\"" + urlProtocolDomainSlash + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
                         break;
                 }
             }
@@ -1433,7 +1428,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="emailStyles"></param>
         /// <param name="EmailFrom"></param>
         /// <param name="EmailStatusList"></param>
-        public static void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string PrimaryLink, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList, string emailContextMessage) {
+        public static void queueConfirmationEmail(CoreController core, int ConfirmationMemberID, int EmailDropID, string EmailTemplate, bool EmailAllowLinkEID, string EmailSubject, string emailBody, string emailStyles, string EmailFrom, string EmailStatusList, string emailContextMessage) {
             try {
                 PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ConfirmationMemberID);
                 if (person != null) {
@@ -1455,12 +1450,27 @@ namespace Contensive.Processor.Controllers {
                         + BR;
                     string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberId + "=" + person.id;
                     string sendStatus = "";
-                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + core.appConfig.domainList[0], ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
+                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + getRootRelativeUrlPlusSlash(core), ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return the URL protocol + domain + "/" to be used to prepend rroot relative urls in images, links, etc
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getRootRelativeUrlPlusSlash(CoreController core) {
+            string rootUrlPlusSlash = core.siteProperties.getText("EmailUrlRootRelativePrefix");
+            rootUrlPlusSlash = string.IsNullOrWhiteSpace(rootUrlPlusSlash) ? "https://" + core.appConfig.domainList[0] + "/" : rootUrlPlusSlash + "/";
+            if (rootUrlPlusSlash.substringSafe(rootUrlPlusSlash.Length - 2, 2).Equals("//")) {
+                rootUrlPlusSlash = rootUrlPlusSlash.substringSafe(0, rootUrlPlusSlash.Length - 1);
+            }
+            return rootUrlPlusSlash;
         }
     }
 }
