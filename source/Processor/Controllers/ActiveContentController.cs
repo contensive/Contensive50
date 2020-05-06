@@ -1200,9 +1200,14 @@ namespace Contensive.Processor.Controllers {
                 // -- exit if nothing there or not allowed
                 if (string.IsNullOrWhiteSpace(htmlContent)) { return htmlContent; }
                 if (!core.siteProperties.imageAllowUpdate) { return htmlContent; }
+                ////
+                //// if image urls are typed with wrong slash and forward slash after cclibraryfiles is wrong, that breaks this routine
+                //htmlContent = htmlContent.replace("\\cclibraryfiles", "/cclibraryfiles", StringComparison.InvariantCultureIgnoreCase);
+                //htmlContent = htmlContent.replace("/cclibraryfiles\\", "/cclibraryfiles/", StringComparison.InvariantCultureIgnoreCase);
+                //htmlContent = htmlContent.replace("/cclibraryfiles/filename\\", "/cclibraryfiles/filename/", StringComparison.InvariantCultureIgnoreCase);
                 //
-                // this used to be "/" + core.appConfig.name + "/files/"
-                int posLink = htmlContent.IndexOf(core.appConfig.cdnFileUrl + "ccLibraryFiles/", StringComparison.OrdinalIgnoreCase);
+                // -- search for library files and correct them
+                int posLink = htmlContent.IndexOf(core.appConfig.cdnFileUrl + "ccLibraryFiles", StringComparison.OrdinalIgnoreCase);
                 if (posLink == -1) { return htmlContent; }
                 //
                 // ----- Process Resource Library Images (swap in most current file)
@@ -1222,12 +1227,21 @@ namespace Contensive.Processor.Controllers {
                         int posQuote = htmlContentSegment.IndexOf("\"");
                         if (posQuote == -1) { continue; }
                         string htmlContentSegment_file = htmlContentSegment.Substring(0, posQuote);
+
+                        htmlContentSegment_file = htmlContentSegment_file.replace("\\", "/", StringComparison.InvariantCultureIgnoreCase);
+
                         string[] libraryFileSplit = htmlContentSegment_file.Split('/');
                         if (libraryFileSplit.GetUpperBound(0) > 2) {
                             int libraryRecordId = encodeInteger(libraryFileSplit[2]);
                             if ((libraryFileSplit[0].ToLower(CultureInfo.InvariantCulture) == "cclibraryfiles") && (libraryFileSplit[1].ToLower(CultureInfo.InvariantCulture) == "filename") && (libraryRecordId != 0)) {
                                 LibraryFilesModel file = LibraryFilesModel.create<LibraryFilesModel>(core.cpParent, libraryRecordId);
-                                if ((file != null) && (htmlContentSegment_file != file.filename)) { htmlContentSegment_file = file.filename; }
+                                if ((file != null) && (htmlContentSegment_file != file.filename)) { 
+                                    htmlContentSegment_file = file.filename;
+                                    htmlContentSegment_file = htmlContentSegment_file.replace("\\", "/", StringComparison.InvariantCultureIgnoreCase);
+                                }
+                                //
+                                // -- special case. image URLs with spaces must be corrected to %20 so gmail will not convert ot plus
+                                htmlContentSegment_file = htmlContentSegment_file.replace(" ", "%20", StringComparison.InvariantCultureIgnoreCase);
                             }
                         }
                         htmlContentSegment = htmlContentSegment_file + htmlContentSegment.Substring(posQuote);
