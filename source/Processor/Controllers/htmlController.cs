@@ -2301,7 +2301,7 @@ namespace Contensive.Processor.Controllers {
                         if (PosACInstanceId == 0) {
                             LogController.logError(core, new Exception("AC Instance [" + ACInstanceId + "] not found in record with content [" + ContentName + "] and RecordID [" + RecordID + "]"));
                         } else {
-                            Copy = ActiveContentController.optimizeLibraryFileImagesInHtmlContent(core, Copy);
+                            Copy = ActiveContentController.updateLibraryFilesInHtmlContent(core, Copy);
                             ParseOK = false;
                             PosStart = Copy.LastIndexOf("<ac ", PosACInstanceId - 1, System.StringComparison.OrdinalIgnoreCase) + 1;
                             if (PosStart != 0) {

@@ -1023,7 +1023,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- resize images
                     hint = "20";
-                    result = optimizeLibraryFileImagesInHtmlContent(core, result);
+                    result = updateLibraryFilesInHtmlContent(core, result);
                     //
                     // -- Do Active Content Conversion
                     hint = "30";
@@ -1194,20 +1194,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// for html content, this routine optimizes images referenced in the html if they are from library file
         /// </summary>
-        public static string optimizeLibraryFileImagesInHtmlContent(CoreController core, string htmlContent) {
+        public static string updateLibraryFilesInHtmlContent(CoreController core, string htmlContent) {
             try {
                 //
                 // -- exit if nothing there or not allowed
                 if (string.IsNullOrWhiteSpace(htmlContent)) { return htmlContent; }
                 if (!core.siteProperties.imageAllowUpdate) { return htmlContent; }
-                ////
-                //// if image urls are typed with wrong slash and forward slash after cclibraryfiles is wrong, that breaks this routine
-                //htmlContent = htmlContent.replace("\\cclibraryfiles", "/cclibraryfiles", StringComparison.InvariantCultureIgnoreCase);
-                //htmlContent = htmlContent.replace("/cclibraryfiles\\", "/cclibraryfiles/", StringComparison.InvariantCultureIgnoreCase);
-                //htmlContent = htmlContent.replace("/cclibraryfiles/filename\\", "/cclibraryfiles/filename/", StringComparison.InvariantCultureIgnoreCase);
                 //
-                // -- search for library files and correct them
-                int posLink = htmlContent.IndexOf(core.appConfig.cdnFileUrl + "ccLibraryFiles", StringComparison.OrdinalIgnoreCase);
+                // -- search for library files and update them
+                int posLink = htmlContent.IndexOf(core.appConfig.cdnFileUrl + "cclibraryfiles", StringComparison.OrdinalIgnoreCase);
                 if (posLink == -1) { return htmlContent; }
                 //
                 // ----- Process Resource Library Images (swap in most current file)
