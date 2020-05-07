@@ -12,6 +12,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 // email drops for only 365 days
                 core.db.executeNonQuery("delete from ccemaildrops where (dateadded < dateadd(day,-" + env.emailDropArchiveAgeDays + ",cast(getdate() as date)))");
+                //
+                // email drops with no email
+                core.db.executeNonQuery("delete from ccemaildrops from ccemaildrops d left join ccemail e on e.id=d.emailid where e.id is null");
+                //
+                //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
