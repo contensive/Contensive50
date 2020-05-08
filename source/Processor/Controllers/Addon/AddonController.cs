@@ -703,7 +703,7 @@ namespace Contensive.Processor.Controllers {
                                                                     }
                                                                 case "date": {
                                                                         //
-                                                                        if(encodeDateMinValue(encodeDate(fieldValue)).Equals(DateTime.MinValue)) {
+                                                                        if (encodeDateMinValue(encodeDate(fieldValue)).Equals(DateTime.MinValue)) {
                                                                             //
                                                                             // -- value is not a valid date, save empty
                                                                             fieldValue = "";
@@ -1355,15 +1355,21 @@ namespace Contensive.Processor.Controllers {
                 try {
                     //
                     // -- catch exceptions found (Select.Pdf.dll has two classes that differ by only case)
-                    var typeMap = testAssembly.GetTypes().ToDictionary(t => t.FullName, t => t, StringComparer.OrdinalIgnoreCase);
-                    if (typeMap.TryGetValue(addon.dotNetClass, out addonType)) {
-                        if ((addonType.IsPublic) && (!((addonType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (addonType.BaseType != null)) {
-                            //
-                            // -- assembly is public, not abstract, based on a base type
-                            if (addonType.BaseType.FullName != null) {
+                    foreach (Type assemblyType in testAssembly.GetTypes()) {
+                        if (addon.dotNetClass.Equals(assemblyType.FullName,StringComparison.InvariantCultureIgnoreCase)) {
+                            if ((assemblyType.IsPublic) && (!((assemblyType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (assemblyType.BaseType != null)) {
                                 //
-                                // -- assembly has a baseType fullname
-                                addonFound = ((addonType.BaseType.FullName.ToLowerInvariant() == "addonbaseclass") || (addonType.BaseType.FullName.ToLowerInvariant() == "contensive.baseclasses.addonbaseclass"));
+                                // -- assembly is public, not abstract, based on a base type
+                                if (!string.IsNullOrEmpty(assemblyType.BaseType.FullName)) {
+                                    //
+                                    // -- assembly has a baseType fullname
+                                    string baseTypeName = assemblyType.BaseType.FullName.ToLowerInvariant();
+                                    addonFound = baseTypeName.Equals("addonbaseclass") || (baseTypeName.Equals("contensive.baseclasses.addonbaseclass"));
+                                    if (addonFound) {
+                                        addonType = assemblyType;
+                                        break;
+                                    }
+                                }
                             }
                         }
                     }
