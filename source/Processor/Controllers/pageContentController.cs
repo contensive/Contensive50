@@ -485,16 +485,6 @@ namespace Contensive.Processor.Controllers {
                     return HtmlController.div("This domain name is not configured for this site.", "ccDialogPageNotFound");
                 }
                 //
-                // -- OnBodyStart add-ons
-                result += core.addon.executeOnBodyStart();
-                //foreach (AddonModel addon in core.addonCache.getOnBodyStartAddonList()) {
-                //    CPUtilsBaseClass.addonExecuteContext bodyStartContext = new CPUtilsBaseClass.addonExecuteContext {
-                //        addonType = CPUtilsBaseClass.addonContext.ContextOnBodyStart,
-                //        errorContextMessage = "calling onBodyStart addon [" + addon.name + "] in HtmlBodyTemplate"
-                //    };
-                //    result += core.addon.execute(addon, bodyStartContext);
-                //}
-                //
                 // -- get contentBoxHtml (page related content that should only be visible if the content is visible)
                 bool blockSiteWithLogin = false;
                 string contentBoxHtml = getHtmlBody_BodyTag_ContentBox(core, ref blockSiteWithLogin);
@@ -528,20 +518,6 @@ namespace Contensive.Processor.Controllers {
                         result = AdminUIController.getEditWrapper(core, result);
                     }
                 }
-                //
-                // -- OnBodyEnd add-ons, set the doc.body to the current body, then repopulate it for the return
-                core.doc.body = result;
-                string addonResult = core.addon.executeOnBodyEnd();
-                result = core.doc.body + addonResult;
-                //foreach (var addon in core.addonCache.getOnBodyEndAddonList()) {
-                //    CPUtilsBaseClass.addonExecuteContext bodyEndContext = new CPUtilsBaseClass.addonExecuteContext {
-                //        addonType = CPUtilsBaseClass.addonContext.ContextFilter,
-                //        errorContextMessage = "calling onBodyEnd addon [" + addon.name + "] in HtmlBodyTemplate"
-                //    };
-                //    core.doc.body = result;
-                //    string AddonReturn = core.addon.execute(addon, bodyEndContext);
-                //    result = core.doc.body + AddonReturn;
-                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

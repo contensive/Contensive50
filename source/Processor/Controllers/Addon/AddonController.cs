@@ -184,6 +184,13 @@ namespace Contensive.Processor.Controllers {
                                 core.doc.addonRecursionDepth[addon.id] += 1;
                             }
                             //
+                            // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
+                            if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                                //
+                                // -- on body start addons
+                                resultString += core.addon.executeOnBodyStart();
+                            }
+                            //
                             // -- if executeContext.instanceGuid is set, save the current instanceId and set the context value. If not set, leave the current in place
                             string parentInstanceId = core.docProperties.getText("instanceId");
                             if (!string.IsNullOrWhiteSpace(executeContext.instanceGuid)) {
@@ -590,7 +597,16 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
                         if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                            //
+                            // -- on body end addons
+                            core.doc.body = resultString;
+                            string addonResult = core.addon.executeOnBodyEnd();
+                            resultString = core.doc.body + addonResult;
+                            //
+                            // -- create html document from returned body
                             resultString = core.html.getHtmlDoc(resultString, "<body>");
+                            //
+                            // -- minify results
                             if ((!core.doc.visitPropertyAllowDebugging) && (core.siteProperties.getBoolean("Allow Html Minify", true))) {
                                 resultString = NUglify.Uglify.Html(resultString).Code;
                             }
@@ -1356,7 +1372,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- catch exceptions found (Select.Pdf.dll has two classes that differ by only case)
                     foreach (Type assemblyType in testAssembly.GetTypes()) {
-                        if (addon.dotNetClass.Equals(assemblyType.FullName,StringComparison.InvariantCultureIgnoreCase)) {
+                        if (addon.dotNetClass.Equals(assemblyType.FullName, StringComparison.InvariantCultureIgnoreCase)) {
                             if ((assemblyType.IsPublic) && (!((assemblyType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (assemblyType.BaseType != null)) {
                                 //
                                 // -- assembly is public, not abstract, based on a base type

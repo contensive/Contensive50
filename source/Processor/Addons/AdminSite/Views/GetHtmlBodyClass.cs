@@ -52,20 +52,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                     return HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
                 }
                 //
-                // -- on body start addons
-                result += cp.core.addon.executeOnBodyStart();
-                //
-                // todo - convert admin addon to use cpbase to help understand cp api requirements
-                //
-                //
                 // get admin content
                 result += getHtmlBody(cp);
                 result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
-                //
-                // -- on body end addons
-                cp.core.doc.body = result;
-                string addonResult = cp.core.addon.executeOnBodyEnd();
-                result = cp.core.doc.body + addonResult;
+
+
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
             }
