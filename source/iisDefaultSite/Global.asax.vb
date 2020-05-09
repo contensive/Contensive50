@@ -75,12 +75,21 @@ Public Class Global_asax
     ''' <param name="e"></param>
     Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
         If (sender IsNot Nothing) Then
-            '
-            LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError() [" + Server.GetLastError().ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
-            '
-            Dim innerException As Exception = Server.GetLastError().InnerException
-            If (innerException IsNot Nothing) Then
-                LogController.logLocalOnly("Global.asax, Application_Error, Server.GetLastError().InnerException [" + Server.GetLastError().InnerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
+            Dim exception As Exception = Server.GetLastError()
+            If (exception IsNot Nothing) Then
+                '
+                ' -- dont log [The file '...' does not exist.]
+                Dim exMsg As String = exception.Message
+                If (exMsg.Substring(0, 10).Equals("The file '") And exMsg.Substring(exMsg.Length - 17, 17).Equals("' does not exist.")) Then
+                    '
+                    ' -- File does not exist, thrown for every bot searching content
+                    Return
+                End If
+                LogController.logLocalOnly("Global.asax, Application_Error, exception message [" + exception.Message + "], toString [" + exception.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
+                Dim innerException As Exception = exception.InnerException
+                If (innerException IsNot Nothing) Then
+                    LogController.logLocalOnly("Global.asax, Application_Error, inner exception message [" + innerException.Message + "], toString [" + innerException.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Error)
+                End If
             End If
         End If
 
