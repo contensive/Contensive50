@@ -174,7 +174,6 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Process the other files
                 LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], process xml files.");
-                bool CollectionblockNavigatorNode_fileValueOK = false;
                 foreach (FileDetail file in srcFileInfoArray) {
                     if (file.Extension == ".xml") {
                         //
@@ -209,12 +208,10 @@ namespace Contensive.Processor.Controllers {
                                     return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
                                     return false;
                                 }
-                                bool CollectionSystem_fileValueOK = false;
-                                bool CollectionUpdatable_fileValueOK = false;
-                                //
-                                bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "system", ""));
-                                string collectionOninstalladdonGuid = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "onInstallAddonGuid", "");
-                                string dataRecordList = XmlController.getXMLAttribute(core, ref CollectionSystem_fileValueOK, Doc.DocumentElement, "DataRecordList", "");
+                                bool attributeFound = false;
+                                bool CollectionSystem = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref attributeFound, Doc.DocumentElement, "system", "false"));
+                                string collectionOninstalladdonGuid = XmlController.getXMLAttribute(core, ref attributeFound, Doc.DocumentElement, "onInstallAddonGuid", "");
+                                string dataRecordList = XmlController.getXMLAttribute(core, ref attributeFound, Doc.DocumentElement, "DataRecordList", "");
                                 int Parent_NavId = BuildController.verifyNavigatorEntry(core, new MetadataMiniCollectionModel.MiniCollectionMenuModel {
                                     guid = addonGuidManageAddon,
                                     name = "Manage Add-ons",
@@ -223,9 +220,8 @@ namespace Contensive.Processor.Controllers {
                                     newWindow = false,
                                     active = true,
                                 }, 0);
-                                bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "updatable", "true"));
-                                string onInstallAddonGuid = XmlController.getXMLAttribute(core, ref CollectionUpdatable_fileValueOK, Doc.DocumentElement, "OnInstallAddonGuid", "");
-                                bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref CollectionblockNavigatorNode_fileValueOK, Doc.DocumentElement, "blockNavigatorNode", ""));
+                                bool CollectionUpdatable = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref attributeFound, Doc.DocumentElement, "updatable", "true"));
+                                bool CollectionblockNavigatorNode = GenericController.encodeBoolean(XmlController.getXMLAttribute(core, ref attributeFound, Doc.DocumentElement, "blockNavigatorNode", "false"));
                                 string FileGuid = XmlController.getXMLAttribute(core, ref IsFound, Doc.DocumentElement, "guid", CollectionName);
                                 if (string.IsNullOrEmpty(FileGuid)) {
                                     FileGuid = CollectionName;
@@ -442,15 +438,9 @@ namespace Contensive.Processor.Controllers {
                                         collection.help = "";
                                         collection.ccguid = collectionGuid;
                                         collection.lastChangeDate = collectionFolderConfig.lastChangeDate;
-                                        if (CollectionSystem_fileValueOK) {
-                                            collection.system = CollectionSystem;
-                                        }
-                                        if (CollectionUpdatable_fileValueOK) {
-                                            collection.updatable = CollectionUpdatable;
-                                        }
-                                        if (CollectionblockNavigatorNode_fileValueOK) {
-                                            collection.blockNavigatorNode = CollectionblockNavigatorNode;
-                                        }
+                                        collection.system = CollectionSystem;
+                                        collection.updatable = CollectionUpdatable;
+                                        collection.blockNavigatorNode = CollectionblockNavigatorNode;
                                         collection.helpLink = CollectionHelpLink;
                                         //
                                         MetadataController.deleteContentRecords(core, "Add-on Collection CDef Rules", "CollectionID=" + collection.id);
@@ -815,14 +805,14 @@ namespace Contensive.Processor.Controllers {
                                 }
                                 //
                                 // -- execute onInstall addon if found
-                                if (string.IsNullOrEmpty(onInstallAddonGuid)) {
+                                if (string.IsNullOrEmpty(collectionOninstalladdonGuid)) {
                                     //
                                     // -- log warning. This collection does not have an install addon
                                     LogController.logDebug(core, "Collection does not include an install addon, [" + collection.name + "]");
                                 } else {
                                     //
                                     // -- install the install addon
-                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, onInstallAddonGuid);
+                                    var addon = DbBaseModel.create<AddonModel>(core.cpParent, collectionOninstalladdonGuid);
                                     if (addon != null) {
                                         var executeContext = new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
                                             addonType = BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple,

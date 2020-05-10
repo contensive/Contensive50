@@ -292,8 +292,8 @@ namespace Contensive.Processor.Controllers {
                         core.siteProperties.setProperty("PageController Render Legacy Copy", false);
                     }
                     //
-                    // -- 5.2002.12 conversion -- collections incorrectly marked not-updateable - mark all except themes (templates)
-                    if (GenericController.versionIsOlder(DataBuildVersion, "5.2002.12")) {
+                    // -- 5.2005.9.4 conversion -- collections incorrectly marked not-updateable - mark all except themes (templates)
+                    if (GenericController.versionIsOlder(DataBuildVersion, "5.2005.9.4")) {
                         //
                         // -- 
                         cp.Db.ExecuteNonQuery("update ccaddoncollections set updatable=1 where name not like '%theme%'");

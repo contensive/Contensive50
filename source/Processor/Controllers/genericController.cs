@@ -30,6 +30,28 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static bool versionIsOlder(string versionFirst, string versionSecond) {
             try {
+                //
+                // -- formats:
+                // c4 = 4.1.636
+                //          major = 4
+                //          minor = 1
+                //          revision = 636
+                //          build = 0
+                // c5, 5.1.2.3
+                //          major = 5
+                //          minor = 1
+                //          revision = 2
+                //          build = 3
+                // c5, 5.18.1027.1
+                //          major = 5
+                //          minor = 18
+                //          revision = 1027
+                //          build = 1
+                // c5, 5.2001.1.1
+                //          major = 5
+                //          minor = 2001
+                //          revision = 1
+                //          build = 1
                 string[] vfsplit = versionFirst.Split('.');
                 string[] vssplit = versionSecond.Split('.');
                 //
