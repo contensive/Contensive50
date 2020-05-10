@@ -13,6 +13,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Deleting visitors with no visits");
                     //
+                    core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery("delete ccVisitors from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID where ccVisits.ID is null");
                 }
                 //
@@ -26,6 +27,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Deleting visitors from visits with no cookie support older than Midnight, Two Days Ago");
                     string sql = "delete from ccvisitors from ccvisitors r,ccvisits v where r.id=v.visitorid and(v.CookieSupport=0)and(v.LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))";
+                    core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery(sql);
                 }
 

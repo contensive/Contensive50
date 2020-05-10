@@ -24,6 +24,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     // Set NextSummaryStartDate based on the last time we ran hourly summarization
                     //
                     DateTime LastTimeSummaryWasRun = env.visitArchiveDate;
+                    core.db.sqlCommandTimeout = 180;
                     using (var csData = new CsModel(core)) {
                         if (csData.openSql(core.db.getSQLSelect("ccVisitSummary", "DateAdded", "(timeduration=1)and(Dateadded>" + DbController.encodeSQLDate(env.visitArchiveDate) + ")", "id Desc", "", 1))) {
                             LastTimeSummaryWasRun = csData.getDate("DateAdded");
@@ -42,6 +43,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     DateTime StartOfHour = (new DateTime(LastTimeSummaryWasRun.Year, LastTimeSummaryWasRun.Month, LastTimeSummaryWasRun.Day, LastTimeSummaryWasRun.Hour, 1, 1)).AddHours(-1); // (Int(24 * LastTimeSummaryWasRun) / 24) - PeriodStep
                     DateTime OldestDateAdded = StartOfHour;
+                    core.db.sqlCommandTimeout = 180;
                     using (var csData = new CsModel(core)) {
                         if (csData.openSql(core.db.getSQLSelect("ccVisits", "DateAdded", "LastVisitTime>" + DbController.encodeSQLDate(StartOfHour), "dateadded", "", 1))) {
                             OldestDateAdded = csData.getDate("DateAdded");
@@ -54,6 +56,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     DateTime PeriodStartDate = core.dateTimeNowMockable.Date.AddDays(-90);
                     double PeriodStep = 1;
                     int HoursPerDay = 0;
+                    core.db.sqlCommandTimeout = 180;
                     for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
                         //
                         // Verify there are 24 hour records for every day back the past 90 days
@@ -154,6 +157,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             + "";
                         int NoCookieVisits = 0;
                         using (var csData = new CsModel(core)) {
+                            core.db.sqlCommandTimeout = 180;
                             csData.openSql(SQL);
                             if (csData.ok()) {
                                 NoCookieVisits = csData.getInteger("NoCookieVisits");
@@ -173,6 +177,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         int VisitCnt = 0;
                         int HitCnt = 0;
                         using (var csData = new CsModel(core)) {
+                            core.db.sqlCommandTimeout = 180;
                             csData.openSql(SQL);
                             if (csData.ok()) {
                                 VisitCnt = csData.getInteger("VisitCnt");
@@ -198,6 +203,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(v.VisitorNew<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     NewVisitorVisits = csData.getInteger("NewVisitorVisits");
@@ -215,6 +221,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(v.PageVisits=1)"
                                 + "";
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     SinglePageVisits = csData.getInteger("SinglePageVisits");
@@ -235,6 +242,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             int MultiPageVisitCnt = 0;
                             double MultiPageTimetoLastHitSum = 0;
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     MultiPageVisitCnt = csData.getInteger("VisitCnt");
@@ -254,6 +262,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(VisitAuthenticated<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     AuthenticatedVisits = csData.getInteger("AuthenticatedVisits");
@@ -272,6 +281,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(Mobile<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     MobileVisits = csData.getInteger("cnt");
@@ -289,6 +299,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                 + " and(Bot<>0)"
                                 + "";
                             using (var csData = new CsModel(core)) {
+                                core.db.sqlCommandTimeout = 180;
                                 csData.openSql(SQL);
                                 if (csData.ok()) {
                                     BotVisits = csData.getInteger("cnt");
@@ -305,6 +316,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         // Add or update the Visit Summary Record
                         //
                         using (var csData = new CsModel(core)) {
+                            core.db.sqlCommandTimeout = 180;
                             csData.open("Visit Summary", "(timeduration=" + HourDuration + ")and(DateNumber=" + DateNumber + ")and(TimeNumber=" + TimeNumber + ")");
                             if (!csData.ok()) {
                                 csData.close();
@@ -343,6 +355,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             + " and d.TimeDuration=24"
                             + " and f.id<d.id"
                             + ")";
+                        core.db.sqlCommandTimeout = 180;
                         core.db.executeNonQuery(SQL);
                         //
                         // Find missing daily summaries, summarize that date

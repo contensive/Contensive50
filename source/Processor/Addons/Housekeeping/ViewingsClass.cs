@@ -13,6 +13,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 try {
                     //
                     // delete old viewings
+                    core.db.sqlCommandTimeout = 1800;
                     core.db.executeNonQuery("delete from ccviewings where (dateadded < DATEADD(day,-" + env.visitArchiveAgeDays + ",CAST(GETDATE() AS DATE)))");
                 } catch (Exception) {
                     LogController.logWarn(core, "exception deleting old viewings");
@@ -25,6 +26,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     // if this fails, continue with the rest of the work
                     try {
                         string sql = "delete from ccviewings from ccviewings h,ccvisits v where h.visitid=v.id and(v.CookieSupport=0)and(v.LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))";
+                        core.db.sqlCommandTimeout = 1800;
                         core.db.executeNonQuery(sql);
                     } catch (Exception) {
                         LogController.logWarn(core, "exception deleting viewings with no cookie");
@@ -35,6 +37,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 try {
                     string sql = "delete from ccviewings  where (visitid=0 or visitid is null)";
+                    core.db.sqlCommandTimeout = 1800;
                     core.db.executeNonQuery(sql);
                 } catch (Exception) {
                     LogController.logWarn(core, "exception deleting viewings with invalid visits");

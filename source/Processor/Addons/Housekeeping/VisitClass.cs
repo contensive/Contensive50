@@ -14,6 +14,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Deleting visits with no DateAdded");
                     //
+                    core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery("delete from ccvisits where (DateAdded is null)or(DateAdded<DATEADD(year,-10,CAST(GETDATE() AS DATE)))");
                 }
                 {
@@ -26,6 +27,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Deleting visits with no cookie support older than Midnight, Two Days Ago");
                     //
+                    core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery("delete from ccvisits where (CookieSupport=0)and(LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
                 }
                 DateTime OldestVisitDate = default(DateTime);
