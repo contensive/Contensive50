@@ -85,7 +85,7 @@ namespace Contensive.Processor.Controllers {
                         // -- style sheet is in the wwwroot
                         if (!string.IsNullOrEmpty(addon.stylesLinkHref)) {
                             string filename = addon.stylesLinkHref.Replace("/", "\\");
-                            if (filename.Substring(0, 1).Equals("\\")) { filename = filename.Substring(1); };
+                            if (filename.Substring(0, 1).Equals(@"\")) { filename = filename.Substring(1); }
                             if (!cp.WwwFiles.FileExists(filename)) {
                                 cp.WwwFiles.Save(filename, @"/* css file created as exported for addon [" + addon.name + "], collection [" + collection.name + "] in site [" + cp.Site.Name + "] */");
                             }
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                         // -- js is in the wwwroot
                         if (!string.IsNullOrEmpty(addon.jsHeadScriptSrc)) {
                             string filename = addon.jsHeadScriptSrc.Replace("/", "\\");
-                            if (filename.Substring(0, 1).Equals("\\")) { filename = filename.Substring(1); };
+                            if (filename.Substring(0, 1).Equals(@"\")) { filename = filename.Substring(1); }
                             if (!cp.WwwFiles.FileExists(filename)) {
                                 cp.WwwFiles.Save(filename, @"// javascript file created as exported for addon [" + addon.name + "], collection [" + collection.name + "] in site [" + cp.Site.Name + "]");
                             }

@@ -336,8 +336,8 @@ namespace Contensive.Processor.Controllers {
                 //    + indent(localButtonList + body + localHiddenList)
                 //    + cr + "</form>";
             }
-            if (_includeBodyPadding) { s = new StringBuilder(cp.Html.div(s.ToString(), "", "afwBodyPad", "")); };
-            if (_includeBodyColor) { s = new StringBuilder(cp.Html.div(s.ToString(), "", "afwBodyColor", "")); };
+            if (_includeBodyPadding) { s = new StringBuilder(cp.Html.div(s.ToString(), "", "afwBodyPad", "")); }
+            if (_includeBodyColor) { s = new StringBuilder(cp.Html.div(s.ToString(), "", "afwBodyColor", "")); }
             //
             // if outer container, add styles and javascript
             //

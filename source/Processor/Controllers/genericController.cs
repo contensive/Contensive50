@@ -278,10 +278,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addQuery"></param>
         /// <returns></returns>
         public static string joinQueryString(string primaryQuery, string addQuery) {
-            if (string.IsNullOrWhiteSpace(addQuery)) { return primaryQuery; };
+            if (string.IsNullOrWhiteSpace(addQuery)) { return primaryQuery; }
             foreach (string queryPair in addQuery.Split('&')) {
                 string[] queryVar = queryPair.Split('=');
-                if (queryVar.Length < 2) { continue; };
+                if (queryVar.Length < 2) { continue; }
                 primaryQuery = modifyQueryString(primaryQuery, queryVar[0], queryVar[1]);
             }
             return primaryQuery;
@@ -392,44 +392,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Height"></param>
         /// <returns></returns>
         public static string nop2(int Width, int Height) => string.Empty;
-        //
-        //========================================================================================================
-        /// <summary>
-        /// Convert the href and src links in html content to full urls that include the protocol and domain 
-        /// </summary>
-        /// <param name="htmlContent"></param>
-        /// <param name="urlProtocolDomainSlash"></param>
-        /// <returns></returns>
-        public static string convertLinksToAbsolute(string htmlContent, string urlProtocolDomainSlash) {
-            string result = htmlContent;
-            result = result.Replace(" href=\"", " href=\"/");
-            result = result.Replace(" href=\"/http", " href=\"http");
-            result = result.Replace(" href=\"/mailto", " href=\"mailto");
-            result = result.Replace(" href=\"//", " href=\"" + urlProtocolDomainSlash);
-            result = result.Replace(" href=\"/?", " href=\"" + urlProtocolDomainSlash + "?");
-            result = result.Replace(" href=\"/", " href=\"" + urlProtocolDomainSlash);
-            //
-            result = result.Replace(" href=", " href=/");
-            result = result.Replace(" href=/\"", " href=\"");
-            result = result.Replace(" href=/http", " href=http");
-            result = result.Replace(" href=//", " href=" + urlProtocolDomainSlash);
-            result = result.Replace(" href=/?", " href=" + urlProtocolDomainSlash + "?");
-            result = result.Replace(" href=/", " href=" + urlProtocolDomainSlash);
-            //
-            result = result.Replace(" src=\"", " src=\"/");
-            result = result.Replace(" src=\"/http", " src=\"http");
-            result = result.Replace(" src=\"//", " src=\"" + urlProtocolDomainSlash);
-            result = result.Replace(" src=\"/?", " src=\"" + urlProtocolDomainSlash + "?");
-            result = result.Replace(" src=\"/", " src=\"" + urlProtocolDomainSlash);
-            //
-            result = result.Replace(" src=", " src=/");
-            result = result.Replace(" src=/\"", " src=\"");
-            result = result.Replace(" src=/http", " src=http");
-            result = result.Replace(" src=//", " src=" + urlProtocolDomainSlash);
-            result = result.Replace(" src=/?", " src=" + urlProtocolDomainSlash + "?");
-            result = result.Replace(" src=/", " src=" + urlProtocolDomainSlash);
-            return result;
-        }
         //
         //========================================================================================================
         /// <summary>
@@ -1195,7 +1157,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static int? encodeIntegerNullable(object expression) {
             if (expression == null) { return null; }
-            if ((expression is string) &&(string.IsNullOrWhiteSpace((string)expression))){ return null; };
+            if ((expression is string) &&(string.IsNullOrWhiteSpace((string)expression))){ return null; }
             return encodeInteger(expression);
         }
         //
@@ -1222,7 +1184,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static double? encodeNumberNullable(object expression) {
             if (expression == null) { return null; }
-            if ((expression is string) && (string.IsNullOrWhiteSpace((string)expression))) { return null; };
+            if ((expression is string) && (string.IsNullOrWhiteSpace((string)expression))) { return null; }
             return encodeNumber(expression);
         }
         //
@@ -1239,7 +1201,7 @@ namespace Contensive.Processor.Controllers {
             if (Expression == null) { return false; }
             if (Expression is bool) { return (bool)Expression; }
             if (Expression.isNumeric()) { return (encodeText(Expression) != "0"); }
-            if (Expression is string) { return (new string[] { "on", "yes", "true" }).Any(((string)Expression).ToLowerInvariant().Equals); };
+            if (Expression is string) { return (new string[] { "on", "yes", "true" }).Any(((string)Expression).ToLowerInvariant().Equals); }
             return false;
         }
         //

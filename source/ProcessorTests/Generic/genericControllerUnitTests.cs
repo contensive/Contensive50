@@ -280,17 +280,21 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             const string link2 = "https://www.good.com/";
             const string content1 = "<div><a href=\"/page.html\"></div>";
             const string content2 = "<div><a href=\"http://www.bad.com/page.html\"></div>";
+            const string content4 = "<div><a href=\"./page.html\"></div>";
             string expect1 = "<div><a href=\"http://www.good.com/page.html\"></div>";
             string expect2 = "<div><a href=\"http://www.bad.com/page.html\"></div>";
             string expect3 = "<div><a href=\"https://www.good.com/page.html\"></div>";
+            string expect4 = "<div><a href=\"https://www.good.com/page.html\"></div>";
             // act
-            string result1 = GenericController.convertLinksToAbsolute(content1, link1);
-            string result2 = GenericController.convertLinksToAbsolute(content2, link1);
-            string result3 = GenericController.convertLinksToAbsolute(content1, link2);
+            string result1 = HtmlController.convertLinksToAbsolute(content1, link1);
+            string result2 = HtmlController.convertLinksToAbsolute(content2, link1);
+            string result3 = HtmlController.convertLinksToAbsolute(content1, link2);
+            string result4 = HtmlController.convertLinksToAbsolute(content4, link2);
             // assert
             Assert.AreEqual(expect1, result1);
             Assert.AreEqual(expect2, result2);
             Assert.AreEqual(expect3, result3);
+            Assert.AreEqual(expect4, result4);
         }
         //
         [TestMethod]

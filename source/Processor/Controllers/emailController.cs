@@ -175,6 +175,7 @@ namespace Contensive.Processor.Controllers {
                             LogController.logInfo(core, "queueAdHocEmail, sent with warning [" + returnSendStatus + "], toAddress [" + toAddress + "], fromAddress [" + fromAddress + "], subject [" + subject + "]");
                         }
                     }
+                    string subjectRendered = encodeEmailTextBody(core, false, subject, null);
                     string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "");
                     string textBody = encodeEmailTextBody(core, isHTML, body, null);
                     queueEmail(core, isImmediate, emailContextMessage, new EmailSendDomainModel {
@@ -183,7 +184,7 @@ namespace Contensive.Processor.Controllers {
                         fromAddress = fromAddress,
                         htmlBody = htmlBody,
                         replyToAddress = replyToAddress,
-                        subject = subject,
+                        subject = subjectRendered,
                         textBody = textBody,
                         toAddress = toAddress
                     });
@@ -262,7 +263,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
-
+                    string subjectRendered = encodeEmailTextBody(core, false, subject, recipient);
                     string htmlBody = encodeEmailHtmlBody(core, isHTML, body, template, subject, recipient, queryStringForLinkAppend);
                     string textBody = encodeEmailTextBody(core, isHTML, body, recipient);
                     string recipientName = (!string.IsNullOrWhiteSpace(recipient.name) && !recipient.name.ToLower().Equals("guest")) ? recipient.name : string.Empty;
@@ -280,7 +281,7 @@ namespace Contensive.Processor.Controllers {
                         fromAddress = fromAddress,
                         htmlBody = htmlBody,
                         replyToAddress = replyToAddress,
-                        subject = subject,
+                        subject = subjectRendered,
                         textBody = textBody,
                         toAddress = (string.IsNullOrWhiteSpace(recipientName)) ? recipient.email : "\"" + recipientName.Replace("\"", "") + "\" <" + recipient.email.Trim() + ">",
                         toMemberId = recipient.id
@@ -439,13 +440,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // Spam Footer
                 //
-                if (email.allowSpamFooter) {
-                    //
-                    // This field is default true, and non-authorable
-                    // It will be true in all cases, except a possible unforseen exception
-                    //
-                    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(getRootRelativeUrlPlusSlash(core) + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
-                }
+                //if (email.allowSpamFooter) {
+                //    //
+                //    // This field is default true, and non-authorable
+                //    // It will be true in all cases, except a possible unforseen exception
+                //    //
+                //    EmailTemplateSource = EmailTemplateSource + "<div style=\"clear: both;padding:10px 0;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(getRootRelativeUrlPlusSlash(core) + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                //}
                 string confirmationMessage = "";
                 //
                 // --- collect values needed for send
@@ -573,14 +574,14 @@ namespace Contensive.Processor.Controllers {
                     //
                     // spam footer
                     string EmailBody = csData.getText("copyFilename");
-                    if (csData.getBoolean("AllowSpamFooter")) {
-                        //
-                        // AllowSpamFooter is default true, and non-authorable
-                        // It will be true in all cases, except a possible unforseen exception
-                        //
-                        EmailBody = EmailBody + "<div style=\"clear:both;padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
-                        EmailBody = GenericController.strReplace(EmailBody, "#member_email#", "UserEmailAddress");
-                    }
+                    //if (csData.getBoolean("AllowSpamFooter")) {
+                    //    //
+                    //    // AllowSpamFooter is default true, and non-authorable
+                    //    // It will be true in all cases, except a possible unforseen exception
+                    //    //
+                    //    EmailBody = EmailBody + "<div style=\"clear:both;padding:10px 0;\">" + GenericController.getLinkedText("<a href=\"" + HtmlController.encodeHtml(core.webServer.requestProtocol + core.webServer.requestDomain + "/" + core.siteProperties.serverPageDefault + "?" + rnEmailBlockRecipientEmail + "=#member_email#") + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                    //    EmailBody = GenericController.strReplace(EmailBody, "#member_email#", "UserEmailAddress");
+                    //}
                     //
                     // Confirm footer
                     //
@@ -1030,7 +1031,7 @@ namespace Contensive.Processor.Controllers {
             // -- subject
             if (!string.IsNullOrWhiteSpace(subject)) {
                 subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
-                subject = GenericController.convertLinksToAbsolute(subject, rootUrlPlusSlash);
+                subject = HtmlController.convertLinksToAbsolute(subject, rootUrlPlusSlash);
                 try {
                     subject = HtmlController.convertHtmlToText(core, "<body>" + subject + "</body>");
                 } catch (Exception ex) {
@@ -1044,9 +1045,6 @@ namespace Contensive.Processor.Controllers {
             // -- body
             if (!string.IsNullOrWhiteSpace(body)) {
                 body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend);
-                body = GenericController.convertLinksToAbsolute(body, rootUrlPlusSlash);
-                body = GenericController.strReplace(body, "#member_id#", recipientId.ToString());
-                body = GenericController.strReplace(body, "#member_email#", recipientEmail);
             }
             //
             // -- encode and merge template
@@ -1062,6 +1060,13 @@ namespace Contensive.Processor.Controllers {
                     body = template + body;
                 }
             }
+            //
+            // -- convert links to absolute links
+            body = HtmlController.convertLinksToAbsolute(body, rootUrlPlusSlash);
+            //
+            // -- support legacy replace
+            body = GenericController.strReplace(body, "#member_id#", recipientId.ToString());
+            body = GenericController.strReplace(body, "#member_email#", recipientEmail);
             if (!isHTML) {
                 //
                 // -- non html email, return a text version of the finished document
@@ -1073,7 +1078,7 @@ namespace Contensive.Processor.Controllers {
             if (AllowSpamFooter) {
                 //
                 // non-authorable, default true - leave it as an option in case there is an important exception
-                body += "<div style=\"padding:10px;\">" + GenericController.getLinkedText("<a href=\"" + rootUrlPlusSlash + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                body += "<div style=\"padding:10px 0;\">" + GenericController.getLinkedText("<a href=\"" + rootUrlPlusSlash + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
             }
 
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
