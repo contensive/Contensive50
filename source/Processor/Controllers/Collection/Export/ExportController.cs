@@ -84,16 +84,22 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- style sheet is in the wwwroot
                         if (!string.IsNullOrEmpty(addon.stylesLinkHref)) {
-                            if(cp.WwwFiles.FileExists(addon.stylesLinkHref) || cp.WwwFiles.FileExists("/" + addon.stylesLinkHref)) {
-                                wwwFileList += System.Environment.NewLine + addon.stylesLinkHref;
+                            string filename = addon.stylesLinkHref.Replace("/", "\\");
+                            if (filename.Substring(0, 1).Equals("\\")) { filename = filename.Substring(1); };
+                            if (!cp.WwwFiles.FileExists(filename)) {
+                                cp.WwwFiles.Save(filename, @"/* css file created as exported for addon [" + addon.name + "], collection [" + collection.name + "] in site [" + cp.Site.Name + "] */");
                             }
+                            wwwFileList += System.Environment.NewLine + addon.stylesLinkHref;
                         }
                         //
                         // -- js is in the wwwroot
                         if (!string.IsNullOrEmpty(addon.jsHeadScriptSrc)) {
-                            if (cp.WwwFiles.FileExists(addon.jsHeadScriptSrc) || cp.WwwFiles.FileExists("/" + addon.jsHeadScriptSrc)) {
-                                wwwFileList += System.Environment.NewLine + addon.jsHeadScriptSrc;
+                            string filename = addon.jsHeadScriptSrc.Replace("/", "\\");
+                            if (filename.Substring(0, 1).Equals("\\")) { filename = filename.Substring(1); };
+                            if (!cp.WwwFiles.FileExists(filename)) {
+                                cp.WwwFiles.Save(filename, @"// javascript file created as exported for addon [" + addon.name + "], collection [" + collection.name + "] in site [" + cp.Site.Name + "]");
                             }
+                            wwwFileList += System.Environment.NewLine + addon.jsHeadScriptSrc;
                         }
                         collectionXml += ExportAddonController.getAddonNode(cp, addon.id, ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
                     }

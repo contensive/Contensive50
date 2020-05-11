@@ -192,39 +192,30 @@ namespace Contensive.Processor.Controllers {
         public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context) {
             try {
                 //
-                // -- exit if no src to process
-                if (string.IsNullOrWhiteSpace(src)) { return src; }
+                // -- fast exit for content w/o cmds
+                if(string.IsNullOrWhiteSpace(src)) { return src;  };
+                if (src.IndexOf(contentReplaceEscapeStart).Equals(-1)) { return src; }
+                if (src.IndexOf(contentReplaceEscapeEnd).Equals(-1)) { return src; }
                 //
-                // -- work-around for users putting content-cmds in with a wysiwyg editor
-                src = src.replace("{%&nbsp;", "{%", StringComparison.InvariantCultureIgnoreCase);
-                src = src.replace("&nbsp;%}", "%}", StringComparison.InvariantCultureIgnoreCase);
-                //
-                bool badCmd = false;
-                bool notFound = false;
-                int posOpen = 0;
-                int posClose = 0;
-                string Cmd = "";
-                string cmdResult = null;
-                int posDq = 0;
-                int posSq = 0;
                 int Ptr = 0;
-                string escape = null;
-                //
                 var result = new StringBuilder();
                 int ptrLast = 1;
                 do {
-                    Cmd = "";
-                    posOpen = GenericController.strInstr(ptrLast, src, contentReplaceEscapeStart);
+                    string Cmd = "";
+                    int posOpen = GenericController.strInstr(ptrLast, src, contentReplaceEscapeStart);
                     Ptr = posOpen;
+                    int posClose = 0;
                     if (Ptr == 0) {
                         //
                         // not found, copy the rest of src to dst
                         //
                     } else {
                         //
+                        //bool badCmd = false;
+                        //
                         // scan until we have passed all double and single quotes that are before the next
                         //
-                        notFound = true;
+                        bool notFound = true;
                         do {
                             posClose = GenericController.strInstr(Ptr, src, contentReplaceEscapeEnd);
                             if (posClose == 0) {
@@ -234,7 +225,8 @@ namespace Contensive.Processor.Controllers {
                                 posOpen = 0;
                                 notFound = false;
                             } else {
-                                posDq = Ptr;
+                                int posDq = Ptr;
+                                string escape = null;
                                 do {
                                     posDq = GenericController.strInstr(posDq + 1, src, "\"");
                                     escape = "";
@@ -242,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                                         escape = src.Substring(posDq - 2, 1);
                                     }
                                 } while (escape == "\\");
-                                posSq = Ptr;
+                                int posSq = Ptr;
                                 do {
                                     posSq = GenericController.strInstr(posSq + 1, src, "'");
                                     escape = "";
@@ -289,13 +281,11 @@ namespace Contensive.Processor.Controllers {
                         // cmd found, process it and add the results to the dst
                         //
                         Cmd = src.Substring(posOpen + 1, (posClose - posOpen - 2));
-                        cmdResult = executeSingleCommand(core, Cmd, Context);
-                        if (badCmd) {
-                            //
-                            // the command was bad, put it back in place (?) in case it was not a command
-                            //
-                            cmdResult = contentReplaceEscapeStart + Cmd + contentReplaceEscapeEnd;
-                        }
+                        //
+                        // -- when cmd entered through wysiwyg, it is html encoded
+                        Cmd = HtmlController.decodeHtml(Cmd);
+                        //
+                        string cmdResult = executeSingleCommand(core, Cmd, Context);
                         result.Append(src.Substring(ptrLast - 1, posOpen - ptrLast) + cmdResult);
                         Ptr = posClose + 2;
                     }
