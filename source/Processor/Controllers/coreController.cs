@@ -645,24 +645,29 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) {
-            cpParent = cp;
-            deleteSessionOnExit = true;
-            _mockNow = null;
-            LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            //
-            metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
-            tableSchemaDictionary = null;
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            session = new SessionController(this);
-            //
-            this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
-            webServer.iisContext = null;
-            constructorInitialize(false);
-            LogController.log(this, "CoreController constructor-2, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            try {
+                cpParent = cp;
+                deleteSessionOnExit = true;
+                _mockNow = null;
+                LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
+                metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+                tableSchemaDictionary = null;
+                //
+                // -- create default auth objects for non-user methods, or until auth is available
+                session = new SessionController(this);
+                //
+                this.serverConfig = serverConfig;
+                this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
+                appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
+                appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
+                webServer.iisContext = null;
+                constructorInitialize(false);
+                LogController.log(this, "CoreController constructor-2, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            } catch (Exception ex) {
+                LogController.logLocalOnly("CoreController constructor-2, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+                throw;
+            }
         }
         //
         //====================================================================================================
@@ -672,6 +677,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
+            try {
             this.cpParent = cp;
             this.cpParent.core = this;
             _mockNow = null;
@@ -688,6 +694,10 @@ namespace Contensive.Processor.Controllers {
             webServer.initWebContext(httpContext);
             constructorInitialize(true);
             LogController.log(this, "CoreController constructor-3, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            } catch (Exception ex) {
+                LogController.logLocalOnly("CoreController constructor-3, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+                throw;
+            }
         }
         //
         //====================================================================================================
@@ -695,25 +705,30 @@ namespace Contensive.Processor.Controllers {
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
         public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) {
-            this.cpParent = cp;
-            this.cpParent.core = this;
-            _mockNow = null;
-            LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            //
-            metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
-            tableSchemaDictionary = null;
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            session = new SessionController(this);
-            //
-            serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            if (appConfig != null) {
-                webServer.initWebContext(httpContext);
-                constructorInitialize(true);
+            try {
+                this.cpParent = cp;
+                this.cpParent.core = this;
+                _mockNow = null;
+                LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
+                metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+                tableSchemaDictionary = null;
+                //
+                // -- create default auth objects for non-user methods, or until auth is available
+                session = new SessionController(this);
+                //
+                serverConfig = ServerConfigModel.getObject(this);
+                serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
+                appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
+                if (appConfig != null) {
+                    webServer.initWebContext(httpContext);
+                    constructorInitialize(true);
+                }
+                LogController.log(this, "CoreController constructor-4, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            } catch (Exception ex) {
+                LogController.logLocalOnly("CoreController constructor-4, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+                throw;
             }
-            LogController.log(this, "CoreController constructor-4, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
         }
         //
         /// <summary>
@@ -748,7 +763,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError(this, ex);
+                LogController.logLocalOnly("CoreController constructorInitialize, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
                 throw;
             }
         }

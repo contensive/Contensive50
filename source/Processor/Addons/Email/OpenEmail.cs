@@ -33,9 +33,9 @@ namespace Contensive.Processor.Addons.Primitives {
                             log.visitId = cp.Visit.Id;
                             log.save(cp);
                         }
-                        core.webServer.redirect(NonEncodedLink: "" + cdnPrefix + "images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
                     }
                 }
+                core.webServer.redirect(NonEncodedLink: "" + cdnPrefix + "images/spacer.gif", RedirectReason: "Group Email Open hit, redirecting to a dummy image", IsPageNotFound: false, allowDebugMessage: false);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

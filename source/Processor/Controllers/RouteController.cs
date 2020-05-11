@@ -63,61 +63,51 @@ namespace Contensive.Processor.Controllers {
                             case ajaxGetFieldEditorPreferenceForm: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.GetFieldEditorPreference()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxGetDefaultAddonOptionString: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.GetAjaxDefaultAddonOptionStringClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxSetVisitProperty: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.SetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxGetVisitProperty: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.GetAjaxVisitPropertyClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxData: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.ProcessAjaxDataClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxPing: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.GetOKClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxOpenIndexFilter: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.OpenAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxOpenIndexFilterGetContent: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.OpenAjaxIndexFilterGetContentClass()).Execute(core.cpParent).ToString();
                                 }
                             case AjaxCloseIndexFilter: {
                                     //
                                     // moved to Addons.AdminSite
-                                    core.doc.continueProcessing = false;
                                     return (new Contensive.Processor.Addons.AdminSite.CloseAjaxIndexFilterClass()).Execute(core.cpParent).ToString();
                                 }
                             default: {
                                     //
                                     // -- unknown method, log warning
-                                    core.doc.continueProcessing = false;
                                     return string.Empty;
                                 }
                         }
@@ -127,19 +117,16 @@ namespace Contensive.Processor.Controllers {
                     if (core.docProperties.getInteger(rnEmailOpenFlag) > 0) {
                         //
                         // -- Process Email Open
-                        core.doc.continueProcessing = false;
                         return (new Contensive.Processor.Addons.Primitives.OpenEmailClass()).Execute(core.cpParent).ToString();
                     }
                     if (core.docProperties.getInteger(rnEmailClickFlag) > 0) {
                         //
                         // -- Process Email click, execute and continue
-                        core.doc.continueProcessing = true;
                         (new Contensive.Processor.Addons.Primitives.ClickEmailClass()).Execute(core.cpParent).ToString();
                     }
                     if (!string.IsNullOrWhiteSpace(core.docProperties.getText(rnEmailBlockRecipientEmail))) {
                         //
                         // -- Process Email block
-                        core.doc.continueProcessing = false;
                         return (new Contensive.Processor.Addons.Primitives.BlockEmailClass()).Execute(core.cpParent).ToString();
                     }
                     //
