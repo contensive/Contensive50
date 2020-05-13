@@ -342,9 +342,9 @@ namespace Contensive.Processor.Controllers {
                         // 
                         if (ContentID != 0)
                             SQL = "select " + FieldSelectList + ""
-+ " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
-+ " where (f.Type<>0)and(f.contentid=" + ContentID + ")"
-+ "";
+                                + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
+                                + " where (f.Type<>0)and(f.contentid=" + ContentID + ")"
+                                + "";
                         else
                             SQL = "select " + FieldSelectList + ""
                             + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
@@ -352,7 +352,7 @@ namespace Contensive.Processor.Controllers {
                             + "";
                         if (!IncludeBaseFields)
                             SQL = SQL + " and ((f.IsBaseField is null)or(f.IsBaseField=0))";
-                        SQL = SQL + " order by f.contentid,f.id,h.id desc";
+                        SQL = SQL + " order by f.contentid,f.editTab,f.editSortPriority,f.id";
                         CPCSBaseClass CFields = cp.CSNew();
                         if ((CFields.OpenSQL(SQL))) {
                             fieldId = 0;
@@ -370,28 +370,22 @@ namespace Contensive.Processor.Controllers {
                                         sb.Append(System.Environment.NewLine + "\t" + "\t" + "<Field");
                                         fieldType = csv_GetFieldDescriptorByType(CFields.GetInteger("Type"));
                                         sb.Append(" Name=\"" + FieldName + "\"");
+                                        sb.Append(" Caption=\"" + CFields.GetText("Caption") + "\"");
+                                        sb.Append(" EditTab=\"" + CFields.GetText("EditTab") + "\"");
+                                        sb.Append(" FieldType=\"" + fieldType + "\"");
+                                        sb.Append(" Authorable=\"" + CFields.GetBoolean("Authorable") + "\"");
+                                        sb.Append(" EditSortPriority=\"" + CFields.GetText("EditSortPriority") + "\"");
+                                        sb.Append(" DefaultValue=\"" + CFields.GetText("DefaultValue") + "\"");
                                         sb.Append(" active=\"" + CFields.GetBoolean("Active") + "\"");
                                         sb.Append(" AdminOnly=\"" + CFields.GetBoolean("AdminOnly") + "\"");
-                                        sb.Append(" Authorable=\"" + CFields.GetBoolean("Authorable") + "\"");
-                                        sb.Append(" Caption=\"" + CFields.GetText("Caption") + "\"");
                                         sb.Append(" DeveloperOnly=\"" + CFields.GetBoolean("DeveloperOnly") + "\"");
-                                        sb.Append(" EditSortPriority=\"" + CFields.GetText("EditSortPriority") + "\"");
-                                        sb.Append(" FieldType=\"" + fieldType + "\"");
                                         sb.Append(" HTMLContent=\"" + CFields.GetBoolean("HTMLContent") + "\"");
-                                        sb.Append(" IndexColumn=\"" + CFields.GetText("IndexColumn") + "\"");
-                                        sb.Append(" IndexSortDirection=\"" + CFields.GetText("IndexSortDirection") + "\"");
-                                        sb.Append(" IndexSortOrder=\"" + CFields.GetText("IndexSortPriority") + "\"");
-                                        sb.Append(" IndexWidth=\"" + CFields.GetText("IndexWidth") + "\"");
-                                        sb.Append(" RedirectID=\"" + CFields.GetText("RedirectID") + "\"");
-                                        sb.Append(" RedirectPath=\"" + CFields.GetText("RedirectPath") + "\"");
                                         sb.Append(" Required=\"" + CFields.GetBoolean("Required") + "\"");
                                         sb.Append(" TextBuffered=\"" + CFields.GetBoolean("TextBuffered") + "\"");
                                         sb.Append(" UniqueName=\"" + CFields.GetBoolean("UniqueName") + "\"");
-                                        sb.Append(" DefaultValue=\"" + CFields.GetText("DefaultValue") + "\"");
                                         sb.Append(" RSSTitle=\"" + CFields.GetBoolean("RSSTitleField") + "\"");
                                         sb.Append(" RSSDescription=\"" + CFields.GetBoolean("RSSDescriptionField") + "\"");
                                         sb.Append(" MemberSelectGroup=\"" + memberSelectGroup + "\"");
-                                        sb.Append(" EditTab=\"" + CFields.GetText("EditTab") + "\"");
                                         sb.Append(" Scramble=\"" + CFields.GetBoolean("Scramble") + "\"");
                                         sb.Append(" LookupList=\"" + CFields.GetText("LookupList") + "\"");
                                         sb.Append(" NotEditable=\"" + CFields.GetBoolean("NotEditable") + "\"");
@@ -400,6 +394,12 @@ namespace Contensive.Processor.Controllers {
                                         sb.Append(" ManyToManyRulePrimaryField=\"" + CFields.GetText("ManyToManyRulePrimaryField") + "\"");
                                         sb.Append(" ManyToManyRuleSecondaryField=\"" + CFields.GetText("ManyToManyRuleSecondaryField") + "\"");
                                         sb.Append(" IsModified=\"" + (CFields.GetInteger("ModifiedBy") != 0) + "\"");
+                                        sb.Append(" IndexColumn=\"" + CFields.GetText("IndexColumn") + "\"");
+                                        sb.Append(" IndexSortDirection=\"" + CFields.GetText("IndexSortDirection") + "\"");
+                                        sb.Append(" IndexSortOrder=\"" + CFields.GetText("IndexSortPriority") + "\"");
+                                        sb.Append(" IndexWidth=\"" + CFields.GetText("IndexWidth") + "\"");
+                                        sb.Append(" RedirectID=\"" + CFields.GetText("RedirectID") + "\"");
+                                        sb.Append(" RedirectPath=\"" + CFields.GetText("RedirectPath") + "\"");
                                         if (true)
                                             sb.Append(" IsBaseField=\"" + CFields.GetBoolean("IsBaseField") + "\"");
                                         // 
