@@ -25,27 +25,51 @@ namespace Contensive.Processor {
         }
         //
         // ====================================================================================================
+        //
+        public override string CdnFilePathPrefix {
+            get {
+                return HttpController.getCdnFilePathPrefix(cp.core);
+            }
+        }
+        //
+        // ====================================================================================================
+        //
+        public override string CdnFilePathPrefixAbsolute {
+            get {
+                return HttpController.getCdnFilePathPrefixAbsolute(cp.core);
+            }
+        }
+        //
+        // ====================================================================================================
+        //
+        public override string WebAddressProtocolDomain {
+            get {
+                return HttpController.getWebAddressProtocolDomain(cp.core);
+            }
+        }
+        //
+        // ====================================================================================================
         /// <summary>
         /// Simple http get of a url
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
         public override string Get(string url) {
-            HttpRequestController httpRequest = new HttpRequestController();
+            HttpController httpRequest = new HttpController();
             return httpRequest.getURL(url);
         }
         //
         // ====================================================================================================
         //
         public override string Post(string url, System.Collections.Specialized.NameValueCollection requestArguments) {
-            HttpRequestController httpRequest = new HttpRequestController();
+            HttpController httpRequest = new HttpController();
             return httpRequest.postUrl(url, requestArguments);
         }
         //
         // ====================================================================================================
         //
         public override string Post(string url) {
-            HttpRequestController httpRequest = new HttpRequestController();
+            HttpController httpRequest = new HttpController();
             return httpRequest.postUrl(url);
         }
     }

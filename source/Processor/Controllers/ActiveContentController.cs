@@ -1289,14 +1289,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sendToPersonId"></param>
         /// <param name="queryStringForLinkAppend"></param>
         /// <returns></returns>
-        public static string renderHtmlForEmail(CoreController core, string Source, int sendToPersonId, string queryStringForLinkAppend) {
+        public static string renderHtmlForEmail(CoreController core, string Source, int sendToPersonId, string queryStringForLinkAppend, bool addLinkAuthToAllLinks) {
             string result = Source;
             //
             // -- create session context for this user and queue the email.
             using (CPClass cp = new CPClass(core.appConfig.name, core.serverConfig)) {
                 if (cp.User.LoginByID(sendToPersonId)) {
                     result = ContentCmdController.executeContentCommands(cp.core, result, CPUtilsClass.addonContext.ContextEmail);
-                    result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, true, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+                    result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, addLinkAuthToAllLinks, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
                 }
             };
             return result;

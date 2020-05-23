@@ -268,8 +268,7 @@ namespace Contensive.Processor {
             try {
                 if (string.IsNullOrWhiteSpace(layoutName)) { return string.Empty; }
                 using (var cs = new CsModel(cp.core)) {
-                    string sql = "select layout from ccLayouts where name=" + DbController.encodeSQLText(layoutName);
-                    cs.openSql(sql);
+                    cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
                     if (cs.ok()) { return cs.getText("layout"); }
                 }
             } catch (Exception ex) {

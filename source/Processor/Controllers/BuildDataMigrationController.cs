@@ -299,6 +299,15 @@ namespace Contensive.Processor.Controllers {
                         cp.Db.ExecuteNonQuery("update ccaddoncollections set updatable=1 where name not like '%theme%'");
                     }
                     //
+                    // -- 5.2005.19.1 conversion -- rename site property EmailUrlRootRelativePrefix to LocalFileModeProtocolDomain
+                    if (GenericController.versionIsOlder(DataBuildVersion, "5.2005.19.1")) {
+                        //
+                        // -- 
+                        if (string.IsNullOrWhiteSpace(cp.Site.GetText("webAddressProtocolDomain"))) {
+                            cp.Site.SetProperty("webAddressProtocolDomain", cp.Site.GetText("EmailUrlRootRelativePrefix"));
+                        }
+                    }
+                    //
                     // -- delete legacy corehelp collection. Created with fields that have only field name, legacy install layed collections over the application collection
                     //    new install loads fields directly from collection, which coreHelp then marks all fields inactive.
                     core.db.delete("{6e905db1-d3f0-40af-aac4-4bd78e680fae}", "ccaddoncollections");

@@ -12,7 +12,7 @@ using System.Collections.Generic;
 //
 namespace Contensive.Processor.Controllers {
     //
-    public class HttpRequestController {
+    public class HttpController {
         private WebHeaderCollection privateRequestHeaders;
         private string _password;
         private string _username;
@@ -30,13 +30,47 @@ namespace Contensive.Processor.Controllers {
         // constructor
         //======================================================================================
         //
-        public HttpRequestController() {
+        public HttpController() {
             Type myType = typeof(CoreController);
             Assembly myAssembly = Assembly.GetAssembly(myType);
             AssemblyName myAssemblyname = myAssembly.GetName();
             Version myVersion = myAssemblyname.Version;
             userAgent = "contensive/" + myVersion.Major.ToString("0") + "." + myVersion.Minor.ToString("0000") + "." + myVersion.Build.ToString("00");
             _timeout = 30000;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Return the URL protocol + domain + "/" to be used to prepend rroot relative urls in images, links, etc
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
+        public static string getCdnFilePathPrefixAbsolute(CoreController core) {
+            //
+            // -- if remote file system, return the cdnFileUrl
+            if (!core.serverConfig.isLocalFileSystem) { return core.appConfig.cdnFileUrl; }
+            //
+            // -- local file system
+            return getWebAddressProtocolDomain(core) + core.appConfig.cdnFileUrl;
+        }
+        //
+        //======================================================================================
+        public static string getCdnFilePathPrefix(CoreController core) {
+            //
+            // -- This value is determined during installation and saved in the ecdnFileUrl appConfig property
+            return core.appConfig.cdnFileUrl;
+        }
+        //
+        //======================================================================================
+        public static string getWebAddressProtocolDomain(CoreController core) {
+            //
+            // -- This value is determined during installation and saved in the ecdnFileUrl appConfig property
+            //
+            // -- local file system
+            string webAddressProtocolDomain = core.siteProperties.getText("webAddressProtocolDomain");
+            //
+            // -- if site property is empty, use https + first domain in domain list
+            return string.IsNullOrWhiteSpace(webAddressProtocolDomain) ? "https://" + core.appConfig.domainList[0] : webAddressProtocolDomain;
         }
         //
         //======================================================================================

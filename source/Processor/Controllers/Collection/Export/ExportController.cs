@@ -333,8 +333,8 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getNode(string NodeName, string NodeContent, bool deprecated) {
-            if (string.IsNullOrWhiteSpace(NodeContent)) return string.Empty;
-            return System.Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + EncodeCData(NodeContent) + "</" + NodeName + ">";
+            string xmlContent = (string.IsNullOrWhiteSpace(NodeContent)) ? "" : EncodeCData(NodeContent);
+            return Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + xmlContent + "</" + NodeName + ">";
         }
         //
         public static string getNode(string NodeName, string NodeContent)

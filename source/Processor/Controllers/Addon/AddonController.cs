@@ -341,7 +341,7 @@ namespace Contensive.Processor.Controllers {
                                             contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "");
+                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "",false);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextFilter:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
@@ -384,7 +384,7 @@ namespace Contensive.Processor.Controllers {
                                         }
                                     }
                                     int PosStart = 0;
-                                    HttpRequestController kmaHTTP = new HttpRequestController();
+                                    HttpController kmaHTTP = new HttpController();
                                     string RemoteAssetContent = kmaHTTP.getURL(RemoteAssetLink);
                                     int Pos = GenericController.strInstr(1, RemoteAssetContent, "<body", 1);
                                     if (Pos > 0) {

@@ -90,6 +90,9 @@ namespace Contensive.Processor.Controllers {
                         result += ExportController.getNode( "OnBodyEnd", CS.GetBoolean("OnBodyEnd"));
                         result += ExportController.getNode( "RemoteMethod", CS.GetBoolean("RemoteMethod"));
                         result += CS.FieldOK("Diagnostic") ? ExportController.getNode( "Diagnostic", CS.GetBoolean("Diagnostic")) : "";
+                        //
+                        // -- Presentation
+                        result += ExportController.getNode("category", CS.GetText("addoncategoryid"));
                         // 
                         // -- Process
                         result += ExportController.getNode( "ProcessRunOnce", processRunOnce);

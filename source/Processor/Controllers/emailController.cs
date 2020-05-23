@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     string subjectRendered = encodeEmailTextBody(core, false, subject, null);
-                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "");
+                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, "", subject, null, "", false);
                     string textBody = encodeEmailTextBody(core, isHTML, body, null);
                     queueEmail(core, isImmediate, emailContextMessage, new EmailSendDomainModel {
                         attempts = 0,
@@ -244,11 +244,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isHTML"></param>
         /// <param name="emailId"></param>
         /// <param name="template"></param>
-        /// <param name="EmailAllowLinkEID"></param>
+        /// <param name="addLinkAuthToAllLinks"></param>
         /// <param name="queryStringForLinkAppend"></param>
         /// <param name="emailContextMessage">Brief description for the log entry (Conditional Email, etc)</param>
         /// <returns> returns ok if send is successful, otherwise returns the principle issue as a user error</returns>
-        public static bool queuePersonEmail(CoreController core, PersonModel recipient, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailId, string template, bool EmailAllowLinkEID, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
+        public static bool queuePersonEmail(CoreController core, PersonModel recipient, string fromAddress, string subject, string body, string bounceAddress, string replyToAddress, bool Immediate, bool isHTML, int emailId, string template, bool addLinkAuthToAllLinks, ref string userErrorMessage, string queryStringForLinkAppend, string emailContextMessage) {
             bool result = false;
             try {
                 if (recipient == null) {
@@ -264,7 +264,7 @@ namespace Contensive.Processor.Controllers {
                     userErrorMessage = "Email not sent because the to-address is blocked by this application. See the Blocked Email Report.";
                 } else {
                     string subjectRendered = encodeEmailTextBody(core, false, subject, recipient);
-                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, template, subject, recipient, queryStringForLinkAppend);
+                    string htmlBody = encodeEmailHtmlBody(core, isHTML, body, template, subject, recipient, queryStringForLinkAppend, addLinkAuthToAllLinks);
                     string textBody = encodeEmailTextBody(core, isHTML, body, recipient);
                     string recipientName = (!string.IsNullOrWhiteSpace(recipient.name) && !recipient.name.ToLower().Equals("guest")) ? recipient.name : string.Empty;
                     if (string.IsNullOrWhiteSpace(recipientName)) {
@@ -983,7 +983,7 @@ namespace Contensive.Processor.Controllers {
             //
             // -- body
             if (!string.IsNullOrWhiteSpace(body)) {
-                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, "");
+                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, "", false);
             }
             //
             if (!isHTML) {
@@ -1021,17 +1021,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recipient"></param>
         /// <param name="queryStringForLinkAppend"></param>
         /// <returns></returns>
-        public static string encodeEmailHtmlBody(CoreController core, bool isHTML, string body, string template, string subject, PersonModel recipient, string queryStringForLinkAppend) {
+        public static string encodeEmailHtmlBody(CoreController core, bool isHTML, string body, string template, string subject, PersonModel recipient, string queryStringForLinkAppend, bool addLinkAuthToAllLinks) {
             int recipientId = (recipient == null) ? 0 : recipient.id;
             string recipientEmail = (recipient == null) ? "" : recipient.email;
             //
-            // -- hotfix - move template merge before link conversion to update template links also
-            string rootUrlPlusSlash = getRootRelativeUrlPlusSlash(core);
+            // -- add www website address to root relative links 
+            string webAddressProtocolDomain = HttpController.getWebAddressProtocolDomain(core);
             //
             // -- subject
             if (!string.IsNullOrWhiteSpace(subject)) {
-                subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend);
-                subject = HtmlController.convertLinksToAbsolute(subject, rootUrlPlusSlash);
+                subject = ActiveContentController.renderHtmlForEmail(core, subject, recipientId, queryStringForLinkAppend, false);
+                subject = HtmlController.convertLinksToAbsolute(subject, webAddressProtocolDomain + "/");
                 try {
                     subject = HtmlController.convertHtmlToText(core, "<body>" + subject + "</body>");
                 } catch (Exception ex) {
@@ -1044,7 +1044,7 @@ namespace Contensive.Processor.Controllers {
             //
             // -- body
             if (!string.IsNullOrWhiteSpace(body)) {
-                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend);
+                body = ActiveContentController.renderHtmlForEmail(core, body, recipientId, queryStringForLinkAppend, addLinkAuthToAllLinks);
             }
             //
             // -- encode and merge template
@@ -1053,7 +1053,7 @@ namespace Contensive.Processor.Controllers {
                 // hotfix - templates no longer have wysiwyg editors, so content may not be saved correctly - preprocess to convert wysiwyg content
                 template = ActiveContentController.processWysiwygResponseForSave(core, template);
                 //
-                template = ActiveContentController.renderHtmlForEmail(core, template, recipientId, queryStringForLinkAppend);
+                template = ActiveContentController.renderHtmlForEmail(core, template, recipientId, queryStringForLinkAppend, addLinkAuthToAllLinks);
                 if (template.IndexOf(fpoContentBox) != -1) {
                     body = GenericController.strReplace(template, fpoContentBox, body);
                 } else {
@@ -1062,7 +1062,7 @@ namespace Contensive.Processor.Controllers {
             }
             //
             // -- convert links to absolute links
-            body = HtmlController.convertLinksToAbsolute(body, rootUrlPlusSlash);
+            body = HtmlController.convertLinksToAbsolute(body, webAddressProtocolDomain + "/");
             //
             // -- support legacy replace
             body = GenericController.strReplace(body, "#member_id#", recipientId.ToString());
@@ -1078,7 +1078,7 @@ namespace Contensive.Processor.Controllers {
             if (AllowSpamFooter) {
                 //
                 // non-authorable, default true - leave it as an option in case there is an important exception
-                body += "<div style=\"padding:10px 0;\">" + GenericController.getLinkedText("<a href=\"" + rootUrlPlusSlash + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
+                body += "<div style=\"padding:10px 0;\">" + GenericController.getLinkedText("<a href=\"" + webAddressProtocolDomain + "?" + rnEmailBlockRecipientEmail + "=" + recipientEmail + "\">", core.siteProperties.getText("EmailSpamFooter", DefaultSpamFooter)) + "</div>";
             }
 
             if (body.ToLower(CultureInfo.InvariantCulture).IndexOf("<html") >= 0) {
@@ -1091,7 +1091,7 @@ namespace Contensive.Processor.Controllers {
             return "<html>"
                 + "<head>"
                 + "<Title>" + subject + "</Title>"
-                + "<Base href=\"" + rootUrlPlusSlash + "\" >"
+                + "<Base href=\"" + webAddressProtocolDomain + "\" >"
                 + "</head>"
                 + "<body class=\"ccBodyEmail\">" + body + "</body>"
                 + "</html>";
@@ -1388,14 +1388,14 @@ namespace Contensive.Processor.Controllers {
             //
             // -- open detect
             if (emailDropID != 0) {
-                string urlProtocolDomainSlash = getRootRelativeUrlPlusSlash(core);
+                string webAddressProtocolDomain = HttpController.getWebAddressProtocolDomain(core);
                 string defaultPage = core.siteProperties.serverPageDefault;
                 switch (core.siteProperties.getInteger("GroupEmailOpenTriggerMethod", 0)) {
                     case 1:
-                        EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + urlProtocolDomainSlash + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        EmailBody += "<link rel=\"stylesheet\" type=\"text/css\" href=\"" + webAddressProtocolDomain + "?" + rnEmailOpenCssFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
                         break;
                     default:
-                        EmailBody += "<img src=\"" + urlProtocolDomainSlash + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
+                        EmailBody += "<img src=\"" + webAddressProtocolDomain + "?" + rnEmailOpenFlag + "=" + emailDropID + "&" + rnEmailMemberId + "=" + sendToPersonId + "\">";
                         break;
                 }
             }
@@ -1455,27 +1455,12 @@ namespace Contensive.Processor.Controllers {
                         + BR;
                     string queryStringForLinkAppend = rnEmailClickFlag + "=" + EmailDropID + "&" + rnEmailMemberId + "=" + person.id;
                     string sendStatus = "";
-                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + getRootRelativeUrlPlusSlash(core), ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
+                    EmailController.queuePersonEmail(core, person, EmailFrom, "Email confirmation from " + HttpController.getWebAddressProtocolDomain(core), ConfirmBody, "", "", true, true, EmailDropID, EmailTemplate, EmailAllowLinkEID, ref sendStatus, queryStringForLinkAppend, emailContextMessage);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Return the URL protocol + domain + "/" to be used to prepend rroot relative urls in images, links, etc
-        /// </summary>
-        /// <param name="core"></param>
-        /// <returns></returns>
-        public static string getRootRelativeUrlPlusSlash(CoreController core) {
-            string rootUrlPlusSlash = core.siteProperties.getText("EmailUrlRootRelativePrefix");
-            rootUrlPlusSlash = string.IsNullOrWhiteSpace(rootUrlPlusSlash) ? "https://" + core.appConfig.domainList[0] + "/" : rootUrlPlusSlash + "/";
-            if (rootUrlPlusSlash.substringSafe(rootUrlPlusSlash.Length - 2, 2).Equals("//")) {
-                rootUrlPlusSlash = rootUrlPlusSlash.substringSafe(0, rootUrlPlusSlash.Length - 1);
-            }
-            return rootUrlPlusSlash;
         }
     }
 }

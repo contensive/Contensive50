@@ -65,7 +65,7 @@ namespace Contensive.Processor.Controllers {
                         MainCsvScriptCompatibilityClass mainCsv = new MainCsvScriptCompatibilityClass(core);
                         engine.AddHostObject("ccLib", mainCsv);
                     } catch (Microsoft.ClearScript.ScriptEngineException ex) {
-                        string errorMessage = getScriptEngineExceptionMessage(ex, "Adding cclib compatibility object");
+                        string errorMessage = getScriptEngineExceptionMessage(ex, "Adding cclib compatibility object ");
                         LogController.logError(core, ex, errorMessage);
                         throw new GenericException(errorMessage, ex);
                     } catch (Exception ex) {
@@ -77,7 +77,7 @@ namespace Contensive.Processor.Controllers {
                     try {
                         engine.AddHostObject("cp", core.cpParent);
                     } catch (Microsoft.ClearScript.ScriptEngineException ex) {
-                        string errorMessage = getScriptEngineExceptionMessage(ex, "Adding cclib compatibility object");
+                        string errorMessage = getScriptEngineExceptionMessage(ex, "Adding cp object ");
                         LogController.logError(core, ex, errorMessage);
                         throw new GenericException(errorMessage, ex);
                     } catch (Exception ex) {
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     } catch (Microsoft.ClearScript.ScriptEngineException ex) {
-                        string errorMessage = getScriptEngineExceptionMessage(ex, "Adding cclib compatibility object");
+                        string errorMessage = getScriptEngineExceptionMessage(ex, "executing script ");
                         LogController.logError(core, ex, errorMessage);
                         throw new GenericException(errorMessage, ex);
                     } catch (Exception ex) {
@@ -191,7 +191,7 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     } catch (Microsoft.ClearScript.ScriptEngineException ex) {
-                        string errorMessage = getScriptEngineExceptionMessage(ex, "executing code");
+                        string errorMessage = getScriptEngineExceptionMessage(ex, "executing script");
                         LogController.logError(core, ex, errorMessage);
                         throw new GenericException(errorMessage, ex);
                     } catch (Exception ex) {
@@ -212,8 +212,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ex"></param>
         /// <returns></returns>
         private static string getScriptEngineExceptionMessage(Microsoft.ClearScript.ScriptEngineException ex,string scopeDescription) {
-            string errorMsg = "Clearscript Javascript exception, " + scopeDescription;
-            errorMsg += ex.Message;
+            string errorMsg = "Clearscript exception, " + scopeDescription;
+            errorMsg += "\nex [" + ex.Message + "]";
             if (ex.Data.Count > 0) {
                 foreach (DictionaryEntry de in ex.Data) {
                     errorMsg += "\nkey [" + de.Key.ToString() + "] = [" + de.Value + "]";

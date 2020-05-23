@@ -144,14 +144,6 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override string FilePath {
-            get {
-                return cp.core.appConfig.cdnFileUrl;
-            }
-        }
-        //
-        //====================================================================================================
-        //
         public override string PageDefault {
             get {
                 return cp.core.siteProperties.serverPageDefault;
@@ -315,6 +307,15 @@ namespace Contensive.Processor {
         [Obsolete("Use CP.Utils.EncodeAppRootPath()", false)]
         public override string EncodeAppRootPath(string link) 
             => cp.Utils.EncodeAppRootPath(link);
+        //
+        //====================================================================================================
+        //
+        [Obsolete("Use CP.Http.CdnFilePathPrefix or CP.Http.CdnFilePathPrefixAbsolute", false)]
+        public override string FilePath {
+            get {
+                return cp.core.appConfig.cdnFileUrl;
+            }
+        }
         //
         //
         #region  IDisposable Support 

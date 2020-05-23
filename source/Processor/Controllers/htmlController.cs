@@ -4003,6 +4003,8 @@ namespace Contensive.Processor.Controllers {
             result = result.Replace(" href=\"", " href=\"/");
             result = result.Replace(" href=\"/http", " href=\"http");
             result = result.Replace(" href=\"/mailto", " href=\"mailto");
+            result = result.Replace(" href=\"/../", " href=\"" + urlProtocolDomainSlash);
+            result = result.Replace(" href=\"/./", " href=\"" + urlProtocolDomainSlash);
             result = result.Replace(" href=\"//", " href=\"" + urlProtocolDomainSlash);
             result = result.Replace(" href=\"/?", " href=\"" + urlProtocolDomainSlash + "?");
             result = result.Replace(" href=\"/", " href=\"" + urlProtocolDomainSlash);
