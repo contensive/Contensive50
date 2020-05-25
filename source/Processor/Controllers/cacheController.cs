@@ -88,7 +88,6 @@ namespace Contensive.Processor.Controllers {
     ///         - objects like addonList depend on it, and are flushed if ANY record in that table is updated
     ///         
     /// </summary>
-    [Serializable]
     public class CacheController : IDisposable {
         //
         // ====================================================================================================
