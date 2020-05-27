@@ -72,7 +72,7 @@ rem
 cd ..\source
 rem set assembly version
 copy "cpbase51\properties\assemblyinfo-src.cs" "cpbase51\properties\assemblyinfo.cs"
-cscript ..\scripts\replace.vbs "cpbase51\properties\assemblyinfo.cs" "0.0.0.0" "%versionNumber%"
+cscript ..\scripts\replace.vbs "cpbase51\properties\assemblyinfo.cs" "5.2005.0.0" "%versionNumber%"
 
 rem build
 "%msbuildLocation%msbuild.exe" contensiveCPBase.sln
@@ -87,16 +87,16 @@ rem ==============================================================
 rem
 rem build CPBaseClass Nuget
 rem
-cd ..\source\cpbase51
-IF EXIST "Contensive.CPBaseClass.%versionNumber%.nupkg" (
-	del "Contensive.CPBaseClass.%versionNumber%.nupkg" /Q
-)
-"nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version "%versionNumber%"
-if errorlevel 1 (
-   echo failure in nuget CPBase
-   pause
-   exit /b %errorlevel%
-)
+rem cd ..\source\cpbase51
+rem IF EXIST "Contensive.CPBaseClass.%versionNumber%.nupkg" (
+rem 	del "Contensive.CPBaseClass.%versionNumber%.nupkg" /Q
+rem )
+rem "nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version "%versionNumber%"
+rem if errorlevel 1 (
+rem    echo failure in nuget CPBase
+rem    pause
+rem    exit /b %errorlevel%
+rem )
 rem no local nuget package folder - xcopy "Contensive.CPBaseClass.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
 move /y "Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly

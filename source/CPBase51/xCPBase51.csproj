@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <Version>5.20.0.0</Version>
+    <AssemblyVersion>5.2005.0.0</AssemblyVersion>
+    <FileVersion>5.2005.0.0</FileVersion>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Contensive.CPBaseClass</PackageId>
+    <Authors>Contensive</Authors>
+    <Company>Contensive</Company>
+    <Product>Contensive Base Classes</Product>
+    <Copyright>Copyright 2020</Copyright>
+    <Description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.</Description>
+    <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>LogoBalls.png</PackageIcon>
+    <NeutralLanguage>en-US</NeutralLanguage>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>CPBase2.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BaseClasses\AddonBaseClass.cs" />
+    <Compile Include="BaseClasses\BaseAdminUIClasses\ListReportBaseClass.cs" />
+    <Compile Include="BaseClasses\BaseAdminUIClasses\ToolFormBaseClass.cs" />
+    <Compile Include="BaseClasses\CPAddonBaseClass.cs" />
+    <Compile Include="BaseClasses\CPBaseClass.cs" />
+    <Compile Include="BaseClasses\CPBlockBaseClass.cs" />
+    <Compile Include="BaseClasses\CPCacheBaseClass.cs" />
+    <Compile Include="BaseClasses\CPContentBaseClass.cs" />
+    <Compile Include="BaseClasses\CPCSBaseClass.cs" />
+    <Compile Include="BaseClasses\CPAdminUIBaseClass.cs" />
+    <Compile Include="BaseClasses\CPHttpBaseClass.cs" />
+    <Compile Include="BaseClasses\CPJSONBaseClass.cs" />
+    <Compile Include="BaseClasses\CPLogBaseClass.cs" />
+    <Compile Include="BaseClasses\CPDbBaseClass.cs" />
+    <Compile Include="BaseClasses\CPDocBaseClass.cs" />
+    <Compile Include="BaseClasses\CPEmailBaseClass.cs" />
+    <Compile Include="BaseClasses\CPFileBaseClass.cs" />
+    <Compile Include="BaseClasses\CPFileSystemBaseClass.cs" />
+    <Compile Include="BaseClasses\CPGroupBaseClass.cs" />
+    <Compile Include="BaseClasses\CPHtml5BaseClass.cs" />
+    <Compile Include="BaseClasses\CPHtmlBaseClass.cs" />
+    <Compile Include="BaseClasses\CPRequestBaseClass.cs" />
+    <Compile Include="BaseClasses\CPResponseBaseClass.cs" />
+    <Compile Include="BaseClasses\CPSiteBaseClass.cs" />
+    <Compile Include="BaseClasses\CPUserBaseClass.cs" />
+    <Compile Include="BaseClasses\CPUserErrorBaseClass.cs" />
+    <Compile Include="BaseClasses\CPUtilsBaseClass.cs" />
+    <Compile Include="BaseClasses\CPVisitBaseClass.cs" />
+    <Compile Include="BaseClasses\CPVisitorBaseClass.cs" />
+    <Compile Include="BaseModels\AppConfigBaseModel.cs" />
+    <Compile Include="BaseModels\LastestDateTrackerBaseModel.cs" />
+    <Compile Include="BaseModels\HtmlAttributesA.cs" />
+    <Compile Include="BaseModels\HtmlAttributesForm.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsClipboard.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsDrag.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsForm.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsGlobal.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsKeyboard.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsMedia.cs" />
+    <Compile Include="BaseModels\HtmlAttributesGlobal_EventsMouse.cs" />
+    <Compile Include="BaseModels\NameValueBaseModel.cs" />
+    <Compile Include="BaseModels\ServerConfigBaseModel.cs" />
+    <Compile Include="BaseModels\CaseInsensitiveDictionaryBaseModel.cs" />
+    <Compile Include="BaseModels\SimplestDataBaseModel.cs" />
+    <Compile Include="Exceptions\Exception.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="CPBase2.snk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
