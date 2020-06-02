@@ -166,7 +166,7 @@ namespace Contensive.Processor.Controllers {
                     foreach (string formKey in core.docProperties.getKeyList()) {
                         var formValue = core.docProperties.getProperty(formKey);
                         if (formValue.propertyType == DocPropertyModel.DocPropertyTypesEnum.form) {
-                            switch (GenericController.toUCase(formValue.name)) {
+                            switch (toUCase(formValue.name)) {
                                 case "S":
                                 case "MA":
                                 case "MB":
@@ -176,14 +176,14 @@ namespace Contensive.Processor.Controllers {
                                 case "TYPE":
                                     break;
                                 default:
-                                    returnResult = returnResult + HtmlController.inputHidden(formValue.name, formValue.value);
+                                    returnResult += HtmlController.inputHidden(formValue.name, formValue.value);
                                     break;
                             }
                         }
                     }
                     QueryString = core.doc.refreshQueryString;
-                    QueryString = GenericController.modifyQueryString(QueryString, "S", "");
-                    QueryString = GenericController.modifyQueryString(QueryString, "ccIPage", "");
+                    QueryString = modifyQueryString(QueryString, "S", "");
+                    QueryString = modifyQueryString(QueryString, "ccIPage", "");
                     returnResult = HtmlController.form(core, returnResult, QueryString);
                 }
             } catch (Exception ex) {
