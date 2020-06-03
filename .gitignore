@@ -251,3 +251,6 @@ paket-files/
 .idea/
 *.sln.iml
 WebDeploymentPackage/Setup.msi
+
+# User ignores
+/source/CliSetup.out.txt
