@@ -18,6 +18,7 @@
     <Authors>Contensive</Authors>
     <Company>Contensive</Company>
     <Product>Contensive Database Models</Product>
+    <PackageTags>Contensive</PackageTags>
     <Copyright>Copyright 2020</Copyright>
     <Description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.</Description>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>

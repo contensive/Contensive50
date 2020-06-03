@@ -5,6 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Contensive</Authors>
     <Company>Contensive</Company>
+    <PackageTags>Contensive</PackageTags>
     <Copyright>Copyright 2020</Copyright>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

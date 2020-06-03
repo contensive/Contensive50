@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net452</TargetFrameworks>
@@ -16,6 +16,7 @@
     <Authors>Contensive</Authors>
     <Company>Contensive</Company>
     <Product>Contensive Addon API Base Classes</Product>
+    <PackageTags>Contensive</PackageTags>
     <Copyright>Copyright 2020</Copyright>
     <Description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.</Description>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
