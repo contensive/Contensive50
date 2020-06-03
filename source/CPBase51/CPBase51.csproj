@@ -5,6 +5,9 @@
     <Version>5.2005.0.0</Version>
     <AssemblyVersion>5.2005.0.0</AssemblyVersion>
     <FileVersion>4.1.2.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Nuget">
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Contensive.CPBaseClass</PackageId>
     <Authors>Contensive</Authors>
