@@ -1,0 +1,15 @@
+<Project>
+
+  <PropertyGroup Label="Common Nuget" Condition="'$(Configuration)' == 'Release'">
+    <Version>5.2005.20.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Contensive</Authors>
+    <Company>Contensive</Company>
+    <Copyright>Copyright 2020</Copyright>
+    <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>LogoBalls.png</PackageIcon>
+    <NeutralLanguage>en-US</NeutralLanguage>
+  </PropertyGroup>
+  
+</Project>
