@@ -12,6 +12,7 @@ using Contensive.Processor.Exceptions;
 using System.Linq;
 using System.IO;
 using System.Globalization;
+using System.Reflection;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -1438,7 +1439,7 @@ namespace Contensive.Processor.Controllers {
         // the the name of the current executable
         //
         public static string getAppExeName() {
-            return Path.GetFileName(System.Windows.Forms.Application.ExecutablePath);
+            return Path.GetFileName(Assembly.GetEntryAssembly()?.Location);
         }
         //
         //====================================================================================================
