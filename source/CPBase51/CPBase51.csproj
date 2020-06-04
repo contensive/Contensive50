@@ -11,6 +11,7 @@
 
   <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
     <Version>5.2005.0.0</Version>
+    <FileVersion>4.1.2.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Contensive.CPBaseClass</PackageId>
     <Authors>Contensive</Authors>
