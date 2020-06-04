@@ -1,492 +1,126 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\Microsoft.NetFramework.Analyzers.2.9.8\build\Microsoft.NetFramework.Analyzers.props" Condition="Exists('..\packages\Microsoft.NetFramework.Analyzers.2.9.8\build\Microsoft.NetFramework.Analyzers.props')" />
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>Contensive.Processor</RootNamespace>
     <AssemblyName>processor</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup>
+
+  <PropertyGroup Label="Signing">
     <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>signingKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Amazon.ElastiCacheCluster, Version=1.0.1.0, Culture=neutral, PublicKeyToken=445456c82d5a0fce, processorArchitecture=MSIL">
-      <HintPath>..\packages\Amazon.ElastiCacheCluster.1.0.1.0\lib\net35\Amazon.ElastiCacheCluster.dll</HintPath>
-    </Reference>
-    <Reference Include="AWS.Logger.Core, Version=1.6.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWS.Logger.Core.1.6.0\lib\net45\AWS.Logger.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.CloudWatchLogs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.101.101\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.Core.3.3.105.5\lib\net45\AWSSDK.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.S3.3.3.110.42\lib\net45\AWSSDK.S3.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.SimpleEmail, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.122\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.SimpleNotificationService, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SimpleNotificationService.3.3.101.140\lib\net45\AWSSDK.SimpleNotificationService.dll</HintPath>
-    </Reference>
-    <Reference Include="AWSSDK.SQS, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWSSDK.SQS.3.3.102.83\lib\net45\AWSSDK.SQS.dll</HintPath>
-    </Reference>
-    <Reference Include="ClearScript, Version=6.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
-      <HintPath>..\packages\Microsoft.ClearScript.6.0.0\lib\net45\ClearScript.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="ContensiveDbModels, Version=5.2005.20.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.5.2005.20.1\lib\net461\ContensiveDbModels.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.5.2005.20.1\lib\net472\CPBase.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
-      <HintPath>..\packages\EnyimMemcached.2.16.0\lib\net35\Enyim.Caching.dll</HintPath>
-    </Reference>
-    <Reference Include="Enyim.Caching.NLogAdapter, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
-      <HintPath>..\packages\EnyimMemcached-NLog.2.16.0\lib\net35\Enyim.Caching.NLogAdapter.dll</HintPath>
-    </Reference>
-    <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
-      <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="Microsoft.Web.Administration, Version=7.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.7.0\lib\net45\NLog.dll</HintPath>
-    </Reference>
-    <Reference Include="NLog.AWS.Logger, Version=1.5.2.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
-      <HintPath>..\packages\AWS.Logger.NLog.1.5.2\lib\net45\NLog.AWS.Logger.dll</HintPath>
-    </Reference>
-    <Reference Include="NUglify, Version=1.5.14.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUglify.1.5.14\lib\net40\NUglify.dll</HintPath>
-    </Reference>
-    <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
-      <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.ComponentModel.Composition" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.Entity.Design" />
-    <Reference Include="System.Data.OracleClient" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.IO.Compression" />
-    <Reference Include="System.Net" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.ServiceModel" />
-    <Reference Include="System.ServiceProcess" />
-    <Reference Include="System.Transactions" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+
+  <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
+    <Version>5.2005.20.1</Version>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>Contensive.Processor</PackageId>
+    <Authors>Contensive</Authors>
+    <Company>Contensive</Company>
+    <Product>Contensive Processor</Product>
+    <PackageTags>Contensive</PackageTags>
+    <Copyright>Copyright 2020</Copyright>
+    <Description>This package installs the library files required to create an instance of cp within an application.</Description>
+    <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>LogoBalls.png</PackageIcon>
+    <NeutralLanguage>en-US</NeutralLanguage>
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget">
+    <None Include="..\images\LogoBalls.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="resources\web.config.transform">
+      <Pack>True</Pack>
+      <PackagePath>content</PackagePath>
+    </None>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Addons\AdminSite\Controllers\ListGridController.cs" />
-    <Compile Include="Addons\AdminSite\Controllers\ProcessActionController.cs" />
-    <Compile Include="Addons\AdminSite\Models\ButtonMetadata.cs" />
-    <Compile Include="Addons\AdminSite\SortingStateEnum.cs" />
-    <Compile Include="Addons\AdminSite\FindWordMatchEnum.cs" />
-    <Compile Include="Addons\AdminSite\Constants.cs" />
-    <Compile Include="Addons\AdminSite\Models\EditButtonBarInfoClass.cs" />
-    <Compile Include="Addons\AdminSite\Models\RecordEditHeaderInfoClass.cs" />
-    <Compile Include="Addons\AdminSite\Models\EditRecordFieldModel.cs" />
-    <Compile Include="Addons\AdminSite\Models\EditRecordModel.cs" />
-    <Compile Include="Addons\AdminSite\Models\FieldTypeEditorAddonModel.cs" />
-    <Compile Include="Addons\AdminSite\Models\FieldEditorAddonModel.cs" />
-    <Compile Include="Addons\AdminSite\Views\EditorRowClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\EditViewTabList.cs" />
-    <Compile Include="Addons\Authentication\GetLoginButtonFormClass.cs" />
-    <Compile Include="Addons\Authentication\Authenticate.cs" />
-    <Compile Include="Addons\Diagnostics\ServerDiagnosticClass.cs" />
-    <Compile Include="Addons\Email\BlockEmail.cs" />
-    <Compile Include="Addons\Housekeeping\ContentFieldsClass.cs" />
-    <Compile Include="Addons\Housekeeping\MetadataClass.cs" />
-    <Compile Include="Addons\Housekeeping\ActivityLogClass.cs" />
-    <Compile Include="Addons\Housekeeping\MemberRuleClass.cs" />
-    <Compile Include="Addons\Housekeeping\GroupRulesClass.cs" />
-    <Compile Include="Addons\Housekeeping\ContentWatchClass.cs" />
-    <Compile Include="Addons\Housekeeping\ContentWatchListRulesClass.cs" />
-    <Compile Include="Addons\Housekeeping\FieldHelpClass.cs" />
-    <Compile Include="Addons\Housekeeping\AddonContentFieldTypeRuleClass.cs" />
-    <Compile Include="Addons\Housekeeping\AddonContentTriggerRuleClass.cs" />
-    <Compile Include="Addons\Housekeeping\LinkAliasClass.cs" />
-    <Compile Include="Addons\Housekeeping\ViewingSummaryClass.cs" />
-    <Compile Include="Addons\Housekeeping\EmailBounceListClass.cs" />
-    <Compile Include="Addons\Housekeeping\_Class.cs" />
-    <Compile Include="Addons\Housekeeping\HourlyTasksClass.cs" />
-    <Compile Include="Addons\Housekeeping\DailyTasksClass.cs" />
-    <Compile Include="Addons\Housekeeping\RemoteQueryClass.cs" />
-    <Compile Include="Addons\Housekeeping\PersonClass.cs" />
-    <Compile Include="Addons\Housekeeping\ViewingsClass.cs" />
-    <Compile Include="Addons\Housekeeping\EmailDropClass.cs" />
-    <Compile Include="Addons\Housekeeping\VisitorClass.cs" />
-    <Compile Include="Addons\Housekeeping\VisitSummaryClass.cs" />
-    <Compile Include="Addons\Housekeeping\SoftwareUpdatesClass.cs" />
-    <Compile Include="Addons\Housekeeping\AddonFolderClass.cs" />
-    <Compile Include="Addons\Housekeeping\UserPropertiesClass.cs" />
-    <Compile Include="Addons\Housekeeping\VisitPropertyClass.cs" />
-    <Compile Include="Addons\Housekeeping\VisitorPropertyClass.cs" />
-    <Compile Include="Addons\Housekeeping\PageContentClass.cs" />
-    <Compile Include="Addons\Housekeeping\TempFilesClass.cs" />
-    <Compile Include="Addons\Housekeeping\VisitClass.cs" />
-    <Compile Include="Addons\Housekeeping\EmailLogClass.cs" />
-    <Compile Include="Addons\Housekeeping\HouseKeepEnvironmentModel.cs" />
-    <Compile Include="Addons\NewApp\NewAppClass.cs" />
-    <Compile Include="Addons\OnInstallBase51.cs" />
-    <Compile Include="Addons\Diagnostics\StatusClass.cs" />
-    <Compile Include="Addons\Email\Download.cs" />
-    <Compile Include="Addons\SeeAlso\SeeAlsoClass.cs" />
-    <Compile Include="Addons\Tools\manualQueryClass.cs" />
-    <Compile Include="Addons\Tools\CreateGUIDToolClass.cs" />
-    <Compile Include="Addons\Tools\IISResetToolClass.cs" />
-    <Compile Include="Addons\Tools\FindAndReplaceToolClass.cs" />
-    <Compile Include="Addons\Tools\WebsiteFileManagerToolClass.cs" />
-    <Compile Include="Addons\Tools\ContentFileManagerToolClass.cs" />
-    <Compile Include="Addons\Tools\DbSchemaToolClass.cs" />
-    <Compile Include="Addons\Tools\ConfigureListClass.cs" />
-    <Compile Include="Addons\Tools\CreateContentDefinitionClass.cs" />
-    <Compile Include="Addons\Tools\CreateChildContentDefinitionClass.cs" />
-    <Compile Include="Addons\Tools\SyncTablesClass.cs" />
-    <Compile Include="Addons\Tools\DbIndexToolClass.cs" />
-    <Compile Include="Addons\Tools\ContentSchemaToolClass.cs" />
-    <Compile Include="Addons\Tools\LogFileToolClass.cs" />
-    <Compile Include="Addons\Tools\ContentChildToolClass.cs" />
-    <Compile Include="Addons\Tools\HouseKeepingControlClass.cs" />
-    <Compile Include="Addons\Tools\_empty.cs" />
-    <Compile Include="Addons\WhatsRelated\WhatsRelatedClass.cs" />
-    <Compile Include="Controllers\Addon\AddonControllerScript.cs" />
-    <Compile Include="Controllers\AdminUI\AdminUIEditorController.cs" />
-    <Compile Include="Controllers\AdminUI\ListReportController.cs" />
-    <Compile Include="Controllers\AdminUI\ToolFormController.cs" />
-    <Compile Include="Controllers\Aws\AwsSqsController.cs" />
-    <Compile Include="Controllers\Aws\AwsSnsController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportLayoutController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportAddonController.cs" />
-    <Compile Include="Controllers\Collection\CollectionFolderController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportTemplateController.cs" />
-    <Compile Include="Controllers\Collection\Install\CollectionInstallTemplateController.cs" />
-    <Compile Include="Controllers\Collection\Install\CollectionInstallMetadataController.cs" />
-    <Compile Include="Controllers\Collection\Install\CollectionInstallLayoutController.cs" />
-    <Compile Include="Controllers\Collection\Install\CollectionInstallAddonController.cs" />
-    <Compile Include="Controllers\Collection\CollectionLibraryController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportDataRecordController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportController.cs" />
-    <Compile Include="Controllers\Collection\Export\ExportResourceListController.cs" />
-    <Compile Include="Controllers\XmlController.cs" />
-    <Compile Include="Controllers\PermissionController.cs" />
-    <Compile Include="Controllers\Aws\AwsSesController.cs" />
-    <Compile Include="Controllers\UpgradeController.cs" />
-    <Compile Include="Controllers\RouteController.cs" />
-    <Compile Include="Controllers\ContentController.cs" />
-    <Compile Include="Controllers\EmailHippoController.cs" />
-    <Compile Include="Controllers\BuildDataMigrationController.cs" />
-    <Compile Include="Exceptions\Exceptions.cs" />
-    <Compile Include="Addons\AdminSite\Views\EditViewTabControlInfo.cs" />
-    <Compile Include="Controllers\AdminUI\LinkAliasEditor.cs" />
-    <Compile Include="Addons\Tools\DownloadManager.cs" />
-    <Compile Include="Addons\AdminSite\Views\RootView.cs" />
-    <Compile Include="Addons\AdminSite\Views\QuickStatsView.cs" />
-    <Compile Include="Addons\AdminSite\Views\EditView.cs" />
-    <Compile Include="Addons\Tools\ToolCustomReports.cs" />
-    <Compile Include="Addons\AdminSite\Views\EditorConfigView.cs" />
-    <Compile Include="Addons\AdminSite\_BlankEditor.cs" />
-    <Compile Include="Addons\AdminSite\Models\AdminDataModel.cs" />
-    <Compile Include="Addons\AdminSite\Controllers\AdminErrorController.cs" />
-    <Compile Include="Addons\AdminSite\Views\ListViewExport.cs" />
-    <Compile Include="Addons\AdminSite\Views\ListViewAdvancedSearch.cs" />
-    <Compile Include="Addons\AdminSite\Models\IndexConfigClass.cs" />
-    <Compile Include="Controllers\AdminUI\GroupRuleEditor.cs" />
-    <Compile Include="Addons\AdminSite\Views\ListView.cs" />
-    <Compile Include="Addons\AdminSite\Views\ListViewSetColumns.cs" />
-    <Compile Include="Addons\ExportSql\ExportCsvClass.cs" />
-    <Compile Include="Addons\PageManager\GetChildPageList.cs" />
-    <Compile Include="Addons\Tools\DefineContentFieldsFromTable.cs" />
-    <Compile Include="Addons\Tools\_sample.cs" />
-    <Compile Include="Addons\Tools\CacheToolClass.cs" />
-    <Compile Include="Addons\_blank.cs" />
-    <Compile Include="Addons\SafeAddonManager\AddonManagerClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\CloseAjaxIndexFilter.cs" />
-    <Compile Include="Addons\AdminSite\Views\GetHtmlBodyClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetAjaxDefaultAddonOptionString.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetAjaxVisitProperty.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetFieldEditorPreference.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\GetOkClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilter.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\OpenAjaxIndexFilterGetContent.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\ProcessAjaxDataClass.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAdminSiteFieldHelp.cs" />
-    <Compile Include="Addons\AdminSite\Views\RemoteMethods\SetAjaxVisitPropertyClass.cs" />
-    <Compile Include="Addons\Email\ValicateEmail2.cs" />
-    <Compile Include="Addons\Email\ClickEmail.cs" />
-    <Compile Include="Addons\FaviconIco\faviconIco.cs" />
-    <Compile Include="Addons\Email\OpenEmail.cs" />
-    <Compile Include="Addons\Editors\ProcessActiveEditor.cs" />
-    <Compile Include="Addons\Editors\ProcessAddonSettingsEditor.cs" />
-    <Compile Include="Addons\Editors\ProcessAddonStyleEditor.cs" />
-    <Compile Include="Addons\Download\processExportAsciiMethod.cs" />
-    <Compile Include="Addons\Authentication\processLoginDefault.cs" />
-    <Compile Include="Addons\Editors\processFormQuickEditing.cs" />
-    <Compile Include="Addons\ToolPanel\processFormToolsPanel.cs" />
-    <Compile Include="Addons\Editors\processHelpBubbleEditor.cs" />
-    <Compile Include="Addons\Authentication\processJoinForm.cs" />
-    <Compile Include="Addons\Authentication\processLoginDefaultMethod.cs" />
-    <Compile Include="Addons\Authentication\processLoginMethod.cs" />
-    <Compile Include="Addons\Authentication\processLogoutLoginMethod.cs" />
-    <Compile Include="Addons\Authentication\processLogoutMethod.cs" />
-    <Compile Include="Addons\Redirect\processRedirectMethod.cs" />
-    <Compile Include="Addons\ResourceLibrary\processResourceLibraryMethod.cs" />
-    <Compile Include="Addons\Authentication\processSendPasswordForm.cs" />
-    <Compile Include="Addons\Authentication\processSendPasswordMethod.cs" />
-    <Compile Include="Addons\SiteExplorer\processSiteExplorerMethod.cs" />
-    <Compile Include="Addons\Editors\processSiteStyleEditor.cs" />
-    <Compile Include="Addons\RobotsTxt\robotsTxt.cs" />
-    <Compile Include="Addons\Email\processEmailClass.cs" />
-    <Compile Include="Addons\Housekeeping\HouseKeepClass.cs" />
-    <Compile Include="Addons\Authentication\GetLoginFormClass.cs" />
-    <Compile Include="Addons\Authentication\GetLoginPageClass.cs" />
-    <Compile Include="Addons\PageManager\saveChildPageListDraggableClass.cs" />
-    <Compile Include="Addons\PageManager\GetHtmlBodyClass.cs" />
-    <Compile Include="Addons\Tools\ConfigureEditClass.cs" />
-    <Compile Include="Constants.cs" />
-    <Compile Include="Controllers\Addon\AddonController.cs" />
-    <Compile Include="Controllers\Collection\Install\CollectionInstallController.cs" />
-    <Compile Include="Controllers\AdminUI\AdminUIController.cs" />
-    <Compile Include="Controllers\BuildController.cs" />
-    <Compile Include="Controllers\CacheController.cs" />
-    <Compile Include="Controllers\ContentCmdController.cs" />
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Models\Domain\DocPropertyModel.cs" />
-    <Compile Include="Models\Domain\CsModel.cs" />
-    <Compile Include="Controllers\DbController.cs" />
-    <Compile Include="Controllers\DbServerController.cs" />
-    <Compile Include="Controllers\LinkAliasController.cs" />
-    <Compile Include="Controllers\DocController.cs" />
-    <Compile Include="Models\Domain\DocPropertiesModel.cs" />
-    <Compile Include="Controllers\EditorController.cs" />
-    <Compile Include="Controllers\EmailController.cs" />
-    <Compile Include="Controllers\ErrorController.cs" />
-    <Compile Include="Controllers\ExportAsciiController.cs" />
-    <Compile Include="Controllers\FileController.cs" />
-    <Compile Include="Controllers\GenericController.cs" />
-    <Compile Include="Controllers\GroupController.cs" />
-    <Compile Include="Controllers\ActiveContentController.cs" />
-    <Compile Include="Controllers\HtmlParseStaticController.cs" />
-    <Compile Include="Controllers\HtmlController.cs" />
-    <Compile Include="Controllers\HtmlParserController.cs" />
-    <Compile Include="Controllers\HttpController.cs" />
-    <Compile Include="Controllers\WebServerController.cs" />
-    <Compile Include="Controllers\ImageEditController.cs" />
-    <Compile Include="Controllers\IpDaemonController.cs" />
-    <Compile Include="Controllers\KeyPtrController.cs" />
-    <Compile Include="Controllers\LogController.cs" />
-    <Compile Include="Controllers\LoginController.cs" />
-    <Compile Include="Models\Domain\EditTabModel.cs" />
-    <Compile Include="Controllers\PageContentController.cs" />
-    <Compile Include="Controllers\RemoteQueryController.cs" />
-    <Compile Include="Controllers\SecurityController.cs" />
-    <Compile Include="Controllers\SitePropertiesController.cs" />
-    <Compile Include="Controllers\EmailSmtpController.cs" />
-    <Compile Include="Controllers\StringBuilderLegacyController.cs" />
-    <Compile Include="Controllers\TaskRunnerController.cs" />
-    <Compile Include="Controllers\TaskSchedulerController.cs" />
-    <Compile Include="Controllers\WorkflowController.cs" />
-    <Compile Include="Controllers\QuickEditController.cs" />
-    <Compile Include="Controllers\MetadataController.cs" />
-    <Compile Include="Controllers\_BlankController.cs" />
-    <Compile Include="Extensions\extensionMethodsClass.cs" />
-    <Compile Include="Extensions\webClientExtensionClass.cs" />
-    <Compile Include="Models\Domain\AppConfigModel.cs" />
-    <Compile Include="Controllers\CoreController.cs" />
-    <Compile Include="Models\Domain\NameValueModel.cs" />
-    <Compile Include="Models\Domain\AddonCacheModel.cs" />
-    <Compile Include="Models\Domain\CollectionFolderModel.cs" />
-    <Compile Include="Models\Domain\CollectionLibraryModel.cs" />
-    <Compile Include="Models\Domain\AssemblyFileDetails.cs" />
-    <Compile Include="Models\Domain\MockEmailClass.cs" />
-    <Compile Include="Models\Domain\FieldEditorType.cs" />
-    <Compile Include="Models\Domain\GoogleVisualizationModels.cs" />
-    <Compile Include="Models\Domain\CacheDocumentClass.cs" />
-    <Compile Include="Models\Domain\CacheInputSelectClass.cs" />
-    <Compile Include="Models\Domain\PageFormModel.cs" />
-    <Compile Include="Models\Domain\PageFormFieldModel.cs" />
-    <Compile Include="Models\Domain\EmailSendDomainModel.cs" />
-    <Compile Include="Models\Domain\AwsCredentialsModel.cs" />
-    <Compile Include="Models\Domain\GroupRuleType.cs" />
-    <Compile Include="Models\Domain\LastestDateTracker.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Views\AdminUI\CPAdminUIListReportClass.cs" />
-    <Compile Include="Views\AdminUI\CPAdminUIToolFormClass.cs" />
-    <Compile Include="Views\AdminUI\CPAdminUIClass.cs" />
-    <Compile Include="Views\CPHttpClass.cs" />
-    <Compile Include="Views\CPJSONClass.cs" />
-    <Compile Include="Views\CPLogClass.cs" />
-    <Compile Include="Views\CPAddonClass.cs" />
-    <Compile Include="Views\CPBlockClass.cs" />
-    <Compile Include="Views\CPCacheClass.cs" />
-    <Compile Include="Views\CPClass.cs" />
-    <Compile Include="Views\CPContentClass.cs" />
-    <Compile Include="Views\CPCSClass.cs" />
-    <Compile Include="Views\CPDbClass.cs" />
-    <Compile Include="Views\CPDocClass.cs" />
-    <Compile Include="Views\CPEmailClass.cs" />
-    <Compile Include="Views\CPFileClass.cs" />
-    <Compile Include="Views\CPFileSystemClass.cs" />
-    <Compile Include="Views\CPGroupClass.cs" />
-    <Compile Include="Views\CPHtmlClass.cs" />
-    <Compile Include="Views\CPHtml5Class.cs" />
-    <Compile Include="Views\CPRequestClass.cs" />
-    <Compile Include="Views\CPResponseClass.cs" />
-    <Compile Include="Views\CPSiteClass.cs" />
-    <Compile Include="Views\CPUserClass.cs" />
-    <Compile Include="Views\CPUserErrorClass.cs" />
-    <Compile Include="Views\CPUtilsClass.cs" />
-    <Compile Include="Views\CPVisitClass.cs" />
-    <Compile Include="Views\CPVisitorClass.cs" />
-    <Compile Include="Views\mainCsvCompatibilityClass.cs" />
-    <Compile Include="Models\Domain\ContentFieldMetadataModel.cs" />
-    <Compile Include="Models\Domain\ContentMetadataModel.cs" />
-    <Compile Include="Models\Domain\RouteMapModel.cs" />
-    <Compile Include="Models\Domain\TableSchemeModel.cs" />
-    <Compile Include="Controllers\SessionController.cs" />
-    <Compile Include="Models\Domain\MetadataMiniCollectionModel.cs" />
-    <Compile Include="Models\Domain\PropertyModel.cs" />
-    <Compile Include="Models\Domain\StylesheetContextModel.cs" />
-    <Compile Include="Models\Domain\UploadFileModel.cs" />
-    <Compile Include="Models\Domain\_BlankModel.cs" />
-    <Compile Include="Models\Domain\ServerConfigModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
-    <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
+
+  <ItemGroup Label="Content">
+    <None Remove="Addons\AdminSite\Resources\*.html" />
+    <None Remove="aoBase51.xml" />
+    <None Remove="Resources\*.txt" />
+    <None Remove="Resources\*.html" />
+    <None Remove="Resources\*.png" />
+    <None Remove="Resources\Icons\*.txt" />
+
+    <Content Include="Addons\AdminSite\Resources\*.html" />
     <Content Include="aoBase51.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Resources\adminNavBarHtml.txt" />
-    <Content Include="Resources\adminTemplateHtml.txt" />
-    <Content Include="Resources\ContensiveLogo-64x64.png" />
-    <Content Include="Resources\defaultAddonListJson.txt" />
-    <Content Include="Resources\defaultEmailBlockedResponsePage.html" />
-    <Content Include="Resources\defaultLogin_email_html.txt" />
-    <Content Include="Resources\defaultForgetPassword_html.txt" />
-    <Content Include="Resources\defaultLogin_email_autoLogin_html.txt" />
-    <Content Include="Resources\defaultLogin_html.txt" />
-    <Content Include="Resources\defaultLogin_autoLogin_html.txt" />
-    <Content Include="Resources\DefaultTemplateHtml.txt" />
-    <Content Include="Resources\Icons\AdminHeaderIconSettings.txt" />
-    <Content Include="Resources\Icons\IdeaAdminHeaderIconAddonManager.txt" />
-    <Content Include="Resources\LogoutButtonFormHtml.txt" />
-    <Content Include="Resources\LoginButtonFormHtml.txt" />
-    <Content Include="Resources\sqlConditionalEmail-DaysAfterJoin.txt" />
-    <Content Include="Resources\sqlTriggerManyManyRule.txt" />
+    <Content Include="Resources\*.txt" />
+    <Content Include="Resources\*.html" />
+    <Content Include="Resources\*.png" />
+    <Content Include="Resources\Icons\*.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Db\" />
-    <Folder Include="Models\View\" />
-  </ItemGroup>
-  <ItemGroup>
+
+  <ItemGroup Label="Editor Config">
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
-    <None Include="app.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="packages.config" />
-    <None Include="Processor.nuspec">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Resources\web.config.transform" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
+
+  <ItemGroup Label="Resources">
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\AWSSDK.CloudWatchLogs.3.3.101.101\analyzers\dotnet\cs\AWSSDK.CloudWatchLogs.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.S3.3.3.110.42\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.SimpleEmail.3.3.101.122\analyzers\dotnet\cs\AWSSDK.SimpleEmail.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.SimpleNotificationService.3.3.101.140\analyzers\dotnet\cs\AWSSDK.SimpleNotificationService.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\AWSSDK.SQS.3.3.102.83\analyzers\dotnet\cs\AWSSDK.SQS.CodeAnalysis.dll" />
-    <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.NetFramework.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.NetFramework.Analyzers.2.9.8\analyzers\dotnet\cs\Microsoft.NetFramework.CSharp.Analyzers.dll" />
+
+  <ItemGroup Label="Settings">
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
+
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
+    <ProjectReference Include="..\CPBase51\CPBase51.csproj" />
+    <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
-  <Import Project="..\packages\Microsoft.ClearScript.6.0.0\build\net45\Microsoft.ClearScript.targets" Condition="Exists('..\packages\Microsoft.ClearScript.6.0.0\build\net45\Microsoft.ClearScript.targets')" />
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Microsoft.ClearScript.6.0.0\build\net45\Microsoft.ClearScript.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.ClearScript.6.0.0\build\net45\Microsoft.ClearScript.targets'))" />
-    <Error Condition="!Exists('..\packages\Microsoft.NetFramework.Analyzers.2.9.8\build\Microsoft.NetFramework.Analyzers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.NetFramework.Analyzers.2.9.8\build\Microsoft.NetFramework.Analyzers.props'))" />
-  </Target>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.ElastiCacheCluster" Version="1.0.1" />
+    <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.13" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.111.5" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.158" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.176" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.102.119" />
+    <PackageReference Include="EnyimMemcached" Version="2.16.0" />
+    <PackageReference Include="EnyimMemcached-NLog" Version="2.16.0" />
+    <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
+    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Web.Administration" Version="7.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="NLog" Version="4.7.2" />
+    <PackageReference Include="NUglify" Version="1.5.14" />
+    <PackageReference Include="Nustache" Version="1.16.0.10" />
+    <PackageReference Include="SharpZipLib" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System.Data.Entity.Design" />
+    <Reference Include="System.Runtime.Caching" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
+  </ItemGroup>
+
 </Project>

@@ -243,13 +243,16 @@ namespace Contensive.Processor.Properties {
         ///    &lt;label for=&quot;name432&quot;&gt;{{listCaption}}&lt;/label&gt;
         ///    &lt;!-- list --&gt;
         ///    &lt;div class=&quot;ml-5&quot;&gt;
-        ///        {{#rowList}}
-        ///        &lt;!-- row repeat --&gt;
-        ///        &lt;div class=&quot;row pb-1 border-bottom border-light&quot;&gt;
+        ///        &lt;div class=&quot;row pb-1&quot;&gt;
         ///            &lt;!-- checkbox and group name --&gt;
-        ///            &lt;div class=&quot;col-sm-4&quot;&gt;&lt;label class=&quot;checkbox-inline&quot;&gt;{{{checkboxInput}}}&amp;nbsp;{{{groupCaption}}}&lt;/label&gt;&lt;/div&gt;
+        ///            &lt;div class=&quot;col-sm-3&quot;&gt;&amp;nbsp;&lt;/div&gt;
         ///            &lt;!-- expiration date --&gt;
-        ///            &lt;div class=&quot;col-sm-4&quot;&gt;{{{expiresI [rest of string was truncated]&quot;;.
+        ///            &lt;div class=&quot;col-sm-3&quot;&gt;Expires&lt;/div&gt;
+        ///            &lt;!-- Role --&gt;
+        ///            &lt;div class=&quot;col-sm-3&quot;&gt;Role&lt;/div&gt;
+        ///            &lt;!-- Links --&gt;
+        ///            &lt;div class=&quot;col-sm-3&quot;&gt;&amp;nbsp;&lt;/div&gt;
+        ///  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string GroupRuleEditorRow2 {
             get {
@@ -283,16 +286,18 @@ namespace Contensive.Processor.Properties {
         ///   Looks up a localized string similar to 
         ///
         ///SELECT Distinct 
-        /// ccEmail.TestMemberID AS TestMemberID,ccEmail.ID as EmailID,ccEmail.BlockSiteStyles,ccEmail.stylesFilename
+        /// ccEmail.TestMemberID AS TestMemberID
+        /// ,ccEmail.ID AS EmailID
+        /// ,ccEmail.BlockSiteStyles
+        /// ,ccEmail.stylesFilename
         /// ,ccMembers.ID AS MemberID
         /// ,ccMemberRules.DateExpires AS DateExpires
-        /// from ((((ccEmail
+        /// FROM ((((ccEmail
         /// LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)
         /// LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)
         /// LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)
         /// LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)
-        /// Where (ccEmail.id Is Not Null)
-        /// a [rest of string was truncated]&quot;;.
+        /// WHERE (ccEmail.id Is Not  [rest of string was truncated]&quot;;.
         /// </summary>
         public static string sqlConditionalEmail_DaysAfterJoin {
             get {
