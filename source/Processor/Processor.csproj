@@ -14,6 +14,10 @@
   <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
     <Version>5.2005.20.1</Version>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn Label="FIX IT: Disable missing docs warnings">1701;1702;1570;1572;1573;1587;1591</NoWarn>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageId>Contensive.Processor</PackageId>
     <Authors>Contensive</Authors>
     <Company>Contensive</Company>

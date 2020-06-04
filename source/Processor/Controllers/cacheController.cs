@@ -234,7 +234,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get a cache object from the cache. returns the cacheObject that wraps the object
         /// </summary>
-        /// <typeparam name="returnType"></typeparam>
         /// <param name="key"></param>
         /// <returns></returns>
         private CacheDocumentClass getCacheDocument(string key) {
