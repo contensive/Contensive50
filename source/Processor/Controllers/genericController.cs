@@ -1480,13 +1480,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="start"></param>
         /// <param name="haystack"></param>
         /// <param name="needle"></param>
-        /// <param name="ignore"></param>
         /// <returns></returns>
-        public static bool isInStr(int start, string haystack, string needle, Microsoft.VisualBasic.CompareMethod ignore = Microsoft.VisualBasic.CompareMethod.Text) {
-            return (haystack.IndexOf(needle, start - 1, System.StringComparison.InvariantCultureIgnoreCase) + 1 >= 0);
-        }
-        //
-        // ====================================================================================================
         public static bool isInStr(int start, string haystack, string needle) {
             return (haystack.IndexOf(needle, start - 1, System.StringComparison.InvariantCultureIgnoreCase) + 1 >= 0);
         }
