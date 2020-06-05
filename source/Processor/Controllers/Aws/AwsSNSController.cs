@@ -9,6 +9,8 @@ using Amazon.SimpleNotificationService;
 using Amazon.Runtime;
 using Amazon.Runtime.CredentialManagement;
 using Amazon.SQS;
+using Contensive.Processor.Extensions;
+
 //
 namespace Contensive.Processor.Controllers {
     public class AwsSnsController {
@@ -32,8 +34,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="topic"></param>
         /// <returns></returns>
         public static string createTopic(CoreController core, AmazonSimpleNotificationServiceClient snsClient, string topic) {
-            try {
+            try
+            {
+#if NETFRAMEWORK
                 var topicResponse = snsClient.CreateTopic(core.appConfig.name + "_" + topic);
+#else
+                var topicResponse = snsClient.CreateTopicAsync(core.appConfig.name + "_" + topic).WaitSynchronously();
+#endif
                 return topicResponse.TopicArn;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -49,7 +56,11 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static List<string> getTopicList( CoreController core, AmazonSimpleNotificationServiceClient snsClient) {
             var result = new List<string>();
+#if NETFRAMEWORK
             var listTopicsResponse = snsClient.ListTopics();
+#else
+            var listTopicsResponse = snsClient.ListTopicsAsync().WaitSynchronously();
+#endif
             foreach ( var topic in listTopicsResponse.Topics) {
                 result.Add(topic.ToString());
             }
@@ -59,7 +70,11 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         public void subscribeQueue( CoreController core, AmazonSimpleNotificationServiceClient snsClient, AmazonSQSClient sqsClient, string topicArn, string queueURL) {
+#if NETFRAMEWORK
             snsClient.SubscribeQueue(topicArn, sqsClient, queueURL);
+#else
+            snsClient.SubscribeQueueAsync(topicArn, sqsClient, queueURL).WaitSynchronously();
+#endif
         }
     }
 }

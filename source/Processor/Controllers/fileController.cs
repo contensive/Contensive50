@@ -12,6 +12,8 @@ using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using System.Globalization;
+using System.Threading;
+using Contensive.Processor.Extensions;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Controllers {
@@ -419,7 +421,11 @@ namespace Contensive.Processor.Controllers {
                             Key = remoteUnixPathFilename
                         };
                         LogController.logInfo(core, "deleteFile_remote, s3Client.DeleteObject");
+#if NETFRAMEWORK
                         s3Client.DeleteObject(deleteObjectRequest);
+#else
+                        s3Client.DeleteObjectAsync(deleteObjectRequest).WaitSynchronously();
+#endif
                     }
                 }
             } catch (Exception ex) {
@@ -465,8 +471,10 @@ namespace Contensive.Processor.Controllers {
                         }
                         if (!string.IsNullOrEmpty(unixPathName)) {
                             LogController.logInfo(core, "deleteFolder, Amazon.S3.IO.S3DirectoryInfo, path [" + path + "]");
+#if NETFRAMEWORK
                             var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, unixPathName);
                             parentFolderInfo.Delete(true);
+#endif
                         }
                     } else {
                     }
@@ -611,7 +619,11 @@ namespace Contensive.Processor.Controllers {
                 };
                 // Build your call out to S3 and store the response
                 LogController.logInfo(core, "getFileList_remote, s3Client.ListObjects, path [" + path + "]");
+#if NETFRAMEWORK
                 ListObjectsResponse response = s3Client.ListObjects(request);
+#else
+                ListObjectsResponse response = s3Client.ListObjectsAsync(request).WaitSynchronously();
+#endif
                 IEnumerable<S3Object> fileList = response.S3Objects.Where(x => !x.Key.EndsWith(@"/"));
                 var returnFileList = new List<FileDetail>();
                 foreach (var file in fileList) {
@@ -741,7 +753,11 @@ namespace Contensive.Processor.Controllers {
                 // Build your call out to S3 and store the response
                 var returnFolders = new List<FolderDetail>();
                 LogController.logInfo(core, "getFolderList_remote, s3Client.ListObjects, path [" + path + "]");
+#if NETFRAMEWORK
                 ListObjectsResponse response = s3Client.ListObjects(request);
+#else
+                ListObjectsResponse response = s3Client.ListObjectsAsync(request).WaitSynchronously();
+#endif
                 foreach (var commonPrefix in response.CommonPrefixes) {
                     string subFolder = commonPrefix.Substring(prefixLength);
                     if (string.IsNullOrWhiteSpace(subFolder)) { continue; }
@@ -837,6 +853,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pathFilename"></param>
         private bool fileExists_remote(string pathFilename) {
             try {
+#if NETFRAMEWORK
                 string unixAbsPathFilename = convertToUnixSlash(joinPath(remotePathPrefix, pathFilename));
                 string path = "";
                 string filename = "";
@@ -847,6 +864,9 @@ namespace Contensive.Processor.Controllers {
                 LogController.logInfo(core, "fileExists_remote, Amazon.S3.IO.S3DirectoryInfo, pathFilename [" + pathFilename + "]");
                 Amazon.S3.IO.S3DirectoryInfo s3DirectoryInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, s3Key);
                 return s3DirectoryInfo.GetFiles(filename).Any();
+#else
+                return false;
+#endif
             } catch (Amazon.S3.AmazonS3Exception ex) {
                 //
                 // -- support this unwillingly
@@ -924,6 +944,7 @@ namespace Contensive.Processor.Controllers {
                 string remoteUnixPathFilename = convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
                 var url = GenericController.splitUrl(remoteUnixPathFilename);
                 LogController.logInfo(core, "pathExists_remote, Amazon.S3.IO.S3DirectoryInfo, path [" + path + "");
+#if NETFRAMEWORK
                 var parentFolderInfo = new Amazon.S3.IO.S3DirectoryInfo(s3Client, core.serverConfig.awsBucketName, "");
                 string dosPathFromLeft = "";
                 foreach (string segment in url.pathSegments) {
@@ -934,6 +955,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     parentFolderInfo = subFolderInfo;
                 }
+#endif
                 return true;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1548,7 +1570,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- Make service call and get back the response.
                 LogController.logInfo(core, "copyFileLocalToRemote, s3Client.PutObject, from [" + request.FilePath + "], to bucket [" + request.BucketName + "], to file [" + request.Key + "])");
+
+#if NETFRAMEWORK
                 PutObjectResponse response = s3Client.PutObject(request);
+#else
+                PutObjectResponse response = s3Client.PutObjectAsync(request).WaitSynchronously();
+#endif
+
                 result = true;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1588,6 +1616,7 @@ namespace Contensive.Processor.Controllers {
                         Key = remoteUnixAbsPathFilename
                     };
                     LogController.logInfo(core, "copyFileRemoteToLocal, s3Client.GetObject, to [" + dosPathFilename + "], from bucket [" + request.BucketName + "], from file [" + request.Key + "])");
+#if NETFRAMEWORK
                     using (GetObjectResponse response = s3Client.GetObject(request)) {
                         try {
                             response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
@@ -1597,6 +1626,23 @@ namespace Contensive.Processor.Controllers {
                             response.WriteResponseStreamToFile(joinPath(localAbsRootPath, localDosPathFilename));
                         }
                     }
+#else
+                    using (GetObjectResponse response = s3Client.GetObjectAsync(request).WaitSynchronously())
+                    using (var source = new CancellationTokenSource())
+                    {
+                        try
+                        {
+                            response.WriteResponseStreamToFileAsync(joinPath(localAbsRootPath, localDosPathFilename), true, source.Token).WaitSynchronously();
+                        }
+                        catch (System.IO.IOException)
+                        {
+                            // -- pause 1 second and retry
+                            System.Threading.Thread.Sleep(1000);
+                            response.WriteResponseStreamToFileAsync(joinPath(localAbsRootPath, localDosPathFilename), true, source.Token).WaitSynchronously();
+                        }
+                    }
+#endif
+
                     result = true;
                 }
             } catch (Exception ex) {
@@ -1656,6 +1702,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 path = normalizeDosPath(path);
                 string remoteUnixPathLowercase = convertToUnixSlash("/" + joinPath(remotePathPrefix, path));
+#if NETFRAMEWORK
                 if (!verifiedRemotePathList.Contains(remoteUnixPathLowercase)) {
                     var urlLowercase = GenericController.splitUrl(remoteUnixPathLowercase);
                     LogController.logInfo(core, "verifyPath_remote, Amazon.S3.IO.S3DirectoryInfo, path [" + path + "])");
@@ -1675,7 +1722,9 @@ namespace Contensive.Processor.Controllers {
                         parentFolderInfo = subFolderInfo;
                     }
                 }
-            } catch (Exception ex) {
+#endif
+            }
+            catch (Exception ex) {
                 LogController.logError(core, ex);
             }
         }
@@ -1787,7 +1836,11 @@ namespace Contensive.Processor.Controllers {
                 BucketName = bucketName
             };
             LogController.logInfo(core, "getSpaceUsedMB, s3Client.ListObjects, bucketName [" + bucketName + "])");
+#if NETFRAMEWORK
             ListObjectsResponse response = s3Client.ListObjects(request);
+#else
+            ListObjectsResponse response = s3Client.ListObjectsAsync(request).WaitSynchronously();
+#endif
             long totalSize = 0;
             foreach (S3Object o in response.S3Objects) {
                 totalSize += o.Size;
@@ -1858,7 +1911,11 @@ namespace Contensive.Processor.Controllers {
                     Prefix = unixPathFilename
                 };
                 LogController.logInfo(core, "getFileDetails_remote, s3Client.ListObjects, pathFilename [" + normalPathFilename + "])");
+#if NETFRAMEWORK
                 ListObjectsResponse response = s3Client.ListObjects(request);
+#else
+                ListObjectsResponse response = s3Client.ListObjectsAsync(request).WaitSynchronously();
+#endif
                 IEnumerable<S3Object> s3fileList = response.S3Objects.Where(x => x.Key == unixPathFilename);
                 foreach (var s3File in s3fileList) {
                     //
@@ -1971,7 +2028,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         // dispose
         //
-        #region  IDisposable Support 
+#region  IDisposable Support 
         //
         protected bool disposed;
         protected virtual void Dispose(bool disposing) {
@@ -2006,6 +2063,6 @@ namespace Contensive.Processor.Controllers {
 
 
         }
-        #endregion
+#endregion
     }
 }
