@@ -440,7 +440,7 @@ namespace Contensive.Processor.Controllers {
                                                         //
                                                         // Bad field name - need to report it somehow
                                                         //
-                                                        LogController.logError(core, new ApplicationException("bad field found [" + fieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
+                                                        LogController.logError(core, new InvalidOperationException("bad field found [" + fieldName + "], in addon node [" + addonName + "], of collection [" + MetadataController.getRecordName(core, "add-on collections", CollectionID) + "]"));
                                                     } else {
                                                         cs.set(fieldName, FieldValue);
                                                     }

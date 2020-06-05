@@ -293,7 +293,7 @@ namespace Contensive.Processor.Controllers {
     //
     // exception classes
     //
-    public class HttpException : ApplicationException {
+    public class HttpException : Exception {
         //
         public HttpException(string context, Exception innerEx) : base("Unknown error in http4Class, " + context + ", innerException [" + innerEx.ToString() + "]") {
         }

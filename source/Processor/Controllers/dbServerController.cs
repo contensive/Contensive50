@@ -132,7 +132,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
             } catch (Exception ex) {
-                ApplicationException newEx = new GenericException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
+                var newEx = new GenericException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
                 LogController.logError( core,newEx);
             }
             return returnData;

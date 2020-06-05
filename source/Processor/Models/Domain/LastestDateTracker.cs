@@ -25,7 +25,7 @@ namespace Contensive.Processor.Models.Domain {
                 DateTime workingDate = (DateTime)modifiedDate;
                 latestDate = (workingDate.CompareTo(latestDate).Equals(1)) ? workingDate : latestDate;
             } catch (Exception ex) {
-                throw new ApplicationException("hint [" + hint + "]", ex);
+                throw new InvalidOperationException("hint [" + hint + "]", ex);
             }
         }
     }

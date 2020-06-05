@@ -1116,7 +1116,7 @@ namespace Contensive.Processor.Controllers {
             string Link = "";
             if (content != null) {
                 if (usedContentIdList.Contains(content.id)) {
-                    throw (new ApplicationException("result , Content Child [" + content.name + "] is one of its own parents"));
+                    throw (new ArgumentException("result , Content Child [" + content.name + "] is one of its own parents", nameof(usedContentIdList)));
                 } else {
                     usedContentIdList.Add(content.id);
                     //
