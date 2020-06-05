@@ -98,7 +98,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         // ----- objects constructed that must be disposed
         //
-        private Enyim.Caching.MemcachedClient cacheClient;
+        private Enyim.Caching.MemcachedClient cacheClient = null;
         //
         // ====================================================================================================
         // ----- private instance storage

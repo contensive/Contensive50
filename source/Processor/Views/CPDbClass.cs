@@ -221,6 +221,7 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        [Obsolete("Deprecated. Use CreateUploadFieldPathFilename with no fieldType or FileType", false)]
         public override string CreateUploadFieldPathFilename(string tableName, string fieldName, int recordId, string filename, CPContentBaseClass.FieldTypeIdEnum fieldType) {
             if ((fieldType == CPContentBaseClass.FieldTypeIdEnum.File) || (fieldType == CPContentBaseClass.FieldTypeIdEnum.FileImage)) {
                 //

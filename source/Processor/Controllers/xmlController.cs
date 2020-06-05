@@ -10,8 +10,6 @@ using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
     public class XmlController {
-        private int iBusy;
-        private int iTaskCount;
         const string ApplicationNameLocal = "unknown";
         private CPBaseClass cp;
         // 

@@ -142,7 +142,7 @@ namespace Contensive.Processor.Controllers {
                 return _requestUrlSource;
             }
         }
-        private string _requestUrlSource;
+        private string _requestUrlSource = null;
         //
         // ====================================================================================================
         //

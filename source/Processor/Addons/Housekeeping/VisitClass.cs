@@ -74,7 +74,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 int TimeoutSave = 0;
-                string SQL = null;
                 string DeleteBeforeDateSQL = null;
                 string appName = null;
                 string SQLTablePeople = null;

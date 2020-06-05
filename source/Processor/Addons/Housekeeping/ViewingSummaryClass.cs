@@ -21,18 +21,18 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
                 // Page View Summary
                 //
-                {
-                    DateTime datePtr = default;
-                    using (var csData = new CsModel(core)) {
-                        if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
-                            datePtr = env.oldestVisitSummaryWeCareAbout;
-                        } else {
-                            datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
-                        }
-                    }
-                    if (datePtr < env.oldestVisitSummaryWeCareAbout) { datePtr = env.oldestVisitSummaryWeCareAbout; }
-                    pageViewSummary(core, datePtr, env.yesterday, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
-                }
+                //{
+                //    DateTime datePtr = default;
+                //    using (var csData = new CsModel(core)) {
+                //        if (!csData.openSql(core.db.getSQLSelect("ccviewingsummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber Desc", "", 1))) {
+                //            datePtr = env.oldestVisitSummaryWeCareAbout;
+                //        } else {
+                //            datePtr = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
+                //        }
+                //    }
+                //    if (datePtr < env.oldestVisitSummaryWeCareAbout) { datePtr = env.oldestVisitSummaryWeCareAbout; }
+                //    pageViewSummary(core, datePtr, env.yesterday, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                //}
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
