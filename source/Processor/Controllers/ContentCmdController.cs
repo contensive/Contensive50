@@ -304,6 +304,7 @@ namespace Contensive.Processor.Controllers {
         /// convert a single command in the command formats to call the execute
         /// </summary>
         private static string executeSingleCommand(CoreController core, string cmdSrc, CPUtilsBaseClass.addonContext Context) {
+#if NETFRAMEWORK
             try {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
@@ -747,6 +748,9 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
                 throw;
             }
+#else
+            return string.Empty;
+#endif
         }
 
 

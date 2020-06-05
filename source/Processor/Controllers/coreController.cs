@@ -575,7 +575,9 @@ namespace Contensive.Processor.Controllers {
             //
             serverConfig = ServerConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
+#if NETFRAMEWORK
             webServer.iisContext = null;
+#endif
             constructorInitialize(false);
             LogController.log(this, "CoreController constructor-0, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
         }
@@ -605,7 +607,9 @@ namespace Contensive.Processor.Controllers {
             serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
+#if NETFRAMEWORK
                 webServer.iisContext = null;
+#endif
                 constructorInitialize(false);
             }
             LogController.log(this, "CoreController constructor-1, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
@@ -661,7 +665,9 @@ namespace Contensive.Processor.Controllers {
                 this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
                 appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
                 appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
+#if NETFRAMEWORK
                 webServer.iisContext = null;
+#endif
                 constructorInitialize(false);
                 LogController.log(this, "CoreController constructor-2, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             } catch (Exception ex) {
@@ -669,6 +675,8 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+
+#if NETFRAMEWORK
         //
         //====================================================================================================
         /// <summary>
@@ -699,6 +707,7 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+
         //
         //====================================================================================================
         /// <summary>
@@ -730,6 +739,7 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+#endif
         //
         /// <summary>
         /// coreClass constructor common tasks.
@@ -822,7 +832,7 @@ namespace Contensive.Processor.Controllers {
         }
         private Logger _nlogLogger;
 
-        #region  IDisposable Support 
+#region  IDisposable Support 
         //
         protected bool disposed;
         //====================================================================================================
@@ -957,6 +967,6 @@ namespace Contensive.Processor.Controllers {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }
-        #endregion
+#endregion
     }
 }

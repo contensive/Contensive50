@@ -40,6 +40,7 @@ namespace Contensive.Processor {
         public CPClass(string appName,  ServerConfigModel serverConfig ) {
             core = new CoreController(this, appName, serverConfig);
         }
+#if NETFRAMEWORK
         //
         //=========================================================================================================
         /// <summary>
@@ -60,6 +61,7 @@ namespace Contensive.Processor {
         public CPClass(string appName, System.Web.HttpContext httpContext) {
             core = new CoreController(this, appName, httpContext);
         }
+#endif
         //
         //=========================================================================================================
         /// <summary>

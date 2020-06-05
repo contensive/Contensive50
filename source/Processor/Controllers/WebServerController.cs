@@ -27,10 +27,13 @@ namespace Contensive.Processor.Controllers {
         //
         private readonly CoreController core;
         //
+
+#if NETFRAMEWORK
         /// <summary>
         /// if this instance is a webRole, retain pointer for callbacks
         /// </summary>
         public System.Web.HttpContext iisContext { get; set; }
+#endif
         //
         // todo - create request domain model with constructor for both web-driven and non-web-driven environments
         //
@@ -40,9 +43,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int requestPort {
             get {
+#if NETFRAMEWORK
                 if (_requestPort == null) {
                     _requestPort = ((iisContext != null) && (iisContext.Request != null) && (iisContext.Request.Url != null)) ? iisContext.Request.Url.Port : 0;
                 }
+#endif
                 return (int)_requestPort;
             }
         }
@@ -129,9 +134,11 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestUrlSource {
             get {
+#if NETFRAMEWORK
                 if (_requestUrlSource == null) {
                     _requestUrlSource = iisContext.Request.Url.AbsoluteUri;
                 }
+#endif
                 return _requestUrlSource;
             }
         }
@@ -386,6 +393,8 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+
+#if NETFRAMEWORK
         //
         //==================================================================================
         //   Initialize the application
@@ -723,6 +732,7 @@ namespace Contensive.Processor.Controllers {
             }
             return core.doc.continueProcessing;
         }
+#endif
         //
         //========================================================================
         // Read a cookie to the stream
@@ -761,6 +771,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (core.doc.continueProcessing) {
                     {
+#if NETFRAMEWORK
                         if (iisContext != null) {
                             //
                             // Pass cookie to iis
@@ -777,7 +788,9 @@ namespace Contensive.Processor.Controllers {
                             if (secure) {
                                 iisContext.Response.Cookies[name].Secure = secure;
                             }
-                        } else {
+                        } else 
+#endif
+                        {
                             //
                             // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
                             if (bufferCookies != "") {
@@ -825,22 +838,28 @@ namespace Contensive.Processor.Controllers {
         public void setResponseStatus(string status) {
             if (core.doc.continueProcessing) {
                 LogController.logTrace(core, "setResponseStatus [" + status + "]");
+#if NETFRAMEWORK
                 if (iisContext != null) {
                     // add header to response
                     iisContext.Response.Status = status;
                 }
+#endif
                 bufferResponseStatus = status;
             }
         }
         //
         //
         //
-        public void setResponseContentType(string ContentType) {
-            if (core.doc.continueProcessing) {
+        public void setResponseContentType(string ContentType)
+        {
+            if (core.doc.continueProcessing)
+            {
+#if NETFRAMEWORK
                 if (iisContext != null) {
                     // add header to response
                     iisContext.Response.ContentType = ContentType;
                 }
+#endif
                 bufferContentType = ContentType;
             }
         }
@@ -849,11 +868,14 @@ namespace Contensive.Processor.Controllers {
         //
         public void addResponseHeader(string HeaderName, string HeaderValue) {
             try {
-                if (core.doc.continueProcessing) {
+                if (core.doc.continueProcessing)
+                {
+#if NETFRAMEWORK
                     if (iisContext != null) {
                         // add header to response
                         iisContext.Response.AddHeader(HeaderName, HeaderValue);
                     }
+#endif
                     if (bufferResponseHeader != "") {
                         bufferResponseHeader = bufferResponseHeader + Environment.NewLine;
                     }
@@ -950,12 +972,15 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- Redirect now
                             clearResponseBuffer();
+#if NETFRAMEWORK
                             if (iisContext != null) {
                                 //
                                 // -- redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
                                 iisContext.Response.Redirect(NonEncodedLink, false);
                                 iisContext.ApplicationInstance.CompleteRequest();
-                            } else {
+                            } else 
+#endif
+                            {
                                 bufferRedirect = NonEncodedLink;
                             }
                         }
@@ -1092,10 +1117,13 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void flushStream() {
+        public void flushStream()
+        {
+#if NETFRAMEWORK
             if (iisContext != null) {
                 iisContext.Response.Flush();
             }
+#endif
         }
         //
         //====================================================================================================
@@ -1312,8 +1340,11 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public void clearResponseBuffer() {
+        public void clearResponseBuffer()
+        {
+#if NETFRAMEWORK
             iisContext.Response.ClearHeaders();
+#endif
             bufferRedirect = "";
             bufferResponseHeader = "";
         }
