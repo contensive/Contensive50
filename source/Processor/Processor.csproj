@@ -97,7 +97,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Amazon.ElastiCacheCluster" Version="1.0.1" />
     <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.16" />
     <PackageReference Include="AWSSDK.Core" Version="3.3.107.7" />
@@ -105,8 +104,6 @@
     <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.161" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.179" />
     <PackageReference Include="AWSSDK.SQS" Version="3.3.102.122" />
-    <PackageReference Include="EnyimMemcached" Version="2.16.0" />
-    <PackageReference Include="EnyimMemcached-NLog" Version="2.16.0" />
     <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
     <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -120,6 +117,9 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Amazon.ElastiCacheCluster" Version="1.0.1" />
+    <PackageReference Include="EnyimMemcached" Version="2.16.0" />
+    <PackageReference Include="EnyimMemcached-NLog" Version="2.16.0" />
     <PackageReference Include="Nustache" Version="1.16.0.10" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System.Data.Entity.Design" />
@@ -129,6 +129,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
+    <PackageReference Include="EnyimMemcachedCore" Version="2.4.3" />
     <PackageReference Include="CG.Pluralization" Version="0.3000.12" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />

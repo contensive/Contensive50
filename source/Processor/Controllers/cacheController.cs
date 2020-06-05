@@ -661,6 +661,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
+#if NETFRAMEWORK
                 if (core.serverConfig.enableRemoteCache) {
                     //
                     // -- leave off, it causes a performance hit
@@ -683,7 +684,9 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-            } catch (Exception ex) {
+#endif
+            }
+            catch (Exception ex) {
                 //
                 // -- client does not throw its own errors, so try to differentiate by message
                 throw (new GenericException("Exception initializing remote cache, will continue with cache disabled.", ex));
