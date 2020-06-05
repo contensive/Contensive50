@@ -1,10 +1,4 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using Contensive.BaseClasses;
-using Contensive.BaseModels;
 using Contensive.Processor.Controllers;
 
 namespace Contensive.Processor {

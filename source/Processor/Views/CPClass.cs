@@ -43,7 +43,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// constructor for iis site use. Configuration provided manually (maybe from webconfig)
+        /// legacy dotnet framework constructor for iis site use. Configuration provided manually (maybe from webconfig)
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>
@@ -53,7 +53,7 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// constructor for iis site use. Configuration read from programdata json
+        /// legacy dotnet framework constructor for iis site use. Configuration read from programdata json
         /// </summary>
         /// <param name="httpContext"></param>
         /// <remarks></remarks>

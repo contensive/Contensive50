@@ -361,6 +361,7 @@
     <Compile Include="Models\Domain\AwsCredentialsModel.cs" />
     <Compile Include="Models\Domain\GroupRuleType.cs" />
     <Compile Include="Models\Domain\LastestDateTracker.cs" />
+    <Compile Include="Models\Domain\System_Web_HttpContext.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
