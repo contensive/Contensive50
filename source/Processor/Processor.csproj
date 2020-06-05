@@ -116,11 +116,11 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.7.2" />
     <PackageReference Include="NUglify" Version="1.5.14" />
-    <PackageReference Include="Nustache" Version="1.16.0.10" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
+    <PackageReference Include="Nustache" Version="1.16.0.10" />
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Runtime.Caching" />

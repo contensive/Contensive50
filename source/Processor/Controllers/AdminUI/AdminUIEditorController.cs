@@ -10,7 +10,6 @@ using Contensive.Models.Db;
 using System.Globalization;
 using Contensive.Processor.Addons.AdminSite.Models;
 using Contensive.Processor.Addons.AdminSite;
-using Nustache.Core;
 using Contensive.Processor.Properties;
 
 namespace Contensive.Processor.Controllers {
@@ -863,7 +862,11 @@ namespace Contensive.Processor.Controllers {
                     relatedButtonList = "",
                     roleInput = AdminUIController.getButtonPrimaryAnchor("Add Role", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Group Roles"))
                 });
-                return Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor);
+#if NETFRAMEWORK
+                return Nustache.Core.Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor);
+#else
+                return string.Empty;
+#endif
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return string.Empty;
