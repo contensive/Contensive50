@@ -67,143 +67,51 @@ del /Q "..\WebDeploymentPackage\*.*"
 
 rem ==============================================================
 rem
-rem build cpbaseclass 
+rem build Contensive common solution (CPBase +Models + Processor)
 rem
 cd ..\source
-rem set assembly version
-copy "cpbase51\properties\assemblyinfo-src.cs" "cpbase51\properties\assemblyinfo.cs"
-cscript ..\scripts\replace.vbs "cpbase51\properties\assemblyinfo.cs" "5.2005.0.0" "%versionNumber%"
 
-rem build
-"%msbuildLocation%msbuild.exe" contensiveCPBase.sln
+dotnet build -p:Version=%versionNumber% contensivecommon.sln
+
 if errorlevel 1 (
-   echo failure building CPBase.dll
+   echo failure building common solution
    pause
    exit /b %errorlevel%
 )
 cd ..\scripts
 
+
 rem ==============================================================
 rem
-rem build CPBaseClass Nuget
+rem pack Contensive common solution (CPBase +Models + Processor)
 rem
-rem cd ..\source\cpbase51
-rem IF EXIST "Contensive.CPBaseClass.%versionNumber%.nupkg" (
-rem 	del "Contensive.CPBaseClass.%versionNumber%.nupkg" /Q
-rem )
-rem "nuget.exe" pack "Contensive.CPBaseClass.nuspec" -version "%versionNumber%"
-rem if errorlevel 1 (
-rem    echo failure in nuget CPBase
-rem    pause
-rem    exit /b %errorlevel%
-rem )
-rem no local nuget package folder - xcopy "Contensive.CPBaseClass.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-move /y "Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
+cd ..\source
+
+dotnet pack -p:PackageVersion=%versionNumber% contensivecommon.sln
+
+if errorlevel 1 (
+   echo failure packing common solution
+   pause
+   exit /b %errorlevel%
+)
+
+rem move packages to deplyment, and to local package folder
+
+move /y "CPBase51\bin\debug\Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly
 xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.CPBaseClass.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-cd ..\..\scripts
 
-rem ==============================================================
-rem
-rem update models nuget packages  
-rem
-
-cd ..\source\Models
-nuget update Models.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-cd ..\ModelTests
-nuget update ModelTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-cd ..\..\scripts
-
-
-rem ==============================================================
-rem
-rem build Models
-rem
-
-cd ..\source
-rem set assembly version
-copy "models\properties\assemblyinfo-src.cs" "models\properties\assemblyinfo.cs"
-cscript ..\scripts\replace.vbs "models\properties\assemblyinfo.cs" "0.0.0.0" "%versionNumber%"
-
-"%msbuildLocation%msbuild.exe" contensiveDbModels.sln
- 
-if errorlevel 1 (
-   echo failure building contensiveDbModels.dll
-   pause
-   exit /b %errorlevel%
-)
-cd ..\scripts
-
-rem ==============================================================
-rem
-rem build ContensiveDbModels Nuget
-rem
-
-cd ..\source\Models
-IF EXIST "Contensive.Models.%versionNumber%.nupkg" (
-	del "Contensive.Models.%versionNumber%.nupkg" /Q
-)
-"nuget.exe" pack "Contensive.DbModels.nuspec" -version %versionNumber%
-if errorlevel 1 (
-   echo failure in nuget Contensive.DbModels
-   pause
-   exit /b %errorlevel%
-)
-rem xcopy no local nuget package folder - "Contensive.DbModels.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-move /y "Contensive.DbModels.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
+move /y "Models\Bin\Debug\Contensive.DBModels.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly
-xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.DbModels.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-cd ..\..\scripts
+xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.DBModels.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
 
-rem ==============================================================
-rem
-rem update processor nuget packages  
-rem
-
-cd ..\source\Processor
-nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-nuget update Processor.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
-cd ..\ProcessorTests
-nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
-cd ..\..\scripts
-
-
-rem ==============================================================
-rem
-rem build Processor 
-rem
-cd ..\source
-copy "processor\properties\assemblyinfo-src.cs" "processor\properties\assemblyinfo.cs"
-cscript ..\scripts\replace.vbs "processor\properties\assemblyinfo.cs" "0.0.0.0" "%versionNumber%"
-
-"%msbuildLocation%msbuild.exe" contensive.sln
-if errorlevel 1 (
-   echo failure building processor.dll
-   pause
-   exit /b %errorlevel%
-)
-cd ..\scripts
-
-rem ==============================================================
-rem
-rem build Processor Nuget 
-rem
-cd ..\source\processor
-IF EXIST "Contensive.Processor.%versionNumber%.nupkg" (
-	del "Contensive.Processor.%versionNumber%.nupkg" /Q
-)
-"nuget.exe" pack "processor.nuspec" -version %versionNumber%
-if errorlevel 1 (
-   echo failure building processor.dll
-   pause
-   exit /b %errorlevel%
-)
-rem xcopy no local nuget package folder - "Contensive.Processor.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-move /y "Contensive.Processor.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
+move /y "Processor\bin\debug\Contensive.Processor.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly
 xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.Processor.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-cd ..\..\scripts
+
+cd ..\scripts
+
+pause
 
 rem ==============================================================
 rem
@@ -219,6 +127,9 @@ nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGet
 nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
+
+pause
+
 
 rem ==============================================================
 rem
@@ -236,6 +147,9 @@ if errorlevel 1 (
 )
 cd ..\scripts
 
+pause
+
+
 rem ==============================================================
 rem
 rem update aspx site nuget packages 
@@ -245,6 +159,9 @@ nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %Nu
 nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
+
+pause
+
 
 rem ==============================================================
 rem
@@ -260,6 +177,9 @@ if errorlevel 1 (
 xcopy "..\WebDeploymentPackage\*.zip" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\scripts
 
+pause
+
+
 rem ==============================================================
 rem
 rem hack - copy aoBase51.xml file from processor project to cli setup
@@ -274,7 +194,7 @@ rem build cli setup
 rem
 cd ..\source
 del CliSetup.out.txt /Q
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" /Rebuild Debug contensiveCli.sln /project "CliSetup\setup3.vdproj" /projectconfig Debug /out CliSetup.out.txt
+"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\devenv.exe" /Rebuild Debug contensiveCli.sln /project "CliSetup\setup3.vdproj" /projectconfig Debug
 if errorlevel 1 (
    echo failure building CLIsetup
    pause
@@ -282,6 +202,9 @@ if errorlevel 1 (
 )
 xcopy ".\CliSetup\Debug\*.msi" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\scripts
+
+pause
+
 rem ==============================================================
 rem
 rem update nuget for all test projects
@@ -300,11 +223,6 @@ nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %Nu
 nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 nuget update ProcessorTests.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
-
-rem ==============================================================
-rem
-rem future - ContensiveMvc
-rem
 
 rem ==============================================================
 rem
