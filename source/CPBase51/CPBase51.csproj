@@ -14,7 +14,7 @@
     <FileVersion>4.1.2.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn Label="FIX IT: Disable missing docs warnings">1701;1702;1570;1572;1573;1587;1591</NoWarn>
+    <NoWarn Label="FIX IT: Disable missing docs warnings">$(NoWarn);1570;1572;1573;1587;1591</NoWarn>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageId>Contensive.CPBaseClass</PackageId>

@@ -6,7 +6,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CPBase51", "CPBase51\CPBase
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{199CB0A3-5550-478E-88EF-22AAE346F351}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Processor", "Processor\Processor.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Processor", "Processor\Processor.csproj", "{46657D07-74BC-4DDC-8FDD-9078EB1A1CD2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{798962D9-8DFA-4454-A0A5-6C7D329809F6}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.Example.props = Directory.Build.Example.props
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
