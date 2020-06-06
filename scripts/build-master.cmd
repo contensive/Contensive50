@@ -111,8 +111,6 @@ xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.Processor.%versionNumber
 
 cd ..\scripts
 
-pause
-
 rem ==============================================================
 rem
 rem update cli, taskservice nuget packages 
@@ -127,9 +125,6 @@ nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGet
 nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
-
-pause
-
 
 rem ==============================================================
 rem
@@ -147,9 +142,6 @@ if errorlevel 1 (
 )
 cd ..\scripts
 
-pause
-
-
 rem ==============================================================
 rem
 rem update aspx site nuget packages 
@@ -159,9 +151,6 @@ nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %Nu
 nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
 nuget update iisdefaultsite.vbproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
-
-pause
-
 
 rem ==============================================================
 rem
@@ -176,9 +165,6 @@ if errorlevel 1 (
 )
 xcopy "..\WebDeploymentPackage\*.zip" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\scripts
-
-pause
-
 
 rem ==============================================================
 rem
@@ -202,8 +188,6 @@ if errorlevel 1 (
 )
 xcopy ".\CliSetup\Debug\*.msi" "%deploymentFolderRoot%%versionNumber%" /Y
 cd ..\scripts
-
-pause
 
 rem ==============================================================
 rem
@@ -229,4 +213,3 @@ rem
 rem done
 rem
 
-pause
