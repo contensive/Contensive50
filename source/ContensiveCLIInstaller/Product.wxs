@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
+  <!-- Upgrade code does not change. This is the same for all builds of this product -->
+  <?define UpgradeCode="{33AA8CA2-FF57-47F7-83FA-A9018ECF783D}"?>
+
   <!-- Product code changes each build -->
   <?if $(var.Platform)=x64 ?>
 	  <?define ProductCode="{EDB5DD31-045A-4F59-8B2B-F44F6286A086}"?>
@@ -8,11 +11,8 @@
     <?define ProductCode="{F4DC7830-A59C-42F0-9CE0-19CDCC4D2E85}"?>
   <?endif?>
   
-	<!-- Upgrade code does not change. This is the same for all builds of this product -->
-  <?define UpgradeCode="{33AA8CA2-FF57-47F7-83FA-A9018ECF783D}"?>
-  
-  <!-- Build version of the  prodcut -->
-  <?define BuildVersion="20.6.6.1"?>
+  <!-- get build version from assembly in project xml -->
+  <!-- <?define BuildVersion="20.6.6.1"?> -->
   
   <!-- defind main product -->
 	<Product 
@@ -49,14 +49,19 @@
     
     <!-- define main app icon -->
     <Icon Id ="icon.ico" SourceFile="$(var.Cli.ProjectDir)\app.ico"/>
-    <Property Id="APPPRODUCTICON">icon.ico</Property>
+    <Property Id="ARPPRODUCTICON">icon.ico</Property>
     
     <!-- help support website for add/remove programs-->
-    <Property Id="APPURLINFOABOUT">https://contensive.io</Property>
+    <Property Id="ARPURLINFOABOUT">https://contensive.io</Property>
     
     <!-- Basic UI for installer, added reference from wix program-files -->
     <UIRef Id="WixUI_Minimal"/>
     
+    <!-- install banners-->
+    <WixVariable Id="WixUIDialogBmp" Value="$(var.ProjectDir)\Assets\Background.bmp" />
+    <WixVariable Id="WixUIBannerBmp" Value="$(var.ProjectDir)\Assets\Banner.bmp" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\Assets\license.rtf" />
+
     <!-- define components, shortcuts, files, etc -->
 		<Feature 
       Id="ProductFeature" 

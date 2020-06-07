@@ -2,11 +2,25 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <Fragment>
+    
+    <!-- Product Components -->
     <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-      <!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-      <!-- <Component Id="ProductComponent"> -->
-      <!-- TODO: Insert files, registry keys, and other resources here. -->
-      <!-- </Component> -->
+      
+      <!-- reference the components to install -->
+      <ComponentRef Id="TestFile"/>
     </ComponentGroup>
+    
+    <!-- reference the directory in the directories file -->
+    <DirectoryRef Id="INSTALLFOLDER" FileSource="..\Cli\bin\Debug\">
+      
+      <Component Id="TestFile" Guid="{79E3B767-5C45-40D6-A0BC-6DDE1B0E4257}">
+        
+        <!-- file files to install -->
+        <File Id="FileTestFile" Name="cc.exe" KeyPath="yes"/>
+        
+        <!-- Remove Start Menu Items on uninstal -->
+        <RemoveFolder Id="RemoveStartFolder" Directory="InstallProgramMenuFolder" On="uninstall"/>
+      </Component>  
+    </DirectoryRef>
   </Fragment>
 </Wix>

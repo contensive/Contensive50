@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <WixLocalization Culture="en-us" xmlns="http://schemas.microsoft.com/wix/2006/localization">
 
-  <String Id="ProductName_x86">Console App (32-bit)</String>
-  <String Id="ProductName_x64">Console App (64-bit)</String>
+  <String Id="ProductName_x86">Contensive Console (32-bit)</String>
+  <String Id="ProductName_x64">Contensive Console (64-bit)</String>
 
+  <String Id="ProductNameFolder">Contensive5</String>
   <String Id="Company">Contensive</String>
   <String Id="Description">This is the description</String>
   <String Id="Comments">This is a comment</String>

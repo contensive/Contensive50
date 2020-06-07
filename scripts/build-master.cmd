@@ -6,7 +6,6 @@ rem
 
 rem @echo off
 rem Setup deployment folder
-set versionMajor=5
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
 rem set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
 set deploymentFolderRoot=C:\Deployments\Contensive5\Dev\
@@ -17,7 +16,8 @@ set day=%date:~7,2%
 if %day% GEQ 10 goto dateOk
 set day=%date:~8,1%
 :dateOk
-set versionMinor=%year%%month%
+set versionMajor=%year%
+set versionMinor=%month%
 set versionBuild=%day%
 set versionRevision=1
 rem
