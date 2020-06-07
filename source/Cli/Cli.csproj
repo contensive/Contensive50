@@ -320,6 +320,9 @@
     <None Include="aspnetAppPatternDataSet.xss">
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </None>
+    <Content Include="app.ico" />
+    <Content Include="LogoBalls.png" />
+    <Content Include="LogoBalls.svg" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

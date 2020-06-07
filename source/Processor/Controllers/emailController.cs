@@ -1263,39 +1263,13 @@ namespace Contensive.Processor.Controllers {
             int emailsEffected = 0;
             string bounceAddress = getBounceAddress(core, "");
             using (var csList = new CsModel(core)) {
-                string FieldList = "ccEmail.TestMemberID AS TestMemberID,ccEmail.ID AS EmailID, ccMembers.ID AS MemberID, ccMemberRules.DateExpires AS DateExpires,ccEmail.BlockSiteStyles,ccEmail.stylesFilename";
-                string sqlDateTest = "";
-                sqlDateTest = ""
-                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod > " + core.sqlDateTimeMockable + ")"
-                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod-1.0 < " + core.sqlDateTimeMockable + ")"
-                    + " AND (CAST(ccMemberRules.DateExpires as datetime)-ccEmail.ConditionPeriod < ccemail.lastProcessDate)"
-                    + "";
-                string SQL = "SELECT DISTINCT " + FieldList
-                    + " FROM ((((ccEmail"
-                    + " LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)"
-                    + " LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)"
-                    + " LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)"
-                    + " LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)"
-                    + " Where (ccEmail.id Is Not Null)"
-                    + " and(DATEADD(day, -ccEmail.ConditionPeriod, ccMemberRules.DateExpires) < " + core.sqlDateTimeMockable + ")" // dont send before
-                    + " and(DATEADD(day, -ccEmail.ConditionPeriod+1.0, ccMemberRules.DateExpires) > " + core.sqlDateTimeMockable + ")" // don't send after 1-day
-                    + " and(DATEADD(day, ccEmail.ConditionPeriod, ccMemberRules.DateExpires) > ccemail.lastProcessDate )" // don't send if condition occured before last proces date
-                    + " AND (ccEmail.ConditionExpireDate > " + core.sqlDateTimeMockable + " OR ccEmail.ConditionExpireDate IS NULL)"
-                    + " AND (ccEmail.ScheduleDate < " + core.sqlDateTimeMockable + " OR ccEmail.ScheduleDate IS NULL)"
-                    + " AND (ccEmail.Submitted <> 0)"
-                    + " AND (ccEmail.ConditionId = 1)"
-                    + " AND (ccEmail.ConditionPeriod IS NOT NULL)"
-                    + " AND (ccGroups.Active <> 0)"
-                    + " AND (ccGroups.AllowBulkEmail <> 0)"
-                    + " AND (ccMembers.ID IS NOT NULL)"
-                    + " AND (ccMembers.Active <> 0)"
-                    + " AND (ccMembers.AllowBulkEmail <> 0)"
-                    + " AND (ccEmail.ID Not In (Select ccEmailLog.EmailID from ccEmailLog where ccEmailLog.memberId=ccMembers.ID))";
+                string sql = Properties.Resources.sqlConditionalEmail_DaysBeforeExpiration;
+                sql = sql.Replace("{{sqldatenow}}", core.sqlDateTimeMockable);
                 //
                 // -- almost impossible to debug without a log entry
-                LogController.logInfo(core, "processConditional_DaysBeforeExpiration, select emails to send to users, sql [" + SQL + "]");
+                LogController.logInfo(core, "processConditional_DaysBeforeExpiration, select emails to send to users, sql [" + sql + "]");
                 //
-                csList.openSql(SQL);
+                csList.openSql(sql);
                 while (csList.ok()) {
                     int emailId = csList.getInteger("EmailID");
                     int EmailMemberId = csList.getInteger("MemberID");

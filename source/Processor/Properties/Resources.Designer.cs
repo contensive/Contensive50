@@ -306,6 +306,30 @@ namespace Contensive.Processor.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to                 
+        ///                
+        ///SELECT DISTINCT 
+        ///ccEmail.TestMemberID AS TestMemberID,
+        ///ccEmail.ID AS EmailID, 
+        ///ccMembers.ID AS MemberID, 
+        ///ccMemberRules.DateExpires AS DateExpires,
+        ///ccEmail.BlockSiteStyles,ccEmail.stylesFilename
+        ///
+        ///FROM ((((ccEmail
+        ///LEFT JOIN ccEmailGroups ON ccEmail.Id = ccEmailGroups.EmailID)
+        ///LEFT JOIN ccGroups ON ccEmailGroups.GroupId = ccGroups.ID)
+        ///LEFT JOIN ccMemberRules ON ccGroups.Id = ccMemberRules.GroupID)
+        ///LEFT JOIN ccMembers ON ccMemberRules.memberId = ccMembers.ID)
+        ///
+        ///W [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string sqlConditionalEmail_DaysBeforeExpiration {
+            get {
+                return ResourceManager.GetString("sqlConditionalEmail_DaysBeforeExpiration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to IF EXISTS (SELECT * FROM sys.objects WHERE [name] = N&apos;ccManyManyRuleDelete_{ruleTable}_{ruleField}&apos; AND [type] = &apos;TR&apos;)
         ///BEGIN
         ///      DROP TRIGGER [dbo].[ccManyManyRuleDelete_{ruleTable}_{ruleField}];
