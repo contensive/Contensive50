@@ -157,6 +157,7 @@
   <ItemGroup>
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow.html" />
     <Content Include="Addons\AdminSite\Resources\GroupRuleEditorRow2.html" />
+    <Content Include="app.ico" />
     <Content Include="Models\dataModelFields.txt" />
     <Content Include="Resources\adminNavBarHtml.txt" />
     <Content Include="Resources\adminTemplateHtml.txt" />
