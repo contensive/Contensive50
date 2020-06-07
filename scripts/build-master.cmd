@@ -6,18 +6,21 @@ rem
 
 rem @echo off
 rem Setup deployment folder
-set versionMajor=5
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
 rem set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
 set deploymentFolderRoot=C:\Deployments\Contensive5\Dev\
 set NuGetLocalPackagesFolder=C:\NuGetLocalPackages\
 set year=%date:~12,4%
 set month=%date:~4,2%
+if %month% GEQ 10 goto monthOk
+set month=%date:~5,1%
+:monthOk
 set day=%date:~7,2%
-if %day% GEQ 10 goto dateOk
+if %day% GEQ 10 goto dayOk
 set day=%date:~8,1%
-:dateOk
-set versionMinor=%year%%month%
+:dayOk
+set versionMajor=%year%
+set versionMinor=%month%
 set versionBuild=%day%
 set versionRevision=1
 rem
@@ -71,8 +74,8 @@ rem build Contensive common solution (CPBase +Models + Processor)
 rem
 cd ..\source
 
-dotnet build -p:Version=%versionNumber% contensivecommon.sln
-
+dotnet build contensivecommon.sln -p:Version=%versionNumber% --no-incremental
+pause
 if errorlevel 1 (
    echo failure building common solution
    pause
@@ -87,7 +90,7 @@ rem pack Contensive common solution (CPBase +Models + Processor)
 rem
 cd ..\source
 
-dotnet pack -p:PackageVersion=%versionNumber% contensivecommon.sln
+dotnet pack contensivecommon.sln -p:PackageVersion=%versionNumber%
 
 if errorlevel 1 (
    echo failure packing common solution
