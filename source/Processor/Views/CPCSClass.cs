@@ -8,7 +8,7 @@ namespace Contensive.Processor {
     /// <summary>
     /// The implementation of the CPCSBaseClass interface. Base interface is exposed to addons, and this implementation is passed during run-time
     /// </summary>
-    public class CPCSClass : CPCSBaseClass, IDisposable {
+    public class CPCSClass : CPCSBaseClass {
         /// <summary>
         /// dependancies
         /// </summary>
@@ -694,7 +694,7 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public override void Dispose() {
+        public sealed override void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }

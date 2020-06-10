@@ -14,7 +14,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>CPBase2.snk</AssemblyOriginatorKeyFile>
     <PackageId>Contensive.CPBaseClass</PackageId>
-    <Version>20.0.0.0</Version>
+    <Version>4.1.2.0</Version>
     <Authors>Contensive</Authors>
     <Product>Contensive Addon API Base Classes</Product>
     <Description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.</Description>
@@ -23,7 +23,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
-    <Version>20.0.0.0</Version>
+    <Version>4.1.2.0</Version>
     <FileVersion>4.1.2.0</FileVersion>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

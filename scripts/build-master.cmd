@@ -38,67 +38,107 @@ rem
 rem clean build folders
 rem
 
-rd /S /Q "..\source\cpbase51\bin"
-rd /S /Q "..\source\cpbase51\obj"
+del /s /q  "..\source\cli\bin"
+rd /s /q  "..\source\cli\bin"
 
-rd /S /Q "..\source\models\bin"
-rd /S /Q "..\source\models\obj"
+del /s /q  "..\source\cli\obj"
+rd /s /q  "..\source\cli\obj"
 
-rd /S /Q "..\source\processor\bin"
-rd /S /Q "..\source\processor\obj"
+del /s /q  "..\source\clisetup\debug"
+rd /s /q  "..\source\clisetup\debug"
 
-rd /S /Q "..\source\processortests\bin"
-rd /S /Q "..\source\processortests\obj"
+del /s /q  "..\source\clisetup\Debug-DevApp"
+rd /s /q  "..\source\clisetup\Debug-DevApp"
 
-rd /S /Q "..\source\cli\bin"
-rd /S /Q "..\source\cli\obj"
+del /s /q  "..\source\clisetup\Debug-StagingDefaultApp"
+rd /s /q  "..\source\clisetup\Debug-StagingDefaultApp"
 
-rd /S /Q "..\source\clisetup\debug"
-rd /S /Q "..\source\clisetup\Debug-DevApp"
-rd /S /Q "..\source\clisetup\Debug-StagingDefaultApp"
-rd /S /Q "..\source\clisetup\DevDefaultApp"
-rd /S /Q "..\source\clisetup\Release"
-rd /S /Q "..\source\clisetup\StagingDefaultApp"
+del /s /q  "..\source\clisetup\DevDefaultApp"
+rd /s /q  "..\source\clisetup\DevDefaultApp"
 
-rd /S /Q "..\source\iisDefault\bin"
-rd /S /Q "..\source\iisDefault\obj"
+del /s /q  "..\source\clisetup\Release"
+rd /s /q  "..\source\clisetup\Release"
 
-rd /S /Q "..\source\taskservice\bin"
-rd /S /Q "..\source\taskservice\obj"
+del /s /q  "..\source\clisetup\StagingDefaultApp"
+rd /s /q  "..\source\clisetup\StagingDefaultApp"
 
-del /Q "..\WebDeploymentPackage\*.*"
+del /s /q  "..\source\cpbase51\bin"
+rd /s /q  "..\source\cpbase51\bin"
+
+del /s /q  "..\source\cpbase51\obj"
+rd /s /q  "..\source\cpbase51\obj"
+
+del /s /q  "..\source\iisDefaultSite\bin"
+rd /s /q  "..\source\iisDefaultSite\bin"
+
+del /s /q  "..\source\iisDefaultSite\obj"
+rd /s /q  "..\source\iisDefaultSite\obj"
+
+del /s /q  "..\source\models\bin"
+rd /s /q  "..\source\models\bin"
+
+del /s /q  "..\source\models\obj"
+rd /s /q  "..\source\models\obj"
+
+del /s /q  "..\source\processor\bin"
+rd /s /q  "..\source\processor\bin"
+
+del /s /q  "..\source\processor\obj"
+rd /s /q  "..\source\processor\obj"
+
+del /s /q  "..\source\processortests\bin"
+rd /s /q  "..\source\processortests\bin"
+
+del /s /q  "..\source\processortests\obj"
+rd /s /q  "..\source\processortests\obj"
+
+del /s /q  "..\source\taskservice\bin"
+rd /s /q  "..\source\taskservice\bin"
+
+del /s /q  "..\source\taskservice\obj"
+rd /s /q  "..\source\taskservice\obj"
+
+del /q "..\WebDeploymentPackage\*.*"
 
 rem ==============================================================
 rem
-rem build Contensive common solution (CPBase +Models + Processor)
+rem build and pack Contensive common solution (CPBase +Models + Processor)
 rem
+
 cd ..\source
 
-dotnet build contensivecommon.sln -p:Version=%versionNumber% --no-incremental
+rem clean, build, pack contensivecommon.sln /property:Version=%versionNumber% --no-incremental
+dotnet clean contensivecommon.sln
+rem dotnet pack contensivecommon.sln /property:PackageVersion=%versionNumber% /property:Version=%versionNumber%
+dotnet build CPBase51/CPBase51.csproj --no-dependencies /property:Version=4.1.2.0 /property:AssemblyVersion=4.1.2.0 /property:FileVersion=4.1.2.0
+
 pause
+
+dotnet build Models/Models.csproj --no-dependencies /property:Version=%versionNumber%
+
+pause
+
+dotnet build Processor/Processor.csproj --no-dependencies /property:Version=%versionNumber%
+
+pause
+
+dotnet pack contensivecommon.sln --no-build --no-restore /property:PackageVersion=%versionNumber%
+
+pause
+
 if errorlevel 1 (
    echo failure building common solution
    pause
    exit /b %errorlevel%
 )
-cd ..\scripts
 
+cd ..\scripts
 
 rem ==============================================================
 rem
-rem pack Contensive common solution (CPBase +Models + Processor)
-rem
-cd ..\source
-
-dotnet pack contensivecommon.sln -p:PackageVersion=%versionNumber%
-
-if errorlevel 1 (
-   echo failure packing common solution
-   pause
-   exit /b %errorlevel%
-)
-
 rem move packages to deplyment, and to local package folder
+
+cd ..\source
 
 move /y "CPBase51\bin\debug\Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly
@@ -134,10 +174,8 @@ rem
 rem build cli and task server 
 rem
 cd ..\source
-copy "cli\properties\assemblyinfo-src.cs" "cli\properties\assemblyinfo.cs"
-cscript ..\scripts\replace.vbs "cli\properties\assemblyinfo.cs" "0.0.0.0" "%versionNumber%"
 
-"%msbuildLocation%msbuild.exe" contensiveCli.sln
+dotnet build contensivecli.sln --no-incremental  /property:Version=%versionNumber%
 if errorlevel 1 (
    echo failure building processor.dll
    pause
@@ -160,7 +198,8 @@ rem
 rem build aspx and publish 
 rem
 cd ..\source
-"%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
+dotnet build contensiveAspx.sln /property:DeployOnBuild=true /property:PublishProfile=defaultSite /property:Version=%versionNumber% --no-incremental
+rem "%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
 if errorlevel 1 (
    echo failure building contensiveAspx
    pause

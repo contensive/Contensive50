@@ -249,7 +249,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Returns the filename for the field, if a filename is related to the field type. Use this call to create the appropriate filename when a new file is added. The filename with the appropriate path is created or returned. This file and path is relative to the site's content file path and does not include a leading slash. To use this file in a URL, prefix with cp.site.filepath.
+        /// Returns the filename for the field, if a filename is related to the field type. Use this call to create the appropriate filename when a new file is added. The filename with the appropriate path is created or returned. This file and path is relative to the site's content file path and does not include a leading slash. To use this file in a URL, prefix with cp.Http.CdnFilePathPrefix.
         /// </summary>
         /// <param name="fieldName"></param>
         /// <param name="originalFilename"></param>
@@ -421,7 +421,7 @@ namespace Contensive.BaseClasses {
         [Obsolete("Use OpenGroupUsers instead. The GroupCommaList is a comma delimited list of groups and cannot handle group names that include a comma.", false)]
         public abstract bool OpenGroupListUsers(string GroupCommaList);
         //
-        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)",true)]
+        [Obsolete("Use SetField for all field types that store data in files (textfile, cssfile, etc)", true)]
         public abstract void SetFile(string FieldName, string Copy, string ContentName);
         //
         [Obsolete("Use getText to get copy, getFilename to get file.", false)]
@@ -453,6 +453,7 @@ namespace Contensive.BaseClasses {
         /// support IDisposable
         /// </summary>
         public abstract void Dispose();
+        //public abstract void Dispose(bool itIsSafeToAlsoFreeManagedObjects);
     }
 
 }

@@ -88,9 +88,12 @@ namespace Contensive.Processor.Models.Domain {
                             if (result.routeDictionary.ContainsKey(route)) {
                                 LogController.logWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
                             } else {
+                                //
+                                // -- add routeSuffix wildcard to all remote methods so /a/b/c will match addons a, or a/b, or a/b/c
+                                string virtualRoute = route + ((route.Substring(route.Length - 1, 1).Equals("/")) ? "" : "/") + "{*routeSuffix}";
                                 result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
-                                    virtualRoute = route,
+                                    virtualRoute = virtualRoute,
                                     routeType = RouteTypeEnum.remoteMethod,
                                     remoteMethodAddonId = remoteMethod.id
                                 });

@@ -117,6 +117,7 @@
     <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.161" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.179" />
     <PackageReference Include="AWSSDK.SQS" Version="3.3.102.122" />
+    <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
     <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
@@ -143,7 +144,6 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="EnyimMemcachedCore" Version="2.4.3" />
-    <PackageReference Include="CG.Pluralization" Version="0.3000.12" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
     <PackageReference Include="System.Runtime.Caching" Version="4.7.0" />

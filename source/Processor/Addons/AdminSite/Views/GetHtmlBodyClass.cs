@@ -134,12 +134,12 @@ namespace Contensive.Processor.Addons.AdminSite {
                     adminData.contentWatchLoaded = false;
                     //
                     string buildVersion = cp.core.siteProperties.dataBuildVersion;
-                    if (string.Compare(buildVersion, cp.Version) < 0) {
-                        LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + cp.core.siteProperties.dataBuildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
+                    if (versionIsOlder(buildVersion, cp.Version)) {
+                        LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + buildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
                     }
                     //
-                    if (string.Compare(buildVersion, cp.Version) > 0) {
-                        LogController.logWarn(cp.core, new GenericException("Database upgrade (v" + cp.core.siteProperties.dataBuildVersion + ") is newer than the Application code (v" + cp.Version + "). Upgrade the website code."));
+                    if (versionIsOlder(cp.Version, buildVersion )) {
+                        LogController.logWarn(cp.core, new GenericException("Database upgrade (v" + buildVersion + ") is newer than the Application code (v" + cp.Version + "). Upgrade the website code."));
                     }
                     //
                     // Process SourceForm/Button into Action/Form, and process
