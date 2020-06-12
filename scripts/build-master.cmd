@@ -107,24 +107,15 @@ rem
 
 cd ..\source
 
-rem clean, build, pack contensivecommon.sln /property:Version=%versionNumber% --no-incremental
 dotnet clean contensivecommon.sln
-rem dotnet pack contensivecommon.sln /property:PackageVersion=%versionNumber% /property:Version=%versionNumber%
-dotnet build CPBase51/CPBase51.csproj --no-dependencies /property:Version=4.1.2.0 /property:AssemblyVersion=4.1.2.0 /property:FileVersion=4.1.2.0
 
-pause
+dotnet build CPBase51/CPBase51.csproj --no-dependencies /property:Version=4.1.2.0 /property:AssemblyVersion=4.1.2.0 /property:FileVersion=4.1.2.0
 
 dotnet build Models/Models.csproj --no-dependencies /property:Version=%versionNumber%
 
-pause
-
 dotnet build Processor/Processor.csproj --no-dependencies /property:Version=%versionNumber%
 
-pause
-
 dotnet pack contensivecommon.sln --no-build --no-restore /property:PackageVersion=%versionNumber%
-
-pause
 
 if errorlevel 1 (
    echo failure building common solution

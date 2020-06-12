@@ -68,7 +68,8 @@
       Title="ContensiveCLIInstaller" 
       Level="1"
       >
-			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="PublishedComponents" />
 		</Feature>
 	</Product>
 

@@ -41,7 +41,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">
-    <None Include="..\images\LogoBalls.png">
+    <None Include="aoBase51.xml">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

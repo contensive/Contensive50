@@ -2,6 +2,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 
   <Fragment>
+    <!-- these are nested directories. This top level is required by windows for msi. TARGETDIR is keyword -->
     <Directory Id="TARGETDIR" Name="SourceDir">
 
         <!-- shortucts - start menu -->
@@ -11,14 +12,20 @@
 
       <?if $(var.Platform)=x64 ?>
       <?define ProductCode="{EDB5DD31-045A-4F59-8B2B-F44F6286A086}"?>
-        <!-- program files folder 64-bit -->
+      
+        <!-- program files folder 64-bit. ProgramFiles64Folder is keyword -->
         <Directory Id="ProgramFiles64Folder">
+          
+          <!-- folder in program files folder where we will copy file -->
           <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
         </Directory>
       <?else?>
-        <!-- program files folder 32-bit -->
-        <Directory Id="ProgramFilesFolder">
-          <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
+
+      <!-- folder in program files folder where we will copy file -->
+      <Directory Id="ProgramFilesFolder">
+
+        <!-- folder in program files folder where we will copy file -->
+        <Directory Id="INSTALLFOLDER" Name="!(loc.ProductNameFolder)" />
         </Directory>
       <?endif?>
       
