@@ -4,6 +4,9 @@ rem run >build [versionNumber]
 rem versionNumber is 5.YYMM.DD.build-number, like 5.1908.24.5
 rem
 
+c:
+cd \Git\Contensive5\scripts
+
 rem @echo off
 rem Setup deployment folder
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
@@ -162,17 +165,46 @@ cd ..\..\scripts
 
 rem ==============================================================
 rem
-rem build cli and task server 
+rem build cli and task server
 rem
 cd ..\source
 
-dotnet build contensivecli.sln --no-incremental  /property:Version=%versionNumber%
+dotnet clean ContensiveCli.sln
+
+dotnet build Cli/Cli.csproj --no-dependencies /property:Version=%versionNumber%
 if errorlevel 1 (
-   echo failure building processor.dll
+   echo failure building cli
    pause
    exit /b %errorlevel%
 )
+
+dotnet build TaskService/TaskService.csproj --no-dependencies /property:Version=%versionNumber%
+if errorlevel 1 (
+   echo failure building taskservice
+   pause
+   exit /b %errorlevel%
+)
+
 cd ..\scripts
+
+pause
+
+rem ==============================================================
+rem
+rem build cli installer
+rem
+cd ..\source
+
+"%msbuildLocation%msbuild.exe" ContensiveCLIInstaller\ContensiveCLIInstaller.wixproj
+if errorlevel 1 (
+   echo failure building cli installer
+   pause
+   exit /b %errorlevel%
+)
+
+cd ..\scripts
+
+pause
 
 rem ==============================================================
 rem

@@ -13,7 +13,7 @@
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>signingKey.snk</AssemblyOriginatorKeyFile>
     <PackageId>Contensive.Processor</PackageId>
-    <Version>20.0.0.0</Version>
+    <Version>20.6.12.2</Version>
     <Authors>Contensive</Authors>
     <Product>Contensive Processor</Product>
     <Description>This package installs the library files required to create an instance of cp within an application.</Description>
@@ -21,7 +21,9 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget" Condition="'$(Configuration)' == 'Release'">
+    <!-- 
     <Version>20.0.0.0</Version>
+    -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn Label="FIX IT: Disable missing docs warnings">$(NoWarn);1570;1572;1573;1587;1591</NoWarn>
@@ -41,10 +43,12 @@
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">
+    <!-- 
     <None Include="aoBase51.xml">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+    -->
     <None Include="..\images\LogoBalls.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
@@ -57,7 +61,9 @@
 
   <ItemGroup Label="Content">
     <None Remove="Addons\AdminSite\Resources\*.html" />
-    <None Remove="aoBase51.xml" />
+    <!-- 
+    <None Remove="aoBase51.xml" /> 
+    -->
     <None Remove="Resources\*.txt" />
     <None Remove="Resources\*.html" />
     <None Remove="Resources\*.png" />
@@ -65,6 +71,10 @@
 
     <Content Include="Addons\AdminSite\Resources\*.html" />
     <Content Include="aoBase51.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="app.ico">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -98,6 +108,15 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <None Update="app.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="LogoBalls.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="LogoBalls.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
