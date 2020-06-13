@@ -128,6 +128,8 @@ if errorlevel 1 (
 
 cd ..\scripts
 
+pause
+
 rem ==============================================================
 rem
 rem move packages to deplyment, and to local package folder

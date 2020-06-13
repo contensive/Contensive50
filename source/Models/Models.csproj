@@ -37,19 +37,16 @@
     <Description>The CPBaseClass package is used to build Contensive Addons. See http://Contensive.io/Docs for details.</Description>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageIcon>LogoBalls.png</PackageIcon>
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\images\LogoBalls.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    <None Include="..\images\LogoBalls.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
+    <!-- 
+      required to pack the file used in the PropertyGroup nuget PackageIcon 
+      not Content because already picked up with wildcard but without pack=true
+      https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets
+    -->
+    <None Include="LogoBalls.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup>

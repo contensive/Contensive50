@@ -38,43 +38,29 @@
     <Description>This package installs the library files required to create an instance of cp within an application.</Description>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- 
     <PackageIcon>LogoBalls.png</PackageIcon>
+    -->
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
   <ItemGroup Label="Nuget">
-    <!-- 
-    <None Include="aoBase51.xml">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-    -->
-    <None Include="..\images\LogoBalls.png">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
     <None Include="resources\web.config.transform">
       <Pack>True</Pack>
       <PackagePath>content</PackagePath>
     </None>
   </ItemGroup>
 
-  <ItemGroup Label="Content">
-    <None Remove="Addons\AdminSite\Resources\*.html" />
-    <!-- 
-    <None Remove="aoBase51.xml" /> 
-    -->
-    <None Remove="Resources\*.txt" />
-    <None Remove="Resources\*.html" />
-    <None Remove="Resources\*.png" />
-    <None Remove="Resources\Icons\*.txt" />
+  <ItemGroup>
+  </ItemGroup>
 
+  <ItemGroup Label="Content">
     <Content Include="Addons\AdminSite\Resources\*.html" />
-    <Content Include="aoBase51.xml">
+    <Content Include="aoBase51.xml" Pack="true" Visible="false" PackagePath="" >
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="app.ico">
+    <Content Include="app.ico" Pack="true" Visible="false" PackagePath="" >
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -82,6 +68,12 @@
     <Content Include="Resources\*.html" />
     <Content Include="Resources\*.png" />
     <Content Include="Resources\Icons\*.txt" />
+    <!-- 
+      required to pack the file used in the PropertyGroup nuget PackageIcon 
+      not Content because already picked up with wildcard but without pack=true
+      https://docs.microsoft.com/en-us/nuget/reference/msbuild-targets
+    -->
+    <None Include="LogoBalls.png" Pack="true" Visible="false" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup Label="Editor Config">
@@ -111,18 +103,17 @@
     <None Update="app.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <!-- 
     <None Update="LogoBalls.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="LogoBalls.svg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    -->
     <None Update="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\CPBase51\CPBase51.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
