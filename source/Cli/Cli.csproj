@@ -17,6 +17,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <PublishUrl>C:\software\c5\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -37,7 +38,6 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -113,7 +113,7 @@
     <ManifestKeyFile>clib_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
-    <GenerateManifests>false</GenerateManifests>
+    <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>false</SignManifests>
@@ -162,12 +162,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.2\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveModels, Version=20.6.13.7, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.20.6.13.7\lib\net45\ContensiveModels.dll</HintPath>
+    <Reference Include="ContensiveModels, Version=20.6.13.15, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.20.6.13.15\lib\net45\ContensiveModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.20.6.13.7\lib\net45\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.20.6.13.15\lib\net45\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -211,9 +211,8 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=20.6.13.7, Culture=neutral, PublicKeyToken=0777f439e33f89f3">
-      <HintPath>..\packages\Contensive.Processor.20.6.13.7\lib\net472\processor.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="processor, Version=20.6.13.13, Culture=neutral, PublicKeyToken=0777f439e33f89f3, processorArchitecture=MSIL">
+      <HintPath>..\packages\Contensive.Processor.20.6.13.15\lib\net472\processor.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext" />
@@ -352,12 +351,9 @@
     <None Include="aspnetAppPatternDataSet.xss">
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </None>
-    <Content Include="aoBase51.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="app.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Content Include="aoBase51.xml" />
+    <Content Include="app.ico" />
+    <Content Include="LogoBalls.png" />
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -393,7 +389,6 @@
   <ItemGroup>
     <Folder Include="Controllers\" />
     <Folder Include="Models\" />
-    <Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">

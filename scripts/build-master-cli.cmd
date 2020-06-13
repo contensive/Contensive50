@@ -65,35 +65,6 @@ rd /s /q  "..\source\clisetup\Release"
 del /s /q  "..\source\clisetup\StagingDefaultApp"
 rd /s /q  "..\source\clisetup\StagingDefaultApp"
 
-del /s /q  "..\source\cpbase51\bin"
-rd /s /q  "..\source\cpbase51\bin"
-
-del /s /q  "..\source\cpbase51\obj"
-rd /s /q  "..\source\cpbase51\obj"
-
-del /s /q  "..\source\iisDefaultSite\bin"
-rd /s /q  "..\source\iisDefaultSite\bin"
-
-del /s /q  "..\source\iisDefaultSite\obj"
-rd /s /q  "..\source\iisDefaultSite\obj"
-
-del /s /q  "..\source\models\bin"
-rd /s /q  "..\source\models\bin"
-
-del /s /q  "..\source\models\obj"
-rd /s /q  "..\source\models\obj"
-
-del /s /q  "..\source\processor\bin"
-rd /s /q  "..\source\processor\bin"
-
-del /s /q  "..\source\processor\obj"
-rd /s /q  "..\source\processor\obj"
-
-del /s /q  "..\source\processortests\bin"
-rd /s /q  "..\source\processortests\bin"
-
-del /s /q  "..\source\processortests\obj"
-rd /s /q  "..\source\processortests\obj"
 
 del /s /q  "..\source\taskservice\bin"
 rd /s /q  "..\source\taskservice\bin"
@@ -103,55 +74,6 @@ rd /s /q  "..\source\taskservice\obj"
 
 del /q "..\WebDeploymentPackage\*.*"
 
-rem ==============================================================
-rem
-rem build and pack Contensive common solution (CPBase +Models + Processor)
-rem
-
-cd ..\source
-
-dotnet clean contensivecommon.sln
-
-dotnet build CPBase51/CPBase51.csproj --no-dependencies /property:Version=4.1.2.0 /property:AssemblyVersion=4.1.2.0 /property:FileVersion=4.1.2.0
-
-dotnet build Models/Models.csproj --no-dependencies /property:Version=%versionNumber%
-
-dotnet build Processor/Processor.csproj --no-dependencies /property:Version=%versionNumber%
-
-dotnet pack contensivecommon.sln --no-build --no-restore /property:PackageVersion=%versionNumber%
-
-if errorlevel 1 (
-   echo failure building common solution
-   pause
-   exit /b %errorlevel%
-)
-
-cd ..\scripts
-
-rem ==============================================================
-rem
-rem move packages to deplyment, and to local package folder
-
-cd ..\source
-
-move /y "CPBase51\bin\debug\Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
-rem copy this package to the local package source so the next project builds all upgrade the assembly
-xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.CPBaseClass.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-
-move /y "Models\Bin\Debug\Contensive.DBModels.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
-rem copy this package to the local package source so the next project builds all upgrade the assembly
-xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.DBModels.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-
-move /y "Processor\bin\debug\Contensive.Processor.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
-rem copy this package to the local package source so the next project builds all upgrade the assembly
-xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.Processor.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
-
-cd ..\scripts
-
-rem ==============================================================
-rem
-rem update cli, taskservice nuget packages 
-rem
 
 cd ..\source\cli
 nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
@@ -188,6 +110,8 @@ if errorlevel 1 (
 )
 
 cd ..\scripts
+
+pause
 
 rem ==============================================================
 rem
