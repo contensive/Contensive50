@@ -37,6 +37,15 @@ namespace Contensive.CLI {
                         Console.WriteLine("The Server Group does not appear to be configured correctly. Please run --configure");
                         return;
                     }
+                    //
+                    // -- verify program files folder
+                    string currentPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                    if (!cp.core.serverConfig.programFilesPath.Equals(currentPath)) {
+                        cp.core.serverConfig.programFilesPath = currentPath;
+                        cp.core.serverConfig.save(cp.core);
+                    }
+                    //
+                    // -- create the new app
                     Console.Write("\n\nCreate an application within the server group [" + cp.core.serverConfig.name + "]. The application name can contain upper and lower case alpha numeric characters with no spaces or special characters. This name will be used to create and identity resources and should not be changed later.");
                     AppConfigModel appConfig = new AppConfigModel {
                         //

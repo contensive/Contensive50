@@ -162,12 +162,12 @@
       <HintPath>..\packages\Microsoft.ClearScript.6.0.2\lib\net45\ClearScript.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ContensiveModels, Version=20.6.13.15, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.20.6.13.15\lib\net45\ContensiveModels.dll</HintPath>
+    <Reference Include="ContensiveModels, Version=20.6.16.1, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
+      <HintPath>..\packages\Contensive.DbModels.20.6.16.1\lib\net45\ContensiveModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.20.6.13.15\lib\net45\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.20.6.16.1\lib\net45\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -211,8 +211,9 @@
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=20.6.13.13, Culture=neutral, PublicKeyToken=0777f439e33f89f3, processorArchitecture=MSIL">
-      <HintPath>..\packages\Contensive.Processor.20.6.13.15\lib\net472\processor.dll</HintPath>
+    <Reference Include="processor, Version=20.6.16.1, Culture=neutral, PublicKeyToken=0777f439e33f89f3">
+      <HintPath>..\packages\Contensive.Processor.20.6.16.1\lib\net472\processor.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.AppContext" />
@@ -351,9 +352,9 @@
     <None Include="aspnetAppPatternDataSet.xss">
       <DependentUpon>aspnetAppPatternDataSet.xsd</DependentUpon>
     </None>
-    <Content Include="aoBase51.xml" />
-    <Content Include="app.ico" />
-    <Content Include="LogoBalls.png" />
+    <Content Include="aoBase51.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="NLog.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -415,6 +416,9 @@
     <Error Condition="!Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets'))" />
   </Target>
   <Import Project="..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets" Condition="Exists('..\packages\NETStandard.Library.2.0.3\build\netstandard2.0\NETStandard.Library.targets')" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "C:\Git\Contensive5\source\processor\aobase51.xml" "C:\Git\Contensive5\source\cli" /y</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

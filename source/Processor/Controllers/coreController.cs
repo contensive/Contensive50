@@ -430,7 +430,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             //  -- developer, fake a path
-                            serverConfig.programFilesPath = "c:\\Program Files (x86)\\kma\\Contensive5\\";
+                            serverConfig.programFilesPath = "c:\\Program Files (x86)\\Contensive\\";
                             LogController.logWarn(this, "serverConfig.ProgramFilesPath is blank. Current executable path does NOT includes \\git\\ so assumed program files path environment set.");
                         }
                         serverConfig.save(this);

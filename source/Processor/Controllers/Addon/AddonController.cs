@@ -1356,6 +1356,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     LogController.logTrace(core, "execute_dotNetClass_assembly, 1, [" + assemblyPhysicalPrivatePathname + "]");
                     addonFound = false;
+                    //
+                    // -- MS says BadImageFormatException is how you detect non-assembly DLLs
+                    string filename = Path.GetFileName(assemblyPhysicalPrivatePathname);
+                    if (!string.IsNullOrWhiteSpace(filename)) { core.assemblyList_NonAddonsInstalled.Add(filename); }
                     return string.Empty;
                 } catch (Exception ex) {
                     //

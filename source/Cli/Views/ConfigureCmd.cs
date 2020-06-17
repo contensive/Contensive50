@@ -3,6 +3,7 @@ using System;
 using Contensive.Processor;
 using Amazon;
 using System.Text;
+using System.Reflection;
 
 namespace Contensive.CLI {
     static class ConfigureCmd {
@@ -190,6 +191,9 @@ namespace Contensive.CLI {
                     // -- tasks and logging
                     cp.core.serverConfig.allowTaskRunnerService = true;
                     cp.core.serverConfig.allowTaskSchedulerService = true;
+                    //
+                    // -- program files folder will be the current folder for this application
+                    cp.core.serverConfig.programFilesPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                     //
                     // -- save the configuration
                     cp.core.serverConfig.save(cp.core);

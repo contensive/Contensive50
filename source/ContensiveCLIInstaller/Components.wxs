@@ -16,6 +16,16 @@
       <!-- Shortcut to main application-->
       <Component Id="MainAppShortcut" Guid="{79E3B767-5C45-40D6-A0BC-6DDE1B0E4257}">
         
+        <!-- add install path to environment path variable-->
+        <Environment
+          Id="PATH"
+          Name="PATH"
+          Value="[INSTALLDIR]"
+          Permanent="yes"
+          Part="last"
+          Action="set"
+          System="yes" />        
+        
         <!-- add a shortcut (not really needed) -->
         <Shortcut
           Id="MainAppShortcut"

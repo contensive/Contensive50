@@ -53,6 +53,11 @@ namespace Contensive.Processor.Controllers {
                 //          minor = 2001
                 //          revision = 1
                 //          build = 1
+                // 20.6.14.2
+                //          major = 20 (2020)
+                //          minor = 6 (june)
+                //          revision = 14 (day)
+                //          build = 2
                 string[] vfsplit = versionFirst.Split('.');
                 string[] vssplit = versionSecond.Split('.');
                 //

@@ -63,16 +63,17 @@ Public Class ConfigurationClass
             'serverConfig.password = ConfigurationManager.AppSettings("ContensiveServerGroupPassword")
             serverConfig.programFilesPath = ""
             'serverConfig.username = ConfigurationManager.AppSettings("ContensiveServerGroupUsername")
-            Dim appConfig As New AppConfigModel
-            appConfig.name = getAppName()
-            appConfig.adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute")
-            appConfig.localWwwPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath")
-            appConfig.remoteFilePath = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix")
-            appConfig.localFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath")
+            Dim appConfig As New AppConfigModel With {
+                .name = getAppName(),
+                .adminRoute = ConfigurationManager.AppSettings("ContensiveAdminRoute"),
+                .localWwwPath = ConfigurationManager.AppSettings("ContensiveAppRootFilesPath"),
+                .remoteFilePath = ConfigurationManager.AppSettings("ContensiveCdnFilesNetprefix"),
+                .localFilesPath = ConfigurationManager.AppSettings("ContensiveCdnFilesPath"),
+                .enabled = True,
+                .localPrivatePath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath"),
+                .privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
+            }
             appConfig.domainList.Add(ConfigurationManager.AppSettings("ContensivePrimaryDomain"))
-            appConfig.enabled = True
-            appConfig.localPrivatePath = ConfigurationManager.AppSettings("ContensivePrivateFilesPath")
-            appConfig.privateKey = ConfigurationManager.AppSettings("ContensivePrivateKey")
             serverConfig.apps.Add(appConfig.name.ToLowerInvariant(), appConfig)
         Catch ex As Exception
             'Logger.appendProgramDataLog(ex.ToString)

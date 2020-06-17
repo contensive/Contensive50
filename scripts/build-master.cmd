@@ -163,8 +163,6 @@ nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGet
 nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
 cd ..\..\scripts
 
-pause
-
 rem ==============================================================
 rem
 rem build cli and task server
@@ -173,19 +171,20 @@ cd ..\source
 
 dotnet clean ContensiveCli.sln
 
-dotnet build Cli/Cli.csproj --no-dependencies /property:Version=%versionNumber%
+"%msbuildLocation%msbuild.exe" contensiveCli.sln
+rem dotnet build Cli/Cli.csproj --no-dependencies /property:Version=%versionNumber%
 if errorlevel 1 (
    echo failure building cli
    pause
    exit /b %errorlevel%
 )
 
-dotnet build TaskService/TaskService.csproj --no-dependencies /property:Version=%versionNumber%
-if errorlevel 1 (
-   echo failure building taskservice
-   pause
-   exit /b %errorlevel%
-)
+rem dotnet build TaskService/TaskService.csproj --no-dependencies /property:Version=%versionNumber%
+rem if errorlevel 1 (
+rem    echo failure building taskservice
+rem    pause
+rem    exit /b %errorlevel%
+rem )
 
 cd ..\scripts
 
@@ -201,6 +200,8 @@ echo failure building cli installer
    pause
    exit /b %errorlevel%
 )
+
+xcopy "ContensiveCLIInstaller\bin\Debug\en-us\*.msi" "%deploymentFolderRoot%%versionNumber%\"
 
 cd ..\scripts
 
@@ -219,14 +220,16 @@ rem
 rem build aspx and publish 
 rem
 cd ..\source
-dotnet build contensiveAspx.sln /property:DeployOnBuild=true /property:PublishProfile=defaultSite /property:Version=%versionNumber% --no-incremental
-rem "%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
+
+"%msbuildLocation%msbuild.exe" contensiveAspx.sln /p:DeployOnBuild=true /p:PublishProfile=defaultSite
 if errorlevel 1 (
    echo failure building contensiveAspx
    pause
    exit /b %errorlevel%
 )
+
 xcopy "..\WebDeploymentPackage\*.zip" "%deploymentFolderRoot%%versionNumber%" /Y
+
 cd ..\scripts
 
 rem ==============================================================

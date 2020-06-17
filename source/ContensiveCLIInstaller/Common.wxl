@@ -4,12 +4,12 @@
   <String Id="ProductName_x86">Contensive Console (32-bit)</String>
   <String Id="ProductName_x64">Contensive Console (64-bit)</String>
 
-  <String Id="ProductNameFolder">Contensive5</String>
+  <String Id="ProductNameFolder">Contensive</String>
   <String Id="Company">Contensive</String>
   <String Id="Description">This is the description</String>
   <String Id="Comments">This is a comment</String>
   <String Id="Keywords">keyword1,keyword2</String>
   <String Id="Language">1033</String>
-  <String Id="DowngradeErrorMessage">A newer version of Console App is already installed.</String>
+  <String Id="DowngradeErrorMessage">A newer version of Contensive is already installed.</String>
 
 </WixLocalization>

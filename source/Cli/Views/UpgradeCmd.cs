@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Reflection;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
 
@@ -23,6 +24,13 @@ namespace Contensive.CLI {
         /// <param name="appName"></param>
         /// <param name="repair"></param>
         public static void execute(Contensive.Processor.CPClass cp, string appName, bool repair) {
+            //
+            // -- verify program files folder
+            string currentPath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (!cp.core.serverConfig.programFilesPath.Equals(currentPath)) {
+                cp.core.serverConfig.programFilesPath = currentPath;
+                cp.core.serverConfig.save(cp.core);
+            }
             if (!string.IsNullOrEmpty(appName)) {
                 //
                 // -- upgrade app
