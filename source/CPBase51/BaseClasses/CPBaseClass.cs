@@ -246,6 +246,8 @@ namespace Contensive.BaseClasses {
         /// read and write files in a temporary location.
         /// </summary>
         /// <returns></returns>
+        public abstract CPSecurityBaseClass Security { get; }
+        //
         public abstract CPFileSystemBaseClass TempFiles { get; }
         //
         //====================================================================================================

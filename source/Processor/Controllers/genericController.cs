@@ -1990,7 +1990,7 @@ namespace Contensive.Processor.Controllers {
         public static string textDeScramble(CoreController core, string Copy) {
             string result = "";
             try {
-                result = SecurityController.twoWayDecrypt(core, Copy);
+                result = SecurityController.decryptTwoWay(core, Copy);
             } catch (Exception) {
                 //
                 if (!core.siteProperties.allowLegacyDescrambleFallback) {
@@ -2062,7 +2062,7 @@ namespace Contensive.Processor.Controllers {
         //=============================================================================
         // 
         public static string textScramble(CoreController core, string Copy) {
-            return SecurityController.twoWayEncrypt(core, Copy);
+            return SecurityController.encryptTwoWay(core, Copy);
         }
         //
         //====================================================================================================

@@ -641,6 +641,19 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         //
+        public override CPSecurityBaseClass Security {
+            get {
+                if (_Security == null) {
+                    _Security = new CPSecurityClass(core);
+                }
+                return _Security;
+            }
+        }
+        private CPSecurityBaseClass _Security;
+
+        //
+        //=========================================================================================================
+        //
         public override List<string> GetAppNameList()  {
             var result = new List<string>();
             foreach ( var app in core.serverConfig.apps) {

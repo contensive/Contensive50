@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string encodeToken(CoreController core, int keyInteger, DateTime expiresDate) {
             try {
-                return twoWayEncrypt(core, keyInteger.ToString() + "\t" + expiresDate.ToString("yyyy-MM-dd'T'HH:mm:ss"));
+                return encryptTwoWay(core, keyInteger.ToString() + "\t" + expiresDate.ToString("yyyy-MM-dd'T'HH:mm:ss"));
             } catch (Exception ex) {
                 LogController.logError(core, ex, "EncodeToken failure. Returning blank result for keyInteger [" + keyInteger + "], keyDate [" + expiresDate + "]");
                 return "";
@@ -45,7 +45,7 @@ namespace Contensive.Processor.Controllers {
         public static TokenData decodeToken(CoreController core, string token) {
             var result = new TokenData();
             try {
-                string decodedString = twoWayDecrypt(core, token);
+                string decodedString = decryptTwoWay(core, token);
                 string[] parts = decodedString.Split(Convert.ToChar("\t"));
                 if (parts.Length == 2) {
                     result.id = GenericController.encodeInteger(parts[0]);
@@ -74,7 +74,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="password"></param>
         /// <returns></returns>
-        public static string oneWayEncrypt(CoreController core, string password) {
+        public static string encryptOneWay(CoreController core, string password) {
             string returnResult = "";
             try {
                 returnResult = HashEncode.computeHash(password, "SHA512", null);
@@ -91,7 +91,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="sourceToTest"></param>
         /// <returns></returns>
-        public static bool oneWayVerify(CoreController core, string sourceToTest, string encryptedToken) {
+        public static bool verifyOneWay(CoreController core, string sourceToTest, string encryptedToken) {
             bool returnResult = false;
             try {
                 returnResult = HashEncode.verifyHash(sourceToTest, "SHA512", encryptedToken);
@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sourceToEncrypt"></param>
         /// <param name="cipher">Select the cipher. Des is older, Aes is newer and more secure. The selection is provided </param>
         /// <returns></returns>
-        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher) {
+        public static string encryptTwoWay(CoreController core, string sourceToEncrypt, TwoWayCiphers cipher) {
             try {
                 if (cipher == TwoWayCiphers.aes) {
                     return Crypto.encryptStringAES(sourceToEncrypt, core.appConfig.privateKey);
@@ -129,7 +129,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="sourceToEncrypt"></param>
         /// <returns></returns>
-        public static string twoWayEncrypt(CoreController core, string sourceToEncrypt) => twoWayEncrypt(core, sourceToEncrypt, TwoWayCiphers.aes);
+        public static string encryptTwoWay(CoreController core, string sourceToEncrypt) => encryptTwoWay(core, sourceToEncrypt, TwoWayCiphers.aes);
         //
         //====================================================================================================
         /// <summary>
@@ -139,7 +139,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sourceToDecrypt"></param>
         /// <param name="cipher"></param>
         /// <returns></returns>
-        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher) {
+        public static string decryptTwoWay(CoreController core, string sourceToDecrypt, TwoWayCiphers cipher) {
             try {
                 if (cipher == TwoWayCiphers.aes) {
                     return Crypto.decryptStringAES(sourceToDecrypt, core.appConfig.privateKey);
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="sourceToDecrypt"></param>
         /// <returns></returns>
-        public static string twoWayDecrypt(CoreController core, string sourceToDecrypt) => twoWayDecrypt(core, sourceToDecrypt, TwoWayCiphers.aes);
+        public static string decryptTwoWay(CoreController core, string sourceToDecrypt) => decryptTwoWay(core, sourceToDecrypt, TwoWayCiphers.aes);
         //
         //====================================================================================================
         /// <summary>
