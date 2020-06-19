@@ -10,7 +10,6 @@ cd \Git\Contensive5\scripts
 rem @echo off
 rem Setup deployment folder
 set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\
-rem set msbuildLocation=C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\MSBuild\15.0\Bin\
 set deploymentFolderRoot=C:\Deployments\Contensive5\Dev\
 set NuGetLocalPackagesFolder=C:\NuGetLocalPackages\
 set year=%date:~12,4%
