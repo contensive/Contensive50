@@ -376,6 +376,15 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Returns the html layout field of a layout record. If the record does not exist, it is created with the supplied default layout
+        /// </summary>
+        /// <param name="layoutName"></param>
+        /// <returns></returns>
+        /// <remarks></remarks>
+        public abstract string getLayout(string layoutName, string defaultLayout);
+        //
+        //====================================================================================================
+        /// <summary>
         /// Returns the html layout field of a layout record
         /// </summary>
         /// <param name="layoutId"></param>

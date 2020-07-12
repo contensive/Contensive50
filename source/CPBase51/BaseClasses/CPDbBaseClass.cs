@@ -218,7 +218,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// get or set the timeout for all Db methods in the current process
+        /// get or set the timeout in seconds for all Db methods in the current process
         /// </summary>
         public abstract int SQLTimeout { get; set; }
         //

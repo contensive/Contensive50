@@ -279,6 +279,28 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
+        public override string getLayout(string layoutName, string defaultLayout) {
+            try {
+                if (string.IsNullOrWhiteSpace(layoutName)) { return string.Empty; }
+                using (var cs = new CsModel(cp.core)) {
+                    cs.open("layouts", "name=" + DbController.encodeSQLText(layoutName), "id", false, cp.core.session.user.id, "layout");
+                    if (cs.ok()) { return cs.getText("layout"); }
+                }
+                //
+                // -- create default layout record
+                if (string.IsNullOrWhiteSpace(defaultLayout)) { return string.Empty; }
+                LayoutModel layout = DbBaseModel.addDefault<LayoutModel>(cp);
+                layout.layout.content = defaultLayout;
+                layout.save(cp);
+                return defaultLayout;
+            } catch (Exception ex) {
+                LogController.logError(cp.core, ex);
+                return string.Empty;
+            }
+        }
+        //
+        //====================================================================================================
+        //
         public override string GetLayout(int layoutid) {
             try {
                 using (var cs = new CsModel(cp.core)) {
