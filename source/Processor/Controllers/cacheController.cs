@@ -115,11 +115,11 @@ namespace Contensive.Processor.Controllers {
         public TData getObject<TData>(string key) {
             try {
                 key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                if (string.IsNullOrEmpty(key)) { return default(TData); }
+                if (string.IsNullOrEmpty(key)) { return default; }
                 //
                 // -- read cacheDocument (the object that holds the data object plus control fields)
                 CacheDocumentClass cacheDocument = getCacheDocument(key);
-                if (cacheDocument == null) { return default(TData); }
+                if (cacheDocument == null) { return default; }
                 //
                 // -- test for global invalidation
                 int dateCompare = globalInvalidationDate.CompareTo(cacheDocument.saveDate);
@@ -127,7 +127,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- global invalidation
                     LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
-                    return default(TData);
+                    return default;
                 }
                 //
                 // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
@@ -152,7 +152,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                TData result = default(TData);
+                TData result = default;
                 if (!cacheMiss) {
                     if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
                         //
@@ -169,7 +169,7 @@ namespace Contensive.Processor.Controllers {
                     } else if (cacheDocument.content == null) {
                         //
                         // -- if cache data was left as a string (might be empty), and return object is not string, there was an error
-                        result = default(TData);
+                        result = default;
                     } else {
                         //
                         // -- all worked, but if the class is unavailable let it return default like a miss
@@ -179,14 +179,14 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- object value did not match. return as miss
                             LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex + "]");
-                            result = default(TData);
+                            result = default;
                         }
                     }
                 }
                 return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                return default(TData);
+                return default;
             }
         }
         //

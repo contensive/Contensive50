@@ -1982,7 +1982,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         /// <summary>
-        /// descramble a phrase using twoWayDecrypt. If decryption fails, attempt legacy scramble. If no decryption works, return original scrambled source
+        /// descramble a phrase using decryptTwoWay. If decryption fails, attempt legacy scramble. If no decryption works, return original scrambled source
         /// </summary>
         /// <param name="core"></param>
         /// <param name="Copy"></param>

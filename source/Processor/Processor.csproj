@@ -61,9 +61,9 @@
       <Pack>True</Pack>
       <PackagePath>content</PackagePath>
     </None>
-    <None Include="LogoBalls.png" Pack="true" PackagePath=""/>
-    <None Include="aoBase51.xml" Pack="true" PackagePath=""/>
-    <None Include="app.ico" Pack="true" PackagePath=""/>
+    <None Include="LogoBalls.png" Pack="true" PackagePath="" />
+    <None Include="aoBase51.xml" Pack="true" PackagePath="" />
+    <None Include="app.ico" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <ItemGroup Label="Editor Config">
@@ -103,12 +103,12 @@
 
   <ItemGroup>
     <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.16" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.107.7" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.111.8" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.161" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.179" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.102.122" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.41" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.107.32" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.111.34" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.186" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.102.9" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.103.19" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
     <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.0.0">
@@ -117,8 +117,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.2" />
-    <PackageReference Include="NUglify" Version="1.5.14" />
+    <PackageReference Include="NLog" Version="4.7.3" />
+    <PackageReference Include="NUglify" Version="1.6.4" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
   </ItemGroup>
 

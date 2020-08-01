@@ -133,7 +133,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Decrypt a token encrypted with twoWayEncrypt
+        /// Decrypt a token encrypted with encryptTwoWay
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceToDecrypt"></param>
@@ -153,7 +153,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         /// <summary>
-        /// Decrypt a token encrypted with twoWayEncrypt using AES
+        /// Decrypt a token encrypted with encryptTwoWay using AES
         /// </summary>
         /// <param name="core"></param>
         /// <param name="sourceToDecrypt"></param>

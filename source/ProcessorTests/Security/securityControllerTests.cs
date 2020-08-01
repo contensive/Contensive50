@@ -37,12 +37,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // arrange
                 string source = "All work and no play makes johnny a dull boy.";
                 // act
-                string resultEncrypted = SecurityController.twoWayEncrypt(cp.core, source, SecurityController.TwoWayCiphers.des);
-                string resultEncryptedAes = SecurityController.twoWayEncrypt(cp.core, source, SecurityController.TwoWayCiphers.aes);
-                string resultDecrypted = SecurityController.twoWayDecrypt(cp.core, resultEncrypted, SecurityController.TwoWayCiphers.des);
-                string blankEncrypted = SecurityController.twoWayEncrypt(cp.core, "", SecurityController.TwoWayCiphers.des);
-                string blankDecrypted = SecurityController.twoWayDecrypt(cp.core, "", SecurityController.TwoWayCiphers.des);
-                string invalidDecrypted = SecurityController.twoWayDecrypt(cp.core, source, SecurityController.TwoWayCiphers.des);
+                string resultEncrypted = SecurityController.encryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.des);
+                string resultEncryptedAes = SecurityController.encryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.aes);
+                string resultDecrypted = SecurityController.decryptTwoWay(cp.core, resultEncrypted, SecurityController.TwoWayCiphers.des);
+                string blankEncrypted = SecurityController.encryptTwoWay(cp.core, "", SecurityController.TwoWayCiphers.des);
+                string blankDecrypted = SecurityController.decryptTwoWay(cp.core, "", SecurityController.TwoWayCiphers.des);
+                string invalidDecrypted = SecurityController.decryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.des);
                 // assert
                 Assert.AreEqual(source, resultDecrypted);
                 Assert.AreNotEqual(resultEncrypted, resultEncryptedAes);
@@ -61,12 +61,12 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 // arrange
                 string source = "All work and no play makes johnny a dull boy again.";
                 // act
-                string resultEncrypted = SecurityController.twoWayEncrypt(cp.core, source, SecurityController.TwoWayCiphers.aes);
-                string resultEncryptedDes = SecurityController.twoWayEncrypt(cp.core, source, SecurityController.TwoWayCiphers.des);
-                string resultDecrypted = SecurityController.twoWayDecrypt(cp.core, resultEncrypted, SecurityController.TwoWayCiphers.aes);
-                string blankEncrypted = SecurityController.twoWayEncrypt(cp.core, "", SecurityController.TwoWayCiphers.aes);
-                string blankDecrypted = SecurityController.twoWayDecrypt(cp.core, "", SecurityController.TwoWayCiphers.aes);
-                string invalidDecrypted = SecurityController.twoWayDecrypt(cp.core, source, SecurityController.TwoWayCiphers.aes);
+                string resultEncrypted = SecurityController.encryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.aes);
+                string resultEncryptedDes = SecurityController.encryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.des);
+                string resultDecrypted = SecurityController.decryptTwoWay(cp.core, resultEncrypted, SecurityController.TwoWayCiphers.aes);
+                string blankEncrypted = SecurityController.encryptTwoWay(cp.core, "", SecurityController.TwoWayCiphers.aes);
+                string blankDecrypted = SecurityController.decryptTwoWay(cp.core, "", SecurityController.TwoWayCiphers.aes);
+                string invalidDecrypted = SecurityController.decryptTwoWay(cp.core, source, SecurityController.TwoWayCiphers.aes);
                 // assert
                 Assert.AreEqual(source, resultDecrypted);
                 Assert.AreNotEqual(resultEncrypted, resultEncryptedDes);
