@@ -1478,10 +1478,10 @@ namespace Contensive.Processor {
                             }
                             //
                             // -- invalidate the special cache name used to detect a change in any record
-                            core.cache.invalidateDbRecord(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
+                            core.cache.invalidateRecordKey(id, this.contentMeta.tableName, this.contentMeta.dataSourceName);
                             //
                             // -- save the table_LastModified key so objects like admin-nav can depend on this key and invalidate
-                            core.cache.store_LastRecordModifiedDate(this.contentMeta.tableName);
+                            core.cache.invalidateTableDependencyKey(this.contentMeta.tableName);
                         }
                     }
                 }

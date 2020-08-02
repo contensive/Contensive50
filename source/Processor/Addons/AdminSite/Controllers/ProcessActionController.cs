@@ -229,7 +229,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                         // non-Workflow Delete
                                                         //
                                                         string ContentName = MetadataController.getContentNameByID(cp.core, csData.getInteger("contentControlId"));
-                                                        cp.core.cache.invalidateDbRecord(RecordId, adminData.adminContent.tableName);
+                                                        cp.core.cache.invalidateRecordKey(RecordId, adminData.adminContent.tableName);
                                                         ContentController.processAfterSave(cp.core, true, ContentName, RecordId, "", 0, useContentWatchLink);
                                                         //
                                                         // Page Content special cases
@@ -780,11 +780,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     tableName = MetadataController.getContentTablename(cp.core, adminData.editRecord.contentControlId_Name).ToLowerInvariant();
                                 }
                                 if (tableName == LinkAliasModel.tableMetadata.tableNameLower) {
-                                    LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
+                                    DbBaseModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
                                 } else if (tableName == AddonModel.tableMetadata.tableNameLower) {
-                                    AddonModel.invalidateCacheOfRecord<AddonModel>(cp, adminData.editRecord.id);
+                                    DbBaseModel.invalidateCacheOfRecord<AddonModel>(cp, adminData.editRecord.id);
                                 } else {
-                                    LinkAliasModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
+                                    DbBaseModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
                                 }
                             }
                             //

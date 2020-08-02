@@ -2410,7 +2410,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 if (!string.IsNullOrEmpty(ContentName)) {
                     string contentTablename = MetadataController.getContentTablename(core, ContentName);
-                    core.cache.invalidateTableObjects(contentTablename);
+                    core.cache.invalidateTableDependencyKey(contentTablename);
                 }
             }
         }
@@ -3485,7 +3485,7 @@ namespace Contensive.Processor.Controllers {
             }
             if (RuleContentChanged) {
                 string tablename = MetadataController.getContentTablename(core, rulesContentName);
-                core.cache.invalidateTableObjects(tablename);
+                core.cache.invalidateTableDependencyKey(tablename);
             }
         }
         //

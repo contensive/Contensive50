@@ -20,90 +20,118 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Interface to cache systems. Cache objects are saved to dotnet cache, remotecache, filecache. 
     /// 
-    /// 3 types of cache methods
-    /// -- 1) primary key -- cache key holding the content.
-    /// -- 2) dependent key -- a dependent key holds content that the primary cache depends on. If the dependent cache is invalid, the primary cache is invalid
-    /// -------- if an org cache includes a primary content person, then the org (org/id/10) is saved with a dependent key (ccmembers/id/99). The org content id valid only if both the primary and dependent keys are valid
-    /// -- 3) pointer key -- a cache entry that holds a primary key (or another pointer key). When read, the cache returns the primary value. (primary="ccmembers/id/10", pointer="ccmembers/ccguid/{1234}"
-    /// ------- pointer keys are read-only, as the content is saved in the primary key
+    /// Cache Methods
     /// 
-    /// 2  types of cache data:
-    ///  -- record cache -- cache of an Db model (one record in a db table)
-    ///     .. saveCache, reachCache in the entity model
-    ///     .. invalidateCache in the entity model, includes invalication for complex objects that include the entity
-    ///      
-    ///  -- complex cache -- cache of a domain model, an object with mixed data based on the entity data model (an org object that contains a person object)
-    ///    .. has an id for the topmost object
-    ///    .. these objects are in .. ? (another model folder?)
-    ///    
-    /// 3 using dependent keys to track groups of record
-    /// -- "table-objects-invalidate-date" key
-    ///      use only as a dependency in other cache
-    ///         - any cache with this as the dependency will be invalidated if it's save-date is after this table-invalidation-date
-    ///      use to trigger a clear of all record-cache from one table
-    ///      this key is updated when non-specific changes are made to the table, like 'delete all records matching an odd criteria'
-    ///      updating this key invalidates all cache objects with data from that table saved before this date
-    ///      when you run a query that updates misc records, invalidate this key
-    ///      when you save an object that includes a table record, make it dependent on this key so it will be cleared if it's save date is before this date
-    ///      
-    /// -- "last-record-modified-date" key
-    ///      this cache object contains the modified date of the record last modified for this table
-    ///      to update it, use the DbModel method DbModel.storeCacheLastRecordModifiedDate()
-    ///      it is updated automatically on every Db record update through models
-    ///      if you update a Db record outside models (update/insert/delete query, etc.) also update this cache object
-    ///      ex: the admin navigator. the object contains many records and we want it to clear if any add-on or navigator entry record is modified/added/deleted
-    ///      for record-cache, only udpate the cache key on save. Do not make any record-cache dependent on this key
-    ///      when you save a complex object and you want it invalidated if any record in a table is updated, make it dependent on this key
-    ///      invalidate this key everytime any a record is updated.
-    ///      
-    /// -- if you add/modify/delete a database record
-    ///      => if you update using DbModels this is handled internally and nothing more needs to be done
-    ///      => otherwise, use the DbModel method setCacheRecordLastModified
+    ///   1) primary key -- cache key holding the object.
+    ///         -- A key can be any string - a name for the cache
+    ///         -- A key can be created in a standard format to represent a record in a database RecordKey()
+    ///         -- A key can be created in a standard format to represent a dependency on Any record in a table - use
+    ///         -- use createKey() to create a primary key
+    ///         
+    ///   2) dependent key -- an optional argument passed to a store() that invalidates the key if it is invalidated
+    ///         -- it may hold content that the primary cache depends on. 
+    ///                 -- for example a cache of Team may be saved with a dependency key list of people keys. if any people key is invalidated, the team invalidates
+    ///         -- TableDependencyKey is invalidated each time a record is saved to the table. primary keys saved with the dependency are then also invalidated
+    ///                 -- for example a cache of catalog items set to depend on the tableDependecyKey for items is invalidated if any item is updated.
+    ///         -- use createKey() to create a dependency key if the primary key depends on the dependency
+    ///         -- use create
+    ///                 
+    ///    3) pointer key -- a cache entry that holds a primary key (or another pointer key). 
+    ///         -- When read, the cache returns the primary value. (primary="ccmembers/id/10", pointer="ccmembers/ccguid/{1234}"
+    ///         -- pointer keys are read-only, as the content is saved in the primary key
+    ///         -- set a pointer key with storePtr()
+    ///         -- use storeRecord() to store the content to the key and all the ptrs
     /// 
-    /// -- save a record that is dependent on many untrackable records 
+    /// Cache Data Types
     /// 
-    /// -- update any record is a table
-    /// 
-    /// -- update one or more untracked records (an update or delete command with where clause unrelated to id or guid)
-    ///    
-    /// When a record is saved in admin, an invalidation call is made for tableName/id/#
-    /// 
-    /// If code edits a db record, you should call invalidate for tablename/id/#
-    /// 
-    /// one-to-many lists: if the list is cached, it has to include dependent keys for all its included members
-    /// 
-    /// many-to-many lists: should have a model for the rule table, and lists should come from methods there. the delete method must invalidate the rule model cache
-    /// 
-    /// A cacheobject has:
-    ///   key - if the object is a model of a database record, and there is only one model for that db record, use tableName+id as the cacheName. If it contains other data,
-    ///     use the modelName+id as the cacheName, and include all records in the dependentObjectList.
-    ///   primaryObjectKey -- a secondary cacheObject does not hold data, just a pointer to a primary object. For example, if you use both id and guid to reference objects,
-    ///     save the data in the primary cacheObject (tableName+id) and save a secondary cacheObject (tablename+guid). Sve both when you update the cacheObject. requesting either
-    ///     or invalidating either will effect the primary cache
-    ///   dependentObjectList -- if a cacheobject contains data from multiple sources, each source should be included in the dependencyList. This includes both cached models and Db records.
-    ///   
-    /// Special cache entries
-    ///     dbTablename - cachename = the name of the table
-    ///         - when any record is saved to the table, this dbTablename cache is updated
-    ///         - objects like addonList depend on it, and are flushed if ANY record in that table is updated
+    ///    1) object cache -- cache of any unstructured data
+    ///         -- use createKey() to generate the key
+    ///         -- use store() to store the object to the key
+    ///         -- use get() to retrieve the object from the key
+    ///         -- use invalidate() to invalidate the key
+    ///         -- is invalidated by invalidateAll()
+    ///         
+    ///    2) record cache -- cache holding one record in a table
+    ///         -- use createRecordKey() to generate the key
+    ///         -- use createRecordGuidPtrKey() to generate a Ptr Key for the record that will retrieve the record based on the Guid
+    ///         -- use createRecordNamePtrKey() to generate a Ptr Key for the record that will retrieve the record based on the Unique Name
+    ///         -- use store() to store the object to the key
+    ///         -- use get() to rerieve the object from the key
+    ///         -- use invalidate() to invalidate the RecordKey, the RecordGuidPtr, or the RecordNamePtr
+    ///         -- use invalidateRecordKey() to invalidate the key from the record/table/datasource names
+    ///         
+    /// Table Dependency Key
+    ///         -- any cache object set to depend on this key will invalidate if the save date-time is newer than the table dependency key
+    ///         -- saves the date-time when it was invalidated.
+    ///         -- the /admin site invalidates this key on changes
+    ///         -- models invalidate this key on change
+    ///         -- database updates in the application should invalidate the key when a record is changed in a table
     ///         
     /// </summary>
     public class CacheController : IDisposable {
         //
         // ====================================================================================================
         // ----- objects passed in constructor, do not dispose
-        //
+        /// <summary>
+        /// local storage. Do not dispose
+        /// </summary>
         private readonly CoreController core;
         //
         // ====================================================================================================
         // ----- objects constructed that must be disposed
-        //
+        /// <summary>
+        /// AWS client. Dispose on close
+        /// </summary>
         private Enyim.Caching.MemcachedClient cacheClient = null;
         //
         // ====================================================================================================
         // ----- private instance storage
-        //
+        /// <summary>
+        /// true if cacheClient initialized correctly
+        /// </summary>
         private readonly bool remoteCacheInitialized;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Initializes cache client
+        /// </summary>
+        /// <remarks></remarks>
+        public CacheController(CoreController core) {
+            try {
+                this.core = core;
+                //
+                _globalInvalidationDate = null;
+                remoteCacheInitialized = false;
+#if NETFRAMEWORK
+                if (core.serverConfig.enableRemoteCache) {
+                    //
+                    // -- leave off, it causes a performance hit
+                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); }
+                    //
+                    // -- initialize memcached drive (Enyim)
+                    string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
+                    if (!string.IsNullOrEmpty(cacheEndpoint)) {
+                        string[] cacheEndpointSplit = cacheEndpoint.Split(':');
+                        int cacheEndpointPort = 11211;
+                        if (cacheEndpointSplit.GetUpperBound(0) > 1) {
+                            cacheEndpointPort = GenericController.encodeInteger(cacheEndpointSplit[1]);
+                        }
+                        Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort) {
+                            Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
+                        };
+                        cacheClient = new Enyim.Caching.MemcachedClient(cacheConfig);
+                        if (cacheClient != null) {
+                            remoteCacheInitialized = true;
+                        }
+                    }
+                }
+#endif
+            } catch (Exception ex) {
+                //
+                // -- client does not throw its own errors, so try to differentiate by message
+                throw (new GenericException("Exception initializing remote cache, will continue with cache disabled.", ex));
+            }
+        }
         //
         //========================================================================
         /// <summary>
@@ -406,11 +434,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <param name="datasourceName"></param>
-        /// <param name="modelContent"></param>
-        public void storeDbModel(string guid, int recordId, string tableName, string datasourceName, object modelContent) {
-            string key = createCacheKey_forDbRecord(recordId, tableName, datasourceName);
-            storeObject(key, modelContent);
-            string keyPtr = createCachePtr_forDbRecord_guid(guid, tableName, datasourceName);
+        /// <param name="content"></param>
+        public void storeRecord(string guid, int recordId, string tableName, string datasourceName, object content) {
+            string key = createRecordKey(recordId, tableName, datasourceName);
+            storeObject(key, content);
+            string keyPtr = createRecordGuidPtrKey(guid, tableName, datasourceName);
             storePtr(keyPtr, key);
         }
         //
@@ -422,7 +450,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="guid"></param>
         /// <param name="recordId"></param>
         /// <param name="content"></param>
-        public void storeDbModel<T>(string guid, int recordId, object content) where T : DbBaseModel {
+        public void storeRecord<T>(string guid, int recordId, object content) where T : DbBaseModel {
             Type derivedType = this.GetType();
             FieldInfo fieldInfoTable = derivedType.GetField("tableNameLower");
             if (fieldInfoTable == null) {
@@ -434,9 +462,9 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
                 } else {
                     string datasourceName = fieldInfoDatasource.GetRawConstantValue().ToString();
-                    string key = createCacheKey_forDbRecord(recordId, tableName, datasourceName);
+                    string key = createRecordKey(recordId, tableName, datasourceName);
                     storeObject(key, content);
-                    string keyPtr = createCachePtr_forDbRecord_guid(guid, tableName, datasourceName);
+                    string keyPtr = createRecordGuidPtrKey(guid, tableName, datasourceName);
                     storePtr(keyPtr, key);
                 }
             }
@@ -520,8 +548,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
-        public void invalidateDbRecord(int recordId, string tableName, string dataSourceName = "default") {
-            invalidate(createCacheKey_forDbRecord(recordId, tableName, dataSourceName));
+        public void invalidateRecordKey(int recordId, string tableName, string dataSourceName = "default") {
+            invalidate(createRecordKey(recordId, tableName, dataSourceName));
         }
         //
         //====================================================================================================
@@ -541,7 +569,7 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //=======================================================================
+        //====================================================================================================
         /// <summary>
         /// Convert a key to be used in the server cache. Normalizes name, adds app name and code version
         /// </summary>
@@ -552,65 +580,86 @@ namespace Contensive.Processor.Controllers {
             result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return result;
         }
+        //
+        //====================================================================================================
         /// <summary>
-        /// return the standard key for Db records. 
-        /// setObject for this key should only be the object model for this id
-        /// getObject for this key should return null or an object of the model.
+        /// return the standard key for records. Store for this key should only be the object model for this id. Get for this key should return null or an object of the model.
         /// </summary>
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCacheKey_forDbRecord(int recordId, string tableName, string dataSourceName) {
+        public static string createRecordKey(int recordId, string tableName, string dataSourceName) {
             string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim() + "/";
             key += tableName.Trim() + "/id/" + recordId + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
-        public static string createCacheKey_forDbRecord(int recordId, string tableName) => createCacheKey_forDbRecord(recordId, tableName, "default");
+        //
+        //====================================================================================================
         /// <summary>
-        /// return the standard key for cache ptr by Guid for Db records.  
-        /// Only use this Ptr in setPtr. NEVER setObject for a ptr.
-        /// getObject for this key should return null or an object of the model
+        /// return the standard key for records. Store for this key should only be the object model for this id. Get for this key should return null or an object of the model.
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static string createRecordKey(int recordId, string tableName) => createRecordKey(recordId, tableName, "default");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return pointer key used in storePtr() to associate a guid to a record cache
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCachePtr_forDbRecord_guid(string guid, string tableName, string dataSourceName) {
+        public static string createRecordGuidPtrKey(string guid, string tableName, string dataSourceName) {
             string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         //
-        public static string createCachePtr_forDbRecord_guid(string guid, string tableName) => createCachePtr_forDbRecord_guid(guid, tableName, "default");
+        //====================================================================================================
         /// <summary>
-        /// return the standard key for cache ptr by name for Db records. 
-        /// ONLY use this for tables where the name is unique.
-        /// Only use this Ptr in setPtr. NEVER setObject for a ptr.
-        /// getObject for this key should return a list of models that match the name
+        /// return pointer key used in storePtr() to associate a guid to a record cache
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="recordGuid"></param>
         /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName, string dataSourceName) {
-            string key = "dbptr/" + dataSourceName + "/" + tableName + "/name/" + name + "/";
+        public static string createRecordGuidPtrKey(string recordGuid, string tableName) => createRecordGuidPtrKey(recordGuid, tableName, "default");
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return pointer key used in storePtr() to associate a name to a record cache
+        /// </summary>
+        /// <param name="recordName"></param>
+        /// <param name="tableName"></param>
+        /// <param name="datasourceName"></param>
+        /// <returns></returns>
+        public static string createRecordNamePtrKey(string recordName, string tableName, string datasourceName) {
+            string key = "dbptr/" + datasourceName + "/" + tableName + "/name/" + recordName + "/";
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
         //
-        public static string createCachePtr_forDbRecord_uniqueName(string name, string tableName) => createCachePtr_forDbRecord_uniqueName(name, tableName, "default");
+        //====================================================================================================
+        /// <summary>
+        /// return pointer key used in storePtr() to associate a name to a record cache
+        /// </summary>
+        /// <param name="recordName"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public static string createRecordNamePtrKey(string recordName, string tableName) => createRecordNamePtrKey(recordName, tableName, "default");
         //
         //====================================================================================================
         /// <summary>
-        /// create a cache name for an object composed of data not from a single record
+        /// create a key to store unmanaged content with store(). Managed content like database model should use createRecordKey and createTableDependencyKey.
         /// </summary>
-        /// <param name="objectName">The key that describes the object. This can be more general like "person" and used with a uniqueIdentities like "5"</param>
+        /// <param name="objectUniqueName">The unique key that describes the object. Ex. catalogitemList, or metadata-134</param>
         /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
-        public static string createCacheKey_forObject(string objectName, string objectUniqueIdentifier = "") {
-            string key = "obj/" + objectName + "/" + objectUniqueIdentifier;
+        public static string createKey(string objectUniqueName) {
+            string key = "obj/" + objectUniqueName;
             key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
         }
@@ -649,49 +698,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private DateTime? _globalInvalidationDate;
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Initializes cache client
-        /// </summary>
-        /// <remarks></remarks>
-        public CacheController(CoreController core) {
-            try {
-                this.core = core;
-                //
-                _globalInvalidationDate = null;
-                remoteCacheInitialized = false;
-#if NETFRAMEWORK
-                if (core.serverConfig.enableRemoteCache) {
-                    //
-                    // -- leave off, it causes a performance hit
-                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); }
-                    //
-                    // -- initialize memcached drive (Enyim)
-                    string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
-                    if (!string.IsNullOrEmpty(cacheEndpoint)) {
-                        string[] cacheEndpointSplit = cacheEndpoint.Split(':');
-                        int cacheEndpointPort = 11211;
-                        if (cacheEndpointSplit.GetUpperBound(0) > 1) {
-                            cacheEndpointPort = GenericController.encodeInteger(cacheEndpointSplit[1]);
-                        }
-                        Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort) {
-                            Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                        };
-                        cacheClient = new Enyim.Caching.MemcachedClient(cacheConfig);
-                        if (cacheClient != null) {
-                            remoteCacheInitialized = true;
-                        }
-                    }
-                }
-#endif
-            }
-            catch (Exception ex) {
-                //
-                // -- client does not throw its own errors, so try to differentiate by message
-                throw (new GenericException("Exception initializing remote cache, will continue with cache disabled.", ex));
-            }
-        }
         //
         //====================================================================================================
         /// <summary>
@@ -762,53 +768,33 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// update the cache object that holds the last modified record for any record in this table
-        /// Cache objects that want to be automatically invalidated if any record in a table is updated can add a dependency on this key
+        /// invalidate the Table Dependency Key. This will invalidate any key set to be dependent on this key
         /// </summary>
         /// <param name="core"></param>
-        public void store_LastRecordModifiedDate(string tableName) {
-            storeObject(createCacheKey_LastRecordModifiedDate(tableName), core.dateTimeNowMockable);
-        }
-        //
-        //========================================================================
-        /// <summary>
-        /// invalidate all cache entries that include data from this table.
-        /// when a cacheDocument is saved, it should include a dependancy on key = createCacheKey_TableObjectsInvalidationDate(tablename)
-        /// call this method after running a query that updates records that cannot be individually invalidated (like all records created before a specific date, etc.)
-        /// </summary>
-        /// <param name="dbTableName"></param>
-        public void invalidateTableObjects(string dbTableName) {
-            storeObject(createCacheKey_TableObjectsInvalidationDate(dbTableName), core.dateTimeNowMockable);
+        public void invalidateTableDependencyKey(string tableName) {
+            storeObject(createTableDependencyKey(tableName), core.dateTimeNowMockable);
         }
         //
         //====================================================================================================
         /// <summary>
-        /// create a key for this table that holds the date of before which all objects created with any data from this table should be invalidated
-        /// see CacheController header for more explaination
+        /// create a table dependency key, used in store() to invalidate the content if any record in the table is modified
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        public static string createTableDependencyKey(string tableName, string dataSourceName) {
+            string key = "tabledependency/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
+            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+            return key;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a table dependency key, used in store() to invalidate the content if any record in the table is modified
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createCacheKey_TableObjectsInvalidationDate(string tableName, string dataSourceName) {
-            string key = "tableobjectsinvalidationdate/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
-        }
-        //
-        //====================================================================================================
-        //
-        public static string createCacheKey_TableObjectsInvalidationDate(string tableName) => createCacheKey_TableObjectsInvalidationDate(tableName, "default");
-        //
-        //====================================================================================================
-        //
-        public static string createCacheKey_LastRecordModifiedDate(string tableName, string dataSourceName) {
-            string key = "lastrecordmodifieddate/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
-        }
-        //
-        //====================================================================================================
-        //
-        public static string createCacheKey_LastRecordModifiedDate(string tableName) => createCacheKey_LastRecordModifiedDate(tableName, "default");
+        public static string createTableDependencyKey(string tableName) => createTableDependencyKey(tableName, "default");
         //
         //====================================================================================================
         //

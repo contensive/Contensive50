@@ -145,7 +145,7 @@ namespace Contensive.Processor.Controllers {
                 string tableName = MetadataController.getContentTablename(core, contentName);
                 //
                 // -- invalidate the specific cache for this record
-                core.cache.invalidateDbRecord(recordId, tableName);
+                core.cache.invalidateRecordKey(recordId, tableName);
                 //
                 string tableNameLower = tableName.ToLower(CultureInfo.InvariantCulture);
                 if (tableNameLower == AddonCollectionModel.tableMetadata.tableNameLower) {

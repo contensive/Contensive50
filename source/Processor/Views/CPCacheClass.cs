@@ -20,68 +20,121 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Invalidate a list of cache keys. These keys will return empty the next time they are read.
+        /// </summary>
+        /// <param name="keyList"></param>
         public override void Clear(List<string> keyList) => cp.core.cache.invalidate(keyList);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as an object
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override object GetObject(string key) => cp.core.cache.getObject<object>(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as a string
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override string GetText(string key) => cp.core.cache.getText(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as an integer
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override int GetInteger(string key) => cp.core.cache.getInteger(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as a double number
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override double GetNumber(string key) => cp.core.cache.getNumber(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as a date
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override DateTime GetDate(string key) => cp.core.cache.getDate(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Retrieve a cache object and return it as a boolean
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override bool GetBoolean(string key) => cp.core.cache.getBoolean(key);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// invalidate a single cache key. The next time this cache is retrieved, it will return empty
+        /// </summary>
+        /// <param name="key"></param>
         public override void Invalidate(string key) => cp.core.cache.invalidate(key);
         //
         //====================================================================================================
+        /// <summary>
+        /// Create a key used as a dependency key that will invalidate when any record in a table is changed.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public override string CreateTableDependencyKey(string tableName) => CacheController.createTableDependencyKey(tableName);
         //
-        public override string CreateDependencyKeyInvalidateOnChange(string tableName) => CacheController.createCacheKey_TableObjectsInvalidationDate(tableName);
-        //
-        public override string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName) => CacheController.createCacheKey_TableObjectsInvalidationDate(tableName, dataSourceName);
-        //
-        public override void UpdateLastModified(string tableName) => cp.core.cache.store_LastRecordModifiedDate(tableName);
+        //====================================================================================================
+        /// <summary>
+        /// Create a key used as a dependency key that will invalidate when any record in a table is changed.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        public override string CreateTableDependencyKey(string tableName, string dataSourceName) => CacheController.createTableDependencyKey(tableName, dataSourceName);
         //
         //====================================================================================================
         //
-        public override string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName) => CacheController.createCacheKey_forDbRecord(recordId, tableName, dataSourceName);
-        //
-        public override string CreateKeyForDbRecord(int recordId, string tableName) => CacheController.createCacheKey_forDbRecord(recordId, tableName);
+        public override void invalidateTableDependencyKey(string tableName) => cp.core.cache.invalidateTableDependencyKey(tableName);
         //
         //====================================================================================================
         //
-        public override string CreateKey(string objectName) => CacheController.createCacheKey_forObject(objectName);
-        //
-        public override string CreateKey(string objectName, string objectUniqueIdentifier = "") => CacheController.createCacheKey_forObject(objectName, objectUniqueIdentifier);
+        public override string CreateRecordKey(int recordId, string tableName, string dataSourceName) => CacheController.createRecordKey(recordId, tableName, dataSourceName);
         //
         //====================================================================================================
         //
-        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName) => CacheController.createCachePtr_forDbRecord_guid(guid, tableName, dataSourceName);
-        //
-        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName) => CacheController.createCachePtr_forDbRecord_guid(guid, tableName);
+        public override string CreateRecordKey(int recordId, string tableName) => CacheController.createRecordKey(recordId, tableName);
         //
         //====================================================================================================
         //
-        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName) => CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName, dataSourceName);
+        [Obsolete("Use CreateRecordKey instead", true)]
+        public override string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName) => CacheController.createRecordKey(recordId, tableName, dataSourceName);
+        //
+        [Obsolete("Use CreateRecordKey instead", true)]
+        public override string CreateKeyForDbRecord(int recordId, string tableName) => CacheController.createRecordKey(recordId, tableName);
+        //
+        //====================================================================================================
+        //
+        public override string CreateKey(string objectName) => CacheController.createKey(objectName);
+        //
+        public override string CreateKey(string objectName, string objectUniqueIdentifier = "") => CacheController.createKey(objectName + "-" + objectUniqueIdentifier);
+        //
+        //====================================================================================================
+        //
+        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName, string dataSourceName) => CacheController.createRecordGuidPtrKey(guid, tableName, dataSourceName);
+        //
+        public override string CreatePtrKeyforDbRecordGuid(string guid, string tableName) => CacheController.createRecordGuidPtrKey(guid, tableName);
+        //
+        //====================================================================================================
+        //
+        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName, string dataSourceName) => CacheController.createRecordNamePtrKey(name, tableName, dataSourceName);
 
-        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName) => CacheController.createCachePtr_forDbRecord_uniqueName(name, tableName);
+        public override string CreatePtrKeyforDbRecordUniqueName(string name, string tableName) => CacheController.createRecordNamePtrKey(name, tableName);
         //
         //====================================================================================================
         //
@@ -140,7 +193,7 @@ namespace Contensive.Processor {
                     string tableName = MetadataController.getContentTablename(cp.core, contentName).ToLowerInvariant();
                     if (!tableNameList.Contains(tableName)) {
                         tableNameList.Add(tableName);
-                        cp.core.cache.invalidateTableObjects(tableName);
+                        cp.core.cache.invalidateTableDependencyKey(tableName);
                     }
                 }
             }
@@ -161,26 +214,36 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void InvalidateContentRecord(string contentName, int recordId) {
-            cp.core.cache.invalidateDbRecord(recordId, MetadataController.getContentTablename(cp.core, contentName));
+            cp.core.cache.invalidateRecordKey(recordId, MetadataController.getContentTablename(cp.core, contentName));
         }
         //
         //====================================================================================================
         //
         public override void InvalidateTableRecord(string tableName, int recordId) {
-            cp.core.cache.invalidateDbRecord(recordId, tableName);
+            cp.core.cache.invalidateRecordKey(recordId, tableName);
         }
         //
         //====================================================================================================
         //
         public override void InvalidateTable(string tableName) {
-            cp.core.cache.invalidateTableObjects(tableName);
+            cp.core.cache.invalidateTableDependencyKey(tableName);
         }
         //
         //====================================================================================================
         // deprecated
         //
+        [Obsolete("deprecated", true)]
+        public override void UpdateLastModified(string tableName) => cp.core.cache.invalidateTableDependencyKey(tableName);
         //
-        //====================================================================================================
+        [Obsolete("deprecated", true)]
+        public override string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName) {
+            return CreateTableDependencyKey(tableName, dataSourceName);
+        }
+        //
+        [Obsolete("deprecated", true)]
+        public override string CreateDependencyKeyInvalidateOnChange(string tableName) {
+            return CreateTableDependencyKey(tableName);
+        }
         //
         [Obsolete("deprecated",true)]
         public override void InvalidateTag(string tag) {

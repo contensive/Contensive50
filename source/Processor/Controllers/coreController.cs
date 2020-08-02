@@ -8,6 +8,7 @@ using NLog;
 using Contensive.Models.Db;
 using Contensive.BaseModels;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -34,7 +35,7 @@ namespace Contensive.Processor.Controllers {
         //
         public AwsCredentialsModel awsCredentials {
             get {
-                if(_awsCredentials==null) {
+                if (_awsCredentials == null) {
                     _awsCredentials = new AwsCredentialsModel(this);
                 }
                 return _awsCredentials;
@@ -86,9 +87,14 @@ namespace Contensive.Processor.Controllers {
                 if (_mockNow != null) {
                     return (DateTime)_mockNow;
                 }
-                return DateTime.Now;
+                long fileTime;
+                GetSystemTimePreciseAsFileTime(out fileTime);
+                return DateTimeOffset.FromFileTime(fileTime).DateTime;
+                //return DateTime.Now;
             }
         }
+        [DllImport("Kernel32.dll", CallingConvention = CallingConvention.Winapi)]
+        static extern void GetSystemTimePreciseAsFileTime(out long filetime);
         //
         //===================================================================================================
         //
@@ -180,8 +186,8 @@ namespace Contensive.Processor.Controllers {
         }
         public void assemblyList_AddonsFound_save() {
             var dependentKeyList = new List<string> {
-                CacheController.createCacheKey_LastRecordModifiedDate(AddonModel.tableMetadata.tableNameLower),
-                CacheController.createCacheKey_LastRecordModifiedDate(AddonCollectionModel.tableMetadata.tableNameLower)
+                CacheController.createTableDependencyKey(AddonModel.tableMetadata.tableNameLower),
+                CacheController.createTableDependencyKey(AddonCollectionModel.tableMetadata.tableNameLower)
             };
             cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict, dependentKeyList);
         }
@@ -832,7 +838,7 @@ namespace Contensive.Processor.Controllers {
         }
         private Logger _nlogLogger;
 
-#region  IDisposable Support 
+        #region  IDisposable Support 
         //
         protected bool disposed;
         //====================================================================================================
@@ -967,6 +973,6 @@ namespace Contensive.Processor.Controllers {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }
-#endregion
+        #endregion
     }
 }

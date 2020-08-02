@@ -125,7 +125,7 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract string CreateDependencyKeyInvalidateOnChange(string tableName, string dataSourceName);
+        public abstract string CreateTableDependencyKey(string tableName, string dataSourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -133,7 +133,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract string CreateDependencyKeyInvalidateOnChange(string tableName);
+        public abstract string CreateTableDependencyKey(string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -141,7 +141,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract void UpdateLastModified(string tableName);
+        public abstract void invalidateTableDependencyKey(string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -150,8 +150,8 @@ namespace Contensive.BaseClasses {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
-        /// <returns></returns>
-        public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
+        /// <returns></returns>        
+        public abstract string CreateRecordKey(int recordId, string tableName, string datasourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -160,7 +160,8 @@ namespace Contensive.BaseClasses {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract string CreateKeyForDbRecord(int recordId, string tableName);
+        
+        public abstract string CreateRecordKey(int recordId, string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -300,6 +301,21 @@ namespace Contensive.BaseClasses {
         //
         //public abstract void Save(string key, string Value);
         //public abstract void Save(string key, string Value, string tagCommaList);
+        //
+        [Obsolete("Use InvalidateTableDependencyKey() instead", false)]
+        public abstract void UpdateLastModified(string tableName);
+        //
+        [Obsolete("use CreateRecordKey() instead", false)]
+        public abstract string CreateKeyForDbRecord(int recordId, string tableName);
+        //
+        [Obsolete("use CreateRecordKey() instead", false)]
+        public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
+        //
+        [Obsolete("use CreateTabledependencyKey() instead", false)]
+        public abstract string CreateDependencyKeyInvalidateOnChange(string tablename);
+        //
+        [Obsolete("use CreateTabledependencyKey() instead", false)]
+        public abstract string CreateDependencyKeyInvalidateOnChange(string tablename, string datasource);
         //
         [Obsolete("use Store() instead", false)]
         public abstract void SetKey(string key, object Value);

@@ -23,14 +23,14 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                 // arrange
                 cp.core.siteProperties.setProperty("AllowBake", true);
                 //
-                // save a new record using model
+                // save a new record using model, this should create the cache 
                 //
                 PersonModel original = DbBaseModel.addDefault<PersonModel>(cp);
                 original.save(cp);
                 //
                 // read the cache key for the record and verify it is empty
                 //
-                PersonModel cacheBeforeInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateKeyForDbRecord(original.id, PersonModel.tableMetadata.tableNameLower));
+                PersonModel cacheBeforeInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateRecordKey(original.id, PersonModel.tableMetadata.tableNameLower));
                 //
                 // invalidate the table
                 //
@@ -38,7 +38,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                 //
                 // read the cache key for the record and verify it is empty
                 //
-                PersonModel cacheAFterInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateKeyForDbRecord(original.id, PersonModel.tableMetadata.tableNameLower));
+                PersonModel cacheAFterInvalidate = cp.Cache.GetObject<PersonModel>(cp.Cache.CreateRecordKey(original.id, PersonModel.tableMetadata.tableNameLower));
                 //
                 Assert.IsNotNull(cacheBeforeInvalidate);
                 Assert.AreEqual(original, cacheBeforeInvalidate);

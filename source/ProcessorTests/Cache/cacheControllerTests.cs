@@ -2,11 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Contensive.Processor.Controllers;
-
 using static Tests.TestConstants;
 using Contensive.Processor;
 
@@ -22,7 +18,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_blank()  {
+        public void Controllers_cache_blank() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 // act
@@ -34,7 +30,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_SetGetString()  {
+        public void Controllers_cache_SetGetString() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string key = "test" + GenericController.getRandomInteger(cp.core).ToString();
@@ -58,7 +54,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectDefault()  {
+        public void Controllers_cache_SetGetObjectDefault() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var srcTest = new cacheTestClass();
@@ -72,7 +68,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectNonDefault()  {
+        public void Controllers_cache_SetGetObjectNonDefault() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var srcTest = new cacheTestClass {
@@ -92,7 +88,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithDependency()  {
+        public void Controllers_cache_SetGetObjectWithDependency() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -114,7 +110,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithDependencyList()  {
+        public void Controllers_cache_SetGetObjectWithDependencyList() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -139,7 +135,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithInvalidationDate()  {
+        public void Controllers_cache_SetGetObjectWithInvalidationDate() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -159,7 +155,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         }
         //
         [TestMethod]
-        public void Controllers_cache_SetGetObjectWithInvalidate()  {
+        public void Controllers_cache_SetGetObjectWithInvalidate() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -181,7 +177,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// set a key with a dependency on a content. insert a record into content, key should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAlias()  {
+        public void Controllers_cache_SetGetAlias() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -200,7 +196,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// if you invalidate a key, any alias pointing to it should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAliasInvalidateKey()  {
+        public void Controllers_cache_SetGetAliasInvalidateKey() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -222,7 +218,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         /// if you invalidate an alias, the parent key should be invalidated
         /// </summary>
         [TestMethod]
-        public void Controllers_cache_SetGetAliasInvalidateAlias()  {
+        public void Controllers_cache_SetGetAliasInvalidateAlias() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
@@ -239,6 +235,28 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 Assert.IsNull(valueFromAlias);
             }
         }
-
+        //
+        [TestMethod]
+        public void Controllers_cache_invalidateTable() {
+            // 
+            // -- save a cache key with a dependency on a table
+            // -- pretent this key is from table TestTable
+            // -- set dependency on AnyRecord of the table
+            using (CPClass cp = new CPClass(testAppName)) {
+                string value = "12345";
+                string key = cp.Cache.CreateKey("testKey") ;
+                string fakeTableName = "testTable";
+                //
+                string tableDependencyKey = cp.Cache.CreateTableDependencyKey(fakeTableName);
+                cp.Cache.Store(key, value, new List<string> { tableDependencyKey });
+                //
+                // -- read key back and verify it
+                Assert.AreEqual(value, cp.Cache.GetText(key));
+                //
+                // -- invalidate table dependency key and read the key back and verify it is empty
+                cp.Cache.InvalidateTable(fakeTableName);
+                Assert.AreEqual(string.Empty, cp.Cache.GetText(key));
+            }
+        }
     }
 }

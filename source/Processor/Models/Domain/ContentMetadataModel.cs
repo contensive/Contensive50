@@ -759,7 +759,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="contentId"></param>
         /// <returns></returns>
         public static string getCacheKey(int contentId) {
-            return CacheController.createCacheKey_forObject("metadata", contentId.ToString());
+            return CacheController.createKey( "metadata-" + contentId.ToString());
         }
         //
         //====================================================================================================

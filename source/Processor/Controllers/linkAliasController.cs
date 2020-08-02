@@ -229,7 +229,7 @@ namespace Contensive.Processor.Controllers {
                             if (flushLinkAliasCache) {
                                 //
                                 // -- invalidate all linkAlias
-                                core.cache.invalidateDbRecord(linkAliasId, LinkAliasModel.tableMetadata.tableNameLower);
+                                core.cache.invalidateRecordKey(linkAliasId, LinkAliasModel.tableMetadata.tableNameLower);
                                 //
                                 // -- invalidate routemap
                                 Models.Domain.RouteMapModel.invalidateCache(core);

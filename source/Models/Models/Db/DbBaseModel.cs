@@ -996,15 +996,20 @@ namespace Contensive.Models.Db {
                     if (id == 0) { id = cp.Db.Add(tableName, userId); }
                     cp.Db.Update(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                 }
+                string cacheKey = cp.Cache.CreateRecordKey(id, tableName, datasourceName);
                 if (!allowRecordCaching(this.GetType())) {
                     //
                     // -- the object being saved is a derived type and cannot be saved to the base object's cache. Clear the cache
-                    cp.Cache.Invalidate(cp.Cache.CreateKeyForDbRecord(id, tableName, datasourceName));
+                    cp.Cache.Invalidate(cacheKey);
                 } else {
                     //
-                    // -- store the cache object referenced by id, invalidated if the table-key is invalidated
-                    string cacheKey = cp.Cache.CreateKeyForDbRecord(id, tableName, datasourceName);
-                    string tableKey = cp.Cache.CreateDependencyKeyInvalidateOnChange(tableName, datasourceName);
+                    // -- create the tableDependencyKey 
+                    string tableKey = cp.Cache.CreateTableDependencyKey(tableName, datasourceName);
+                    //
+                    // -- update the cache Last-Record-Modified-Date
+                    cp.Cache.invalidateTableDependencyKey(tableName);
+                    //
+                    // -- (after the table-invalidate) store the cache object referenced by id, invalidated if the table-key is invalidated
                     cp.Cache.Store(cacheKey, this, tableKey);
                     //
                     // -- store the cache object ptr so this object can be referenced from its guid (as well as id)
@@ -1012,9 +1017,6 @@ namespace Contensive.Models.Db {
                     //
                     // -- if the name for this table is unique, store the cache object ptr for name so this object can be referenced by name
                     if (derivedNameFieldIsUnique(instanceType)) cp.Cache.StorePtr(cp.Cache.CreatePtrKeyforDbRecordUniqueName(name, tableName, datasourceName), cacheKey);
-                    //
-                    // -- update the cache Last-Record-Modified-Date
-                    cp.Cache.UpdateLastModified(tableName);
                 }
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
@@ -1447,7 +1449,7 @@ namespace Contensive.Models.Db {
         /// <param name="cp"></param>
         /// <returns></returns>
         public static string createDependencyKeyInvalidateOnChange<T>(CPBaseClass cp) where T : DbBaseModel {
-            return cp.Cache.CreateDependencyKeyInvalidateOnChange(derivedTableName(typeof(T)));
+            return cp.Cache.CreateTableDependencyKey(derivedTableName(typeof(T)));
         }
         //
         //====================================================================================================
