@@ -823,7 +823,7 @@ namespace Contensive.Models.Db {
                             //DbBaseModel baseInstance;
                             string datasourceName = derivedDataSourceName(instanceType);
                             string tableName = derivedTableName(instanceType);
-                            string cacheKey = cp.Cache.CreateKeyForDbRecord(instance.id, tableName, datasourceName);
+                            string cacheKey = cp.Cache.CreateRecordKey(instance.id, tableName, datasourceName);
                             callersCacheKeyList.Add(cacheKey);
                             cp.Cache.Store(cacheKey, instance);
                             //
@@ -1038,7 +1038,7 @@ namespace Contensive.Models.Db {
                 string dataSourceName = derivedDataSourceName(typeof(T));
                 string tableName = derivedTableName(typeof(T));
                 cp.Db.Delete(tableName, recordId);
-                cp.Cache.Invalidate(cp.Cache.CreateKeyForDbRecord(recordId, tableName, dataSourceName));
+                cp.Cache.Invalidate(cp.Cache.CreateRecordKey(recordId, tableName, dataSourceName));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;
@@ -1462,7 +1462,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         private static T readRecordCache<T>(CPBaseClass cp, int recordId) where T : DbBaseModel {
             if (!allowRecordCaching(typeof(T))) return null;
-            T result = cp.Cache.GetObject<T>(cp.Cache.CreateKeyForDbRecord(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
+            T result = cp.Cache.GetObject<T>(cp.Cache.CreateRecordKey(recordId, derivedTableName(typeof(T)), derivedDataSourceName(typeof(T))));
             restoreCacheDataObjects(cp, result);
             return result;
         }
