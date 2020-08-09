@@ -928,21 +928,25 @@ namespace Contensive.Models.Db {
                                         case "FieldTypeTextFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
                                                 fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                                if (fileProperty == null) { fileProperty = new FieldTypeTextFile(); }
                                             }
                                             break;
                                         case "FieldTypeJavascriptFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
                                                 fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                                if (fileProperty == null) { fileProperty = new FieldTypeJavascriptFile(); }
                                             }
                                             break;
                                         case "FieldTypeCSSFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
                                                 fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                                if (fileProperty == null) { fileProperty = new FieldTypeCSSFile(); }
                                             }
                                             break;
                                         case "FieldTypeHTMLFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
                                                 fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                                if (fileProperty == null) { fileProperty = new FieldTypeHTMLFile(); }
                                             }
                                             break;
                                         default: {
