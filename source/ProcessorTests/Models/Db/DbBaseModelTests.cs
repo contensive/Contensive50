@@ -207,8 +207,29 @@ namespace Contensive.Models.Db.Tests {
                 Assert.AreEqual(contentReadFromModel, contentReadFromFile);
             }
         }
+        //
+        //
+        /// <summary>
+        /// AddDefault inherits fields
+        /// </summary>
         [TestMethod]
         public void addDefaultTest_inheritFields() {
+            using (CPClass cp = new CPClass(testAppName)) {
+                // arrange
+                ConditionalEmailModel email = DbBaseModel.addDefault<ConditionalEmailModel>(cp);
+                // act
+                // assert
+                Assert.AreEqual(cp.Content.GetID("Conditional Email"), email.contentControlId);
+                Assert.AreEqual(true, email.active);
+            }
+        }
+        //
+        //
+        /// <summary>
+        /// AddDefault inherits fields
+        /// </summary>
+        [TestMethod]
+        public void create_FieldTypeFile_() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 ConditionalEmailModel email = DbBaseModel.addDefault<ConditionalEmailModel>(cp);

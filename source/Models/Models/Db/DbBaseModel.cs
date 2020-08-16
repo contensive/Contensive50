@@ -64,16 +64,67 @@ namespace Contensive.Models.Db {
     public class DbBaseModel : DbBaseFieldsModel {
         //
         //====================================================================================================
-        //-- const must be set in derived clases
-        //
-        // -Public Const contentTableName As String = "" '<------ set to tablename for the primary content (used for cache names)
-        // -Public Const contentDataSource As String = "" '<----- set to datasource if not default
+        /// <summary>
+        /// simple constructor needed for deserialization
+        /// </summary>
+        public DbBaseModel() { }
         //
         //====================================================================================================
-        //-- field types
+        /// <summary>
+        /// A field type that contains a pathFilename used to reference an external asset, like an image.
+        /// </summary>
+        public class FieldTypeFile {
+            // 
+            //
+            /// <summary>
+            /// The current pathFilename. Available after the file is loaded by uploading or copying.
+            /// </summary>
+            public string filename { get; set; } = null;
+            // 
+            // 
+            /// <summary>
+            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// </summary>
+            public string tempFileCopySource { get; set; } = null;
+            // 
+            // 
+            /// <summary>
+            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// </summary>
+            public string privateFileCopySource { get; set; } = null;
+            // 
+            // 
+            /// <summary>
+            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// </summary>
+            public string wwwFileCopySource { get; set; } = null;
+            // 
+            // 
+            /// <summary>
+            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// </summary>
+            public string cdnFileCopySource { get; set; } = null;
+            //
+            //
+            /// <summary>
+            /// Set to the name of a file in the current request and the file will be saved to this field during save.
+            /// </summary>
+            public string uploadRequestName { get; set; } = null;
+            //
+            //
+            /// <summary>
+            /// set by load(). Used by field to read content from filename when needed
+            /// </summary>
+            [NonSerialized] public CPBaseClass cpInternal = null;
+
+        }
         //
+        //====================================================================================================
+        /// <summary>
+        /// The base type for a field that contains a filename and points to an external file that contains text-like content, like a css file or javascript file
+        /// </summary>
         [Serializable]
-        public class FieldTypeFileBase {
+        public class FieldTypeTextFileBase {
             //
             // -- 
             // during load
@@ -96,6 +147,8 @@ namespace Contensive.Models.Db {
             //
             // contentLoaded property means the content in the model is valid
             // contentUpdated property means the content needs to be saved on the next save
+            //
+            //====================================================================================================
             //
             public string filename {
                 set {
@@ -142,25 +195,37 @@ namespace Contensive.Models.Db {
             [NonSerialized] public CPBaseClass cpInternal = null;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Field type where the record field contains a filename that references a text file
+        /// </summary>
         [Serializable]
-        public class FieldTypeTextFile : FieldTypeFileBase {
-        }
-        [Serializable]
-        public class FieldTypeJavascriptFile : FieldTypeFileBase {
-        }
-        [Serializable]
-        public class FieldTypeCSSFile : FieldTypeFileBase {
-        }
-        [Serializable]
-        public class FieldTypeHTMLFile : FieldTypeFileBase {
+        public class FieldTypeTextFile : FieldTypeTextFileBase {
         }
         //
         //====================================================================================================
         /// <summary>
-        /// simple constructor needed for deserialization
+        /// Field type where the record field contains a filename that references a javascript file
         /// </summary>
-        public DbBaseModel() { }
-
+        [Serializable]
+        public class FieldTypeJavascriptFile : FieldTypeTextFileBase {
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Field type where the record field contains a filename that references a css file
+        /// </summary>
+        [Serializable]
+        public class FieldTypeCSSFile : FieldTypeTextFileBase {
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Field type where the record field contains a filename that references a html file
+        /// </summary>
+        [Serializable]
+        public class FieldTypeHTMLFile : FieldTypeTextFileBase {
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -507,6 +572,13 @@ namespace Contensive.Models.Db {
                                                         instanceProperty.SetValue(instance, instanceFileType);
                                                         break;
                                                     }
+                                                case "FieldTypeFile": {
+                                                        //
+                                                        // -- cdn file
+                                                        FieldTypeFile instanceFileType = new FieldTypeFile { filename = propertyValue };
+                                                        instanceProperty.SetValue(instance, instanceFileType);
+                                                        break;
+                                                    }
                                                 default: {
                                                         instanceProperty.SetValue(instance, propertyValue, null);
                                                         break;
@@ -607,6 +679,11 @@ namespace Contensive.Models.Db {
                                 }
                             case "FieldTypeTextFile": {
                                     FieldTypeTextFile fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(result);
+                                    fileProperty.cpInternal = cp;
+                                    break;
+                                }
+                            case "FieldTypeFile": {
+                                    FieldTypeFile fileProperty = (FieldTypeFile)instanceProperty.GetValue(result);
                                     fileProperty.cpInternal = cp;
                                     break;
                                 }
@@ -803,6 +880,16 @@ namespace Contensive.Models.Db {
                                                     instanceProperty.SetValue(instance, instanceFileType);
                                                     break;
                                                 }
+                                            case "FieldTypeFile": {
+                                                    //
+                                                    // -- cdn file
+                                                    FieldTypeFile instanceFileType = new FieldTypeFile {
+                                                        filename = propertyValue,
+                                                        cpInternal = cp
+                                                    };
+                                                    instanceProperty.SetValue(instance, instanceFileType);
+                                                    break;
+                                                }
                                             default: {
                                                     instanceProperty.SetValue(instance, propertyValue, null);
                                                     break;
@@ -872,9 +959,16 @@ namespace Contensive.Models.Db {
         public int save(CPBaseClass cp, int userId, bool asyncSave) {
             try {
                 if (isAppInvalid(cp)) { return 0; }
+                //
+                // -- get derived class tablename and data ssource
                 Type instanceType = this.GetType();
                 string tableName = derivedTableName(instanceType);
                 string datasourceName = derivedDataSourceName(instanceType);
+                //
+                // -- if new object save, create record first
+                if (id == 0) { id = cp.Db.Add(tableName, userId); }
+                //
+                // -- create all the sql update pairs for every property set
                 var sqlPairs = new NameValueCollection();
                 foreach (PropertyInfo instanceProperty in this.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
                     switch (instanceProperty.Name.ToLowerInvariant()) {
@@ -897,7 +991,7 @@ namespace Contensive.Models.Db {
                                 } else {
                                     CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                                     bool fileFieldContentUpdated = false;
-                                    FieldTypeFileBase fileProperty = null;
+                                    FieldTypeTextFileBase textFileProperty = null;
                                     Type targetType = (targetNullable) ? Nullable.GetUnderlyingType(instanceProperty.PropertyType) : instanceProperty.PropertyType;
                                     switch (targetType.Name) {
                                         case "Int32": {
@@ -927,26 +1021,32 @@ namespace Contensive.Models.Db {
                                             }
                                         case "FieldTypeTextFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileText;
-                                                fileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
-                                                if (fileProperty == null) { fileProperty = new FieldTypeTextFile(); }
+                                                textFileProperty = (FieldTypeTextFile)instanceProperty.GetValue(this);
+                                                if (textFileProperty == null) { textFileProperty = new FieldTypeTextFile(); }
                                             }
                                             break;
                                         case "FieldTypeJavascriptFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileJavascript;
-                                                fileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
-                                                if (fileProperty == null) { fileProperty = new FieldTypeJavascriptFile(); }
+                                                textFileProperty = (FieldTypeJavascriptFile)instanceProperty.GetValue(this);
+                                                if (textFileProperty == null) { textFileProperty = new FieldTypeJavascriptFile(); }
                                             }
                                             break;
                                         case "FieldTypeCSSFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileCSS;
-                                                fileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
-                                                if (fileProperty == null) { fileProperty = new FieldTypeCSSFile(); }
+                                                textFileProperty = (FieldTypeCSSFile)instanceProperty.GetValue(this);
+                                                if (textFileProperty == null) { textFileProperty = new FieldTypeCSSFile(); }
                                             }
                                             break;
                                         case "FieldTypeHTMLFile": {
                                                 fieldTypeId = CPContentBaseClass.FieldTypeIdEnum.FileHTML;
-                                                fileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
-                                                if (fileProperty == null) { fileProperty = new FieldTypeHTMLFile(); }
+                                                textFileProperty = (FieldTypeHTMLFile)instanceProperty.GetValue(this);
+                                                if (textFileProperty == null) { textFileProperty = new FieldTypeHTMLFile(); }
+                                            }
+                                            break;
+                                        case "FieldTypeFile": {
+                                                FieldTypeFile fileProperty = (FieldTypeFile)instanceProperty.GetValue(this);
+                                                if (fileProperty == null) { fileProperty = new FieldTypeFile(); }
+                                                processFileField(cp, fileProperty, tableName, instanceProperty.Name, id);
                                             }
                                             break;
                                         default: {
@@ -956,12 +1056,12 @@ namespace Contensive.Models.Db {
                                             }
                                     }
                                     if (!((int)fieldTypeId).Equals(0)) {
-                                        fileProperty.cpInternal = cp;
+                                        textFileProperty.cpInternal = cp;
                                         PropertyInfo fileFieldContentUpdatedProperty = instanceProperty.PropertyType.GetProperty("contentUpdated");
-                                        fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(fileProperty);
+                                        fileFieldContentUpdated = (bool)fileFieldContentUpdatedProperty.GetValue(textFileProperty);
                                         if (fileFieldContentUpdated) {
                                             PropertyInfo fileFieldFilenameProperty = instanceProperty.PropertyType.GetProperty("filename");
-                                            string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(fileProperty);
+                                            string fileFieldFilename = (string)fileFieldFilenameProperty.GetValue(textFileProperty);
                                             if ((String.IsNullOrEmpty(fileFieldFilename)) && (id != 0)) {
                                                 // 
                                                 // -- if record exists and file property's filename is not set, get the filename from the Db
@@ -972,19 +1072,19 @@ namespace Contensive.Models.Db {
                                                 }
                                             }
                                             PropertyInfo fileFieldContentProperty = instanceProperty.PropertyType.GetProperty("content");
-                                            string fileFieldContent = (string)fileFieldContentProperty.GetValue(fileProperty);
+                                            string fileFieldContent = (string)fileFieldContentProperty.GetValue(textFileProperty);
                                             if ((string.IsNullOrEmpty(fileFieldContent)) && (!string.IsNullOrEmpty(fileFieldFilename))) {
                                                 //
                                                 // -- empty content and valid filename, delete the file and clear the filename
                                                 sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(string.Empty));
                                                 cp.CdnFiles.DeleteFile(fileFieldFilename);
-                                                fileFieldFilenameProperty.SetValue(fileProperty, string.Empty);
+                                                fileFieldFilenameProperty.SetValue(textFileProperty, string.Empty);
                                             } else {
                                                 //
                                                 // -- save content
                                                 if (string.IsNullOrEmpty(fileFieldFilename)) {
                                                     fileFieldFilename = cp.Db.CreateFieldPathFilename(tableName, instanceProperty.Name.ToLowerInvariant(), id, fieldTypeId);
-                                                    fileFieldFilenameProperty.SetValue(fileProperty, fileFieldFilename);
+                                                    fileFieldFilenameProperty.SetValue(textFileProperty, fileFieldFilename);
                                                 }
                                                 cp.CdnFiles.Save(fileFieldFilename, fileFieldContent);
                                                 sqlPairs.Add(instanceProperty.Name, cp.Db.EncodeSQLText(fileFieldFilename));
@@ -997,7 +1097,8 @@ namespace Contensive.Models.Db {
                     }
                 }
                 if (sqlPairs.Count > 0) {
-                    if (id == 0) { id = cp.Db.Add(tableName, userId); }
+                    // -- moved to top, so new/save will create a record, and so FieldTypeFile can create filename before the end
+                    //if (id == 0) { id = cp.Db.Add(tableName, userId); }
                     cp.Db.Update(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
                 }
                 string cacheKey = cp.Cache.CreateRecordKey(id, tableName, datasourceName);
@@ -1515,7 +1616,12 @@ namespace Contensive.Models.Db {
                     case "FieldTypeCSSFile":
                     case "FieldTypeHTMLFile":
                     case "FieldTypeJavascriptFile": {
-                            FieldTypeFileBase fileProperty = (FieldTypeFileBase)instanceProperty.GetValue(restoredInstance);
+                            FieldTypeTextFileBase fileProperty = (FieldTypeTextFileBase)instanceProperty.GetValue(restoredInstance);
+                            fileProperty.cpInternal = cp;
+                            break;
+                        }
+                    case "FieldTypeFile": {
+                            FieldTypeFile fileProperty = (FieldTypeFile)instanceProperty.GetValue(restoredInstance);
                             fileProperty.cpInternal = cp;
                             break;
                         }
@@ -1567,6 +1673,58 @@ namespace Contensive.Models.Db {
                 }
             }
             return result;
+        }
+        // 
+        // ====================================================================================================
+        /// <summary>
+        /// Process the save for a FieldTypeFile property
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="fileField"></param>
+        /// <param name="tablename"></param>
+        /// <param name="fieldname"></param>
+        /// <param name="recordId"></param>
+        public static void processFileField(CPBaseClass cp, FieldTypeFile fileField, string tablename, string fieldname, int recordId) {
+            if (!string.IsNullOrWhiteSpace(fileField.cdnFileCopySource))
+                // 
+                // -- copy a file from cdnFiles 
+                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.CdnFiles, fileField.cdnFileCopySource);
+            else if (!string.IsNullOrWhiteSpace(fileField.tempFileCopySource))
+                // 
+                // -- copy a file from tempFiles 
+                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.TempFiles, fileField.tempFileCopySource);
+            else if (!string.IsNullOrWhiteSpace(fileField.wwwFileCopySource))
+                // 
+                // -- copy a file from wwwfiles 
+                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.WwwFiles, fileField.wwwFileCopySource);
+            else if (!string.IsNullOrWhiteSpace(fileField.uploadRequestName)) {
+                // 
+                // -- upload a file from the request
+                string srcFilename = cp.Doc.GetText(fileField.uploadRequestName);
+                string dstPathFilename = cp.Db.CreateUploadFieldPathFilename(tablename, fieldname, recordId, srcFilename);
+                cp.CdnFiles.SaveUpload(fileField.uploadRequestName, ref dstPathFilename);
+            }
+        }
+        // 
+        // ====================================================================================================
+        /// <summary>
+        /// Process a copy operation required for a FieldTypeFile from any file storage system to the cdn
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="tablename"></param>
+        /// <param name="fieldname"></param>
+        /// <param name="recordId"></param>
+        /// <param name="fileSystem"></param>
+        /// <param name="srcPathFilename"></param>
+        public static void processFileFieldCopy(CPBaseClass cp, string tablename, string fieldname, int recordId, CPFileSystemBaseClass fileSystem, string srcPathFilename) {
+            if (!string.IsNullOrWhiteSpace(srcPathFilename)) {
+                // 
+                // -- copy a file from cdnFiles 
+                string srcFilename = fileSystem.GetFilename(srcPathFilename);
+                string dstPathFilename = cp.Db.CreateUploadFieldPathFilename(tablename, fieldname, recordId, srcFilename);
+                fileSystem.Copy(srcPathFilename, dstPathFilename, cp.CdnFiles);
+                cp.Db.ExecuteNonQuery("update " + tablename + " set " + fieldname + "=" + cp.Db.EncodeSQLText(dstPathFilename) + " where id=" + recordId);
+            }
         }
     }
 }
