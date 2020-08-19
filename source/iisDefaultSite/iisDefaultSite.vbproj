@@ -57,27 +57,27 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.CloudWatchLogs, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.102.41\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.CloudWatchLogs.3.3.102.47\lib\net45\AWSSDK.CloudWatchLogs.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.Core.3.3.107.32\lib\net45\AWSSDK.Core.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.Core.3.3.107.39\lib\net45\AWSSDK.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.S3, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.S3.3.3.111.34\lib\net45\AWSSDK.S3.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.S3.3.3.113.1\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.SimpleEmail, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.186\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.SimpleEmail.3.3.101.192\lib\net45\AWSSDK.SimpleEmail.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.SimpleNotificationService, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.SimpleNotificationService.3.3.102.9\lib\net45\AWSSDK.SimpleNotificationService.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.SimpleNotificationService.3.3.102.16\lib\net45\AWSSDK.SimpleNotificationService.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="AWSSDK.SQS, Version=3.3.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604">
-      <HintPath>..\packages\AWSSDK.SQS.3.3.103.19\lib\net45\AWSSDK.SQS.dll</HintPath>
+      <HintPath>..\packages\AWSSDK.SQS.3.3.103.25\lib\net45\AWSSDK.SQS.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ClearScript, Version=6.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
@@ -90,11 +90,11 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="ContensiveModels, Version=4.1.2.0, Culture=neutral, PublicKeyToken=c014b235a9c6bb22">
-      <HintPath>..\packages\Contensive.DbModels.20.8.16.1\lib\net45\ContensiveModels.dll</HintPath>
+      <HintPath>..\packages\Contensive.DbModels.20.8.19.1\lib\net45\ContensiveModels.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="CPBase, Version=4.1.2.0, Culture=neutral, PublicKeyToken=10b3c53389b845fb">
-      <HintPath>..\packages\Contensive.CPBaseClass.20.8.16.1\lib\net45\CPBase.dll</HintPath>
+      <HintPath>..\packages\Contensive.CPBaseClass.20.8.19.1\lib\net45\CPBase.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Enyim.Caching, Version=2.16.0.0, Culture=neutral, PublicKeyToken=cec98615db04012e, processorArchitecture=MSIL">
@@ -131,15 +131,15 @@
       <HintPath>..\packages\AWS.Logger.NLog.1.5.2\lib\net45\NLog.AWS.Logger.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NUglify, Version=1.6.4.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e">
-      <HintPath>..\packages\NUglify.1.6.4\lib\net40\NUglify.dll</HintPath>
+    <Reference Include="NUglify, Version=1.6.5.0, Culture=neutral, PublicKeyToken=15bc7810aec21b5e">
+      <HintPath>..\packages\NUglify.1.6.5\lib\net40\NUglify.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nustache.Core, Version=1.16.0.10, Culture=neutral, PublicKeyToken=efd6f3d8f76ecd9f, processorArchitecture=MSIL">
       <HintPath>..\packages\Nustache.1.16.0.10\lib\net20\Nustache.Core.dll</HintPath>
     </Reference>
-    <Reference Include="processor, Version=20.8.16.1, Culture=neutral, PublicKeyToken=0777f439e33f89f3">
-      <HintPath>..\packages\Contensive.Processor.20.8.16.1\lib\net472\processor.dll</HintPath>
+    <Reference Include="processor, Version=20.8.19.1, Culture=neutral, PublicKeyToken=0777f439e33f89f3">
+      <HintPath>..\packages\Contensive.Processor.20.8.19.1\lib\net472\processor.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

@@ -341,7 +341,7 @@ namespace Contensive.Processor.Controllers {
                                             contentParts = ActiveContentController.renderHtmlForWysiwygEditor(core, contentParts);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextEmail:
-                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "",false);
+                                            contentParts = ActiveContentController.renderHtmlForEmail(core, contentParts, core.session.user.id, "", false);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextFilter:
                                         case CPUtilsBaseClass.addonContext.ContextOnBodyEnd:
@@ -1375,30 +1375,59 @@ namespace Contensive.Processor.Controllers {
                 try {
                     //
                     // -- catch exceptions found (Select.Pdf.dll has two classes that differ by only case)
-                    foreach (Type assemblyType in testAssembly.GetTypes()) {
-                        if (addon.dotNetClass.Equals(assemblyType.FullName, StringComparison.InvariantCultureIgnoreCase)) {
-                            if ((assemblyType.IsPublic) && (!((assemblyType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (assemblyType.BaseType != null)) {
-                                //
-                                // -- assembly is public, not abstract, based on a base type
-                                if (!string.IsNullOrEmpty(assemblyType.BaseType.FullName)) {
-                                    //
-                                    // -- assembly has a baseType fullname
-                                    string baseTypeName = assemblyType.BaseType.FullName.ToLowerInvariant();
-                                    addonFound = baseTypeName.Equals("addonbaseclass") || (baseTypeName.Equals("contensive.baseclasses.addonbaseclass"));
-                                    if (addonFound) {
-                                        addonType = assemblyType;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    addonType = Array.Find<Type>(
+                        testAssembly.GetTypes(),
+                        testType => (testType.IsPublic)
+                            && (testType.FullName.Equals(addon.dotNetClass,StringComparison.InvariantCultureIgnoreCase))
+                            && ((testType.Attributes & TypeAttributes.Abstract) != TypeAttributes.Abstract)
+                            && (testType.BaseType != null)
+                            && (!string.IsNullOrEmpty(testType.BaseType.FullName)
+                            && (testType.BaseType.FullName.Equals("contensive.baseclasses.addonbaseclass", StringComparison.InvariantCultureIgnoreCase)))
+                        );
+                    //
+                    addonFound = addonType != null;
+                    //// -- assembly has a baseType fullname
+                    //string baseTypeName = assemblyType2.BaseType.FullName.ToLowerInvariant();
+                    //addonFound = baseTypeName.Equals("addonbaseclass") || (baseTypeName.Equals("contensive.baseclasses.addonbaseclass"));
+                    //if (addonFound) {
+                    //    addonType = assemblyType2;
+                    //}
+                    //foreach (Type assemblyType in testAssembly.GetTypes()) {
+                    //    if (addon.dotNetClass.Equals(assemblyType.FullName, StringComparison.InvariantCultureIgnoreCase)) {
+                    //        if ((assemblyType.IsPublic) && (!((assemblyType.Attributes & TypeAttributes.Abstract) == TypeAttributes.Abstract)) && (assemblyType.BaseType != null)) {
+                    //            //
+                    //            // -- assembly is public, not abstract, based on a base type
+                    //            if (!string.IsNullOrEmpty(assemblyType.BaseType.FullName)) {
+                    //                //
+                    //                // -- assembly has a baseType fullname
+                    //                string baseTypeName = assemblyType.BaseType.FullName.ToLowerInvariant();
+                    //                addonFound = baseTypeName.Equals("addonbaseclass") || (baseTypeName.Equals("contensive.baseclasses.addonbaseclass"));
+                    //                if (addonFound) {
+                    //                    addonType = assemblyType;
+                    //                    break;
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 } catch (ArgumentException ex) {
-                    LogController.logWarn(core, ex, "Argument Exception while collecting classes for addon [" + addon.id + "," + addon.name + "], assembly [" + assemblyPhysicalPrivatePathname + "]. Typically these are when the assembly has two classes that differ only by the case of the class name or namespace.");
+                    //
+                    // -- argument exception
+                    LogController.logWarn(core, ex, "Argument Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "], assembly [" + assemblyPhysicalPrivatePathname + "]. Typically these are when the assembly has two classes that differ only by the case of the class name or namespace.");
+                    addonFound = false;
+                    return string.Empty;
+                } catch (ReflectionTypeLoadException ex) {
+                    //
+                    // -- loader error, one of the types listed could not be loaded. Could be bad or missing dependency
+                    foreach (var loaderException in ex.LoaderExceptions) {
+                        LogController.logError(core, ex, "Loader Exception [" + loaderException.Message + "] while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPhysicalPrivatePathname + "]");
+                    }
                     addonFound = false;
                     return string.Empty;
                 } catch (Exception ex) {
-                    LogController.logError(core, ex, "Exception while collecting classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPhysicalPrivatePathname + "]");
+                    //
+                    // -- unknown error. Better to log and continue
+                    LogController.logError(core, ex, "Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPhysicalPrivatePathname + "]");
                     addonFound = false;
                     return string.Empty;
                 }

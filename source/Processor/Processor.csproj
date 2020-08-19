@@ -7,6 +7,7 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageIcon>LogoBalls.png</PackageIcon>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
 
   <PropertyGroup Label="Signing">
@@ -103,22 +104,22 @@
 
   <ItemGroup>
     <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.41" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.107.32" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.111.34" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.186" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.102.9" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.103.19" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.47" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.107.39" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.113.1" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.192" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.102.16" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.3.103.25" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
     <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
-    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.0.0">
+    <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.7.3" />
-    <PackageReference Include="NUglify" Version="1.6.4" />
+    <PackageReference Include="NUglify" Version="1.6.5" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
   </ItemGroup>
 
@@ -137,7 +138,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.1'">
     <PackageReference Include="EnyimMemcachedCore" Version="2.4.3" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.1" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
     <PackageReference Include="System.Runtime.Caching" Version="4.7.0" />
     <PackageReference Include="System.Configuration.ConfigurationManager">
       <Version>4.7.0</Version>
