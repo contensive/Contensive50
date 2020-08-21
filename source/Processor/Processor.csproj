@@ -121,6 +121,8 @@
     <PackageReference Include="NLog" Version="4.7.3" />
     <PackageReference Include="NUglify" Version="1.6.5" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.7.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">

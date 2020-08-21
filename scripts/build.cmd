@@ -155,13 +155,15 @@ rem update cli, taskservice nuget packages
 rem
 
 cd ..\source\cli
-nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
-nuget update cli.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
+dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
+dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
+dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
+
+
 cd ..\taskservice
-nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.CPBaseClass
-nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.DbModels
-nuget update taskservice.csproj -noninteractive -source nuget.org -source %NuGetLocalPackagesFolder% -Id Contensive.Processor
+dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
+dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
+dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
 cd ..\..\scripts
 
 rem ==============================================================
@@ -172,20 +174,13 @@ cd ..\source
 
 dotnet clean ContensiveCli.sln
 
-"%msbuildLocation%msbuild.exe" contensiveCli.sln
-rem dotnet build Cli/Cli.csproj --no-dependencies /property:Version=%versionNumber%
-if errorlevel 1 (
-   echo failure building cli
-   pause
-   exit /b %errorlevel%
-)
+dotnet build cli/cli.csproj --no-dependencies /property:FileVersion=%versionNumber%
 
-rem dotnet build TaskService/TaskService.csproj --no-dependencies /property:Version=%versionNumber%
-rem if errorlevel 1 (
-rem    echo failure building taskservice
-rem    pause
-rem    exit /b %errorlevel%
-rem )
+pause
+
+dotnet build taskservice/taskservice.csproj --no-dependencies /property:FileVersion=%versionNumber%
+
+pause
 
 cd ..\scripts
 
