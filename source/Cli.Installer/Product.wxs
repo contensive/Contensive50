@@ -58,7 +58,7 @@
       />
     
     <!-- define main app icon -->
-    <Icon Id ="icon.ico" SourceFile="$(var.Cli.ProjectDir)\app.ico"/>
+    <Icon Id ="icon.ico" SourceFile="$(var.ProjectDir)\app.ico"/>
     <Property Id="ARPPRODUCTICON">icon.ico</Property>
     
     <!-- help support website for add/remove programs-->
