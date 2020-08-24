@@ -119,7 +119,15 @@ dotnet build Models/Models.csproj --no-dependencies /property:AssemblyVersion=4.
 
 dotnet build Processor/Processor.csproj --no-dependencies /property:Version=%versionNumber%
 
-dotnet pack contensivecommon.sln --no-build --no-restore /property:PackageVersion=%versionNumber%
+dotnet build taskservice/taskservice.csproj --no-dependencies /property:Version=%versionNumber%
+
+dotnet build cli/cli.csproj --no-dependencies /property:Version=%versionNumber%
+
+dotnet pack CPBase51/CPBase51.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
+
+dotnet pack Models/Models.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
+
+dotnet pack Processor/Processor.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
 
 if errorlevel 1 (
    echo failure building common solution
@@ -153,36 +161,36 @@ rem ==============================================================
 rem
 rem update cli, taskservice nuget packages 
 rem
-
-cd ..\source\cli
-dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
-dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
-dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
-
-
-cd ..\taskservice
-dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
-dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
-dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
-cd ..\..\scripts
+rem 
+rem cd ..\source\cli
+rem dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
+rem dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
+rem dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
+rem 
+rem cd ..\taskservice
+rem dotnet add package Contensive.CPBaseClass -s %NuGetLocalPackagesFolder%
+rem dotnet add package Contensive.DbModels -s %NuGetLocalPackagesFolder%
+rem dotnet add package Contensive.Processor -s %NuGetLocalPackagesFolder%
+rem cd ..\..\scripts
 
 rem ==============================================================
 rem
 rem build cli and task server
 rem
-cd ..\source
-
-dotnet clean ContensiveCli.sln
-
-dotnet build cli/cli.csproj --no-dependencies /property:FileVersion=%versionNumber%
-
-pause
-
-dotnet build taskservice/taskservice.csproj --no-dependencies /property:FileVersion=%versionNumber%
-
-pause
-
-cd ..\scripts
+rem cd ..\source
+rem 
+rem dotnet clean ContensiveCli.sln
+rem 
+rem dotnet build cli/cli.csproj --no-dependencies /property:FileVersion=%versionNumber%
+rem 
+rem pause
+rem 
+rem dotnet build taskservice/taskservice.csproj --no-dependencies /property:FileVersion=%versionNumber%
+rem 
+rem pause
+rem 
+rem cd ..\scripts
+rem 
 
 rem ==============================================================
 rem
@@ -190,14 +198,16 @@ rem build cli installer
 rem
 cd ..\source
 rem "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\MSBuild\Current\Bin\msbuild.exe" ContensiveCLIInstaller\ContensiveCLIInstaller.wixproj
-"%msbuildLocation%msbuild.exe" ContensiveCLIInstaller\ContensiveCLIInstaller.wixproj
+"%msbuildLocation%msbuild.exe" cli.installer\cli.installer.wixproj
 if errorlevel 1 (
 echo failure building cli installer
    pause
    exit /b %errorlevel%
 )
 
-xcopy "ContensiveCLIInstaller\bin\Debug\en-us\*.msi" "%deploymentFolderRoot%%versionNumber%\"
+pause
+
+xcopy "Cli.Installer\bin\Debug\en-us\*.msi" "%deploymentFolderRoot%%versionNumber%\"
 
 cd ..\scripts
 

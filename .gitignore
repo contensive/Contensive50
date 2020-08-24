@@ -255,3 +255,4 @@ WebDeploymentPackage/Setup.msi
 # User ignores
 /source/CliSetup.out.txt
 /source/Cli.Installer/componentsGenerated.wxs
+WebDeploymentPackage/
