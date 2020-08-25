@@ -28,12 +28,10 @@
 
   <ItemGroup>
     <PackageReference Include="Contensive.CPBaseClass" Version="20.8.21.1" />
-    <PackageReference Include="Contensive.DbModels" Version="20.8.21.1" />
-    <PackageReference Include="Contensive.Processor" Version="20.8.21.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CPBase51\CPBase51.csproj" />
+    <ProjectReference Include="..\CPBase\CPBase.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Processor\Processor.csproj" />
   </ItemGroup>

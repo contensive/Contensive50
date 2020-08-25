@@ -9,6 +9,8 @@ using Contensive.Models.Db;
 using Contensive.BaseModels;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using System.Data.Entity.Design.PluralizationServices;
+using System.Globalization;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -837,6 +839,20 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private Logger _nlogLogger;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// dotnet pluralize and singularize.
+        /// </summary>
+        public PluralizationService pluralizationService {
+            get {
+                if (_pluralizationService == null) {
+                    _pluralizationService = PluralizationService.CreateService(CultureInfo.GetCultureInfo("en-us"));
+                }
+                return _pluralizationService;
+            }
+        }
+        private PluralizationService _pluralizationService;
 
         #region  IDisposable Support 
         //

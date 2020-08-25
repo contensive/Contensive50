@@ -64,11 +64,8 @@ rd /s /q  "..\source\clisetup\Release"
 del /s /q  "..\source\clisetup\StagingDefaultApp"
 rd /s /q  "..\source\clisetup\StagingDefaultApp"
 
-del /s /q  "..\source\cpbase51\bin"
-rd /s /q  "..\source\cpbase51\bin"
-
-del /s /q  "..\source\cpbase51\obj"
-rd /s /q  "..\source\cpbase51\obj"
+del /s /q  "..\source\CPBase\obj"
+rd /s /q  "..\source\CPBase\obj"
 
 del /s /q  "..\source\iisDefaultSite\bin"
 rd /s /q  "..\source\iisDefaultSite\bin"
@@ -113,7 +110,7 @@ cd ..\source
 
 dotnet clean contensivecommon.sln
 
-dotnet build CPBase51/CPBase51.csproj --no-dependencies /property:AssemblyVersion=4.1.2.0 /property:FileVersion=%versionNumber%
+dotnet build CPBase/CPBase.csproj --no-dependencies /property:AssemblyVersion=4.1.2.0 /property:FileVersion=%versionNumber%
 
 dotnet build Models/Models.csproj --no-dependencies /property:AssemblyVersion=4.1.2.0 /property:FileVersion=%versionNumber%
 
@@ -123,7 +120,7 @@ dotnet build taskservice/taskservice.csproj --no-dependencies /property:Version=
 
 dotnet build cli/cli.csproj --no-dependencies /property:Version=%versionNumber%
 
-dotnet pack CPBase51/CPBase51.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
+dotnet pack CPBase/CPBase.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
 
 dotnet pack Models/Models.csproj --no-build --no-restore /property:PackageVersion=%versionNumber%
 
@@ -143,7 +140,7 @@ rem move packages to deplyment, and to local package folder
 
 cd ..\source
 
-move /y "CPBase51\bin\debug\Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
+move /y "CPBase\bin\debug\Contensive.CPBaseClass.%versionNumber%.nupkg" "%deploymentFolderRoot%%versionNumber%\"
 rem copy this package to the local package source so the next project builds all upgrade the assembly
 xcopy "%deploymentFolderRoot%%versionNumber%\Contensive.CPBaseClass.%versionNumber%.nupkg" "%NuGetLocalPackagesFolder%" /Y
 
@@ -204,8 +201,6 @@ echo failure building cli installer
    pause
    exit /b %errorlevel%
 )
-
-pause
 
 xcopy "Cli.Installer\bin\Debug\en-us\*.msi" "%deploymentFolderRoot%%versionNumber%\"
 

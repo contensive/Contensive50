@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
     <RootNamespace>Contensive.Processor</RootNamespace>
-    <AssemblyName>processor</AssemblyName>
+    <AssemblyName>Processor</AssemblyName>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageIcon>LogoBalls.png</PackageIcon>
@@ -63,7 +63,9 @@
       <PackagePath>content</PackagePath>
     </None>
     <None Include="LogoBalls.png" Pack="true" PackagePath="" />
-    <None Include="aoBase51.xml" Pack="true" PackagePath="" />
+    <None Include="aoBase51.xml" Pack="true" PackagePath="">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="app.ico" Pack="true" PackagePath="" />
   </ItemGroup>
 
@@ -98,19 +100,18 @@
   </ItemGroup>
   
   <ItemGroup>
-    <ProjectReference Include="..\CPBase51\CPBase51.csproj" />
+    <ProjectReference Include="..\CPBase\CPBase.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AWS.Logger.NLog" Version="1.5.2" />
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.102.47" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.107.39" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.113.1" />
-    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.3.101.192" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.102.16" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.3.103.25" />
-    <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.5.0.1" />
+    <PackageReference Include="AWSSDK.Core" Version="3.5.0.1" />
+    <PackageReference Include="AWSSDK.S3" Version="3.5.0.1" />
+    <PackageReference Include="AWSSDK.SimpleEmail" Version="3.5.0.1" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.5.0.1" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.5.0.1" />
     <PackageReference Include="Microsoft.ClearScript" Version="6.0.2" />
     <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
@@ -118,8 +119,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.Web.Administration" Version="11.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.3" />
-    <PackageReference Include="NUglify" Version="1.6.5" />
+    <PackageReference Include="NLog" Version="4.7.4" />
+    <PackageReference Include="NUglify" Version="1.8.1" />
     <PackageReference Include="SharpZipLib" Version="1.2.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="4.7.0" />
@@ -149,6 +150,12 @@
       <Version>4.7.0</Version>
     </PackageReference>
     <PackageReference Include="System.IO.FileSystem.AccessControl" Version="4.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Data.Entity.Design">
+      <HintPath>..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.7.2\System.Data.Entity.Design.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -50,7 +50,13 @@
          <!--Remove Start Menu Items on uninstal--> 
         <RemoveFolder Id="RemoveStartFolder" Directory="InstallProgramMenuFolder" On="uninstall"/>
         
-      </Component>  
+      </Component>
+      
+      <!-- install aoBase51.xml into install folder
+      <Component Id="aobase51.xml" Guid="{932C072D-EA42-40A5-96A7-09712BF1C213}">
+        <File Id="aobase51.xml" Source="MySourceFiles\MyApplication.exe" KeyPath="yes" Checksum="yes"/>
+      </Component> 
+      -->
     </DirectoryRef>
   </Fragment>
 </Wix>

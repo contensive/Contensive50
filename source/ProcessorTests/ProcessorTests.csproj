@@ -36,7 +36,7 @@
     <PackageReference Include="Microsoft.NetFramework.Analyzers" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.7.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="2.1.2" />
     <PackageReference Include="MSTest.TestFramework" Version="2.1.2" />
   </ItemGroup>
@@ -52,7 +52,6 @@
     <Reference Include="System.Transactions" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CPBase51\CPBase51.csproj" />
     <ProjectReference Include="..\Processor\Processor.csproj" />
   </ItemGroup>
 </Project>
