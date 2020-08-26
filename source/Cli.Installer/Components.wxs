@@ -8,6 +8,9 @@
       
       <!-- reference the components to install -->
       <ComponentRef Id="MainAppShortcut"/>
+<!--
+<ComponentRef Id="TaskServiceExe"/>
+-->
     </ComponentGroup>
     
     <!-- reference the directory in the directories file -->
@@ -51,12 +54,38 @@
         <RemoveFolder Id="RemoveStartFolder" Directory="InstallProgramMenuFolder" On="uninstall"/>
         
       </Component>
-      
-      <!-- install aoBase51.xml into install folder
-      <Component Id="aobase51.xml" Guid="{932C072D-EA42-40A5-96A7-09712BF1C213}">
-        <File Id="aobase51.xml" Source="MySourceFiles\MyApplication.exe" KeyPath="yes" Checksum="yes"/>
-      </Component> 
-      -->
+<!--
+      <Component Id="TaskServiceExe" Guid="{AAF0A10E-0297-4CBE-85A6-B9631EBAD7FC}">
+        <File
+          Id="TaskServiceExe"
+          Name="TaskService.exe"
+          DiskId="1"
+          Source="$(var.BasePath)/TaskService.exe"
+          Vital="yes"
+          KeyPath="yes" />
+
+        <ServiceInstall
+          Id="ServiceInstaller"
+          Type="ownProcess"
+          Vital="yes"
+          Name="MyWindowsService"
+          DisplayName="MyWindowsService"
+          Description="Example Windows Service"
+          Start="auto"
+          Account="LocalSystem"
+          ErrorControl="normal"
+          Arguments=" /start MyWindowsService"
+          Interactive="no" />
+
+        <ServiceControl
+          Id="StartService"
+          Stop="both"
+          Start="install"
+          Remove="uninstall"
+          Name="MyWindowsService"
+          Wait="yes" />
+      </Component>   
+-->  
     </DirectoryRef>
   </Fragment>
 </Wix>

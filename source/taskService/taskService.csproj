@@ -1,14 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net472</TargetFrameworks>
-    <AssemblyName>taskService</AssemblyName>
-    <RootNamespace>Contensive.WindowsServices</RootNamespace>
+    <TargetFrameworks>netcoreapp3.1;net472</TargetFrameworks>
+    <AssemblyName>TaskService</AssemblyName>
+    <RootNamespace>Contensive.Services</RootNamespace>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageIcon>LogoBalls.png</PackageIcon>
     <RepositoryUrl>https://github.com/contensive/Contensive5</RepositoryUrl>
+    <OutputType>WinExe</OutputType>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="ProjectInstaller.cs" />
+    <Compile Remove="ProjectInstaller.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="ProjectInstaller.resx" />
+  </ItemGroup>
 
 
   <ItemGroup>
@@ -27,12 +37,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Contensive.CPBaseClass" Version="20.8.21.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CPBase\CPBase.csproj" />
-    <ProjectReference Include="..\Models\Models.csproj" />
     <ProjectReference Include="..\Processor\Processor.csproj" />
   </ItemGroup>
 

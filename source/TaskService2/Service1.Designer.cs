@@ -1,5 +1,5 @@
-﻿namespace Contensive.Services {
-    partial class taskService {
+﻿namespace Contensive.Workers {
+    partial class Service1 {
         /// <summary> 
         /// Required designer variable.
         /// </summary>

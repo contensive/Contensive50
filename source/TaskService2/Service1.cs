@@ -1,10 +1,33 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.ServiceProcess;
+using System.Text;
+using System.Threading.Tasks;
+
 using Contensive.Processor.Controllers;
 using Contensive.Processor;
 
-namespace Contensive.Services {
+namespace Contensive.Workers {
+    public partial class Service1 : ServiceBase {
+        public Service1() {
+            InitializeComponent();
+        }
+
+        protected override void OnStart(string[] args) {
+        }
+
+        protected override void OnStop() {
+        }
+    }
+}
+
+
+
+namespace Contensive.Workers {
     public partial class taskService : ServiceBase {
         public taskService() {
             InitializeComponent();
