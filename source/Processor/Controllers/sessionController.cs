@@ -377,7 +377,7 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- mobile detect
-                            resultSessionContext.visit.browser = core.webServer.requestBrowser;
+                            resultSessionContext.visit.browser = core.webServer.requestBrowser.substringSafe(0,254);
                             switch (resultSessionContext.visitor.forceBrowserMobile) {
                                 case 1: {
                                         resultSessionContext.visit.mobile = true;

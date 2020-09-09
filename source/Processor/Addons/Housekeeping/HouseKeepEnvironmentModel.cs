@@ -1,5 +1,6 @@
 ﻿
 using System;
+using Amazon.S3.Model.Internal.MarshallTransformations;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 //
@@ -10,68 +11,120 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// housekeep environment, to facilitate argument passing
     /// </summary>
     public class HouseKeepEnvironmentModel {
-        public bool forceHousekeep { get; set; }
-        public bool runDailyTasks { get; set; }
-        public DateTime lastCheckDateTime { get; set; }
-        public int serverHousekeepHour { get; set; }
-        public DateTime yesterday { get; set; }
-        public DateTime aLittleWhileAgo { get; set; }
-        public DateTime oldestVisitSummaryWeCareAbout { get; set; }
-        public int visitArchiveAgeDays { get; set; }
-        public DateTime visitArchiveDate { get; set; }
-        public string defaultMemberName { get; set; }
-        public int guestArchiveAgeDays { get; set; }
-        /// <summary>
-        /// how many days the email drop and email log data are kept
-        /// </summary>
-        public int emailDropArchiveAgeDays { get; set; }
-        /// <summary>
-        /// How many days the email log stores the email body (large data)
-        /// </summary>
-        public int emailLogBodyRetainDays { get; set; }
-        public bool archiveDeleteNoCookie { get; set; }
-        public string sqlDateMidnightTwoDaysAgo { get; set; }
-        public DateTime midnightTwoDaysAgo { get; set; }
-        public DateTime thirtyDaysAgo { get; set; }
-        public bool archiveAlarm { get; set; }
         //
-        public HouseKeepEnvironmentModel(CoreController core) {
-            try {
-                archiveAlarm = false;
-                lastCheckDateTime = core.siteProperties.getDate("housekeep, last check", default);
-                core.siteProperties.setProperty("housekeep, last check", core.dateTimeNowMockable);
-                forceHousekeep = core.docProperties.getBoolean("force");
-                serverHousekeepHour = core.siteProperties.getInteger("housekeep, run time hour", 2);
-                runDailyTasks = ((core.dateTimeNowMockable.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.dateTimeNowMockable.Hour));
-                yesterday = core.dateTimeNowMockable.AddDays(-1).Date;
-                aLittleWhileAgo = core.dateTimeNowMockable.AddDays(-90).Date;
-                defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
-                archiveDeleteNoCookie = core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true);
-                sqlDateMidnightTwoDaysAgo = DbController.encodeSQLDate(midnightTwoDaysAgo);
-                midnightTwoDaysAgo = core.dateTimeNowMockable.AddDays(-2).Date;
-                thirtyDaysAgo = core.dateTimeNowMockable.AddDays(-30).Date;
+        public readonly CoreController core;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// calls to housekeeping will force both the hourly and daily to run
+        /// </summary>
+        public bool forceHousekeep {
+            get {
+                return core.docProperties.getBoolean("force");
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// returns true if daily has not run today, and it is after the house-keep-hour
+        /// </summary>
+        public bool runDailyTasks {
+            get {
+                return ((core.dateTimeNowMockable.Date > lastCheckDateTime.Date) && (serverHousekeepHour < core.dateTimeNowMockable.Hour));
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// the last time housekeep was run
+        /// </summary>
+        public DateTime lastCheckDateTime { get { return core.siteProperties.getDate("housekeep, last check", default); } }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The hour of the day when daily housekeep should run
+        /// </summary>
+        public int serverHousekeepHour { get { return core.siteProperties.getInteger("housekeep, run time hour", 2); } }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// day before current mockable date
+        /// </summary>
+        public DateTime yesterday { get { return core.dateTimeNowMockable.AddDays(-1).Date; } }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// 90 days ago
+        /// </summary>
+        public DateTime aLittleWhileAgo { get { return core.dateTimeNowMockable.AddDays(-90).Date; } }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// oldest visit we care about (30 days)
+        /// </summary>
+        public DateTime oldestVisitSummaryWeCareAbout {
+            get {
+                DateTime oldestVisitSummaryWeCareAbout = core.dateTimeNowMockable.Date.AddDays(-30);
+                if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
+                    oldestVisitSummaryWeCareAbout = visitArchiveDate;
+                }
+                return oldestVisitSummaryWeCareAbout;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// days that we keep simple archive records like visits. Not for summary files like visitsummary
+        /// </summary>
+        public int visitArchiveAgeDays {
+            get {
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
-                visitArchiveAgeDays = core.siteProperties.getInteger("ArchiveRecordAgeDays", 2);
+                int visitArchiveAgeDays = core.siteProperties.getInteger("ArchiveRecordAgeDays", 2);
                 if (visitArchiveAgeDays < 2) {
                     visitArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveRecordAgeDays", 2);
                 }
-                visitArchiveDate = core.dateTimeNowMockable.AddDays(-visitArchiveAgeDays).Date;
-                oldestVisitSummaryWeCareAbout = core.dateTimeNowMockable.Date.AddDays(-30);
-                if (oldestVisitSummaryWeCareAbout < visitArchiveDate) {
-                    oldestVisitSummaryWeCareAbout = visitArchiveDate;
-                }
+                return visitArchiveAgeDays;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// The date before which we delete archives
+        /// </summary>
+        public DateTime visitArchiveDate {
+            get {
+                return core.dateTimeNowMockable.AddDays(-visitArchiveAgeDays).Date;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// how long we keep guest records
+        /// </summary>
+        public int guestArchiveAgeDays {
+            get {
                 //
                 // -- Get GuestArchiveAgeDays
-                guestArchiveAgeDays = core.siteProperties.getInteger("ArchivePeopleAgeDays", 2);
+                int guestArchiveAgeDays = core.siteProperties.getInteger("ArchivePeopleAgeDays", 2);
                 if (guestArchiveAgeDays < 2) {
                     guestArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchivePeopleAgeDays", guestArchiveAgeDays);
                 }
+                return guestArchiveAgeDays;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// how many days the email drop and email log data are kept
+        /// </summary>
+        public int emailDropArchiveAgeDays {
+            get {
                 //
                 // -- Get EmailDropArchiveAgeDays
-                emailDropArchiveAgeDays = core.siteProperties.getInteger("ArchiveEmailDropAgeDays", 90);
+                int emailDropArchiveAgeDays = core.siteProperties.getInteger("ArchiveEmailDropAgeDays", 90);
                 if (emailDropArchiveAgeDays < 2) {
                     emailDropArchiveAgeDays = 2;
                     core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays);
@@ -80,37 +133,28 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     emailDropArchiveAgeDays = 365;
                     core.siteProperties.setProperty("ArchiveEmailDropAgeDays", emailDropArchiveAgeDays);
                 }
-                //
-                // -- Get emailLogBodyRetainDays -- 
-                emailLogBodyRetainDays = GenericController.encodeInteger(core.siteProperties.getText("EmailLogBodyRetainDays", "7"));
-                //
-                defaultMemberName = ContentFieldMetadataModel.getDefaultValue(core, "people", "name");
-                //
-                // Check for site's archive time of day
-                //
-                string AlarmTimeString = core.siteProperties.getText("ArchiveTimeOfDay", "12:00:00 AM");
-                if (string.IsNullOrEmpty(AlarmTimeString)) {
-                    AlarmTimeString = "12:00:00 AM";
-                    core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                }
-                if (!GenericController.isDate(AlarmTimeString)) {
-                    AlarmTimeString = "12:00:00 AM";
-                    core.siteProperties.setProperty("ArchiveTimeOfDate", AlarmTimeString);
-                }
-                double minutesSinceMidnight = core.dateTimeNowMockable.TimeOfDay.TotalMinutes;
-                double LastCheckMinutesFromMidnight = lastCheckDateTime.TimeOfDay.TotalMinutes;
-                if ((minutesSinceMidnight > LastCheckMinutesFromMidnight) && (LastCheckMinutesFromMidnight < minutesSinceMidnight)) {
-                    //
-                    // Same Day - Midnight is before last and after current
-                    //
-                    archiveAlarm = true;
-                } else if ((LastCheckMinutesFromMidnight > minutesSinceMidnight) && ((LastCheckMinutesFromMidnight < minutesSinceMidnight))) {
-                    //
-                    // New Day - Midnight is between Last and Set
-                    //
-                    archiveAlarm = true;
-                }
-
+                return emailDropArchiveAgeDays;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// How many days the email log stores the email body (large data)
+        /// </summary>
+        public int emailLogBodyRetainDays { get { return GenericController.encodeInteger(core.siteProperties.getText("EmailLogBodyRetainDays", "7")); } }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// how long to keep no-cookie visits
+        /// </summary>
+        public bool archiveDeleteNoCookie { get { return core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true); } }
+        //
+        //====================================================================================================
+        //
+        public HouseKeepEnvironmentModel(CoreController core) {
+            try {
+                this.core = core;
+                core.siteProperties.setProperty("housekeep, last check", core.dateTimeNowMockable);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
