@@ -13,7 +13,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// interpret dynamic elements with content including <AC></AC> tags and {% {} %} JSON-based content commands.
     /// </summary>
-    public class ActiveContentController {
+    public static class ActiveContentController {
         //
         //  active content:
         //      1) addons dropped into wysiwyg editor
@@ -36,7 +36,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string renderHtmlForWeb(CoreController core, string source, string contextContentName = "", int ContextRecordId = 0, int deprecated_ContextContactPeopleId = 0, string ProtocolHostString = "", int DefaultWrapperId = 0, CPUtilsBaseClass.addonContext addonContext = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = ContentCmdController.executeContentCommands(core, source, CPUtilsBaseClass.addonContext.ContextAdmin);
-            return encode(core, result, core.session.user.id, contextContentName, ContextRecordId, deprecated_ContextContactPeopleId, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperId, "", addonContext, core.session.isAuthenticated, null, core.session.isEditing());
+            return encode(core, result, core.session.user.id, contextContentName, ContextRecordId, deprecated_ContextContactPeopleId, false, false, true, true, false, true, "", ProtocolHostString, false, addonContext, core.session.isAuthenticated,  core.session.isEditing());
         }
         //
         //====================================================================================================
@@ -66,7 +66,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="deprecated_personalizationIsAuthenticated"></param>
         /// <param name="context"></param>
         /// <returns></returns>
-        private static string renderActiveContent(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, int moreInfoPeopleId, bool addLinkAuthenticationToAllLinks, bool ignore, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool deprecated_personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
+        public static string renderActiveContent(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, bool addLinkAuthenticationToAllLinks, bool ignore, bool encodeACResourceLibraryImages, bool encodeForWysiwygEditor, bool EncodeNonCachableTags, string queryStringToAppendToAllLinks, string protocolHost, bool IsEmailContent, string AdminURL, bool deprecated_personalizationIsAuthenticated, CPUtilsBaseClass.addonContext context = CPUtilsBaseClass.addonContext.ContextPage) {
             string result = sourceHtmlContent;
             try {
                 //
@@ -112,7 +112,7 @@ namespace Contensive.Processor.Controllers {
                                 switch (ElementTag) {
                                     case "INPUT": {
                                             if (EncodeNonCachableTags) {
-                                                FormInputCount = FormInputCount + 1;
+                                                FormInputCount += 1;
                                             }
                                             break;
                                         }
@@ -147,7 +147,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // Ends in a questionmark, must be Dwayne (?)
                                                                     //
-                                                                    attrValue = attrValue + AnchorQuery;
+                                                                    attrValue += AnchorQuery;
                                                                 } else if (GenericController.strInstr(1, attrValue, "mailto:", 1) != 0) {
                                                                     //
                                                                     // catch mailto
@@ -200,7 +200,7 @@ namespace Contensive.Processor.Controllers {
                                                                                 //
                                                                                 // Block content if not allowed
                                                                                 //
-                                                                                ElementPointer = ElementPointer + 1;
+                                                                                ElementPointer +=  1;
                                                                                 while (ElementPointer < KmaHTML.elementCount) {
                                                                                     ElementTag = GenericController.toUCase(KmaHTML.tagName(ElementPointer));
                                                                                     if (ElementTag == "AC") {
@@ -211,7 +211,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             }
                                                                                         }
                                                                                     }
-                                                                                    ElementPointer = ElementPointer + 1;
+                                                                                    ElementPointer +=  1;
                                                                                 }
                                                                             }
                                                                             break;
@@ -336,11 +336,11 @@ namespace Contensive.Processor.Controllers {
                                                                     string[] SrcOptions = GenericController.stringSplit(SrcOptionList, "\r");
                                                                     for (int Ptr = 0; Ptr <= SrcOptions.GetUpperBound(0); Ptr++) {
                                                                         string SrcOptionName = SrcOptions[Ptr];
-                                                                        int LoopPtr2 = 0;
+                                                                        int loopPtr2 = 0;
 
-                                                                        while ((SrcOptionName.Length > 1) && (SrcOptionName.left(1) == "\t") && (LoopPtr2 < 100)) {
+                                                                        while ((SrcOptionName.Length > 1) && (SrcOptionName.left(1) == "\t") && (loopPtr2 < 100)) {
                                                                             SrcOptionName = SrcOptionName.Substring(1);
-                                                                            LoopPtr2 = LoopPtr2 + 1;
+                                                                            loopPtr2 +=  1;
                                                                         }
                                                                         string SrcOptionValueSelector = "";
                                                                         string SrcOptionSelector = "";
@@ -424,7 +424,7 @@ namespace Contensive.Processor.Controllers {
                             // ----- Output the results
                             //
                             Stream.add(Copy);
-                            ElementPointer = ElementPointer + 1;
+                            ElementPointer +=  1;
                         }
                     }
                     result = Stream.text;
@@ -1009,7 +1009,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="isEditingAnything"></param>
         /// <returns></returns>
         //
-        public static string encode(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, int ignore_DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, object nothingObject, bool isEditingAnything) {
+        public static string encode(CoreController core, string sourceHtmlContent, int deprecated_personalizationPeopleId, string ContextContentName, int ContextRecordID, int ContextContactPeopleID, bool convertHtmlToText, bool addLinkAuthToAllLinks, bool EncodeActiveFormatting, bool EncodeActiveImages, bool EncodeActiveEditIcons, bool EncodeActivePersonalization, string queryStringForLinkAppend, string ProtocolHostLink, bool IsEmailContent, CPUtilsBaseClass.addonContext Context, bool personalizationIsAuthenticated, bool isEditingAnything) {
             string result = sourceHtmlContent;
             string hint = "0";
             try {
@@ -1029,7 +1029,7 @@ namespace Contensive.Processor.Controllers {
                     hint = "30";
                     if (addLinkAuthToAllLinks || EncodeActiveFormatting || EncodeActiveImages || EncodeActiveEditIcons) {
                         string AdminURL = "/" + core.appConfig.adminRoute;
-                        result = renderActiveContent(core, result, deprecated_personalizationPeopleId, ContextContentName, ContextRecordID, ContextContactPeopleID, addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
+                        result = renderActiveContent(core, result, deprecated_personalizationPeopleId, ContextContentName, ContextRecordID,  addLinkAuthToAllLinks, EncodeActiveFormatting, EncodeActiveImages, EncodeActiveEditIcons, EncodeActivePersonalization, queryStringForLinkAppend, ProtocolHostLink, IsEmailContent, AdminURL, personalizationIsAuthenticated, Context);
                     }
                     //
                     // -- Do Plain Text Conversion
@@ -1255,7 +1255,7 @@ namespace Contensive.Processor.Controllers {
         /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
         /// </summary>
         public static string renderHtmlForWysiwygEditor(CoreController core, string editorValue) {
-            return encode(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, 0, "", Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, null, false);
+            return encode(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false,  Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false,  false);
         }
         //
         //====================================================================================================
@@ -1272,11 +1272,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ignore_TemplateCaseOnly_Content"></param>
         /// <param name="addonContext"></param>
         /// <returns></returns>
-        public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int deprecated_ContextContactPeopleID, string ProtocolHostString, int DefaultWrapperID, string ignore_TemplateCaseOnly_Content, CPUtilsBaseClass.addonContext addonContext) {
+        public static string renderJSONForRemoteMethod(CoreController core, string Source, string ContextContentName, int ContextRecordID, int deprecated_ContextContactPeopleID, string ProtocolHostString, CPUtilsBaseClass.addonContext addonContext) {
             if (core.siteProperties.beta200327_BlockCCmdForJSONRemoteMethods) { return Source; }
             string result = Source;
             result = ContentCmdController.executeContentCommands(core, result, CPUtilsBaseClass.addonContext.ContextAdmin);
-            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, DefaultWrapperID, ignore_TemplateCaseOnly_Content, addonContext, core.session.isAuthenticated, null, core.session.isEditing());
+            result = encode(core, result, core.session.user.id, ContextContentName, ContextRecordID, deprecated_ContextContactPeopleID, false, false, true, true, false, true, "", ProtocolHostString, false, addonContext, core.session.isAuthenticated,  core.session.isEditing());
             return result;
         }
         //
@@ -1296,7 +1296,7 @@ namespace Contensive.Processor.Controllers {
             using (CPClass cp = new CPClass(core.appConfig.name, core.serverConfig)) {
                 if (cp.User.LoginByID(sendToPersonId)) {
                     result = ContentCmdController.executeContentCommands(cp.core, result, CPUtilsClass.addonContext.ContextEmail);
-                    result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, addLinkAuthToAllLinks, true, true, false, true, queryStringForLinkAppend, "", true, 0, "", CPUtilsBaseClass.addonContext.ContextEmail, true, null, false);
+                    result = encode(cp.core, result, sendToPersonId, "", 0, 0, false, addLinkAuthToAllLinks, true, true, false, true, queryStringForLinkAppend, "", true, CPUtilsBaseClass.addonContext.ContextEmail, true,  false);
                 }
             };
             return result;

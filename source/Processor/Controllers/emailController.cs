@@ -20,6 +20,8 @@ namespace Contensive.Processor.Controllers {
         //
         private const string emailBlockListFilename = "Config\\SMTPBlockList.txt";
         //
+        //====================================================================================================
+        //
         public static string getBounceAddress(CoreController core, string backupBounceAddress) {
             return core.siteProperties.getText("EmailBounceAddress", backupBounceAddress);
         }

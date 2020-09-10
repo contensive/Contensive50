@@ -359,7 +359,7 @@ namespace Contensive.Processor.Controllers {
                                             contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
                                             break;
                                         case CPUtilsBaseClass.addonContext.ContextRemoteMethodJson:
-                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, 0, "", 0, "", executeContext.addonType);
+                                            contentParts = ActiveContentController.renderJSONForRemoteMethod(core, contentParts, "", 0, 0, "", executeContext.addonType);
                                             break;
                                         default:
                                             contentParts = ActiveContentController.renderHtmlForWeb(core, contentParts, "", 0, 0, "", 0, executeContext.addonType);
@@ -370,7 +370,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- RemoteAssetLink
                                 hint = "16";
-                                if (addon.remoteAssetLink != "") {
+                                if (!string.IsNullOrEmpty(addon.remoteAssetLink)) {
                                     string RemoteAssetLink = addon.remoteAssetLink;
                                     if (RemoteAssetLink.IndexOf("://", StringComparison.InvariantCulture) < 0) {
                                         //
@@ -402,7 +402,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // --  FormXML
                                 hint = "17";
-                                if (addon.formXML != "") {
+                                if (!string.IsNullOrEmpty(addon.formXML)) {
                                     bool ExitAddonWithBlankResponse = false;
                                     result.Append(execute_formContent(addon.formXML, ref ExitAddonWithBlankResponse, "addon [" + addon.name + "]"));
                                     if (ExitAddonWithBlankResponse) {
@@ -412,7 +412,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- Script Callback
                                 hint = "18";
-                                if (addon.link != "") {
+                                if (!string.IsNullOrEmpty(addon.link)) {
                                     string callBackLink = encodeVirtualPath(addon.link, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
                                     foreach (var key in core.docProperties.getKeyList()) {
                                         callBackLink = modifyLinkQuery(callBackLink, encodeRequestVariable(key), encodeRequestVariable(core.docProperties.getText(key)), true);
@@ -426,13 +426,13 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- js head links
                                 hint = "19";
-                                if (addon.jsHeadScriptSrc != "") {
+                                if (!string.IsNullOrEmpty(addon.jsHeadScriptSrc)) {
                                     core.html.addScriptLinkSrc(addon.jsHeadScriptSrc, AddedByName + " Javascript Head Src", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
                                 }
                                 //
                                 // -- js head code
                                 hint = "20";
-                                if (addon.jsFilename.filename != "") {
+                                if (!string.IsNullOrEmpty(addon.jsFilename.filename)) {
                                     string scriptFilename = GenericController.getCdnFileLink(core, addon.jsFilename.filename);
                                     core.html.addScriptLinkSrc(scriptFilename, AddedByName + " Javascript Head Code", (executeContext.forceJavascriptToHead || addon.javascriptForceHead), addon.id);
                                 }
@@ -447,12 +447,12 @@ namespace Contensive.Processor.Controllers {
                                     core.html.addHeadTag(addon.otherHeadTags, AddedByName);
                                     //
                                     // -- styles
-                                    if (addon.stylesFilename.filename != "") {
+                                    if (!string.IsNullOrEmpty(addon.stylesFilename.filename)) {
                                         core.html.addStyleLink(GenericController.getCdnFileLink(core, addon.stylesFilename.filename), addon.name + " Stylesheet");
                                     }
                                     //
                                     // -- link to stylesheet
-                                    if (addon.stylesLinkHref != "") {
+                                    if (!string.IsNullOrEmpty(addon.stylesLinkHref)) {
                                         core.html.addStyleLink(addon.stylesLinkHref, addon.name + " Stylesheet Link");
                                     }
                                 }
@@ -462,7 +462,7 @@ namespace Contensive.Processor.Controllers {
                                 hint = "14";
                                 if (addon == null) { LogController.logError(core, new GenericException("AddonController.execute, addon became null at hint-14"), ""); }
                                 if (addon.scriptingCode == null) { LogController.logError(core, new GenericException("AddonController.execute, addon.scriptCode is null at hint-14"), ""); }
-                                if (addon.scriptingCode != "") {
+                                if (!string.IsNullOrEmpty(addon.scriptingCode)) {
                                     hint = "14.1";
                                     try {
                                         hint = "14.2";
@@ -482,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 hint = "15";
-                                if (addon.dotNetClass != "") {
+                                if (!string.IsNullOrEmpty(addon.dotNetClass )) {
                                     result.Append(execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId)));
                                 }
 
@@ -1178,7 +1178,7 @@ namespace Contensive.Processor.Controllers {
                                                                                                 Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                             } else if (Microsoft.VisualBasic.Information.IsArray(CellData)) {
                                                                                                 Copy += ColumnStart + "[array]";
-                                                                                            } else if (GenericController.encodeText(CellData) == "") {
+                                                                                            } else if (string.IsNullOrEmpty(encodeText(CellData))) {
                                                                                                 Copy += (ColumnStart + "[empty]" + ColumnEnd);
                                                                                             } else {
                                                                                                 Copy += (ColumnStart + HtmlController.encodeHtml(GenericController.encodeText(CellData)) + ColumnEnd);
@@ -1259,7 +1259,7 @@ namespace Contensive.Processor.Controllers {
                 UriBuilder uri = new UriBuilder(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
                 string appPath = Path.GetDirectoryName(path);
-                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath, true, ref AddonFound);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath,  ref AddonFound);
                 if (AddonFound) { return result; }
                 //
                 // -- try addon folder
@@ -1273,7 +1273,7 @@ namespace Contensive.Processor.Controllers {
                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), collectionFolderConfig.path);
                 if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
-                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath, false, ref AddonFound);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath,  ref AddonFound);
                 if (!AddonFound) {
                     throw new GenericException(warningMessage + ", not found in application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                 }
@@ -1295,7 +1295,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IsDevAssembliesFolder"></param>
         /// <param name="addonFound"></param>
         /// <returns></returns>
-        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, bool IsDevAssembliesFolder, ref bool addonFound) {
+        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, ref bool addonFound) {
             try {
                 addonFound = false;
                 if (!Directory.Exists(fullPath)) { return string.Empty; }
@@ -1378,7 +1378,7 @@ namespace Contensive.Processor.Controllers {
                     addonType = Array.Find<Type>(
                         testAssembly.GetTypes(),
                         testType => (testType.IsPublic)
-                            && (testType.FullName.Equals(addon.dotNetClass,StringComparison.InvariantCultureIgnoreCase))
+                            && (testType.FullName.Equals(addon.dotNetClass, StringComparison.InvariantCultureIgnoreCase))
                             && ((testType.Attributes & TypeAttributes.Abstract) != TypeAttributes.Abstract)
                             && (testType.BaseType != null)
                             && (!string.IsNullOrEmpty(testType.BaseType.FullName)
@@ -1816,10 +1816,6 @@ namespace Contensive.Processor.Controllers {
                 for (int Ptr = 0; Ptr <= QuerySplit.GetUpperBound(0); Ptr++) {
                     string NameValue = QuerySplit[Ptr];
                     if (!string.IsNullOrEmpty(NameValue)) {
-                        //
-                        // Execute list functions
-                        //
-                        string OptionName = "";
                         string OptionValue = "";
                         string OptionSelector = "";
                         //
@@ -1827,6 +1823,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         NameValue = GenericController.strReplace(NameValue, "\\=", Environment.NewLine);
                         int Pos = GenericController.strInstr(1, NameValue, "=");
+                        //
+                        // Execute list functions
+                        //
+                        string OptionName;
                         if (Pos == 0) {
                             OptionName = NameValue;
                         } else {
@@ -2022,7 +2022,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="IconSpriteColumn"></param>
         /// <returns></returns>
         public static string getAddonIconImg(string AdminURL, int IconWidth, int IconHeight, int IconSprites, bool IconIsInline, string IconImgID, string IconFilename, string serverFilePath, string IconAlt, string IconTitle, string ACInstanceID, int IconSpriteColumn) {
-            string result = "";
             if (string.IsNullOrEmpty(IconAlt)) { IconAlt = "Add-on"; }
             if (string.IsNullOrEmpty(IconTitle)) { IconTitle = "Rendered as Add-on"; }
             if (string.IsNullOrEmpty(IconFilename)) {
@@ -2054,6 +2053,7 @@ namespace Contensive.Processor.Controllers {
                 IconFilename = serverFilePath + IconFilename;
             }
             if ((IconWidth == 0) || (IconHeight == 0)) { IconSprites = 0; }
+            string result;
             if (IconSprites == 0) {
                 //
                 // just the icon
@@ -2096,12 +2096,11 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ACInstanceID"></param>
         /// <returns></returns>
         public static string getIconSprite(string TagID, int SpriteColumn, string IconSrc, int IconWidth, int IconHeight, string IconAlt, string IconTitle, string onDblClick, bool IconIsInline, string ACInstanceID) {
-            string result = "";
-            result = "<img"
+            string result = "<img"
                 + " border=0"
                 + " id=\"" + TagID + "\""
-                + " onMouseOver=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px -" + (2 * IconHeight) + "px';\""
-                + " onMouseOut=\"this.style.backgroundPosition='" + (-1 * SpriteColumn * IconWidth) + "px 0px'\""
+                + " onMouseOver=\"this.style.backgroundPosition='" + -1 * SpriteColumn * IconWidth + "px -" + 2 * IconHeight + "px';\""
+                + " onMouseOut=\"this.style.backgroundPosition='" + -1 * SpriteColumn * IconWidth + "px 0px'\""
                 + " onDblClick=\"" + onDblClick + "\""
                 + " alt=\"" + IconAlt + "\""
                 + " title=\"" + IconTitle + "\""
