@@ -437,6 +437,19 @@ namespace Contensive.Processor {
         }
         private CPHttpClass _HttpObj;
         //
+        //=========================================================================================================
+        //
+        public override CPImageBaseClass Image {
+            get {
+                if (_Image == null) {
+                    _Image = new CPImageClass(this);
+                }
+                return _Image;
+            }
+        }
+        private CPImageClass _Image;
+
+        //
         //====================================================================================================
         /// <summary>
         /// Json serialize/deserialize
@@ -649,6 +662,9 @@ namespace Contensive.Processor {
                 return _Security;
             }
         }
+        //
+        //=========================================================================================================
+        //
         private CPSecurityBaseClass _Security;
 
         //

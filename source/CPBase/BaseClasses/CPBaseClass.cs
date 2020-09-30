@@ -182,6 +182,12 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
+        /// Image controller
+        /// </summary>
+        public abstract CPImageBaseClass Image { get; }
+        //
+        //====================================================================================================
+        /// <summary>
         /// utilities for json
         /// </summary>
         /// <value></value>
