@@ -305,17 +305,17 @@ namespace Contensive.Processor.Addons.Tools {
                     Stream.add("</tr></TABLE>");
                     //
                     Stream.add("<table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"99%\"><tr>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
-                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
+                    Stream.add("<td width=\"9%\"><nobr><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.gif\" width=\"1\" height=\"10\"><IMG alt=\"\" src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"100%\" height=\"10\"></nobr></td>");
                     Stream.add("</tr></TABLE>");
                     //
                     // print the column headers
@@ -347,14 +347,14 @@ namespace Contensive.Processor.Addons.Tools {
                                 }
                                 string AStart = "<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + fieldId + "&dtcn=" + ColumnCount;
                                 Stream.add("<td width=\"" + ColumnWidth + "%\" valign=\"top\" align=\"left\">" + SpanClassAdminNormal + Caption + "<br>");
-                                Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/black.GIF\" width=\"100%\" height=\"1\">");
-                                Stream.add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
-                                Stream.add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
+                                Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/black.GIF\" width=\"100%\" height=\"1\">");
+                                Stream.add(AStart + "&dta=" + ToolsActionRemoveField + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonDeleteUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldRight + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonMoveRightUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionMoveFieldLeft + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonMoveLeftUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionSetAZ + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonSortazUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionSetZA + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonSortzaUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionExpand + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonOpenUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A><br>");
+                                Stream.add(AStart + "&dta=" + ToolsActionContract + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonCloseUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A>");
                                 Stream.add("</SPAN></td>");
                                 ColumnCount += 1;
                             }
@@ -398,42 +398,42 @@ namespace Contensive.Processor.Addons.Tools {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (text file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileCSS) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (css file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileXML) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (xml file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileJavascript) {
                                     //
                                     // text filename can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (javascript file field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.LongText) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (long text field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.FileImage) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (image field)<br>");
                                 } else if (field.fieldTypeId == CPContentBaseClass.FieldTypeIdEnum.Redirect) {
                                     //
                                     // long text can not be search
                                     //
-                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
+                                    Stream.add("<IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/Spacer.gif\" width=\"50\" height=\"15\" border=\"0\"> " + field.caption + " (redirect field)<br>");
                                 } else {
                                     //
                                     // can be used as column header
                                     //
-                                    Stream.add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20200122/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
+                                    Stream.add("<A href=\"" + core.webServer.requestPage + "?" + RequestNameToolContentId + "=" + ContentId + "&af=" + AdminFormToolConfigureListing + "&fi=" + field.id + "&dta=" + ToolsActionAddField + "&" + RequestNameAddFieldId + "=" + field.id + "\"><IMG src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/LibButtonAddUp.gif\" width=\"50\" height=\"15\" border=\"0\"></A> " + field.caption + "<br>");
                                 }
                             }
                         }
