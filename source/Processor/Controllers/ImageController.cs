@@ -1,24 +1,9 @@
 ﻿
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Security;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.VisualBasic;
-using System.Numerics;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using Contensive.BaseClasses;
-//using Contensive.Addons.aoAccountBilling.Models.Db;
-//using Contensive.Addons.aoAccountBilling.Models.View;
-using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
     // 
@@ -31,14 +16,17 @@ namespace Contensive.Processor.Controllers {
         // 
         // ====================================================================================================
         /// <summary>
-        ///         ''' Return an image resized and cropped to best fit the hole. Test if in cache first, else load record and test for resized in alt list, else Resize the image and save back to the image's record
-        ///         ''' </summary>
-        ///         ''' <param name="core"></param>
-        ///         ''' <param name="imagePathFilename">An image file in either cdnFiles, tempFiles, privateFiles, or wwwFiles (cdnFiles default(.</param>
-        ///         ''' <param name="holeWidth">The width of the space to fit the image</param>
-        ///         ''' <param name="holeHeight">The height of the space to fit the image</param>
-        ///         ''' <param name="imageAltSizeList">A List of alternate image sizes available in the same path as the image, in the format widthxheight, like '10x20' and '30x40'</param>
-        ///         ''' <returns></returns>
+        /// Return an image resized and cropped to best fit the hole. Test if in cache first, else load record and test for resized in alt list, else Resize the image and save back to the image's record
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="imagePathFilename">An image file in cdnFiles</param>
+        /// <param name="holeWidth">The width of the space to fit the image</param>
+        /// <param name="holeHeight">The height of the space to fit the image</param>
+        /// <param name="imageAltSizeList">
+        /// A List starting with the filename, followed by a list of alternate image sizes available in the same path as the image, in the format widthxheight, like '10x20' and '30x40'.
+        /// When returned, the caller should check that the filename did not change, and that the list length did not change. If there is a change, the list should be saved for next call.
+        /// </param>
+        /// <returns></returns>
         public static string getBestFit(CoreController core, string imagePathFilename, int holeWidth, int holeHeight, List<string> imageAltSizeList) {
             // 
             try {
@@ -49,7 +37,7 @@ namespace Contensive.Processor.Controllers {
                 // 
                 // -- argument testing, width and height must be >=0
                 if ((holeHeight < 0) | (holeWidth < 0)) {
-                    LogController.logError( core, new ArgumentException("Image resize/crop size must be >0, width [" + holeWidth + "], height [" + holeHeight + "]"));
+                    LogController.logError(core, new ArgumentException("Image resize/crop size must be >0, width [" + holeWidth + "], height [" + holeHeight + "]"));
                     return imagePathFilename.Replace(@"\", "/");
                 }
                 // 
@@ -62,18 +50,44 @@ namespace Contensive.Processor.Controllers {
                 string filePath = FileController.getPath(imagePathFilename);
                 string filenameNoext = Path.GetFileNameWithoutExtension(imagePathFilename);
                 string altSizeFilename = (filenameNoext + filenameExt).Replace(",", "_").Replace("-", "_").Replace("x", "_");
-                // 
-                // -- verify this altsizelist matches this image, or reset it
-                if ((!imageAltSizeList.Contains(altSizeFilename)))
-                    // 
-                    // -- alt size list does not start with this filename, new image uploaded, reset list
-                    imageAltSizeList = new List<string>();
-                // 
-                // -- test image.altresizelist to see if image already available. if so, return it
                 string imageAltsize = holeWidth + "x" + holeHeight;
                 string newImageFilename = filePath + filenameNoext + "-" + imageAltsize + filenameExt;
-                if (("," + imageAltSizeList + ",").Contains("," + imageAltsize + ","))
+                // 
+                // -- verify this altsizelist matches this image, or reset it
+                if ((!imageAltSizeList.Contains(altSizeFilename))) {
+                    // 
+                    // -- alt size list does not start with this filename, new image uploaded, reset list
+                    imageAltSizeList.Clear();
+                    imageAltSizeList.Add(imagePathFilename);
+                }
+                //
+                // -- check if the image is in the altSizeList, fast but default images may not exist
+                if (imageAltSizeList.Contains(imageAltsize)) {
+                    //
+                    // -- if altSizeList shows the image exists, return it
                     return newImageFilename.Replace(@"\", "/");
+                }
+                //
+                // -- first, use cache to determine if this image size exists (fasted)
+                string imageExistsKey = CacheController.createKey("fileExists-" + newImageFilename);
+                if (core.cache.getBoolean(imageExistsKey)) {
+                    //
+                    // -- if altSizeList shows the image exists, return it
+                    imageAltSizeList.Add(imageAltsize);
+                    return newImageFilename.Replace(@"\", "/");
+                }
+                //
+                // -- check if the file actually exists (slowest)
+                if (core.cdnFiles.fileExists(newImageFilename)) {
+                    //
+                    // -- image exists, return it
+                    imageAltSizeList.Add(imageAltsize);
+                    core.cache.storeObject(imageExistsKey, true);
+                    return newImageFilename.Replace(@"\", "/");
+                }
+                //
+                // -- image size does not exist, create it
+                imageAltSizeList.Add(imageAltsize);
                 // 
                 // -- first resize - determine the if the width or the height is the rezie fit
                 // -- then crop to the final size
@@ -169,6 +183,7 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // -- save the new size back to the item and cache
                     imageAltSizeList.Add(imageAltsize);
+                    core.cache.storeObject(imageExistsKey, true);
                     return newImageFilename.Replace(@"\", "/");
                 }
             } catch (Exception ex) {
