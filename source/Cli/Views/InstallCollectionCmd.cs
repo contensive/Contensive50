@@ -12,7 +12,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--install CollectionName"
             + Environment.NewLine + "    downloads and installed the addon collection named from the Contensive Support Library"

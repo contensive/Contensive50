@@ -98,26 +98,26 @@ namespace Contensive.Processor.Addons.AdminSite {
                             + " ORDER BY ccVisits.LastVisitTime DESC;";
                         csData.openSql(sql);
                         if (csData.ok()) {
-                            Panel = Panel + "<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"2\">";
-                            Panel = Panel + "<tr bgcolor=\"#B0B0B0\">";
-                            Panel = Panel + "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "User</td>";
-                            Panel = Panel + "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "IP&nbsp;Address</td>";
-                            Panel = Panel + "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "Last&nbsp;Page&nbsp;Hit</td>";
-                            Panel = Panel + "<td width=\"10%\" align=\"right\">" + SpanClassAdminNormal + "Page&nbsp;Hits</td>";
-                            Panel = Panel + "<td width=\"10%\" align=\"right\">" + SpanClassAdminNormal + "Visit</td>";
-                            Panel = Panel + "<td width=\"30%\" align=\"left\">" + SpanClassAdminNormal + "Referer</td>";
-                            Panel = Panel + "</tr>";
+                            Panel +=  "<table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"2\">";
+                            Panel +=  "<tr bgcolor=\"#B0B0B0\">";
+                            Panel +=  "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "User</td>";
+                            Panel +=  "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "IP&nbsp;Address</td>";
+                            Panel +=  "<td width=\"20%\" align=\"left\">" + SpanClassAdminNormal + "Last&nbsp;Page&nbsp;Hit</td>";
+                            Panel +=  "<td width=\"10%\" align=\"right\">" + SpanClassAdminNormal + "Page&nbsp;Hits</td>";
+                            Panel +=  "<td width=\"10%\" align=\"right\">" + SpanClassAdminNormal + "Visit</td>";
+                            Panel +=  "<td width=\"30%\" align=\"left\">" + SpanClassAdminNormal + "Referer</td>";
+                            Panel +=  "</tr>";
                             RowColor = "ccPanelRowEven";
                             while (csData.ok()) {
                                 VisitID = csData.getInteger("VisitID");
-                                Panel = Panel + "<tr class=\"" + RowColor + "\">";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + csData.getInteger("MemberID")) + "\">" + csData.getText("MemberName") + "</A></span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csData.getText("Remote_Addr") + "</span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + csData.getDate("LastVisitTime").ToString("") + "</span></td>";
-                                Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + csData.getText("PageVisits") + "</A></span></td>";
-                                Panel = Panel + "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=17&VisitID=" + VisitID + "\">" + VisitID + "</A></span></td>";
-                                Panel = Panel + "<td align=\"left\">" + SpanClassAdminNormal + "&nbsp;" + csData.getText("referer") + "</span></td>";
-                                Panel = Panel + "</tr>";
+                                Panel +=  "<tr class=\"" + RowColor + "\">";
+                                Panel +=  "<td align=\"left\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + HtmlController.encodeHtml(core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=16&MemberID=" + csData.getInteger("MemberID")) + "\">" + csData.getText("MemberName") + "</A></span></td>";
+                                Panel +=  "<td align=\"left\">" + SpanClassAdminNormal + csData.getText("Remote_Addr") + "</span></td>";
+                                Panel +=  "<td align=\"left\">" + SpanClassAdminNormal + csData.getDate("LastVisitTime").ToString("") + "</span></td>";
+                                Panel +=  "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=10&VisitID=" + VisitID + "\">" + csData.getText("PageVisits") + "</A></span></td>";
+                                Panel +=  "<td align=\"right\">" + SpanClassAdminNormal + "<a target=\"_blank\" href=\"/" + core.appConfig.adminRoute + "?" + rnAdminForm + "=" + AdminFormReports + "&rid=17&VisitID=" + VisitID + "\">" + VisitID + "</A></span></td>";
+                                Panel +=  "<td align=\"left\">" + SpanClassAdminNormal + "&nbsp;" + csData.getText("referer") + "</span></td>";
+                                Panel +=  "</tr>";
                                 if (RowColor == "ccPanelRowEven") {
                                     RowColor = "ccPanelRowOdd";
                                 } else {
@@ -125,7 +125,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                                 csData.goNext();
                             }
-                            Panel = Panel + "</table>";
+                            Panel +=  "</table>";
                         }
                         csData.close();
                     }

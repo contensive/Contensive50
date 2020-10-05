@@ -1200,7 +1200,6 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         //
         internal static string getContentBlockMessage(CoreController core, bool UseContentWatchLink) {
-            string result = "";
             try {
                 var copyRecord = DbBaseModel.createByUniqueName<CopyContentModel>(core.cpParent, ContentBlockCopyName);
                 if (copyRecord != null) {
@@ -1208,7 +1207,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // ----- Do not allow blank message - if still nothing, create default
-                result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
+                string result = "<p>The content on this page has restricted access. If you have a username and password for this system, <a href=\"?method=login\" rel=\"nofollow\">Click Here</a>. For more information, please contact the administrator.</p>";
                 copyRecord = DbBaseModel.addDefault<CopyContentModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, CopyContentModel.tableMetadata.contentName));
                 copyRecord.name = ContentBlockCopyName;
                 copyRecord.copy = result;
@@ -1216,7 +1215,7 @@ namespace Contensive.Processor.Controllers {
                 return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                return string.Empty;
+                throw;
             }
         }
         //
@@ -1544,10 +1543,10 @@ namespace Contensive.Processor.Controllers {
                     //
                     // No PageNotFound was set -- use the backup link
                     if (string.IsNullOrEmpty(BackupPageNotFoundLink)) {
-                        adminMessage = adminMessage + " The Site Property 'PageNotFoundPageID' is not set so the Landing Page was used.";
+                        adminMessage += " The Site Property 'PageNotFoundPageID' is not set so the Landing Page was used.";
                         Link = core.doc.landingLink;
                     } else {
-                        adminMessage = adminMessage + " The Site Property 'PageNotFoundPageID' is not set.";
+                        adminMessage += " The Site Property 'PageNotFoundPageID' is not set.";
                         Link = BackupPageNotFoundLink;
                     }
                 } else {
@@ -1557,7 +1556,7 @@ namespace Contensive.Processor.Controllers {
                     string DefaultLink = getPageLink(core, 0, "", true, false);
                     if (Link != DefaultLink) {
                     } else {
-                        adminMessage = adminMessage + "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used.";
+                        adminMessage += "</p><p>The current 'Page Not Found' could not be used. It is not valid, or it is not associated with a valid site section. To configure a valid 'Page Not Found' page, first create the page as a child page on your site and check the 'Page Not Found' checkbox on it's control tab. The Landing Page was used.";
                     }
                 }
                 //
@@ -1588,7 +1587,7 @@ namespace Contensive.Processor.Controllers {
                         adminMessage = adminMessage + " The referring page was " + referer + ".";
                     }
                     //
-                    adminMessage = adminMessage + "</p>";
+                    adminMessage += "</p>";
                     //
                     if (EditPageId != 0) {
                         Link = GenericController.modifyLinkQuery(Link, "AdminWarningPageID", EditPageId.ToString(), true);
@@ -1988,13 +1987,13 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 pageForm = loadFormPageInstructions(core, FormInstructions, Formhtml);
-                string RepeatBody = "";
+                string repeatBody = "";
                 string Body = null;
-                bool HasRequiredFields = false;
+                bool hasRequiredFields = false;
                 var peopleMeta = Models.Domain.ContentMetadataModel.createByUniqueName(core, "people");
                 foreach (var formField in pageForm.formFieldList) {
                     bool GroupValue = false;
-                    int GroupRowPtr = 0;
+                    int groupRowPtr = 0;
                     string CaptionSpan = null;
                     string Caption = null;
                     switch (formField.type) {
@@ -2018,8 +2017,8 @@ namespace Contensive.Processor.Controllers {
                                         Body = pageForm.repeatCell;
                                         Body = GenericController.strReplace(Body, "{{CAPTION}}", CaptionSpan + Caption + "</span>", 1, 99, 1);
                                         Body = GenericController.strReplace(Body, "{{FIELD}}", core.html.inputCs(csPeople, "People", formField.peopleFieldName), 1, 99, 1);
-                                        RepeatBody = RepeatBody + Body;
-                                        HasRequiredFields = HasRequiredFields || formField.required;
+                                        repeatBody += Body;
+                                        hasRequiredFields = hasRequiredFields || formField.required;
                                     }
                                 }
 
@@ -2033,9 +2032,9 @@ namespace Contensive.Processor.Controllers {
                                 Body = pageForm.repeatCell;
                                 Body = GenericController.strReplace(Body, "{{CAPTION}}", HtmlController.checkbox("Group" + formField.groupName, GroupValue), 1, 99, 1);
                                 Body = GenericController.strReplace(Body, "{{FIELD}}", formField.caption);
-                                RepeatBody = RepeatBody + Body;
-                                GroupRowPtr = GroupRowPtr + 1;
-                                HasRequiredFields = HasRequiredFields || formField.required;
+                                repeatBody += Body;
+                                groupRowPtr += 1;
+                                hasRequiredFields = hasRequiredFields || formField.required;
                                 break;
                             }
                         default: {
@@ -2044,18 +2043,18 @@ namespace Contensive.Processor.Controllers {
                             }
                     }
                 }
-                if (HasRequiredFields) {
+                if (hasRequiredFields) {
                     Body = pageForm.repeatCell;
                     Body = GenericController.strReplace(Body, "{{CAPTION}}", "&nbsp;", 1, 99, 1);
                     Body = GenericController.strReplace(Body, "{{FIELD}}", "*&nbsp;Required Fields");
-                    RepeatBody = RepeatBody + Body;
+                    repeatBody +=  Body;
                 }
                 //
                 string innerHtml = ""
                     + HtmlController.inputHidden("ContensiveFormPageID", FormPageId)
                     + HtmlController.inputHidden("SuccessID", SecurityController.encodeToken(core, GroupIDToJoinOnSuccess, core.doc.profileStartTime.AddMinutes(30)))
                     + pageForm.preRepeat
-                    + RepeatBody
+                    + repeatBody
                     + pageForm.postRepeat;
                 result = ""
                     + ErrorController.getUserError(core)
@@ -2094,25 +2093,25 @@ namespace Contensive.Processor.Controllers {
                             NoteFromName = core.docProperties.getText("NoteFromName");
                             NoteFromEmail = core.docProperties.getText("NoteFromEmail");
                             //
-                            NoteCopy = NoteCopy + "Feedback Submitted" + BR;
-                            NoteCopy = NoteCopy + "From " + NoteFromName + " at " + NoteFromEmail + BR;
-                            NoteCopy = NoteCopy + "Replying to:" + BR;
+                            NoteCopy +=  "Feedback Submitted" + BR;
+                            NoteCopy +=  "From " + NoteFromName + " at " + NoteFromEmail + BR;
+                            NoteCopy +=  "Replying to:" + BR;
                             if (!string.IsNullOrEmpty(headline)) {
-                                NoteCopy = NoteCopy + "    Article titled [" + headline + "]" + BR;
+                                NoteCopy +=  "    Article titled [" + headline + "]" + BR;
                             }
-                            NoteCopy = NoteCopy + "    Record [" + RecordID + "] in Content Definition [" + ContentName + "]" + BR;
-                            NoteCopy = NoteCopy + BR;
-                            NoteCopy = NoteCopy + "<b>Comments</b>" + BR;
+                            NoteCopy +=  "    Record [" + RecordID + "] in Content Definition [" + ContentName + "]" + BR;
+                            NoteCopy +=  BR;
+                            NoteCopy +=  "<b>Comments</b>" + BR;
                             //
                             Copy = core.docProperties.getText("NoteCopy");
                             if (string.IsNullOrEmpty(Copy)) {
-                                NoteCopy = NoteCopy + "[no comments entered]" + BR;
+                                NoteCopy +=  "[no comments entered]" + BR;
                             } else {
-                                NoteCopy = NoteCopy + HtmlController.convertNewLineToHtmlBreak(Copy) + BR;
+                                NoteCopy +=  HtmlController.convertNewLineToHtmlBreak(Copy) + BR;
                             }
                             //
-                            NoteCopy = NoteCopy + BR;
-                            NoteCopy = NoteCopy + "<b>Content on which the comments are based</b>" + BR;
+                            NoteCopy += BR;
+                            NoteCopy +=  "<b>Content on which the comments are based</b>" + BR;
                             //
                             using (var csData = new CsModel(core)) {
                                 csData.open(ContentName, "ID=" + RecordID);
@@ -2120,7 +2119,7 @@ namespace Contensive.Processor.Controllers {
                                 if (csData.ok()) {
                                     Copy = (csData.getText("copyFilename"));
                                 }
-                                NoteCopy = NoteCopy + Copy + BR;
+                                NoteCopy +=  Copy + BR;
                             }
                             //
                             PersonModel person = DbBaseModel.create<PersonModel>(core.cpParent, ToMemberID);
@@ -2140,38 +2139,38 @@ namespace Contensive.Processor.Controllers {
                             // ----- print the feedback submit form
                             //
                             Panel = "<form Action=\"" + core.webServer.serverFormActionURL + "?" + core.doc.refreshQueryString + "\" Method=\"post\">";
-                            Panel = Panel + "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
-                            Panel = Panel + "<tr>";
-                            Panel = Panel + "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";
-                            Panel = Panel + "</tr><tr>";
+                            Panel +=  "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
+                            Panel +=  "<tr>";
+                            Panel +=  "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";
+                            Panel +=  "</tr><tr>";
                             //
                             // ----- From Name
                             //
                             Copy = core.session.user.name;
-                            Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
-                            Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
-                            Panel = Panel + "</tr><tr>";
+                            Panel +=  "<td align=\"right\" width=\"100\"><p>Your Name</p></td>";
+                            Panel +=  "<td align=\"left\"><input type=\"text\" name=\"NoteFromName\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
+                            Panel +=  "</tr><tr>";
                             //
                             // ----- From Email address
                             //
                             Copy = core.session.user.email;
-                            Panel = Panel + "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
-                            Panel = Panel + "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
-                            Panel = Panel + "</tr><tr>";
+                            Panel +=  "<td align=\"right\" width=\"100\"><p>Your Email</p></td>";
+                            Panel +=  "<td align=\"left\"><input type=\"text\" name=\"NoteFromEmail\" value=\"" + HtmlController.encodeHtml(Copy) + "\"></span></td>";
+                            Panel +=  "</tr><tr>";
                             //
                             // ----- Message
                             //
                             Copy = "";
-                            Panel = Panel + "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
-                            Panel = Panel + "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
-                            Panel = Panel + "</tr><tr>";
+                            Panel +=  "<td align=\"right\" width=\"100\" valign=\"top\"><p>Feedback</p></td>";
+                            Panel +=  "<td>" + HtmlController.inputText_Legacy(core, "NoteCopy", Copy, 4, 40, "TextArea", false) + "</td>";
+                            Panel +=  "</tr><tr>";
                             //
                             // ----- submit button
                             //
-                            Panel = Panel + "<td>&nbsp;</td>";
-                            Panel = Panel + "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
-                            Panel = Panel + "</tr></table>";
-                            Panel = Panel + "</form>";
+                            Panel +=  "<td>&nbsp;</td>";
+                            Panel +=  "<td>" + HtmlController.inputSubmit(FeedbackButtonSubmit, "fbb") + "</td>";
+                            Panel +=  "</tr></table>";
+                            Panel +=  "</form>";
                             //
                             result = Panel;
                             break;

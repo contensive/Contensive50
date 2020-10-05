@@ -11,7 +11,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string helpText = ""
+        internal readonly static string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--exportcollection CollectionName"
             + Environment.NewLine + "    creates a collection zip file with the collections names"

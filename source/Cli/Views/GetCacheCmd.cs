@@ -8,7 +8,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static string helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "-a appName --getcache key"
             + Environment.NewLine + "    gets the cache object for the specified key and displays the object in JSON format. appName and key are required."

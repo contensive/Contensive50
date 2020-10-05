@@ -71,7 +71,8 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string contentName, string presetNameValueList) {
             string result = "";
-            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, presetNameValueList, false, true)) {
+            bool isEditing = cp.core.session.isEditing(contentName);
+            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, presetNameValueList, false, isEditing)) {
                 result += link;
             }
             return result;
@@ -81,7 +82,8 @@ namespace Contensive.Processor {
         //
         public override string GetAddLink(string contentName) {
             string result = "";
-            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, "", false, true)) {
+            bool isEditing = cp.core.session.isEditing(contentName);
+            foreach (var link in AdminUIController.getRecordAddAnchorTag(cp.core, contentName, "", false, isEditing)) {
                 result += link;
             }
             return result;
@@ -90,13 +92,13 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override string GetAddLink(int contentId, string PresetNameValueList) {
-            throw new NotImplementedException();
+            return GetAddLink(cp.Content.GetName(contentId), PresetNameValueList);
         }
         //
         //====================================================================================================
         //
         public override string GetAddLink(int contentId) {
-            throw new NotImplementedException();
+            return GetAddLink(cp.Content.GetName(contentId));
         }
         //
         //====================================================================================================

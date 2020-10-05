@@ -168,7 +168,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="contentName"></param>
         /// <returns></returns>
         public static string getForm_Index_ButtonBar(CoreController core, bool AllowAdd, bool AllowDelete, int pageNumber, int recordsPerPage, int recordCnt, string contentName) {
-            string result = "";
             string LeftButtons = "";
             string RightButtons = "";
             LeftButtons += AdminUIController.getButtonPrimary(ButtonCancel);
@@ -196,8 +195,7 @@ namespace Contensive.Processor.Controllers {
             } else {
                 RightButtons += AdminUIController.getButtonDanger(ButtonDelete, "", true);
             }
-            result = getSectionButtonBar(core, LeftButtons, RightButtons);
-            return result;
+            return getSectionButtonBar(core, LeftButtons, RightButtons);
         }
         //
         //====================================================================================================
@@ -414,11 +412,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="DefaultSortColumnPtr"></param>
         /// <returns></returns>
         public static int getReportSortColumnPtr(CoreController core, int DefaultSortColumnPtr) {
-            int tempGetReportSortColumnPtr = 0;
-            string VarText;
-            //
-            VarText = core.docProperties.getText("ColPtr");
-            tempGetReportSortColumnPtr = GenericController.encodeInteger(VarText);
+            string VarText = core.docProperties.getText("ColPtr");
+            int tempGetReportSortColumnPtr = GenericController.encodeInteger(VarText);
             if ((tempGetReportSortColumnPtr == 0) && (VarText != "0")) {
                 tempGetReportSortColumnPtr = DefaultSortColumnPtr;
             }
@@ -438,19 +433,15 @@ namespace Contensive.Processor.Controllers {
         //   This call returns a comma delimited list of integers representing the columns to sort
         //
         public static int getReportSortType(CoreController core) {
-            int tempGetReportSortType = 0;
-            string VarText;
-            //
-            VarText = core.docProperties.getText("ColPtr");
+            string VarText = core.docProperties.getText("ColPtr");
             if ((encodeInteger(VarText) != 0) || (VarText == "0")) {
                 //
                 // A valid ColPtr was found
                 //
-                tempGetReportSortType = core.docProperties.getInteger("ColSort");
+                return core.docProperties.getInteger("ColSort");
             } else {
-                tempGetReportSortType = (int)SortingStateEnum.SortableSetAZ;
+                return (int)SortingStateEnum.SortableSetAZ;
             }
-            return tempGetReportSortType;
         }
         //
         //====================================================================================================
@@ -1124,7 +1115,7 @@ namespace Contensive.Processor.Controllers {
                     bool userHasAccess = false;
                     bool contentAllowAdd = false;
                     bool groupRulesAllowAdd = false;
-                    DateTime memberRulesDateExpires = default(DateTime);
+                    DateTime memberRulesDateExpires;
                     bool memberRulesAllow = false;
                     if (core.session.isAuthenticatedAdmin()) {
                         //
@@ -1189,11 +1180,10 @@ namespace Contensive.Processor.Controllers {
                         if (contentAllowAdd && groupRulesAllowAdd && memberRulesAllow) {
                             Link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=4&aa=2&ad=1";
                             if (!string.IsNullOrEmpty(PresetNameValueList)) {
-                                string NameValueList = PresetNameValueList;
                                 Link = Link + "&wc=" + GenericController.encodeRequestVariable(PresetNameValueList);
                             }
                         }
-                        string shortName = "";
+                        string shortName;
                         switch (content.name.ToLower()) {
                             case "page content": {
                                     shortName = "Page";

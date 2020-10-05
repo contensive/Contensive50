@@ -41,7 +41,7 @@ namespace Contensive.CLI {
             Console.Write(VersionCmd.helpText);
         }
         //
-        internal static string helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine + "cc command line"
             + Environment.NewLine
             + Environment.NewLine + "-a appName"
