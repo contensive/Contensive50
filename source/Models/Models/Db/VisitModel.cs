@@ -16,8 +16,7 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         public bool bot { get; set; }
-        public string browser { get; set; }
-        
+        public string browser { get; set; }        
         public bool cookieSupport { get; set; }
         public bool excludeFromAnalytics { get; set; }
         //public string http_from { get; set; }
@@ -34,9 +33,9 @@ namespace Contensive.Models.Db {
         //public string remoteName { get; set; }
         public int startDateValue { get; set; }
         public DateTime? startTime { get; set; }
-        public DateTime? stopTime { get; set; }
+        //public DateTime? stopTime { get; set; }
         public int timeToLastHit { get; set; }
-        public bool verboseReporting { get; set; }
+        //public bool verboseReporting { get; set; }
         public bool visitAuthenticated { get; set; }
         public int visitorId { get; set; }
         public bool visitorNew { get; set; }

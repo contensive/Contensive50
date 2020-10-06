@@ -157,10 +157,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static SessionController create(CoreController core, bool trackVisits) {
             //
-            LogController.logTrace(core, "enter");
+            LogController.logTrace(core, "SessionController, create");
             //
             SessionController resultSessionContext = null;
-            var sw = Stopwatch.StartNew();
             try {
                 if (core.serverConfig == null) {
                     //
@@ -226,21 +225,20 @@ namespace Contensive.Processor.Controllers {
                     if (visitToken.id != 0) {
                         //
                         // -- Visit is good, setup visit, then secondary visitor/user if possible
-                        resultSessionContext.visit = VisitModel.create<VisitModel>(core.cpParent, visitToken.id);
+                        resultSessionContext.visit = DbBaseModel.create<VisitModel>(core.cpParent, visitToken.id);
                         if (resultSessionContext.visit == null) {
                             //
                             // -- visit record is missing, create a new visit
-                            LogController.logTrace(core, "cookie visit record is missing, create a new visit");
-                            resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
+                            LogController.logTrace(core, "cookie visit missing, create a new visit");
+                            resultSessionContext.visit = DbBaseModel.addEmpty<VisitModel>(core.cpParent);
                         } else if (encodeDate(resultSessionContext.visit.lastVisitTime).AddHours(1) < core.doc.profileStartTime) {
                             //
                             // -- visit has expired, create new visit
-                            LogController.logTrace(core, "cookie visit has expired, create new visit, lastVisitTime [" + resultSessionContext.visit.lastVisitTime + "], profileStartTime [" + core.doc.profileStartTime + "]");
-                            resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
+                            LogController.logTrace(core, "cookie visit expired, create new visit");
+                            resultSessionContext.visit = DbBaseModel.addEmpty<VisitModel>(core.cpParent);
                         } else {
                             //
                             // -- visit object is valid, share its data with other objects
-                            LogController.logTrace(core, "valid cookie visit [" + visitToken.id + "]");
                             resultSessionContext.visit.timeToLastHit = 0;
                             if (resultSessionContext.visit.startTime > DateTime.MinValue) {
                                 resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - encodeDate(resultSessionContext.visit.startTime)).TotalSeconds);
@@ -249,7 +247,7 @@ namespace Contensive.Processor.Controllers {
                             if (resultSessionContext.visit.visitorId > 0) {
                                 //
                                 // -- try visit's visitor object
-                                VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, resultSessionContext.visit.visitorId);
+                                VisitorModel testVisitor = DbBaseModel.create<VisitorModel>(core.cpParent, resultSessionContext.visit.visitorId);
                                 if (testVisitor != null) {
                                     resultSessionContext.visitor = testVisitor;
                                 }
@@ -262,29 +260,28 @@ namespace Contensive.Processor.Controllers {
                                     resultSessionContext.user = testUser;
                                 }
                             }
-                            if (((visitToken.expires - encodeDate(resultSessionContext.visit.lastVisitTime)).TotalSeconds) > 2) {
-                                LogController.logTrace(core, "visit cookie timestamp [" + visitToken.expires + "] does not match lastvisittime [" + resultSessionContext.visit.lastVisitTime + "]");
+                            if ((visitToken.expires - encodeDate(resultSessionContext.visit.lastVisitTime)).TotalSeconds > 2) {
+                                //
+                                // -- click out of order (back button)
                                 resultSessionContext.visitStateOk = false;
                             }
                         }
                     }
-                    //
-                    LogController.logTrace(core, "load session from cookied complete, visit.id [" + resultSessionContext.visit.id + "], visitor.id [" + resultSessionContext.visitor.id + "], user.id [" + resultSessionContext.user.id + "]");
-                    //
                     bool visit_changes = false;
                     bool visitor_changes = false;
                     bool user_changes = false;
-                    if (resultSessionContext.visit.id == 0) {
+                    if (resultSessionContext.visit.id.Equals(0)) {
                         //
                         // -- create new visit record
-                        LogController.logTrace(core, "visit id=0, create new visit");
-                        resultSessionContext.visit = VisitModel.addEmpty<VisitModel>(core.cpParent);
+                        LogController.logTrace(core, "SessionController, create new visit");
+                        resultSessionContext.visit = DbBaseModel.addEmpty<VisitModel>(core.cpParent);
                         if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
                             resultSessionContext.visit.name = "User";
                         }
                         resultSessionContext.visit.pageVisits = 0;
                         resultSessionContext.visit.startTime = core.doc.profileStartTime;
-                        resultSessionContext.visit.startDateValue = encodeInteger(core.doc.profileStartTime.ToOADate());
+                        resultSessionContext.visit.browser = core.webServer.requestBrowser.substringSafe(0, 254);
+                        resultSessionContext.visit.remote_addr = core.webServer.requestRemoteIP;
                         //
                         // -- setup referrer
                         if (!string.IsNullOrEmpty(core.webServer.requestReferrer)) {
@@ -293,7 +290,7 @@ namespace Contensive.Processor.Controllers {
                             if ((SlashPosition != 0) && (WorkingReferer.Length > (SlashPosition + 2))) {
                                 WorkingReferer = WorkingReferer.Substring(SlashPosition + 1);
                             }
-                            SlashPosition = GenericController.strInstr(1, WorkingReferer, "/");
+                            SlashPosition = strInstr(1, WorkingReferer, "/");
                             if (SlashPosition == 0) {
                                 resultSessionContext.visit.refererPathPage = "";
                                 resultSessionContext.visit.http_referer = WorkingReferer;
@@ -377,7 +374,6 @@ namespace Contensive.Processor.Controllers {
                         } else {
                             //
                             // -- mobile detect
-                            resultSessionContext.visit.browser = core.webServer.requestBrowser.substringSafe(0,254);
                             switch (resultSessionContext.visitor.forceBrowserMobile) {
                                 case 1: {
                                         resultSessionContext.visit.mobile = true;
@@ -392,93 +388,93 @@ namespace Contensive.Processor.Controllers {
                                         break;
                                     }
                             }
-                            //
-                            // -- bot and badBot detect
-                            resultSessionContext.visit.bot = false;
-                            resultSessionContext.visitBadBot = false;
-                            string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
-                            if (string.IsNullOrEmpty(botFileContent)) {
-                                string Filename = "config\\VisitNameList.txt";
-                                botFileContent = core.privateFiles.readFileText(Filename);
-                                if (string.IsNullOrEmpty(botFileContent)) {
-                                    botFileContent = ""
-                                        + Environment.NewLine + "//"
-                                        + Environment.NewLine + "// Default Bot Name list"
-                                        + Environment.NewLine + "// This file is maintained by the server. On the first hit of a visit,"
-                                        + Environment.NewLine + "// the default member name is overridden with this name if there is a match"
-                                        + Environment.NewLine + "// in either the user agent or the ipaddress."
-                                        + Environment.NewLine + "// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
-                                        + Environment.NewLine + "// This text is cached by the server for 1 hour, so changes take"
-                                        + Environment.NewLine + "// effect when the cache expires. It is updated daily from the"
-                                        + Environment.NewLine + "// support site feed. Manual changes may be over written."
-                                        + Environment.NewLine + "// type - r=robot (default), b=bad robot, u=user"
-                                        + Environment.NewLine + "//"
-                                        + Environment.NewLine + "Contensive Monitor\tContensive Monitor\t\tr"
-                                        + Environment.NewLine + "Google-Bot\tgooglebot\t\tr"
-                                        + Environment.NewLine + "MSN-Bot\tmsnbot\t\tr"
-                                        + Environment.NewLine + "Yahoo-Bot\tslurp\t\tr"
-                                        + Environment.NewLine + "SearchMe-Bot\tsearchme.com\t\tr"
-                                        + Environment.NewLine + "Twiceler-Bot\twww.cuil.com\t\tr"
-                                        + Environment.NewLine + "Unknown Bot\trobot\t\tr"
-                                        + Environment.NewLine + "Unknown Bot\tcrawl\t\tr"
-                                        + "";
-                                    core.privateFiles.saveFile(Filename, botFileContent);
-                                }
-                                core.cache.storeObject("DefaultBotNameList", botFileContent, core.dateTimeNowMockable.AddHours(1), new List<string>());
-                            }
-                            //
-                            if (!string.IsNullOrEmpty(botFileContent)) {
-                                botFileContent = GenericController.strReplace(botFileContent, Environment.NewLine, "\n");
-                                List<string> botList = new List<string>();
-                                botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
-                                bool visitNameFound = false;
-                                foreach (string srcLine in botList) {
-                                    string line = srcLine.Trim();
-                                    if (!string.IsNullOrWhiteSpace(line)) {
-                                        // -- remove comment
-                                        int posComment = line.IndexOf("//");
-                                        if (posComment >= 0) {
-                                            line = line.left(posComment);
-                                        }
-                                        if (!string.IsNullOrWhiteSpace(line)) {
-                                            // -- parse line on tab characters
-                                            string[] Args = GenericController.stringSplit(line, "\t");
-                                            if (Args.GetUpperBound(0) > 0) {
-                                                //
-                                                // -- test browser name
-                                                if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
-                                                    if (GenericController.strInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
-                                                        resultSessionContext.visit.name = Args[0];
-                                                        visitNameFound = true;
-                                                    }
-                                                }
-                                                if (Args.GetUpperBound(0) > 1) {
-                                                    //
-                                                    // -- ip address
-                                                    if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
-                                                        if (GenericController.strInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
-                                                            resultSessionContext.visit.name = Args[0];
-                                                            visitNameFound = true;
-                                                        }
-                                                    }
-                                                }
-                                                if (visitNameFound) {
-                                                    //
-                                                    // -- set bot and exit
-                                                    if (Args.GetUpperBound(0) <= 2) {
-                                                        resultSessionContext.visit.bot = true;
-                                                        resultSessionContext.visitBadBot = false;
-                                                    } else {
-                                                        resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
-                                                        resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
-                                                    }
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                            ////
+                            //// -- bot and badBot detect
+                            //resultSessionContext.visit.bot = false;
+                            //resultSessionContext.visitBadBot = false;
+                            //string botFileContent = core.cache.getObject<string>("DefaultBotNameList");
+                            //if (string.IsNullOrEmpty(botFileContent)) {
+                            //    string Filename = "config\\VisitNameList.txt";
+                            //    botFileContent = core.privateFiles.readFileText(Filename);
+                            //    if (string.IsNullOrEmpty(botFileContent)) {
+                            //        botFileContent = ""
+                            //            + Environment.NewLine + "//"
+                            //            + Environment.NewLine + "// Default Bot Name list"
+                            //            + Environment.NewLine + "// This file is maintained by the server. On the first hit of a visit,"
+                            //            + Environment.NewLine + "// the default member name is overridden with this name if there is a match"
+                            //            + Environment.NewLine + "// in either the user agent or the ipaddress."
+                            //            + Environment.NewLine + "// format:  name -tab- browser-user-agent-substring -tab- ip-address-substring -tab- type "
+                            //            + Environment.NewLine + "// This text is cached by the server for 1 hour, so changes take"
+                            //            + Environment.NewLine + "// effect when the cache expires. It is updated daily from the"
+                            //            + Environment.NewLine + "// support site feed. Manual changes may be over written."
+                            //            + Environment.NewLine + "// type - r=robot (default), b=bad robot, u=user"
+                            //            + Environment.NewLine + "//"
+                            //            + Environment.NewLine + "Contensive Monitor\tContensive Monitor\t\tr"
+                            //            + Environment.NewLine + "Google-Bot\tgooglebot\t\tr"
+                            //            + Environment.NewLine + "MSN-Bot\tmsnbot\t\tr"
+                            //            + Environment.NewLine + "Yahoo-Bot\tslurp\t\tr"
+                            //            + Environment.NewLine + "SearchMe-Bot\tsearchme.com\t\tr"
+                            //            + Environment.NewLine + "Twiceler-Bot\twww.cuil.com\t\tr"
+                            //            + Environment.NewLine + "Unknown Bot\trobot\t\tr"
+                            //            + Environment.NewLine + "Unknown Bot\tcrawl\t\tr"
+                            //            + "";
+                            //        core.privateFiles.saveFile(Filename, botFileContent);
+                            //    }
+                            //    core.cache.storeObject("DefaultBotNameList", botFileContent, core.dateTimeNowMockable.AddHours(1), new List<string>());
+                            //}
+                            ////
+                            //if (!string.IsNullOrEmpty(botFileContent)) {
+                            //    botFileContent = GenericController.strReplace(botFileContent, Environment.NewLine, "\n");
+                            //    List<string> botList = new List<string>();
+                            //    botList.AddRange(botFileContent.Split(Convert.ToChar("\n")));
+                            //    bool visitNameFound = false;
+                            //    foreach (string srcLine in botList) {
+                            //        string line = srcLine.Trim();
+                            //        if (!string.IsNullOrWhiteSpace(line)) {
+                            //            // -- remove comment
+                            //            int posComment = line.IndexOf("//");
+                            //            if (posComment >= 0) {
+                            //                line = line.left(posComment);
+                            //            }
+                            //            if (!string.IsNullOrWhiteSpace(line)) {
+                            //                // -- parse line on tab characters
+                            //                string[] Args = GenericController.stringSplit(line, "\t");
+                            //                if (Args.GetUpperBound(0) > 0) {
+                            //                    //
+                            //                    // -- test browser name
+                            //                    if (!string.IsNullOrEmpty(Args[1].Trim(' '))) {
+                            //                        if (GenericController.strInstr(1, core.webServer.requestBrowser, Args[1], 1) != 0) {
+                            //                            resultSessionContext.visit.name = Args[0];
+                            //                            visitNameFound = true;
+                            //                        }
+                            //                    }
+                            //                    if (Args.GetUpperBound(0) > 1) {
+                            //                        //
+                            //                        // -- ip address
+                            //                        if (!string.IsNullOrEmpty(Args[2].Trim(' '))) {
+                            //                            if (GenericController.strInstr(1, core.webServer.requestRemoteIP, Args[2], 1) != 0) {
+                            //                                resultSessionContext.visit.name = Args[0];
+                            //                                visitNameFound = true;
+                            //                            }
+                            //                        }
+                            //                    }
+                            //                    if (visitNameFound) {
+                            //                        //
+                            //                        // -- set bot and exit
+                            //                        if (Args.GetUpperBound(0) <= 2) {
+                            //                            resultSessionContext.visit.bot = true;
+                            //                            resultSessionContext.visitBadBot = false;
+                            //                        } else {
+                            //                            resultSessionContext.visitBadBot = (Args[3].ToLowerInvariant() == "b");
+                            //                            resultSessionContext.visit.bot = resultSessionContext.visitBadBot || (Args[3].ToLowerInvariant() == "r");
+                            //                        }
+                            //                        break;
+                            //                    }
+                            //                }
+                            //            }
+                            //        }
+                            //    }
+                            //}
                         }
                         //
                         // -- new visit, update the persistant visitor cookie

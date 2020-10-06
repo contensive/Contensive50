@@ -239,7 +239,7 @@ namespace Contensive.Processor {
         //
         public override int StartDateValue {
             get {
-                return cp.core.session.visit.startDateValue;
+                return GenericController.encodeInteger(cp.core.doc.profileStartTime.ToOADate());
             }
         }
         //
