@@ -607,7 +607,10 @@ namespace Contensive.Processor.Controllers {
                         //
                         // if there was a change, update the cache
                         //
-                        core.cache.storeObject("domainContentList", core.domainDictionary, new List<string> { DbBaseModel.createDependencyKeyInvalidateOnChange<DomainModel>(core.cpParent) });
+                        string dependencyKey = DbBaseModel.createDependencyKeyInvalidateOnChange<DomainModel>(core.cpParent);
+                        CacheKeyHashClass dependencyKeyHash = core.cache.createKeyHash(dependencyKey);
+                        List<CacheKeyHashClass> keyHashList = new List<CacheKeyHashClass> { dependencyKeyHash };
+                        core.cache.storeObject("domainContentList", core.domainDictionary, keyHashList);
                     }
                     //
                     // domain found
@@ -850,10 +853,8 @@ namespace Contensive.Processor.Controllers {
         //
         //
         //
-        public void setResponseContentType(string ContentType)
-        {
-            if (core.doc.continueProcessing)
-            {
+        public void setResponseContentType(string ContentType) {
+            if (core.doc.continueProcessing) {
 #if NETFRAMEWORK
                 if (iisContext != null) {
                     // add header to response
@@ -868,8 +869,7 @@ namespace Contensive.Processor.Controllers {
         //
         public void addResponseHeader(string HeaderName, string HeaderValue) {
             try {
-                if (core.doc.continueProcessing)
-                {
+                if (core.doc.continueProcessing) {
 #if NETFRAMEWORK
                     if (iisContext != null) {
                         // add header to response
@@ -1117,8 +1117,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         //
-        public void flushStream()
-        {
+        public void flushStream() {
 #if NETFRAMEWORK
             if (iisContext != null) {
                 iisContext.Response.Flush();
@@ -1340,8 +1339,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        public void clearResponseBuffer()
-        {
+        public void clearResponseBuffer() {
 #if NETFRAMEWORK
             iisContext.Response.ClearHeaders();
 #endif

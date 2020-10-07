@@ -14,16 +14,16 @@ namespace Contensive.Processor.Models.Domain {
         // ====================================================================================================
         //
         public CacheDocumentClass(DateTime dateTimeMockable)  {
-            dependentKeyList = new List<string>();
+            dependentKeyHashList = new List<CacheKeyHashClass>();
             saveDate = dateTimeMockable;
             invalidationDate = dateTimeMockable.AddDays(Constants.invalidationDaysDefault);
         }
         //
         // if populated, all other properties are ignored and the primary tag b
-        public string keyPtr;
+        public CacheKeyHashClass keyPtrHash;
         //
         // this object is invalidated if any of these objects are invalidated
-        public List<string> dependentKeyList;
+        public List<CacheKeyHashClass> dependentKeyHashList;
         //
         // the date this object was last saved.
         public DateTime saveDate;

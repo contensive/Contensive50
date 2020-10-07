@@ -1,4 +1,5 @@
 ﻿
+using Contensive.Processor.Models.Domain;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Processing;
 using System;
@@ -54,7 +55,7 @@ namespace Contensive.Processor.Controllers {
                 string newImageFilename = filePath + filenameNoext + "-" + imageAltsize + filenameExt;
                 // 
                 // -- verify this altsizelist matches this image, or reset it
-                if ((!imageAltSizeList.Contains(altSizeFilename))) {
+                if ((!imageAltSizeList.Contains(imagePathFilename))) {
                     // 
                     // -- alt size list does not start with this filename, new image uploaded, reset list
                     imageAltSizeList.Clear();
@@ -69,7 +70,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 //
                 // -- first, use cache to determine if this image size exists (fasted)
-                string imageExistsKey = CacheController.createKey("fileExists-" + newImageFilename);
+                string imageExistsKey = "fileExists-" + newImageFilename;
                 if (core.cache.getBoolean(imageExistsKey)) {
                     //
                     // -- if altSizeList shows the image exists, return it

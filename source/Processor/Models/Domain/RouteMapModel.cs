@@ -106,7 +106,7 @@ namespace Contensive.Processor.Models.Domain {
                         string route = GenericController.normalizeRoute(linkForward.sourceLink);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logError( core,new GenericException("Link Forward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                LogController.logError(core, new GenericException("Link Forward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
                             } else {
                                 result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
@@ -123,7 +123,7 @@ namespace Contensive.Processor.Models.Domain {
                         string route = GenericController.normalizeRoute(linkAlias.name);
                         if (!string.IsNullOrEmpty(route)) {
                             if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logError( core,new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                LogController.logError(core, new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
                             } else {
                                 result.routeDictionary.Add(route, new RouteClass {
                                     physicalRoute = physicalFile,
@@ -137,7 +137,7 @@ namespace Contensive.Processor.Models.Domain {
                     setCache(core, result);
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
             }
             return result;
         }
@@ -149,12 +149,12 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="routeDictionary"></param>
         private static void setCache(CoreController core, RouteMapModel routeDictionary) {
-            var dependentKeyList = new List<string> {
-                CacheController.createTableDependencyKey(AddonModel.tableMetadata.tableNameLower),
-                CacheController.createTableDependencyKey(LinkAliasModel.tableMetadata.tableNameLower),
-                CacheController.createTableDependencyKey(LinkForwardModel.tableMetadata.tableNameLower)
+            var dependentKeyList = new List<CacheKeyHashClass> {
+                core.cache.createTableDependencyKeyHash(AddonModel.tableMetadata.tableNameLower),
+                core.cache.createTableDependencyKeyHash(LinkAliasModel.tableMetadata.tableNameLower),
+                core.cache.createTableDependencyKeyHash(LinkForwardModel.tableMetadata.tableNameLower)
             };
-            core.cache.storeObject(cacheNameRouteMap, routeDictionary,dependentKeyList);
+            core.cache.storeObject(cacheNameRouteMap, routeDictionary, dependentKeyList);
         }
         //
         //====================================================================================================

@@ -10,6 +10,10 @@
     <RepositoryUrl>https://github.com/contensive/Contensive5</RepositoryUrl>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.0|AnyCPU'">
+    <DocumentationFile>C:\Git\Contensive5\source\CPBase\CPBase.xml</DocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Label="Signing">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>CPBase2.snk</AssemblyOriginatorKeyFile>

@@ -136,6 +136,14 @@ namespace Contensive.BaseClasses {
         public abstract string CreateTableDependencyKey(string tableName);
         //
         //====================================================================================================
+        //
+        public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName, string dataSourceName);
+        //
+        //====================================================================================================
+        //
+        public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName);
+        //
+        //====================================================================================================
         /// <summary>
         /// Updates the cache dependency key for this table that a record in this table has been modified
         /// </summary>
@@ -153,6 +161,8 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>        
         public abstract string CreateRecordKey(int recordId, string tableName, string datasourceName);
         //
+        public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string datasourceName);
+        //
         //====================================================================================================
         /// <summary>
         /// Create a key for a database record in the default datasource
@@ -160,8 +170,9 @@ namespace Contensive.BaseClasses {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        
+
         public abstract string CreateRecordKey(int recordId, string tableName);
+        public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -179,6 +190,14 @@ namespace Contensive.BaseClasses {
         /// <param name="objectName"></param>
         /// <returns></returns>
         public abstract string CreateKey(string objectName);
+        //
+        //====================================================================================================
+        //
+        public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier);
+        //
+        //====================================================================================================
+        //
+        public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName);
         //
         //====================================================================================================
         /// <summary>
@@ -220,6 +239,25 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create a Ptr key for a db model object based on the record name. Only for tables where the name is unique
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Create a Ptr key for a db model object based on the record name.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName);
         //
         //====================================================================================================
         /// <summary>

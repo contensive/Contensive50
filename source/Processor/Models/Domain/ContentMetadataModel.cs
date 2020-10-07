@@ -25,7 +25,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// constructor to setup defaults for fields required
         /// </summary>
-        public ContentMetadataModel()  {
+        public ContentMetadataModel() {
             // set defaults, create methods require name, table
             active = true;
         }
@@ -758,8 +758,8 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="contentId"></param>
         /// <returns></returns>
-        public static string getCacheKey(int contentId) {
-            return CacheController.createKey( "metadata-" + contentId.ToString());
+        public static CacheKeyHashClass createKeyHash(CoreController core, int contentId) {
+            return core.cache.createKeyHash("metadata-" + contentId.ToString());
         }
         //
         //====================================================================================================
@@ -769,7 +769,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="core"></param>
         /// <param name="contentId"></param>
         public static void invalidateCache(CoreController core, int contentId) {
-            core.cache.invalidate(getCacheKey(contentId));
+            core.cache.invalidate(createKeyHash(core, contentId));
         }
         //
         //====================================================================================================
@@ -780,8 +780,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <param name="contentId"></param>
         /// <param name="metaData"></param>
         public static void setCache(CoreController core, int contentId, ContentMetadataModel metaData) {
-            List<string> dependantList = new List<string>();
-            core.cache.storeObject(getCacheKey(contentId), metaData, dependantList);
+            core.cache.storeObject(createKeyHash(core, contentId), metaData);
         }
         //
         //====================================================================================================
@@ -795,7 +794,7 @@ namespace Contensive.Processor.Models.Domain {
             ContentMetadataModel result = null;
             try {
                 try {
-                    result = core.cache.getObject<Models.Domain.ContentMetadataModel>(getCacheKey(contentId));
+                    result = core.cache.getObject<Models.Domain.ContentMetadataModel>(createKeyHash(core,contentId));
                 } catch (Exception ex) {
                     LogController.logError(core, ex);
                 }
@@ -843,7 +842,7 @@ namespace Contensive.Processor.Models.Domain {
         /// create a clone of this object. Used for cases like cs copy
         /// </summary>
         /// <returns></returns>
-        public Object Clone()  {
+        public Object Clone() {
             return MemberwiseClone();
         }
         //
@@ -863,7 +862,7 @@ namespace Contensive.Processor.Models.Domain {
                 if (fieldMetadata == null) {
                     throw (new GenericException("Could not create Field for content [" + name + "] because the field metadata is not valid."));
                 }
-                if (string.IsNullOrWhiteSpace( fieldMetadata.nameLc)) {
+                if (string.IsNullOrWhiteSpace(fieldMetadata.nameLc)) {
                     throw (new GenericException("Could not create Field for content [" + name + "] because the field metadata has a blank name."));
                 }
                 if (fieldMetadata.fieldTypeId <= 0) {
@@ -946,54 +945,54 @@ namespace Contensive.Processor.Models.Domain {
                     // -- conditional fields
                     switch (fieldMetadata.fieldTypeId) {
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                        //
-                        // -- lookup field
-                        //
-                        string LookupContentName = fieldMetadata.get_lookupContentName(core);
-                        if (!string.IsNullOrEmpty(LookupContentName)) {
-                            LookupContentId = ContentMetadataModel.getContentId(core, LookupContentName);
-                            if (LookupContentId <= 0) {
-                                LogController.logError(core, "Could not create lookup field [" + fieldMetadata.nameLc + "] for content definition [" + name + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                            //
+                            // -- lookup field
+                            //
+                            string LookupContentName = fieldMetadata.get_lookupContentName(core);
+                            if (!string.IsNullOrEmpty(LookupContentName)) {
+                                LookupContentId = ContentMetadataModel.getContentId(core, LookupContentName);
+                                if (LookupContentId <= 0) {
+                                    LogController.logError(core, "Could not create lookup field [" + fieldMetadata.nameLc + "] for content definition [" + name + "] because no content definition was found For lookup-content [" + LookupContentName + "].");
+                                }
                             }
-                        }
-                        sqlList.Add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentId));
-                        break;
+                            sqlList.Add("LOOKUPCONTENTID", DbController.encodeSQLNumber(LookupContentId));
+                            break;
                         case CPContentBaseClass.FieldTypeIdEnum.ManyToMany:
-                        //
-                        // -- many-to-many field
-                        //
-                        string ManyToManyContent = fieldMetadata.get_manyToManyContentName(core);
-                        if (!string.IsNullOrEmpty(ManyToManyContent)) {
-                            int ManyToManyContentId = ContentMetadataModel.getContentId(core, ManyToManyContent);
-                            if (ManyToManyContentId <= 0) {
-                                LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
+                            //
+                            // -- many-to-many field
+                            //
+                            string ManyToManyContent = fieldMetadata.get_manyToManyContentName(core);
+                            if (!string.IsNullOrEmpty(ManyToManyContent)) {
+                                int ManyToManyContentId = ContentMetadataModel.getContentId(core, ManyToManyContent);
+                                if (ManyToManyContentId <= 0) {
+                                    LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-content [" + ManyToManyContent + "].");
+                                }
+                                sqlList.Add("MANYTOMANYCONTENTID", DbController.encodeSQLNumber(ManyToManyContentId));
                             }
-                            sqlList.Add("MANYTOMANYCONTENTID", DbController.encodeSQLNumber(ManyToManyContentId));
-                        }
-                        //
-                        string ManyToManyRuleContent = fieldMetadata.get_manyToManyRuleContentName(core);
-                        if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
-                            int ManyToManyRuleContentId = ContentMetadataModel.getContentId(core, ManyToManyRuleContent);
-                            if (ManyToManyRuleContentId <= 0) {
-                                LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
+                            //
+                            string ManyToManyRuleContent = fieldMetadata.get_manyToManyRuleContentName(core);
+                            if (!string.IsNullOrEmpty(ManyToManyRuleContent)) {
+                                int ManyToManyRuleContentId = ContentMetadataModel.getContentId(core, ManyToManyRuleContent);
+                                if (ManyToManyRuleContentId <= 0) {
+                                    LogController.logError(core, "Could not create many-to-many field [" + fieldMetadata.nameLc + "] for [" + name + "] because no content definition was found For many-to-many-rule-content [" + ManyToManyRuleContent + "].");
+                                }
+                                sqlList.Add("MANYTOMANYRULECONTENTID", DbController.encodeSQLNumber(ManyToManyRuleContentId));
                             }
-                            sqlList.Add("MANYTOMANYRULECONTENTID", DbController.encodeSQLNumber(ManyToManyRuleContentId));
-                        }
-                        sqlList.Add("MANYTOMANYRULEPRIMARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRulePrimaryField));
-                        sqlList.Add("MANYTOMANYRULESECONDARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRuleSecondaryField));
-                        break;
+                            sqlList.Add("MANYTOMANYRULEPRIMARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRulePrimaryField));
+                            sqlList.Add("MANYTOMANYRULESECONDARYFIELD", DbController.encodeSQLText(fieldMetadata.manyToManyRuleSecondaryField));
+                            break;
                         case CPContentBaseClass.FieldTypeIdEnum.Redirect:
-                        //
-                        // -- redirect field
-                        string RedirectContentName = fieldMetadata.get_redirectContentName(core);
-                        if (!string.IsNullOrEmpty(RedirectContentName)) {
-                            RedirectContentId = ContentMetadataModel.getContentId(core, RedirectContentName);
-                            if (RedirectContentId <= 0) {
-                                LogController.logError(core, "Could not create redirect field [" + fieldMetadata.nameLc + "] for Content Definition [" + name + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
+                            //
+                            // -- redirect field
+                            string RedirectContentName = fieldMetadata.get_redirectContentName(core);
+                            if (!string.IsNullOrEmpty(RedirectContentName)) {
+                                RedirectContentId = ContentMetadataModel.getContentId(core, RedirectContentName);
+                                if (RedirectContentId <= 0) {
+                                    LogController.logError(core, "Could not create redirect field [" + fieldMetadata.nameLc + "] for Content Definition [" + name + "] because no content definition was found For redirect-content [" + RedirectContentName + "].");
+                                }
                             }
-                        }
-                        sqlList.Add("REDIRECTCONTENTID", DbController.encodeSQLNumber(RedirectContentId));
-                        break;
+                            sqlList.Add("REDIRECTCONTENTID", DbController.encodeSQLNumber(RedirectContentId));
+                            break;
                     }
                     //
                     if (fieldMetadata.id == 0) {
@@ -1079,7 +1078,7 @@ namespace Contensive.Processor.Models.Domain {
                         } else {
                             //
                             // -- create model with table metadata defaults
-                            table = TableModel.addDefault<TableModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict( core, tableMetaData.name));
+                            table = TableModel.addDefault<TableModel>(core.cpParent, ContentMetadataModel.getDefaultValueDict(core, tableMetaData.name));
                         }
                         table.name = contentMetadata.tableName;
                         if (!DataSourceModel.isDataSourceDefault(contentMetadata.dataSourceName)) {
@@ -1649,7 +1648,7 @@ namespace Contensive.Processor.Models.Domain {
         public static Dictionary<string, String> getDefaultValueDict(CoreController core, string contentName) {
             var defaultValueDict = new Dictionary<string, String>();
             ContentMetadataModel meta = createByUniqueName(core, contentName);
-            if (meta==null) { return defaultValueDict; }
+            if (meta == null) { return defaultValueDict; }
             foreach (var fieldKvp in meta.fields) {
                 if (!string.IsNullOrWhiteSpace(fieldKvp.Value.defaultValue)) {
                     defaultValueDict.Add(fieldKvp.Key.ToLower(CultureInfo.InvariantCulture), fieldKvp.Value.defaultValue);

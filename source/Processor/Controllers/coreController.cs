@@ -187,9 +187,9 @@ namespace Contensive.Processor.Controllers {
             }
         }
         public void assemblyList_AddonsFound_save() {
-            var dependentKeyList = new List<string> {
-                CacheController.createTableDependencyKey(AddonModel.tableMetadata.tableNameLower),
-                CacheController.createTableDependencyKey(AddonCollectionModel.tableMetadata.tableNameLower)
+            var dependentKeyList = new List<CacheKeyHashClass> {
+                cpParent.core.cache.createTableDependencyKeyHash(AddonModel.tableMetadata.tableNameLower),
+                cpParent.core.cache.createTableDependencyKeyHash(AddonCollectionModel.tableMetadata.tableNameLower)
             };
             cache.storeObject(AssemblyFileDictCacheName, _assemblyFileDict, dependentKeyList);
         }

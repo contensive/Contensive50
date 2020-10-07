@@ -1,18 +1,17 @@
 ﻿
-using System;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using System.Runtime.Caching;
-using Contensive.Processor.Exceptions;
-using System.Reflection;
-using Enyim.Caching;
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using Contensive.Processor.Models.Domain;
-using static Newtonsoft.Json.JsonConvert;
 using Contensive.Models.Db;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
+using Enyim.Caching;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Caching;
+using System.Runtime.Serialization.Formatters.Binary;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -141,12 +140,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key"></param>
         /// <returns></returns>
         public TData getObject<TData>(string key) {
+            if (string.IsNullOrEmpty(key)) { return default; }
+            CacheKeyHashClass keyHash = createKeyHash(key);
+            return getObject<TData>(keyHash);
+        }
+        //
+        //========================================================================
+        /// <summary>
+        /// get an object of type TData from cache. If the cache misses or is invalidated, null object is returned
+        /// </summary>
+        /// <typeparam name="TData"></typeparam>
+        /// <param name="keyHash"></param>
+        /// <returns></returns>
+        public TData getObject<TData>(CacheKeyHashClass keyHash) {
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                if (string.IsNullOrEmpty(key)) { return default; }
                 //
                 // -- read cacheDocument (the object that holds the data object plus control fields)
-                CacheDocumentClass cacheDocument = getCacheDocument(key);
+                CacheDocumentClass cacheDocument = getCacheDocument(keyHash);
                 if (cacheDocument == null) { return default; }
                 //
                 // -- test for global invalidation
@@ -154,18 +164,18 @@ namespace Contensive.Processor.Controllers {
                 if (dateCompare >= 0) {
                     //
                     // -- global invalidation
-                    LogController.logTrace(core, "key [" + key + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
+                    LogController.logTrace(core, "keyHash [" + keyHash + "], invalidated because cacheObject saveDate [" + cacheDocument.saveDate + "] is before the globalInvalidationDate [" + globalInvalidationDate + "]");
                     return default;
                 }
                 //
                 // -- test all dependent objects for invalidation (if they have changed since this object changed, it is invalid)
                 bool cacheMiss = false;
-                foreach (string dependentKey in cacheDocument.dependentKeyList) {
-                    CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKey);
+                foreach (CacheKeyHashClass dependentKeyHash in cacheDocument.dependentKeyHashList) {
+                    CacheDocumentClass dependantCacheDocument = getCacheDocument(dependentKeyHash);
                     if (dependantCacheDocument == null) {
                         // create dummy cache to validate future cache requests, fake saveDate as last globalinvalidationdate
-                        storeCacheDocument(dependentKey, new CacheDocumentClass(core.dateTimeNowMockable) {
-                            keyPtr = null,
+                        storeCacheDocument(dependentKeyHash, new CacheDocumentClass(core.dateTimeNowMockable) {
+                            keyPtrHash = null,
                             content = "",
                             saveDate = globalInvalidationDate
                         });
@@ -175,17 +185,17 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- invalidate because a dependent document was changed after the cacheDocument was saved
                             cacheMiss = true;
-                            LogController.logTrace(core, "[" + key + "], invalidated because the dependantKey [" + dependentKey + "] was modified [" + dependantCacheDocument.saveDate + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate + "]");
+                            LogController.logTrace(core, "keyHash [" + keyHash + "], invalidated because the dependentKeyHash [" + dependentKeyHash + "] was modified [" + dependantCacheDocument.saveDate + "] after the cacheDocument's saveDate [" + cacheDocument.saveDate + "]");
                             break;
                         }
                     }
                 }
                 TData result = default;
                 if (!cacheMiss) {
-                    if (!string.IsNullOrEmpty(cacheDocument.keyPtr)) {
+                    if ((cacheDocument.keyPtrHash != null) && !string.IsNullOrEmpty(cacheDocument.keyPtrHash.hash)) {
                         //
                         // -- this is a pointer key, load the primary
-                        result = getObject<TData>(cacheDocument.keyPtr);
+                        result = getObject<TData>(cacheDocument.keyPtrHash);
                     } else if (cacheDocument.content is Newtonsoft.Json.Linq.JObject dataJObject) {
                         //
                         // -- newtonsoft types
@@ -206,7 +216,7 @@ namespace Contensive.Processor.Controllers {
                         } catch (Exception ex) {
                             //
                             // -- object value did not match. return as miss
-                            LogController.logWarn(core, "cache getObject failed to cast value as type, key [" + key + "], type requested [" +  typeof(TData).FullName + "], ex [" + ex + "]");
+                            LogController.logWarn(core, "cache getObject failed to cast value as type, keyHash [" + keyHash + "], type requested [" + typeof(TData).FullName + "], ex [" + ex + "]");
                             result = default;
                         }
                     }
@@ -262,23 +272,19 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get a cache object from the cache. returns the cacheObject that wraps the object
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="keyHash"></param>
         /// <returns></returns>
-        private CacheDocumentClass getCacheDocument(string key) {
+        private CacheDocumentClass getCacheDocument(CacheKeyHashClass keyHash) {
             CacheDocumentClass result = null;
             try {
-                // - verified in createServerKey() -- key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                if (string.IsNullOrEmpty(key)) {
-                    throw new ArgumentException("cache key cannot be blank");
-                }
-                string serverKey = createServerKey(key);
+                //string serverKey = createServerKeyHash(keyHash);
                 string typeMessage = "";
                 if (remoteCacheInitialized) {
                     //
                     // -- use remote cache
                     typeMessage = "remote";
                     try {
-                        result = cacheClient.Get<CacheDocumentClass>(serverKey);
+                        result = cacheClient.Get<CacheDocumentClass>(keyHash.hash);
                     } catch (Exception ex) {
                         //
                         // --client does not throw its own errors, so try to differentiate by message
@@ -286,7 +292,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
                             LogController.logWarn(core, ex);
-                            cacheClient.Remove(serverKey);
+                            cacheClient.Remove(keyHash.hash);
                             result = null;
                         } else {
                             //
@@ -300,21 +306,21 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- local memory cache
                     typeMessage = "local-memory";
-                    result = (CacheDocumentClass)MemoryCache.Default[serverKey];
+                    result = (CacheDocumentClass)MemoryCache.Default[keyHash.hash];
                 }
                 if ((result == null) && core.serverConfig.enableLocalFileCache) {
                     //
                     // -- local file cache
                     typeMessage = "local-file";
                     string serializedDataObject = null;
-                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
+                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, keyHash.hash)) {
                         mutex.WaitOne();
-                        serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"));
+                        serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(keyHash + ".txt"));
                         mutex.ReleaseMutex();
                     }
                     if (!string.IsNullOrEmpty(serializedDataObject)) {
                         result = DeserializeObject<CacheDocumentClass>(serializedDataObject);
-                        storeCacheDocument_MemoryCache(serverKey, result);
+                        storeCacheDocument_MemoryCache(keyHash, result);
                     }
                 }
                 string returnContentSegment = SerializeObject(result);
@@ -322,14 +328,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- log result
                 if (result == null) {
-                    LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + key + "]");
+                    LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + keyHash + "]");
                 } else {
                     if (result.content == null) {
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [null]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash + "], saveDate [" + result.saveDate + "], content [null]");
                     } else {
                         string content = result.content.ToString();
                         content = (content.Length > 50) ? (content.left(50) + "...") : content;
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + key + "], saveDate [" + result.saveDate + "], content [" + content + "]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash + "], saveDate [" + result.saveDate + "], content [" + content + "]");
                     }
                 }
                 //
@@ -337,8 +343,8 @@ namespace Contensive.Processor.Controllers {
                 if (result != null) {
                     //
                     // -- empty objects return nothing, empty lists return count=0
-                    if (result.dependentKeyList == null) {
-                        result.dependentKeyList = new List<string>();
+                    if (result.dependentKeyHashList == null) {
+                        result.dependentKeyHashList = new List<CacheKeyHashClass>();
                     }
                 }
 
@@ -357,21 +363,47 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key"></param>
         /// <param name="content"></param>
         /// <param name="invalidationDate"></param>
-        /// <param name="dependentKeyList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        /// <param name="dependentKeyHashList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
         /// <remarks></remarks>
-        public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
+        public void storeObject(string key, object content, DateTime invalidationDate, List<CacheKeyHashClass> dependentKeyHashList) {
+            CacheKeyHashClass keyHash = createKeyHash(key);
+            storeObject(keyHash, content, invalidationDate, dependentKeyHashList);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save an object to cache, with invalidation date and dependentKeyList
+        /// </summary>
+        /// <param name="keyHash"></param>
+        /// <param name="content"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="dependentKeyHashList"></param>
+        public void storeObject(CacheKeyHashClass keyHash, object content, DateTime invalidationDate, List<CacheKeyHashClass> dependentKeyHashList) {
             try {
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 var cacheDocument = new CacheDocumentClass(core.dateTimeNowMockable) {
                     content = content,
                     saveDate = core.dateTimeNowMockable,
                     invalidationDate = invalidationDate,
-                    dependentKeyList = dependentKeyList
+                    dependentKeyHashList = dependentKeyHashList
                 };
-                storeCacheDocument(key, cacheDocument);
+                storeCacheDocument(keyHash, cacheDocument);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// create a list of keyHash from a list of key
+        /// </summary>
+        /// <param name="keyList"></param>
+        /// <returns></returns>
+        public List<CacheKeyHashClass> createKeyHashList(List<string> keyList) {
+            var result = new List<CacheKeyHashClass>();
+            foreach (var key in keyList) {
+                result.Add(createKeyHash(key));
+            }
+            return result;
         }
         //
         //====================================================================================================
@@ -381,13 +413,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="CP"></param>
         /// <param name="key"></param>
         /// <param name="content"></param>
-        /// <param name="dependentKeyList">List of dependent keys.</param>
+        /// <param name="dependentKeyHashList">List of dependent keys.</param>
         /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
         /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
         /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
         /// invalidates if any dependent key is invalid.</remarks>
-        public void storeObject(string key, object content, List<string> dependentKeyList) {
-            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyList);
+        public void storeObject(string key, object content, List<CacheKeyHashClass> dependentKeyHashList) {
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyHashList);
         }
         //
         //====================================================================================================
@@ -400,7 +432,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dependantKey"></param>
         /// <remarks></remarks>
         public void storeObject(string key, object content, string dependantKey) {
-            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<string> { dependantKey });
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { createKeyHash(dependantKey) });
         }
         //
         //====================================================================================================
@@ -413,7 +445,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
         public void storeObject(string key, object content, DateTime invalidationDate) {
-            storeObject(key, content, invalidationDate, new List<string> { });
+            storeObject(key, content, invalidationDate, new List<CacheKeyHashClass> { });
         }
         //
         //====================================================================================================
@@ -423,7 +455,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="key">key generated from createKey methods</param>
         /// <param name="content"></param>
         public void storeObject(string key, object content) {
-            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<string> { });
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { });
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// save an object to cache, for compatibility with existing site. Always use a key generated from createKey methods
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="content"></param>
+        public void storeObject(CacheKeyHashClass keyHash, object content) {
+            storeObject(keyHash, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { });
         }
         //
         //====================================================================================================
@@ -436,10 +478,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="datasourceName"></param>
         /// <param name="content"></param>
         public void storeRecord(string guid, int recordId, string tableName, string datasourceName, object content) {
-            string key = createRecordKey(recordId, tableName, datasourceName);
-            storeObject(key, content);
-            string keyPtr = createRecordGuidPtrKey(guid, tableName, datasourceName);
-            storePtr(keyPtr, key);
+            CacheKeyHashClass keyHash = createRecordKeyHash(recordId, tableName, datasourceName);
+            storeObject(keyHash, content);
+            CacheKeyHashClass keyPtrHash = createRecordGuidPtrKeyHash(guid, tableName, datasourceName);
+            storePtr(keyPtrHash, keyHash);
         }
         //
         //====================================================================================================
@@ -462,10 +504,10 @@ namespace Contensive.Processor.Controllers {
                     throw new GenericException("Class [" + derivedType.Name + "] must declare public constant [contentDataSource].");
                 } else {
                     string datasourceName = fieldInfoDatasource.GetRawConstantValue().ToString();
-                    string key = createRecordKey(recordId, tableName, datasourceName);
-                    storeObject(key, content);
-                    string keyPtr = createRecordGuidPtrKey(guid, tableName, datasourceName);
-                    storePtr(keyPtr, key);
+                    CacheKeyHashClass keyHash = createRecordKeyHash(recordId, tableName, datasourceName);
+                    storeObject(keyHash, content);
+                    CacheKeyHashClass keyPtrHash = createRecordGuidPtrKeyHash(guid, tableName, datasourceName);
+                    storePtr(keyPtrHash, keyHash);
                 }
             }
         }
@@ -479,16 +521,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="keyPtr"></param>
         /// <param name="data"></param>
         /// <remarks></remarks>
-        public void storePtr(string keyPtr, string key) {
+        public void storePtr(CacheKeyHashClass keyPtrHash, CacheKeyHashClass keyHash) {
             try {
-                keyPtr = Regex.Replace(keyPtr, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
                 CacheDocumentClass cacheDocument = new CacheDocumentClass(core.dateTimeNowMockable) {
                     saveDate = core.dateTimeNowMockable,
                     invalidationDate = core.dateTimeNowMockable.AddDays(invalidationDaysDefault),
-                    keyPtr = key
+                    keyPtrHash = keyHash
                 };
-                storeCacheDocument(keyPtr, cacheDocument);
+                storeCacheDocument(keyPtrHash, cacheDocument);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
@@ -496,18 +536,36 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// set a key ptr. A ptr points to a normal key, creating an altername way to get/invalidate a cache.
+        /// ex - image with id=10, guid={999}. The normal key="image/id/10", the alias Key="image/ccguid/{9999}"
+        /// </summary>
+        /// <param name="keyPtr"></param>
+        /// <param name="key"></param>
+        public void storePtr(string keyPtr, string key) {
+            CacheKeyHashClass keyPtrHash = createKeyHash(keyPtr);
+            CacheKeyHashClass keyHash = createKeyHash(key);
+            storePtr(keyPtrHash, keyHash);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
         /// invalidates the entire cache (except those entires written with saveRaw)
         /// </summary>
         /// <remarks></remarks>
-        public void invalidateAll()  {
+        public void invalidateAll() {
             try {
-                string key = Regex.Replace(cacheNameGlobalInvalidationDate, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-                storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
+                CacheKeyHashClass keyHash = createKeyHash(cacheNameGlobalInvalidationDate);
+                storeCacheDocument(keyHash, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                 _globalInvalidationDate = null;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
+        }
+
+
+        public void invalidate(string key, int recursionLimit = 5) {
+            CacheKeyHashClass keyHash = createKeyHash(key);
         }
         //
         //====================================================================================================
@@ -516,23 +574,27 @@ namespace Contensive.Processor.Controllers {
         // </summary>
         // <param name="tag"></param>
         // <remarks></remarks>
-        public void invalidate(string key, int recursionLimit = 5) {
+        public void invalidate(CacheKeyHashClass keyHash, int recursionLimit = 5) {
             try {
-                Controllers.LogController.logTrace(core, "invalidate, key [" + key + "], recursionLimit [" + recursionLimit + "]");
-                if ((recursionLimit > 0) && (!string.IsNullOrWhiteSpace(key.Trim()))) {
-                    key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
+                Controllers.LogController.logTrace(core, "invalidate, keyHash [" + keyHash + "], recursionLimit [" + recursionLimit + "]");
+                if ((recursionLimit > 0) && (keyHash != null)) {
+                    //CacheKeyHashClass keyHash = createKeyHash(key);
+                    //
                     // if key is a ptr, we need to invalidate the real key
-                    CacheDocumentClass cacheDocument = getCacheDocument(key);
+                    CacheDocumentClass cacheDocument = getCacheDocument(keyHash);
                     if (cacheDocument == null) {
+                        //
                         // no cache for this key, if this is a dependency for another key, save invalidated
-                        storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
+                        storeCacheDocument(keyHash, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                     } else {
-                        if (!string.IsNullOrWhiteSpace(cacheDocument.keyPtr)) {
+                        if (cacheDocument.keyPtrHash != null) {
+                            //
                             // this key is an alias, invalidate it's parent key
-                            invalidate(cacheDocument.keyPtr, --recursionLimit);
+                            invalidate(cacheDocument.keyPtrHash, --recursionLimit);
                         } else {
+                            //
                             // key is a valid cache, invalidate it
-                            storeCacheDocument(key, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
+                            storeCacheDocument(keyHash, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = core.dateTimeNowMockable });
                         }
                     }
                 }
@@ -549,7 +611,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         public void invalidateRecordKey(int recordId, string tableName, string dataSourceName = "default") {
-            invalidate(createRecordKey(recordId, tableName, dataSourceName));
+            invalidate(createRecordKeyHash(recordId, tableName, dataSourceName));
         }
         //
         //====================================================================================================
@@ -575,11 +637,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="key">The cache key to be converted</param>
         /// <returns></returns>
-        private string createServerKey(string key) {
-            string result = core.appConfig.name + "-" + key;
-            result = Regex.Replace(result, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return result;
-        }
+        //private CacheKeyHashClass createServerKeyHash(string key) {
+        //    return createKeyHash(core.appConfig.name + "-" + key);
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -589,11 +649,15 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createRecordKey(int recordId, string tableName, string dataSourceName) {
+        public string createRecordKey(int recordId, string tableName, string dataSourceName) {
             string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim() + "/";
             key += tableName.Trim() + "/id/" + recordId + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
             return key;
+        }
+        //
+        //====================================================================================================
+        public CacheKeyHashClass createRecordKeyHash(int recordId, string tableName, string dataSourceName) {
+            return createKeyHash(createRecordKey(recordId, tableName, dataSourceName));
         }
         //
         //====================================================================================================
@@ -603,7 +667,14 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createRecordKey(int recordId, string tableName) => createRecordKey(recordId, tableName, "default");
+        public string createRecordKey(int recordId, string tableName) {
+            return createRecordKey(recordId, tableName, "default");
+        }
+        //
+        //====================================================================================================
+        public CacheKeyHashClass createRecordKeyHash(int recordId, string tableName) {
+            return createRecordKeyHash(recordId, tableName, "default");
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -613,10 +684,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createRecordGuidPtrKey(string guid, string tableName, string dataSourceName) {
-            string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
+        public string createRecordGuidPtrKey(string guid, string tableName, string dataSourceName) {
+            return "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
         }
         //
         //====================================================================================================
@@ -626,7 +695,33 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordGuid"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createRecordGuidPtrKey(string recordGuid, string tableName) => createRecordGuidPtrKey(recordGuid, tableName, "default");
+        public string createRecordGuidPtrKey(string recordGuid, string tableName) {
+            return createRecordGuidPtrKey(recordGuid, tableName, "default");
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return pointer key used in storePtr() to associate a guid to a record cache
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        public CacheKeyHashClass createRecordGuidPtrKeyHash(string guid, string tableName, string dataSourceName) {
+            string key = "dbptr/" + dataSourceName + "/" + tableName + "/ccguid/" + guid + "/";
+            return createKeyHash(key);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return pointer key used in storePtr() to associate a guid to a record cache
+        /// </summary>
+        /// <param name="recordGuid"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        public CacheKeyHashClass createRecordGuidPtrKeyHash(string recordGuid, string tableName) {
+            return createRecordGuidPtrKeyHash(recordGuid, tableName, "default");
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -636,10 +731,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="datasourceName"></param>
         /// <returns></returns>
-        public static string createRecordNamePtrKey(string recordName, string tableName, string datasourceName) {
-            string key = "dbptr/" + datasourceName + "/" + tableName + "/name/" + recordName + "/";
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
+        public string createRecordNamePtrKey(string recordName, string tableName, string datasourceName) {
+            return "dbptr/" + datasourceName + "/" + tableName + "/name/" + recordName + "/";
         }
         //
         //====================================================================================================
@@ -649,7 +742,22 @@ namespace Contensive.Processor.Controllers {
         /// <param name="recordName"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createRecordNamePtrKey(string recordName, string tableName) => createRecordNamePtrKey(recordName, tableName, "default");
+        public string createRecordNamePtrKey(string recordName, string tableName) {
+            return createRecordNamePtrKey(recordName, tableName, "default");
+        }
+        //
+        //====================================================================================================
+        //
+        public CacheKeyHashClass createRecordNamePtrKeyHash(string recordName, string tableName, string datasourceName) {
+            string key = createRecordNamePtrKey(recordName, tableName, datasourceName);
+            return createKeyHash(key);
+        }
+        //
+        //====================================================================================================
+        //
+        public CacheKeyHashClass createRecordNamePtrKeyHash(string recordName, string tableName) {
+            return createRecordNamePtrKeyHash(recordName, tableName, "default");
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -658,10 +766,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="objectUniqueName">The unique key that describes the object. Ex. catalogitemList, or metadata-134</param>
         /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
-        public static string createKey(string objectUniqueName) {
-            string key = "obj/" + objectUniqueName;
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
+        public CacheKeyHashClass createKeyHash(string objectUniqueName) {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(createKey(objectUniqueName));
+            return new CacheKeyHashClass() {
+                hash = Convert.ToBase64String(plainTextBytes)
+            };
+        }
+        //
+        //====================================================================================================
+        public string createKey(string objectUniqueName) {
+            return core.appConfig.name + "-" + objectUniqueName;
         }
         //
         //====================================================================================================
@@ -674,8 +788,9 @@ namespace Contensive.Processor.Controllers {
         private DateTime globalInvalidationDate {
             get {
                 bool setDefault = false;
+                CacheKeyHashClass globalInvalidationDateKeyHash = createKeyHash(cacheNameGlobalInvalidationDate);
                 if (_globalInvalidationDate == null) {
-                    CacheDocumentClass dataObject = getCacheDocument(cacheNameGlobalInvalidationDate);
+                    CacheDocumentClass dataObject = getCacheDocument(globalInvalidationDateKeyHash);
                     if (dataObject != null) {
                         _globalInvalidationDate = dataObject.saveDate;
                     }
@@ -692,7 +807,7 @@ namespace Contensive.Processor.Controllers {
                 }
                 if (setDefault) {
                     _globalInvalidationDate = new DateTime(1990, 8, 7);
-                    storeCacheDocument(cacheNameGlobalInvalidationDate, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = encodeDate(_globalInvalidationDate) });
+                    storeCacheDocument(globalInvalidationDateKeyHash, new CacheDocumentClass(core.dateTimeNowMockable) { saveDate = encodeDate(_globalInvalidationDate) });
                 }
                 return encodeDate(_globalInvalidationDate);
             }
@@ -703,32 +818,32 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save object directly to cache.
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="keyHash"></param>
         /// <param name="cacheDocument">Either a string, a date, or a serializable object</param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
-        private void storeCacheDocument(string key, CacheDocumentClass cacheDocument) {
+        private void storeCacheDocument(CacheKeyHashClass keyHash, CacheDocumentClass cacheDocument) {
             try {
                 //
-                if (string.IsNullOrEmpty(key)) {
+                if (keyHash == null) {
                     throw new ArgumentException("cache key cannot be blank");
                 }
                 string typeMessage = "";
-                string serverKey = createServerKey(key);
+                //string keyHash = createServerKeyHash(keyHash);
                 if (core.serverConfig.enableLocalMemoryCache) {
                     //
                     // -- save local memory cache
                     typeMessage = "local-memory";
-                    storeCacheDocument_MemoryCache(serverKey, cacheDocument);
+                    storeCacheDocument_MemoryCache(keyHash, cacheDocument);
                 }
                 if (core.serverConfig.enableLocalFileCache) {
                     //
                     // -- save local file cache
                     typeMessage = "local-file";
                     string serializedData = SerializeObject(cacheDocument);
-                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, serverKey)) {
+                    using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, keyHash.hash)) {
                         mutex.WaitOne();
-                        core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(serverKey + ".txt"), serializedData);
+                        core.privateFiles.saveFile("appCache\\" + FileController.encodeDosFilename(keyHash + ".txt"), serializedData);
                         mutex.ReleaseMutex();
                     }
                 }
@@ -737,7 +852,7 @@ namespace Contensive.Processor.Controllers {
                     if (remoteCacheInitialized) {
                         //
                         // -- save remote cache
-                        if( !cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, serverKey, cacheDocument, cacheDocument.invalidationDate)) {
+                        if (!cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, keyHash.hash, cacheDocument, cacheDocument.invalidationDate)) {
                             //
                             // -- store failed
                             LogController.logError(core, "Enyim cacheClient.Store failed, no details available.");
@@ -745,7 +860,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + key + "], expires [" + cacheDocument.invalidationDate + "], depends on [" + string.Join(",", cacheDocument.dependentKeyList) + "], points to [" + string.Join(",", cacheDocument.keyPtr) + "]");
+                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + keyHash + "], expires [" + cacheDocument.invalidationDate + "], depends on [" + string.Join(",", cacheDocument.dependentKeyHashList) + "], points to [" + string.Join(",", cacheDocument.keyPtrHash) + "]");
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -756,14 +871,14 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save cacheDocument to memory cache
         /// </summary>
-        /// <param name="serverKey">key converted to serverKey with app name and code version</param>
+        /// <param name="keyHash">key converted to serverKey with app name and code version</param>
         /// <param name="cacheDocument"></param>
-        public void storeCacheDocument_MemoryCache(string serverKey, CacheDocumentClass cacheDocument) {
+        private void storeCacheDocument_MemoryCache(CacheKeyHashClass keyHash, CacheDocumentClass cacheDocument) {
             ObjectCache cache = MemoryCache.Default;
             CacheItemPolicy policy = new CacheItemPolicy {
-                AbsoluteExpiration = cacheDocument.invalidationDate // core.dateTimeMockable.AddMinutes(100);
+                AbsoluteExpiration = cacheDocument.invalidationDate
             };
-            cache.Set(serverKey, cacheDocument, policy);
+            cache.Set(keyHash.hash, cacheDocument, policy);
         }
         //
         //====================================================================================================
@@ -772,7 +887,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="core"></param>
         public void invalidateTableDependencyKey(string tableName) {
-            storeObject(createTableDependencyKey(tableName), core.dateTimeNowMockable);
+            storeObject(createTableDependencyKeyHash(tableName), core.dateTimeNowMockable);
         }
         //
         //====================================================================================================
@@ -782,10 +897,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public static string createTableDependencyKey(string tableName, string dataSourceName) {
-            string key = "tabledependency/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
-            key = Regex.Replace(key, "0x[a-fA-F\\d]{2}", "_").ToLowerInvariant().Replace(" ", "_");
-            return key;
+        public CacheKeyHashClass createTableDependencyKeyHash(string tableName, string dataSourceName) {
+            //string key = "tabledependency/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
+            return createKeyHash(createTableDependencyKey(tableName, dataSourceName));
+        }
+        //
+        public string createTableDependencyKey(string tableName, string dataSourceName) {
+            return "tabledependency/" + ((String.IsNullOrWhiteSpace(dataSourceName)) ? "default/" + tableName.Trim().ToLowerInvariant() + "/" : dataSourceName.Trim().ToLowerInvariant() + "/" + tableName.Trim().ToLowerInvariant() + "/");
         }
         //
         //====================================================================================================
@@ -794,7 +912,12 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public static string createTableDependencyKey(string tableName) => createTableDependencyKey(tableName, "default");
+        public CacheKeyHashClass createTableDependencyKeyHash(string tableName) {
+            return createTableDependencyKeyHash(tableName, "default");
+        }
+        public string createTableDependencyKey(string tableName) {
+            return createTableDependencyKey(tableName, "default");
+        }
         //
         //====================================================================================================
         //
@@ -831,13 +954,13 @@ namespace Contensive.Processor.Controllers {
         //
         protected bool disposed;
         //
-        public void Dispose()  {
+        public void Dispose() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(true);
             GC.SuppressFinalize(this);
         }
         //
-        ~CacheController()  {
+        ~CacheController() {
             // do not add code here. Use the Dispose(disposing) overload
             Dispose(false);
         }

@@ -1,14 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Models.Db;
-using System;
+﻿using Contensive.Processor;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Contensive.Processor;
-using static Tests.TestConstants;
-using System.Globalization;
 using System.Data;
+using System.Globalization;
+using static Tests.TestConstants;
 
 namespace Contensive.Models.Db.Tests {
     [TestClass()]
