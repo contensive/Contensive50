@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using Contensive.Processor.Controllers;
 using static Tests.TestConstants;
 using Contensive.Processor;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
     //
@@ -114,11 +115,11 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var originalObject = new cacheTestClass();
-                string keyTest = "test" + GenericController.getRandomInteger(cp.core).ToString();
-                string keyDependency = "dependencyKey1" + GenericController.getRandomInteger(cp.core).ToString();
+                string keyTest = cp.Cache.CreateKey("test" + GenericController.getRandomInteger(cp.core).ToString());
+                string keyDependency = cp.Cache.CreateKey("dependencyKey1" + GenericController.getRandomInteger(cp.core).ToString());
                 var dependencyList = new List<string>();
                 dependencyList.Add(keyDependency);
-                dependencyList.Add("fake");
+                dependencyList.Add(cp.Cache.CreateKey("fake"));
                 // act
                 cp.core.cache.storeObject(keyDependency, "1");
                 System.Threading.Thread.Sleep(1);
@@ -244,7 +245,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
             // -- set dependency on AnyRecord of the table
             using (CPClass cp = new CPClass(testAppName)) {
                 string value = "12345";
-                string key = cp.Cache.CreateKey("testKey") ;
+                string key = cp.Cache.CreateKey("testKey");
                 string fakeTableName = "testTable";
                 //
                 string tableDependencyKey = cp.Cache.CreateTableDependencyKey(fakeTableName);

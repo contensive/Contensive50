@@ -8,10 +8,10 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// contains the hash of a cache key. Class created only to use types to help unwind complicated argument patterns
     /// </summary>
-    public class CacheKeyHashClass : BaseModels.CacheKeyHashBaseModel {
+    public class CacheKeyHashClass {
         //
         // ====================================================================================================
         //
-        public override string hash { get; set; }
+        public string hash { get; set; }
     }
 }

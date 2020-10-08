@@ -1659,23 +1659,6 @@
             <param name="tableName"></param>
             <returns></returns>
         </member>
-        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreatePtrKeyHashforDbRecordUniqueName(System.String,System.String,System.String)">
-            <summary>
-            Create a Ptr key for a db model object based on the record name. Only for tables where the name is unique
-            </summary>
-            <param name="name"></param>
-            <param name="tableName"></param>
-            <param name="dataSourceName"></param>
-            <returns></returns>
-        </member>
-        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreatePtrKeyHashforDbRecordUniqueName(System.String,System.String)">
-            <summary>
-            Create a Ptr key for a db model object based on the record name.
-            </summary>
-            <param name="name"></param>
-            <param name="tableName"></param>
-            <returns></returns>
-        </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.GetObject``1(System.String)">
             <summary>
             Get an object of type T from cache. If empty or invalid type, returns Null.
@@ -6013,13 +5996,6 @@
         <member name="T:Contensive.BaseModels.AppConfigBaseModel.AppStatusEnum">
             <summary>
             status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
-            </summary>
-        </member>
-        <member name="T:Contensive.BaseModels.CacheKeyHashBaseModel">
-            <summary>
-            An object that holds an encoded version of a cache key. This object is primarily used to
-            differentiate between the 'key', a string that describes the data, and what has to be used
-            within the cache system that includes other attributes.
             </summary>
         </member>
         <member name="T:Contensive.BaseModels.CaseInsensitiveDictionaryBaseModel`2">

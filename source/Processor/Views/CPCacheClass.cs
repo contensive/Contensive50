@@ -88,9 +88,9 @@ namespace Contensive.Processor {
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public override BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName) {
-            return cp.core.cache.createTableDependencyKeyHash(tableName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName) {
+        //    return cp.core.cache.createTableDependencyKeyHash(tableName);
+        //}
         public override string CreateTableDependencyKey(string tableName) {
             return cp.core.cache.createTableDependencyKey(tableName);
         }
@@ -102,9 +102,9 @@ namespace Contensive.Processor {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public override BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName, string dataSourceName) {
-            return cp.core.cache.createTableDependencyKeyHash(tableName, dataSourceName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName, string dataSourceName) {
+        //    return cp.core.cache.createTableDependencyKeyHash(tableName, dataSourceName);
+        //}
         //
         //====================================================================================================
         //
@@ -130,15 +130,15 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string dataSourceName) {
-            return cp.core.cache.createRecordKeyHash(recordId, tableName, dataSourceName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string dataSourceName) {
+        //    return cp.core.cache.createRecordKeyHash(recordId, tableName, dataSourceName);
+        //}
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName) {
-            return cp.core.cache.createRecordKeyHash(recordId, tableName, "default");
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName) {
+        //    return cp.core.cache.createRecordKeyHash(recordId, tableName, "default");
+        //}
         //
         //====================================================================================================
         //
@@ -154,15 +154,15 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName) {
-            return cp.core.cache.createKeyHash(objectName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName) {
+        //    return cp.core.cache.createKeyHash(objectName);
+        //}
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier = "") {
-            return cp.core.cache.createKeyHash(objectName + "-" + objectUniqueIdentifier);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier = "") {
+        //    return cp.core.cache.createKeyHash(objectName + "-" + objectUniqueIdentifier);
+        //}
         //
         //====================================================================================================
         //
@@ -188,15 +188,15 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName) {
-            return cp.core.cache.createRecordNamePtrKeyHash(name, tableName, dataSourceName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName) {
+        //    return cp.core.cache.createRecordNamePtrKeyHash(name, tableName, dataSourceName);
+        //}
         //
         //====================================================================================================
         //
-        public override BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName) {
-            return cp.core.cache.createRecordNamePtrKeyHash(name, tableName);
-        }
+        //public override BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName) {
+        //    return cp.core.cache.createRecordNamePtrKeyHash(name, tableName);
+        //}
         //
         //====================================================================================================
         //

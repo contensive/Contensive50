@@ -371,6 +371,14 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
+        //
+        public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
+            CacheKeyHashClass keyHash = createKeyHash(key);
+            List<CacheKeyHashClass> dependentKeyHashList = createKeyHashList(dependentKeyList);
+            storeObject(keyHash, content, invalidationDate, dependentKeyHashList);
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// save an object to cache, with invalidation date and dependentKeyList
         /// </summary>
@@ -420,6 +428,10 @@ namespace Contensive.Processor.Controllers {
         /// invalidates if any dependent key is invalid.</remarks>
         public void storeObject(string key, object content, List<CacheKeyHashClass> dependentKeyHashList) {
             storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyHashList);
+        }
+        //
+        public void storeObject(string key, object content, List<string> dependentKeyList) {
+            storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyList);
         }
         //
         //====================================================================================================

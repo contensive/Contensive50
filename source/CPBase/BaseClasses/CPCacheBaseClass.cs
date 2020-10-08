@@ -137,11 +137,11 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName, string dataSourceName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName, string dataSourceName);
         //
         //====================================================================================================
         //
-        public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateTableDependencyKeyHash(string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -161,7 +161,7 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>        
         public abstract string CreateRecordKey(int recordId, string tableName, string datasourceName);
         //
-        public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string datasourceName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string datasourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -172,7 +172,7 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
 
         public abstract string CreateRecordKey(int recordId, string tableName);
-        public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -193,11 +193,11 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         //
-        public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier);
         //
         //====================================================================================================
         //
-        public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName);
         //
         //====================================================================================================
         /// <summary>
@@ -248,7 +248,7 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
-        public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -257,7 +257,7 @@ namespace Contensive.BaseClasses {
         /// <param name="name"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-        public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName);
+        //public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName);
         //
         //====================================================================================================
         /// <summary>
