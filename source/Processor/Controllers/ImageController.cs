@@ -169,11 +169,12 @@ namespace Contensive.Processor.Controllers {
                         // 
                         // -- now crop if both axis provided
                         if ((!holeWidth.Equals(0)) & (!holeHeight.Equals(0))) {
-                            Rectangle cropRectangle = new Rectangle();
-                            cropRectangle.X = System.Convert.ToInt32((image.Width - holeWidth) / (double)2);
-                            cropRectangle.Y = System.Convert.ToInt32((image.Height - holeHeight) / (double)2);
-                            cropRectangle.Width = holeWidth;
-                            cropRectangle.Height = holeHeight;
+                            Rectangle cropRectangle = new Rectangle {
+                                X = System.Convert.ToInt32((image.Width - holeWidth) / (double)2),
+                                Y = System.Convert.ToInt32((image.Height - holeHeight) / (double)2),
+                                Width = holeWidth,
+                                Height = holeHeight
+                            };
                             image.Mutate(x => x.Crop(cropRectangle));
                         }
                     }
