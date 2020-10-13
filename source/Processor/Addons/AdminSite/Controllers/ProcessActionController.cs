@@ -739,11 +739,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // -- Log Activity for changes to people and organizattions
                                 if (fieldChanged) {
-                                    if (adminData.adminContent.tableName.Equals("cclibraryfiles")) {
-                                        if (!string.IsNullOrWhiteSpace(cp.core.docProperties.getText("filename"))) {
-                                            csData.set("altsizelist", "");
-                                        }
-                                    }
                                     if (!NewRecord) {
                                         switch (GenericController.toLCase(adminData.adminContent.tableName)) {
                                             case "ccmembers": {
@@ -773,19 +768,24 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (recordChanged) {
                                 //
                                 // -- clear cache
-                                string tableName;
-                                if (adminData.editRecord.contentControlId == 0) {
-                                    tableName = MetadataController.getContentTablename(cp.core, adminData.adminContent.name).ToLowerInvariant();
-                                } else {
-                                    tableName = MetadataController.getContentTablename(cp.core, adminData.editRecord.contentControlId_Name).ToLowerInvariant();
-                                }
-                                if (tableName == LinkAliasModel.tableMetadata.tableNameLower) {
-                                    DbBaseModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
-                                } else if (tableName == AddonModel.tableMetadata.tableNameLower) {
-                                    DbBaseModel.invalidateCacheOfRecord<AddonModel>(cp, adminData.editRecord.id);
-                                } else {
-                                    DbBaseModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
-                                }
+                                cp.core.cache.invalidateRecordKey(adminData.editRecord.id, adminData.adminContent.tableName);
+                                ////
+                                //// -- clear cache
+                                //string tableName;
+                                //if (adminData.editRecord.contentControlId == 0) {
+                                //    tableName = MetadataController.getContentTablename(cp.core, adminData.adminContent.name).ToLowerInvariant();
+                                //} else {
+                                //    tableName = MetadataController.getContentTablename(cp.core, adminData.editRecord.contentControlId_Name).ToLowerInvariant();
+                                //}
+                                //if (tableName == LinkAliasModel.tableMetadata.tableNameLower) {
+                                //    DbBaseModel.invalidateCacheOfRecord<LinkAliasModel>(cp, adminData.editRecord.id);
+                                //} else if (tableName == AddonModel.tableMetadata.tableNameLower) {
+                                //    DbBaseModel.invalidateCacheOfRecord<AddonModel>(cp, adminData.editRecord.id);
+                                //} else {
+                                //    //
+                                //    // -- clear cache
+                                //    cp.core.cache.invalidateRecordKey(adminData.editRecord.id, adminData.adminContent.tableName);
+                                //}
                             }
                             //
                             // ----- clear/set authoring controls

@@ -2536,22 +2536,12 @@ function ContensiveJavascriptClass() {
         }
     }
 }
-//
-//-------------------------------------------------------------------------
-//	build cj object
-//-------------------------------------------------------------------------
-//
 var cj = new ContensiveJavascriptClass()
 //
 //-------------------------------------------------------------------------
-// Legacy
+//	child list methods
 //-------------------------------------------------------------------------
 //
-function cjAddHeadTag(tag) {
-    cj.addHeadTag(tag)
-}
-//
-// -- child list methods
 function saveSortable(listId) {
     var e, c, s;
     s = listId;
@@ -2567,9 +2557,22 @@ $(function () {
         items: "li.allowSort",
         stop: function (event, ui) {
             saveSortable(jQuery(this).attr("id"));
-        }
+        },
+        connectWith: ".ccChildList",
+		receive: function(event,ui) {
+            saveSortable(jQuery(this).attr("id"));
+		},		
+		placeholder: "ui-state-highlight"
     });
 })
+//
+//-------------------------------------------------------------------------
+// Legacy
+//-------------------------------------------------------------------------
+//
+function cjAddHeadTag(tag) {
+    cj.addHeadTag(tag)
+}
 /*
 * Admin List, submit FindButton if enter while find input field focus 
 */
@@ -2582,8 +2585,7 @@ jQuery(".findInput").keypress(function (e) {
 });
 /*
  *  dynamicTab
- */
-
+*/
 var numRows;
 var numCols;
 var initialized = 0;

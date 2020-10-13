@@ -30,6 +30,7 @@ namespace Contensive.Processor.Addons.PageManager {
                         cp.Site.ErrorReport(new ArgumentException("pageResort requires first value to identify the parent page"));
                     } else {
                         int parentPageId = encodeInteger(ParentPageValues[1]);
+                        string pageListName = ParentPageValues[2];
                         if (parentPageId == 0) {
                             //
                             // -- parent page is not valid
@@ -80,10 +81,9 @@ namespace Contensive.Processor.Addons.PageManager {
                                     } else {
                                         string SortOrder = (100000 + (pagePtr * 10)).ToString();
                                        PageContentModel childPage = DbBaseModel.create<PageContentModel>(core.cpParent, childPageId);
-                                        if (childPage.sortOrder != SortOrder) {
                                             childPage.sortOrder = SortOrder;
+                                            childPage.parentListName = pageListName;
                                             childPage.save(core.cpParent);
-                                        }
                                     }
                                     pagePtr += 1;
                                 }

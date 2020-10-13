@@ -49,7 +49,7 @@ namespace Contensive.Processor {
         // run the upload script
         // change this const
         // update the URLs in the base5.xml file
-        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/";
+        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20201011/";
         //
         //========================================================================
         // cache names

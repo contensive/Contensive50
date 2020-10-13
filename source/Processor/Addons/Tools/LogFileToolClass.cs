@@ -68,16 +68,16 @@ namespace Contensive.Processor.Addons.Tools {
                 int AdminFormTool = core.docProperties.getInteger(RequestNameAdminForm);
                 //
                 const string GetTableStart = "<table border=\"1\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr><TD><table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\"><tr>"
-                    + "<td width=\"23\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/spacer.gif\" height=\"1\" width=\"23\"></td>"
-                    + "<td width=\"60%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
-                    + "<td width=\"20%\"><img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"23\"><img src=\"" + cdnPrefix + "images/spacer.gif\" height=\"1\" width=\"23\"></td>"
+                    + "<td width=\"60%\"><img src=\"" + cdnPrefix + "images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"" + cdnPrefix + "images/spacer.gif\" height=\"1\" width=\"1\"></td>"
+                    + "<td width=\"20%\"><img src=\"" + cdnPrefix + "images/spacer.gif\" height=\"1\" width=\"1\"></td>"
                     + "</tr>";
                 const string GetTableEnd = "</table></td></tr></table>";
                 //
-                const string SpacerImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderOpenImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
-                const string FolderClosedImage = "<img src=\"https://s3.amazonaws.com/cdn.contensive.com/assets/20201001/Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string SpacerImage = "<img src=\"" + cdnPrefix + "Images/spacer.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderOpenImage = "<img src=\"" + cdnPrefix + "Images/iconfolderopen.gif\" width=\"23\" height=\"22\" border=\"0\">";
+                const string FolderClosedImage = "<img src=\"" + cdnPrefix + "Images/iconfolderclosed.gif\" width=\"23\" height=\"22\" border=\"0\">";
                 //
                 // StartPath is the root - the top of the directory, it ends in the folder name (no slash)
                 //

@@ -662,8 +662,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSourceName"></param>
         /// <returns></returns>
         public string createRecordKey(int recordId, string tableName, string dataSourceName) {
-            string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim() + "/";
-            key += tableName.Trim() + "/id/" + recordId + "/";
+            string key = (String.IsNullOrWhiteSpace(dataSourceName)) ? "dbtable/default/" : "dbtable/" + dataSourceName.Trim().ToLowerInvariant() + "/";
+            key += tableName.Trim().ToLowerInvariant() + "/id/" + recordId + "/";
             return key;
         }
         //
