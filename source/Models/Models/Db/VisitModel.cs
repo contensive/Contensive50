@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Contensive.BaseClasses;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class VisitModel : DbBaseModel {
         //
         //====================================================================================================

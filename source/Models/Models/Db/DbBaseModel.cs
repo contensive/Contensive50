@@ -60,7 +60,6 @@ namespace Contensive.Models.Db {
     //       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     //
     //
-    [System.Serializable]
     public class DbBaseModel : DbBaseFieldsModel {
         //
         //====================================================================================================
@@ -123,7 +122,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// The base type for a field that contains a filename and points to an external file that contains text-like content, like a css file or javascript file
         /// </summary>
-        [Serializable]
         public class FieldTypeTextFileBase {
             //
             // -- 
@@ -199,7 +197,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// Field type where the record field contains a filename that references a text file
         /// </summary>
-        [Serializable]
         public class FieldTypeTextFile : FieldTypeTextFileBase {
         }
         //
@@ -207,7 +204,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// Field type where the record field contains a filename that references a javascript file
         /// </summary>
-        [Serializable]
         public class FieldTypeJavascriptFile : FieldTypeTextFileBase {
         }
         //
@@ -215,7 +211,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// Field type where the record field contains a filename that references a css file
         /// </summary>
-        [Serializable]
         public class FieldTypeCSSFile : FieldTypeTextFileBase {
         }
         //
@@ -223,7 +218,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// Field type where the record field contains a filename that references a html file
         /// </summary>
-        [Serializable]
         public class FieldTypeHTMLFile : FieldTypeTextFileBase {
         }
         //
@@ -1442,7 +1436,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public bool isParentOf<T>(CPBaseClass cp, int childRecordId) {
             if (id == childRecordId) { return true; }
-            var usedIdList = new List<int>();
+            //var usedIdList = new List<int>();
             return isParentOf<T>(cp, id, childRecordId, new List<int>());
         }
         //
@@ -1478,7 +1472,6 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public bool isChildOf<T>(CPBaseClass cp, int parentRecordId) {
             if (id == parentRecordId) { return true; }
-            var usedIdList = new List<int>();
             return isChildOf<T>(cp, id, parentRecordId, new List<int>());
         }
         //

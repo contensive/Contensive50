@@ -9,7 +9,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// Manage User, Visit and Visitor properties
     /// </summary>
-    [System.Serializable]
+    //
     public class PropertyModelClass {
         //
         private readonly CoreController core;

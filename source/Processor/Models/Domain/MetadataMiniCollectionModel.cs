@@ -8,7 +8,6 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// miniCollection - This is an old collection object used in part to load the metadata part xml files. REFACTOR this into CollectionWantList and werialization into jscon
     /// </summary>
-    [System.Serializable]
     public class MetadataMiniCollectionModel : ICloneable {
         //
         //====================================================================================================
@@ -40,7 +39,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model of sqlIndexes for the collection
         /// </summary>
-        [Serializable]
         public class MiniCollectionSQLIndexModel {
             public string dataSourceName { get; set; }
             public string tableName { get; set; }
@@ -59,7 +57,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for menu dictionary
         /// </summary>
-        [Serializable]
         public class MiniCollectionMenuModel {
             public string name { get; set; }
             public bool isNavigator { get; set; }
@@ -92,7 +89,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for style array
         /// </summary>
-        [System.Serializable]
         public class StyleType {
             public string name { get; set; }
             public bool overwrite { get; set; }
@@ -129,7 +125,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Model for page templates
         /// </summary>
-        [System.Serializable]
         public class PageTemplateType {
             public string name { get; set; }
             public string copy { get; set; }

@@ -3,7 +3,7 @@ using Contensive.BaseClasses;
 using System;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class PageContentModel : DbBaseModel {
         //
         //====================================================================================================

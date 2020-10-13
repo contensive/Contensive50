@@ -1038,10 +1038,64 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetIntegerEditor(System.String,System.Nullable{System.Int32},System.String,System.Boolean)">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetIntegerEditor(System.String,System.Nullable{System.Int32},System.String)">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetIntegerEditor(System.String,System.Nullable{System.Int32})">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLinkEditor(System.String,System.Nullable{System.Int32},System.String,System.Boolean,System.Boolean)">
             <summary>
             Create an input for an integer field type
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLinkEditor(System.String,System.Nullable{System.Int32},System.String,System.Boolean)">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLinkEditor(System.String,System.Nullable{System.Int32},System.String)">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLinkEditor(System.String,System.Nullable{System.Int32})">
+            <summary>
+            Create an input for an integer field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLongTextEditor(System.String,System.String,System.String,System.Boolean,System.Boolean)">
@@ -1050,10 +1104,137 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLongTextEditor(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLongTextEditor(System.String,System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLongTextEditor(System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32,System.Int32,System.String,System.Boolean,System.Boolean,System.String)">
             <summary>
             Create an input for a lookup content field type
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32,System.Int32,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentId"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <param name="required"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32,System.Int32,System.String,System.Boolean)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentId"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentId"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentId"></param>
+            <param name="lookupRecordId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.Int32)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <param name="required"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32,System.String,System.Boolean)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32,System.String)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
+            <param name="lookupRecordId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String)">
+            <summary>
+            Create an input for a lookup content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.Int32,System.String,System.Boolean,System.Boolean)">
@@ -1062,10 +1243,162 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.Int32,System.String,System.Boolean)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListIndex"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.Int32,System.String)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListIndex"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.Int32)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListIndex"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String})">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListName"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <param name="required"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListName"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.String,System.String)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListName"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupListEditor(System.String,System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Create an input for a lookup list content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupList"></param>
+            <param name="lookupListName"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Create an input for a member select content field type
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupGuid"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.String,System.String)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupGuid"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.String)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupGuid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.Int32,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <param name="required"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.Int32,System.String,System.Boolean)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupId"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetMemberSelectEditor(System.String,System.Int32,System.Int32)">
+            <summary>
+            Create an input for a member select content field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupPersonId"></param>
+            <param name="groupId"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetNumberEditor(System.String,System.Nullable{System.Double},System.String,System.Boolean,System.Boolean)">
@@ -1074,10 +1407,64 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetNumberEditor(System.String,System.Nullable{System.Double},System.String,System.Boolean)">
+            <summary>
+            Create an input for a number field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetNumberEditor(System.String,System.Nullable{System.Double},System.String)">
+            <summary>
+            Create an input for a number field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetNumberEditor(System.String,System.Nullable{System.Double})">
+            <summary>
+            Create an input for a number field type
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetPasswordEditor(System.String,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Create an input for all text field types
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetPasswordEditor(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetPasswordEditor(System.String,System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetPasswordEditor(System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetSelectorStringEditor(System.String,System.String,System.String,System.String,System.Boolean,System.Boolean)">
@@ -1086,10 +1473,67 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetSelectorStringEditor(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="selectorString"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetSelectorStringEditor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="selectorString"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetSelectorStringEditor(System.String,System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="selectorString"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetTextEditor(System.String,System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Create an input for all text field types
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetTextEditor(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetTextEditor(System.String,System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
+            <param name="htmlId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetTextEditor(System.String,System.String)">
+            <summary>
+            Create an input for all text field types
+            </summary>
+            <param name="htmlName"></param>
+            <param name="htmlValue"></param>
             <returns></returns>
         </member>
         <member name="T:Contensive.BaseClasses.CPBaseClass">
@@ -5993,9 +6437,29 @@
             status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
             </summary>
         </member>
+        <member name="F:Contensive.BaseModels.AppConfigBaseModel.AppModeEnum.normal">
+            <summary>
+            app running normal
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseModels.AppConfigBaseModel.AppModeEnum.maintainence">
+            <summary>
+            app paused
+            </summary>
+        </member>
         <member name="T:Contensive.BaseModels.AppConfigBaseModel.AppStatusEnum">
             <summary>
             status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseModels.AppConfigBaseModel.AppStatusEnum.ok">
+            <summary>
+            app status ok
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseModels.AppConfigBaseModel.AppStatusEnum.maintenance">
+            <summary>
+            app status not ok
             </summary>
         </member>
         <member name="T:Contensive.BaseModels.CaseInsensitiveDictionaryBaseModel`2">
@@ -6126,6 +6590,21 @@
         <member name="P:Contensive.BaseModels.ServerConfigBaseModel.productionEnvironment">
             <summary>
             used by applications to enable/disable features, like ecommerce batch should only run in production, todo figure out how to expose this, add it to configuration setup
+            </summary>
+        </member>
+        <member name="T:Contensive.BaseModels.ServerConfigBaseModel.DataSourceTypeEnum">
+            <summary>
+            The type of database used by the datasource
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseModels.ServerConfigBaseModel.DataSourceTypeEnum.legacy">
+            <summary>
+            Legacy datasource type, do not use
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseModels.ServerConfigBaseModel.DataSourceTypeEnum.sqlServer">
+            <summary>
+            sql server
             </summary>
         </member>
         <member name="T:Contensive.CPBase.BaseModels.HtmlAttributesA">
@@ -6410,6 +6889,31 @@
             <summary>
             Non-specific exception. Used during code conversion. Do not add to future code.
             </summary>
+        </member>
+        <member name="M:Contensive.Exceptions.GenericException.#ctor(System.String)">
+            <summary>
+            Raise generic exception
+            </summary>
+            <param name="message"></param>
+        </member>
+        <member name="M:Contensive.Exceptions.GenericException.#ctor(System.String,System.Exception)">
+            <summary>
+            Raise generic exception
+            </summary>
+            <param name="message"></param>
+            <param name="innerException"></param>
+        </member>
+        <member name="M:Contensive.Exceptions.GenericException.#ctor">
+            <summary>
+            Raise generic exception
+            </summary>
+        </member>
+        <member name="M:Contensive.Exceptions.GenericException.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)">
+            <summary>
+            Raise generic exception
+            </summary>
+            <param name="serializationInfo"></param>
+            <param name="streamingContext"></param>
         </member>
     </members>
 </doc>

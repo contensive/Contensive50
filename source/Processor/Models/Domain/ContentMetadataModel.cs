@@ -18,7 +18,6 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// content definitions - meta data
     /// </summary>
-    [Serializable]
     public class ContentMetadataModel : ICloneable {
         //
         //====================================================================================================
@@ -254,7 +253,6 @@ namespace Contensive.Processor.Models.Domain {
         /// metadata for column definition
         /// </summary>
         //
-        [Serializable]
         public class MetaAdminColumnClass {
             public string Name;
             public int Width;
@@ -705,14 +703,14 @@ namespace Contensive.Processor.Models.Domain {
                         bool FieldActive = field.active;
                         int FieldWidth = GenericController.encodeInteger(field.indexWidth);
                         if (FieldActive && (FieldWidth > 0)) {
-                            FieldWidthTotal = FieldWidthTotal + FieldWidth;
+                            FieldWidthTotal += FieldWidth;
                             adminColumn = new MetaAdminColumnClass {
                                 Name = field.nameLc,
                                 SortDirection = field.indexSortDirection,
                                 SortPriority = GenericController.encodeInteger(field.indexSortOrder),
                                 Width = FieldWidth
                             };
-                            FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
+                            FieldWidthTotal += adminColumn.Width;
                             string key = (cnt + (adminColumn.SortPriority * 1000)).ToString().PadLeft(6, '0');
                             metaData.adminColumns.Add(key, adminColumn);
                         }
@@ -732,7 +730,7 @@ namespace Contensive.Processor.Models.Domain {
                                     SortPriority = 1,
                                     Width = 100
                                 };
-                                FieldWidthTotal = FieldWidthTotal + adminColumn.Width;
+                                FieldWidthTotal += adminColumn.Width;
                                 string key = ((1000)).ToString().PadLeft(6, '0');
                                 metaData.adminColumns.Add(key, adminColumn);
                             }

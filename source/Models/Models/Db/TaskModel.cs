@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
     public class TaskModel : DbBaseModel {
         //
         //====================================================================================================
@@ -22,7 +21,6 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// model for cmdDetail field. Field contains a JSON serialization of this class
         /// </summary>
-        [Serializable]
         public class CmdDetailClass {
             public int addonId;
             public string addonName;

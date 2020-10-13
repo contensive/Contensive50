@@ -2,7 +2,7 @@
 using System;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class ConditionalEmailModel : DbBaseModel {
         //
         //====================================================================================================

@@ -138,7 +138,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         LogController.logWarn(cp.core, new GenericException("Application code (v" + cp.Version + ") is newer than database (v" + buildVersion + "). Upgrade the database with the command line 'cc.exe -a " + cp.core.appConfig.name + " -u'."));
                     }
                     //
-                    if (versionIsOlder(cp.Version, buildVersion )) {
+                    if (versionIsOlder(cp.Version, buildVersion)) {
                         LogController.logWarn(cp.core, new GenericException("Database upgrade (v" + buildVersion + ") is newer than the Application code (v" + cp.Version + "). Upgrade the website code."));
                     }
                     //
@@ -546,7 +546,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             }
                         }
                         if (string.IsNullOrEmpty(AddonHelpCopy)) {
-                            AddonHelpCopy = AddonHelpCopy + "<p>Please refer to the help resources available for this collection. More information may also be available in the Contensive online Learning Center <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com for more information.</p>";
+                            AddonHelpCopy += "<p>Please refer to the help resources available for this collection. More information may also be available in the Contensive online Learning Center <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com for more information.</p>";
                         }
                         addonHelp = ""
                             + "<div class=\"ccHelpCon\">"
@@ -557,7 +557,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             + "</div>"
                             + "<div class=\"body\" style=\"clear:both;\">" + AddonHelpCopy + "</div>"
                             + "</div>";
-                        addonHelp = addonHelp + IncludeHelp;
+                        addonHelp += IncludeHelp;
                     }
                 }
             } catch (Exception ex) {
@@ -621,9 +621,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                         + "</div>"
                         + "<div class=\"body\">" + CollectionHelpCopy + "</div>";
                     if (!string.IsNullOrEmpty(IncludeHelp)) {
-                        returnHelp = returnHelp + IncludeHelp;
+                        returnHelp += IncludeHelp;
                     }
-                    returnHelp = returnHelp + "</div>";
+                    returnHelp += "</div>";
                 }
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
@@ -692,7 +692,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //========================================================================
         //
         private string getAdminHeader(CPClass cp, AdminDataModel adminData, string BackgroundColor = "") {
-            string result = "";
             try {
                 string leftSide = cp.core.siteProperties.getText("AdminHeaderHTML", "Administration Site");
                 string rightSide = HtmlController.a(cp.User.Name, "?af=4&cid=" + cp.Content.GetID("people") + "&id=" + cp.User.Id);
@@ -716,14 +715,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                 });
                 //
                 Stream.add("<table border=0 cellpadding=0 cellspacing=0><tr>\r<td class=\"ccToolsCon\" valign=top>" + AdminNavFull + "</td>\r<td id=\"desktop\" class=\"ccContentCon\" valign=top>");
-                adminData.adminFooter = adminData.adminFooter + "</td></tr></table>";
+                adminData.adminFooter += "</td></tr></table>";
                 //
-                result = Stream.text;
+                return Stream.text;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
                 throw;
             }
-            return result;
         }
         //
         //========================================================================
@@ -857,7 +855,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                             break;
                                         }
                                     case ButtonPrevious: {
-                                            adminData.recordTop = adminData.recordTop - adminData.recordsPerPage;
+                                            adminData.recordTop -= adminData.recordsPerPage;
                                             if (adminData.recordTop < 0) {
                                                 adminData.recordTop = 0;
                                             }

@@ -4,7 +4,7 @@ namespace Contensive.Processor.Models.Domain {
     //
     // Cache the input selects (admin uses the same ones over and over)
     //
-    [System.Serializable]
+    //
     internal class CacheInputSelectClass {
         internal string selectRaw { get; set; }
         internal string contentName { get; set; }

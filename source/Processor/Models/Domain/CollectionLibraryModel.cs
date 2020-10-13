@@ -11,7 +11,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// data from the collection library (remote server that distributes collections)
     /// </summary>
-    [System.Serializable]
+    //
     public class CollectionLibraryModel {
         public string name;
         public string guid;

@@ -18,7 +18,6 @@ namespace Contensive.Processor {
     /// <summary>
     /// A layer on top of DbController that accesses data using the 'content' metadata
     /// </summary>
-    [System.Serializable]
     public class CsModel : IDisposable {
         /// <summary>
         /// dependencies
@@ -461,7 +460,7 @@ namespace Contensive.Processor {
                 if (!this.readable) { throw new GenericException("Cannot move to next row because dataset is not readable."); }
                 save(asyncSave);
                 this.writeCache = new Dictionary<string, string>();
-                this.readCacheRowPtr = this.readCacheRowPtr + 1;
+                this.readCacheRowPtr += 1;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -668,7 +667,6 @@ namespace Contensive.Processor {
         /// <param name="contentName"></param>
         /// <returns></returns>
         public string getFilename(string fieldName, string originalFilename, string contentName, CPContentBaseClass.FieldTypeIdEnum fieldTypeId) {
-            string returnFilename = "";
             try {
                 string TableName = null;
                 int RecordID = 0;
@@ -676,6 +674,7 @@ namespace Contensive.Processor {
                 int LenOriginalFilename = 0;
                 int LenFilename = 0;
                 int Pos = 0;
+                string returnFilename;
                 //
                 if (!ok()) {
                     throw new ArgumentException("the current data set is not valid.");
@@ -772,11 +771,11 @@ namespace Contensive.Processor {
                         }
                     }
                 }
+                return returnFilename;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnFilename;
         }
         /// <summary>
         /// get the filename that backs the field specified.
@@ -785,7 +784,7 @@ namespace Contensive.Processor {
         /// <param name="originalFilename"></param>
         /// <param name="contentName"></param>
         /// <returns></returns>
-        public string getFilename(string fieldName, string originalFilename, string contentName) =>getFilename(fieldName, originalFilename, contentName, 0);
+        public string getFilename(string fieldName, string originalFilename, string contentName) => getFilename(fieldName, originalFilename, contentName, 0);
         /// <summary>
         /// get the filename that backs the field specified.
         /// </summary>
@@ -1135,7 +1134,7 @@ namespace Contensive.Processor {
                                                 Pos = GenericController.strInstr(1, fileNameNoExt, ".r", 1);
                                                 if (Pos > 0) {
                                                     FilenameRev = GenericController.encodeInteger(fileNameNoExt.Substring(Pos + 1));
-                                                    FilenameRev = FilenameRev + 1;
+                                                    FilenameRev += 1;
                                                     fileNameNoExt = fileNameNoExt.left(Pos - 1);
                                                 }
                                             }
@@ -2024,7 +2023,7 @@ namespace Contensive.Processor {
                 pageNumber = (pageNumber > 0) ? pageNumber : 1;
                 //
                 using (var db = new DbController(core, dataSourceName)) {
-                    this.dt = core.db.executeQuery(sql, DbController.getStartRecord( pageSize, pageNumber ), pageSize);
+                    this.dt = core.db.executeQuery(sql, DbController.getStartRecord(pageSize, pageNumber), pageSize);
                 }
                 initAfterOpen();
                 return ok();

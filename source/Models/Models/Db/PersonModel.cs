@@ -6,7 +6,7 @@ using System.Data;
 using System.Linq;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class PersonModel : DbBaseModel {
         //
         //====================================================================================================

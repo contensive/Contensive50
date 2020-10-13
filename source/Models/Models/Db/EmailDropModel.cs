@@ -1,7 +1,7 @@
 ﻿
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class EmailDropModel : DbBaseModel {
         //
         //====================================================================================================

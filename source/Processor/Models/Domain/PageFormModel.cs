@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 //
 namespace Contensive.Processor.Models.Domain {
-    [System.Serializable]
+    //
     internal class PageFormModel {
         internal string preRepeat { get; set; }
         internal string postRepeat { get; set; }

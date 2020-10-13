@@ -5,7 +5,6 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Controllers {
     //
-    [Serializable]
     public class KeyPtrController {
         //
         // new serializable and deserialize
@@ -30,7 +29,6 @@ namespace Contensive.Processor.Controllers {
         //
         private const int KeyPointerArrayChunk = 1000;
         //
-        [Serializable]
         public class StorageClass {
             //
             public int ArraySize;
@@ -362,8 +360,8 @@ namespace Contensive.Processor.Controllers {
     //
     //
     //
-
-    public class IndexException : System.Exception, System.Runtime.Serialization.ISerializable {
+    [Serializable]
+    public class IndexException : System.Exception{
 
         public IndexException()  {
             // Add implementation.
@@ -377,9 +375,8 @@ namespace Contensive.Processor.Controllers {
             // Add implementation.
         }
 
-        // This constructor is needed for serialization.
-        protected IndexException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) {
-            // Add implementation.
+        protected IndexException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) {
+            throw new NotImplementedException();
         }
     }
 

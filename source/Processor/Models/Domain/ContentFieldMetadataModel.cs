@@ -17,7 +17,6 @@ namespace Contensive.Processor.Models.Domain {
     /// For example, a lookup field stores the name of the content it joins in . The site runs with the id of 
     /// that content. This model has the content 'name'
     /// </summary>
-    [Serializable]
     public class ContentFieldMetadataModel : ICloneable, IComparable {
         /// <summary>
         /// Create a content metadata field with all default values

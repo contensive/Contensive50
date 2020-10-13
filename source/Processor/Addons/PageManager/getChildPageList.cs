@@ -194,7 +194,7 @@ namespace Contensive.Processor.Addons.PageManager {
                             //
                             // -- add child page to childPagesListed list
                             if (!core.doc.pageController.childPageIdsListed.Contains(childPage.id)) { core.doc.pageController.childPageIdsListed.Add(childPage.id); }
-                            ChildListCount = ChildListCount + 1;
+                            ChildListCount += 1;
                         }
                     }
                     if (!string.IsNullOrWhiteSpace(currentPageChildPageIdList)) {

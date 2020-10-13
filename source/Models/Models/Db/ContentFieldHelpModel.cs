@@ -3,7 +3,7 @@ using Contensive.BaseClasses;
 using System.Linq;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class ContentFieldHelpModel : DbBaseModel {
         //
         //====================================================================================================

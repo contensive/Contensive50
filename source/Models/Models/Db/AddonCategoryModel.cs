@@ -1,6 +1,5 @@
 ﻿
 namespace Contensive.Models.Db {
-    [System.Serializable]
     public class AddonCategoryModel : DbBaseModel {
         //
         //====================================================================================================

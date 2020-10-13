@@ -10,7 +10,7 @@ namespace Contensive.Models.Db {
     // each inheriting class has to declare a static constructor for these fields
     // there are fields so they can be destinguished from the properties
     // should be a single static readonly field of a class that contains these public fields
-    [System.Serializable]
+    //
     public class DbBaseTableMetadataModel {
         public string contentName { get; }
         public string tableNameLower { get; }

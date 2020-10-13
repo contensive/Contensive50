@@ -11,7 +11,6 @@ namespace Contensive.BaseModels {
     /// - shared getObject( cp, id ) - returns loaded model
     /// - saveObject( cp ) - saves instance properties, returns the record id
     /// </summary>
-    [Serializable]
     public abstract  class AppConfigBaseModel {
         /// <summary>
         /// name for the app. Must be unique within the server group. Difficulate to change later.
@@ -105,9 +104,14 @@ namespace Contensive.BaseModels {
         /// <summary>
         /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         /// </summary>
-        [System.Serializable]
         public enum AppModeEnum {
+            /// <summary>
+            /// app running normal
+            /// </summary>
             normal = 0,
+            /// <summary>
+            /// app paused
+            /// </summary>
             maintainence = 1
         }
         //
@@ -115,9 +119,14 @@ namespace Contensive.BaseModels {
         /// <summary>
         /// status of the app in the appConfigModel. Only applies to the app loaded in the serverstatus.appconfig
         /// </summary>
-        [System.Serializable]
         public enum AppStatusEnum {
+            /// <summary>
+            /// app status ok
+            /// </summary>
             ok = 0,
+            /// <summary>
+            /// app status not ok
+            /// </summary>
             maintenance = 1
         }
     }

@@ -8,7 +8,7 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// cache document that holds the data object and other values used for control
     /// </summary>
-    [System.Serializable]
+    //
     public class CacheDocumentClass {
         //
         // ====================================================================================================

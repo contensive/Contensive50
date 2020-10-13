@@ -14,7 +14,6 @@ namespace Contensive.Processor.Models.Domain {
     /// -- shared getObject( cp, id ) - returns loaded model
     /// -- saveObject( cp ) - saves instance properties, returns the record id
     /// </summary>
-    [Serializable]
     public class ServerConfigModel : ServerConfigBaseModel {
         //
         // -- public properties

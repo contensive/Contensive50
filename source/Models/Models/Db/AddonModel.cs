@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Contensive.Models.Db {
-    [Serializable]
     public class AddonModel : DbBaseModel {
         //
         //====================================================================================================

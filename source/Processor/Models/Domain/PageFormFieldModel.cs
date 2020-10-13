@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 //
 namespace Contensive.Processor.Models.Domain {
-    [System.Serializable]
+    //
     internal class PageFormFieldModel {
         internal int type { get; set; }
         internal string caption { get; set; }

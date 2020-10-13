@@ -11,7 +11,7 @@ namespace Contensive.Processor.Models.Domain {
     /// A caching system for addons. When constructed it reads a domain cache model or constructs one that
     /// provides fast access to addon lists.
     /// </summary>
-    [System.Serializable]
+    //
     public class AddonCacheModel {
         private Dictionary<int, AddonModel> dictIdAddon = new Dictionary<int, AddonModel>();
         private Dictionary<string, int> dictGuidId = new Dictionary<string, int>();

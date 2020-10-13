@@ -20,7 +20,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <param name="editRecord"></param>
         /// <returns></returns>
         public static string get(CoreController core, AdminDataModel adminData) {
-            string returnHtml = "";
             try {
                 //
                 if ((!core.doc.userErrorList.Count.Equals(0)) && adminData.editRecord.loaded) {
@@ -211,7 +210,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
                 Stream.add(editSectionButtonBar);
                 Stream.add(HtmlController.inputHidden("FormFieldList", editorEnv.formFieldList));
-                returnHtml = wrapForm(core, Stream.text, adminData, AdminFormEdit);
                 //
                 // -- update page title
                 if (adminData.editRecord.id == 0) {
@@ -221,16 +219,16 @@ namespace Contensive.Processor.Addons.AdminSite {
                 } else {
                     core.html.addTitle("Edit " + adminData.editRecord.nameLc + " in " + adminData.editRecord.contentControlId_Name);
                 }
+                return wrapForm(core, Stream.text, adminData, AdminFormEdit);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnHtml;
         }
         //
         //========================================================================
         //
-        private static string wrapForm( CoreController core, string innerHtml, AdminDataModel adminData, int AdminFormID) {
+        private static string wrapForm(CoreController core, string innerHtml, AdminDataModel adminData, int AdminFormID) {
             try {
                 core.html.addScriptCode("var docLoaded=false", "Form loader");
                 core.html.addScriptCode_onLoad("docLoaded=true;", "Form loader");

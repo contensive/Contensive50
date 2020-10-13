@@ -337,11 +337,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                             RecordId = (csData.getInteger("ID"));
                             if (core.docProperties.getBoolean("ContentWatchList." + RecordId)) {
                                 if (contentWatchListIDCount >= contentWatchListIDSize) {
-                                    contentWatchListIDSize = contentWatchListIDSize + 50;
+                                    contentWatchListIDSize += 50;
                                     Array.Resize(ref _ContentWatchListID, contentWatchListIDSize);
                                 }
                                 contentWatchListID[contentWatchListIDCount] = RecordId;
-                                contentWatchListIDCount = contentWatchListIDCount + 1;
+                                contentWatchListIDCount += 1;
                             }
                             csData.goNext();
                         }

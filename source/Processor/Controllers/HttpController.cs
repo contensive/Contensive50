@@ -293,9 +293,20 @@ namespace Contensive.Processor.Controllers {
     //
     // exception classes
     //
+    [Serializable]
     public class HttpException : Exception {
         //
         public HttpException(string context, Exception innerEx) : base("Unknown error in http4Class, " + context + ", innerException [" + innerEx.ToString() + "]") {
+        }
+
+        public HttpException() {
+        }
+
+        public HttpException(string message) : base(message) {
+        }
+
+        protected HttpException(System.Runtime.Serialization.SerializationInfo serializationInfo, System.Runtime.Serialization.StreamingContext streamingContext) {
+            throw new NotImplementedException();
         }
     }
 

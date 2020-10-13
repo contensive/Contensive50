@@ -2,7 +2,7 @@
 using Contensive.BaseClasses;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class TableModel : DbBaseModel {
         //
         //====================================================================================================

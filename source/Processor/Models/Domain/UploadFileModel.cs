@@ -1,6 +1,6 @@
 ﻿
 namespace Contensive.Processor.Models.Domain {
-    [System.Serializable]
+    //
     public class UploadFileModel {
         //
         internal string filename { get; set; }

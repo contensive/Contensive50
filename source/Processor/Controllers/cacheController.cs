@@ -574,10 +574,15 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-
-
-        public void invalidate(string key, int recursionLimit = 5) {
-            CacheKeyHashClass keyHash = createKeyHash(key);
+        //
+        //====================================================================================================
+        /// <summary>
+        /// invalidate a key
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="recursionLimit"></param>
+        public void invalidate(string key) {
+            invalidate(createKeyHash(key), 5);
         }
         //
         //====================================================================================================

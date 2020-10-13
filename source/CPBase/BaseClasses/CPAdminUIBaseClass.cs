@@ -294,8 +294,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetIntegerEditor(string htmlName, int? htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetIntegerEditor(string htmlName, int? htmlValue);
         //
         //==========================================================================================
@@ -304,8 +325,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetLinkEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLinkEditor(string htmlName, int? htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLinkEditor(string htmlName, int? htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for an integer field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetLinkEditor(string htmlName, int? htmlValue);
         //
         //==========================================================================================
@@ -314,8 +356,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetLongTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLongTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLongTextEditor(string htmlName, string htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetLongTextEditor(string htmlName, string htmlValue);
         //
         //==========================================================================================
@@ -324,17 +387,97 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly, bool required, string sqlFilter);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentId"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentId"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentId"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId, string htmlId);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentId"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId, int lookupRecordId);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentId"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId);
         //
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly, bool required, string sqlFilter);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId);
+        /// <summary>
+        /// Create an input for a lookup content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName);
         //
         //==========================================================================================
@@ -343,14 +486,77 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListIndex"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListIndex"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex, string htmlId);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListIndex"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, int lookupListIndex);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList);
-        //
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListName"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListName"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListName"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName, string htmlId);
+        /// <summary>
+        /// Create an input for a lookup list content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupList"></param>
+        /// <param name="lookupListName"></param>
+        /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName);
         //
         //==========================================================================================
@@ -368,13 +574,70 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupGuid"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupGuid"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid, string htmlId);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupGuid"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, string groupGuid);
-        //
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupId"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId, string htmlId);
+        /// <summary>
+        /// Create an input for a member select content field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupPersonId"></param>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
         public abstract string GetMemberSelectEditor(string htmlName, int lookupPersonId, int groupId);
         //
         //==========================================================================================
@@ -383,8 +646,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for a number field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for a number field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetNumberEditor(string htmlName, double? htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for a number field type
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetNumberEditor(string htmlName, double? htmlValue);
         //
         //==========================================================================================
@@ -393,8 +677,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetPasswordEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetPasswordEditor(string htmlName, string htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetPasswordEditor(string htmlName, string htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetPasswordEditor(string htmlName, string htmlValue);
         //
         //==========================================================================================
@@ -403,8 +708,32 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="selectorString"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="selectorString"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString, string htmlId);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="selectorString"></param>
+        /// <returns></returns>
         public abstract string GetSelectorStringEditor(string htmlName, string htmlValue, string selectorString);
         //
         //==========================================================================================
@@ -413,8 +742,29 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <returns></returns>
         public abstract string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly, bool required);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <returns></returns>
         public abstract string GetTextEditor(string htmlName, string htmlValue, string htmlId, bool readOnly);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public abstract string GetTextEditor(string htmlName, string htmlValue, string htmlId);
+        /// <summary>
+        /// Create an input for all text field types
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="htmlValue"></param>
+        /// <returns></returns>
         public abstract string GetTextEditor(string htmlName, string htmlValue);
         //
     }

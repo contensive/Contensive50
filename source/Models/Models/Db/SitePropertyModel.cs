@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Data;
 
 namespace Contensive.Models.Db {
-    [System.Serializable]
+    //
     public class SitePropertyModel : DbBaseModel {
         //
         //====================================================================================================

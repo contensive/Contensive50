@@ -2,7 +2,6 @@
 using System;
 
 namespace Contensive.Models.Db {
-    [Serializable]
     public class CustomReportModel : DbBaseModel {
         //
         //====================================================================================================

@@ -9,7 +9,6 @@ namespace Contensive.Processor.Models.Domain {
     /// <summary>
     /// Dictionary of Routes
     /// </summary>
-    [Serializable]
     public class RouteMapModel {
         /// <summary>
         /// cache object name
@@ -20,7 +19,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// model for stored route
         /// </summary>
-        [Serializable]
         public class RouteClass {
             public string virtualRoute;
             public string physicalRoute;
@@ -34,7 +32,6 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Types of routes stored
         /// </summary>
-        [Serializable]
         public enum RouteTypeEnum {
             admin,
             remoteMethod,

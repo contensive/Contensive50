@@ -10,7 +10,6 @@ namespace Contensive.BaseModels {
     /// -- shared getObject( cp, id ) - returns loaded model
     /// -- saveObject( cp ) - saves instance properties, returns the record id
     /// </summary>
-    [Serializable]
     public abstract class ServerConfigBaseModel {
         /// <summary>
         /// full dos path to the contensive program file installation. 
@@ -116,9 +115,17 @@ namespace Contensive.BaseModels {
         /// used by applications to enable/disable features, like ecommerce batch should only run in production, todo figure out how to expose this, add it to configuration setup
         /// </summary>
         public abstract bool productionEnvironment { get; set; }
-        //
+        /// <summary>
+        /// The type of database used by the datasource
+        /// </summary>
         public enum DataSourceTypeEnum {
+            /// <summary>
+            /// Legacy datasource type, do not use
+            /// </summary>
             legacy = 1,
+            /// <summary>
+            /// sql server
+            /// </summary>
             sqlServer = 2
         }
     }
