@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// Methods to create a uniform admin UI interface
+    /// </summary>
     public abstract class CPAdminUIBaseClass {
         //
         //==========================================================================================
@@ -432,7 +435,17 @@ namespace Contensive.BaseClasses {
         /// <param name="lookupContentId"></param>
         /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, int lookupContentId);
-        //
+        /// <summary>
+        /// Create a lookup into content
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="lookupContentName"></param>
+        /// <param name="lookupRecordId"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="readOnly"></param>
+        /// <param name="required"></param>
+        /// <param name="sqlFilter"></param>
+        /// <returns></returns>
         public abstract string GetLookupContentEditor(string htmlName, string lookupContentName, int lookupRecordId, string htmlId, bool readOnly, bool required, string sqlFilter);
         /// <summary>
         /// Create an input for a lookup content field type
@@ -558,15 +571,6 @@ namespace Contensive.BaseClasses {
         /// <param name="lookupListName"></param>
         /// <returns></returns>
         public abstract string GetLookupListEditor(string htmlName, List<string> lookupList, string lookupListName);
-        //
-        //==========================================================================================
-        /// <summary>
-        /// Create an input for a lookup list content field type
-        /// </summary>
-        /// <returns></returns>
-        //public abstract string GetManyToManyCheckList(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly, bool required);
-        //
-        //public abstract string GetManyToManySelect(string htmlName, int lookupListIndex, List<string> lookupList, string htmlId, bool readOnly, bool required);
         //
         //==========================================================================================
         /// <summary>

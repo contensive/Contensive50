@@ -937,7 +937,8 @@ namespace Contensive.Processor.Controllers {
                                         + "," + DbController.encodeSQLText(pagetitle)
                                         + "," + DbController.encodeSQLText(doc.docGuid);
                                     sql += ");";
-                                    Task.Run(() => db.executeNonQueryAsync(sql));
+                                    db.executeNonQuery(sql);
+                                    //Task.Run(() => db.executeNonQueryAsync(sql));
                                 }
                             }
                         }

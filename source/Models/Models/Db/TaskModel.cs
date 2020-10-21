@@ -54,5 +54,9 @@ namespace Contensive.Models.Db {
         /// Timeout in sections for the task. zero means no timeout.
         /// </summary>
         public int timeout { get; set; }
+        /// <summary>
+        /// the guid of the runner that is assigned to handle this task. Empty if not assigned
+        /// </summary>
+        public string cmdRunner { get; set; }
     }
 }

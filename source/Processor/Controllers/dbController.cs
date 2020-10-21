@@ -339,11 +339,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sqlList"></param>
         public void update(string tableName, string criteria, NameValueCollection sqlList, bool asyncSave = false) {
             try {
-                string SQL = "update " + tableName + " set " + sqlList.getNameValueList() + " where " + criteria + ";";
+                string sql = "update " + tableName + " set " + sqlList.getNameValueList() + " where " + criteria + ";";
                 if (!asyncSave) {
-                    executeNonQuery(SQL);
+                    executeNonQuery(sql);
                 } else {
-                    Task.Run(() => executeNonQueryAsync(SQL));
+                    core.db.executeNonQuery(sql);
+                    //Task.Run(() => executeNonQueryAsync(SQL));
                 }
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));
@@ -426,7 +427,8 @@ namespace Contensive.Processor.Controllers {
                     executeNonQuery(sql);
                     return;
                 }
-                Task.Run(() => executeNonQueryAsync(sql));
+                core.db.executeNonQuery(sql);
+                //Task.Run(() => executeNonQueryAsync(sql));
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;

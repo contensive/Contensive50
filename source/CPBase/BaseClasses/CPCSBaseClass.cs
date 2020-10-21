@@ -88,11 +88,56 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize, int pageNumber);
+        /// <summary>
+        /// Opens a record set with the records specified by the sqlCriteria
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="selectFieldList"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList, int pageSize);
+        /// <summary>
+        /// Opens a record set with the records specified by the sqlCriteria
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="selectFieldList"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly, string selectFieldList);
+        /// <summary>
+        /// Opens a record set with the records specified by the sqlCriteria
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList, bool activeOnly);
+        /// <summary>
+        /// Opens a record set with the records specified by the sqlCriteria
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName, string sqlCriteria, string sortFieldList);
+        /// <summary>
+        /// Opens a record set with the records specified by the sqlCriteria
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName, string sqlCriteria);
+        /// <summary>
+        /// Opens a record set
+        /// </summary>
+        /// <param name="contentName"></param>
+        /// <returns></returns>
         public abstract bool Open(string contentName);
         //
         //====================================================================================================
@@ -100,18 +145,53 @@ namespace Contensive.BaseClasses {
         /// Opens a record set with user records that are in a Group
         /// </summary>
         /// <param name="groupName"></param>
-        /// <param name="SQLCriteria"></param>
-        /// <param name="SortFieldList"></param>
-        /// <param name="ActiveOnly"></param>
-        /// <param name="PageSize"></param>
-        /// <param name="PageNumber"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList, bool activeOnly);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria, string sortFieldList);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(string groupName, string sqlCriteria);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(string groupName);
         //
         //====================================================================================================
@@ -127,10 +207,45 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize, int pageNumber);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(List<string> groupList, string sqlCriteria);
+        /// <summary>
+        /// Opens a record set with user records that are in a Group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <returns></returns>
         public abstract bool OpenGroupUsers(List<string> groupList);
         //
         //====================================================================================================
@@ -144,8 +259,26 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         /// <remarks></remarks>
         public abstract bool OpenSQL(string sql, string dataSourcename, int pageSize, int pageNumber);
+        /// <summary>
+        /// Opens a record set based on an sql statement
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourcename"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public abstract bool OpenSQL(string sql, string dataSourcename, int pageSize);
+        /// <summary>
+        /// Opens a record set based on an sql statement
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <param name="dataSourcename"></param>
+        /// <returns></returns>
         public abstract bool OpenSQL(string sql, string dataSourcename);
+        /// <summary>
+        /// Opens a record set based on an sql statement
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
         public abstract bool OpenSQL(string sql);
         //
         //====================================================================================================

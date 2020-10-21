@@ -734,6 +734,11 @@
             A comma delimited list of the local id values of shared style record that will display with this add-on
             </summary>
         </member>
+        <member name="T:Contensive.BaseClasses.CPAdminUIBaseClass">
+            <summary>
+            Methods to create a uniform admin UI interface
+            </summary>
+        </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.NewToolForm">
             <summary>
             Create a new instance of a Tool Form. Tool Forms are simple forms with key elements like buttons and header with a simple body
@@ -1185,6 +1190,19 @@
             </summary>
             <param name="htmlName"></param>
             <param name="lookupContentId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32,System.String,System.Boolean,System.Boolean,System.String)">
+            <summary>
+            Create a lookup into content
+            </summary>
+            <param name="htmlName"></param>
+            <param name="lookupContentName"></param>
+            <param name="lookupRecordId"></param>
+            <param name="htmlId"></param>
+            <param name="readOnly"></param>
+            <param name="required"></param>
+            <param name="sqlFilter"></param>
             <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPAdminUIBaseClass.GetLookupContentEditor(System.String,System.String,System.Int32,System.String,System.Boolean,System.Boolean)">
@@ -2728,18 +2746,120 @@
             <returns></returns>
             <remarks></remarks>
         </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String,System.String,System.String,System.Boolean,System.String,System.Int32)">
+            <summary>
+            Opens a record set with the records specified by the sqlCriteria
+            </summary>
+            <param name="contentName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <param name="selectFieldList"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String,System.String,System.String,System.Boolean,System.String)">
+            <summary>
+            Opens a record set with the records specified by the sqlCriteria
+            </summary>
+            <param name="contentName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <param name="selectFieldList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Opens a record set with the records specified by the sqlCriteria
+            </summary>
+            <param name="contentName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String,System.String,System.String)">
+            <summary>
+            Opens a record set with the records specified by the sqlCriteria
+            </summary>
+            <param name="contentName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String,System.String)">
+            <summary>
+            Opens a record set with the records specified by the sqlCriteria
+            </summary>
+            <param name="contentName"></param>
+            <param name="sqlCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.Open(System.String)">
+            <summary>
+            Opens a record set
+            </summary>
+            <param name="contentName"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String,System.String,System.String,System.Boolean,System.Int32,System.Int32)">
             <summary>
             Opens a record set with user records that are in a Group
             </summary>
             <param name="groupName"></param>
-            <param name="SQLCriteria"></param>
-            <param name="SortFieldList"></param>
-            <param name="ActiveOnly"></param>
-            <param name="PageSize"></param>
-            <param name="PageNumber"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <param name="pageSize"></param>
+            <param name="pageNumber"></param>
             <returns></returns>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String,System.String,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String,System.String,System.String)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupName"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String,System.String)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupName"></param>
+            <param name="sqlCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.String)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupName"></param>
+            <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String},System.String,System.String,System.Boolean,System.Int32,System.Int32)">
             <summary>
@@ -2754,6 +2874,51 @@
             <returns></returns>
             <remarks></remarks>
         </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String},System.String,System.String,System.Boolean,System.Int32)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupList"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String},System.String,System.String,System.Boolean)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupList"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <param name="activeOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String},System.String,System.String)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupList"></param>
+            <param name="sqlCriteria"></param>
+            <param name="sortFieldList"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String},System.String)">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupList"></param>
+            <param name="sqlCriteria"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenGroupUsers(System.Collections.Generic.List{System.String})">
+            <summary>
+            Opens a record set with user records that are in a Group
+            </summary>
+            <param name="groupList"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenSQL(System.String,System.String,System.Int32,System.Int32)">
             <summary>
             Opens a record set based on an sql statement
@@ -2764,6 +2929,30 @@
             <param name="pageNumber"></param>
             <returns></returns>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenSQL(System.String,System.String,System.Int32)">
+            <summary>
+            Opens a record set based on an sql statement
+            </summary>
+            <param name="sql"></param>
+            <param name="dataSourcename"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenSQL(System.String,System.String)">
+            <summary>
+            Opens a record set based on an sql statement
+            </summary>
+            <param name="sql"></param>
+            <param name="dataSourcename"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCSBaseClass.OpenSQL(System.String)">
+            <summary>
+            Opens a record set based on an sql statement
+            </summary>
+            <param name="sql"></param>
+            <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPCSBaseClass.Close">
             <summary>
