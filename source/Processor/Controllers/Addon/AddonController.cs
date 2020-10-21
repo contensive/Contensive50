@@ -482,7 +482,7 @@ namespace Contensive.Processor.Controllers {
                                 //
                                 // -- DotNet
                                 hint = "15";
-                                if (!string.IsNullOrEmpty(addon.dotNetClass )) {
+                                if (!string.IsNullOrEmpty(addon.dotNetClass)) {
                                     result.Append(execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId)));
                                 }
 
@@ -1259,7 +1259,7 @@ namespace Contensive.Processor.Controllers {
                 UriBuilder uri = new UriBuilder(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
                 string appPath = Path.GetDirectoryName(path);
-                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath,  ref AddonFound);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appPath, ref AddonFound);
                 if (AddonFound) { return result; }
                 //
                 // -- try addon folder
@@ -1273,7 +1273,7 @@ namespace Contensive.Processor.Controllers {
                 string AddonPath = core.privateFiles.joinPath(getPrivateFilesAddonPath(), collectionFolderConfig.path);
                 if (!core.privateFiles.pathExists_local(AddonPath)) { core.privateFiles.copyPathRemoteToLocal(AddonPath); }
                 string appAddonPath = core.privateFiles.joinPath(core.privateFiles.localAbsRootPath, AddonPath);
-                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath,  ref AddonFound);
+                result = execute_dotNetClass_byPath(addon, assemblyFileDictKey, appAddonPath, ref AddonFound);
                 if (!AddonFound) {
                     throw new GenericException(warningMessage + ", not found in application path [" + appPath + "] or collection path [" + appAddonPath + "].");
                 }
@@ -1311,12 +1311,16 @@ namespace Contensive.Processor.Controllers {
                     if (addonFound) {
                         //
                         // -- addon found, save addonsFound list and return the addon result
-                        if (!core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
-                            core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails {
-                                pathFilename = testPathFilename,
-                                path = ""
-                            });
-                            core.assemblyList_AddonsFound_save();
+                        // -- lock to prevent change between containsKey and add
+                        object lockObj = new object();
+                        lock (lockObj) {
+                            if (!core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
+                                core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails {
+                                    pathFilename = testPathFilename,
+                                    path = ""
+                                });
+                                core.assemblyList_AddonsFound_save();
+                            }
                         }
                         return returnValue;
                     }
