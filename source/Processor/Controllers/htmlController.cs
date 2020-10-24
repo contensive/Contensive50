@@ -851,10 +851,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="htmlId"></param>
         /// <returns></returns>
         public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass, string htmlId) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
-                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                method = HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
                 name = htmlName,
                 @class = htmlClass,
                 id = htmlId
@@ -862,42 +862,42 @@ namespace Contensive.Processor.Controllers {
         }
         //        
         public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
-                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                method = HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
                 name = htmlName,
                 @class = htmlClass
             });
         }
         //        
         public static string formMultipart(CoreController core, string innerHtml, string actionQueryString, string htmlName) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
-                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
+                method = HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data,
                 name = htmlName
             });
         }
         //        
         public static string formMultipart(CoreController core, string innerHtml, string actionQueryString) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = (string.IsNullOrEmpty(actionQueryString)) ? "" : "?" + actionQueryString,
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
-                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
+                method = HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
             });
         }
         //        
         public static string formMultipart(CoreController core, string innerHtml) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
-                method = CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.post,
-                enctype = CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
+            return form(core, innerHtml, new HtmlAttributesForm() {
+                method = HtmlAttributesForm.HtmlMethodEnum.post,
+                enctype = HtmlAttributesForm.HtmlEncTypeEnum.multipart_form_data
             });
         }
         //
         //====================================================================================================
         //
-        public static string getHtmlAttributesGlobal(Contensive.CPBase.BaseModels.HtmlAttributesGlobal attributes) {
+        public static string getHtmlAttributesGlobal(HtmlAttributesGlobal attributes) {
             var result = new StringBuilder();
             result.Append((string.IsNullOrWhiteSpace(attributes.accesskey)) ? "" : "" + " accesskey=\"" + attributes.accesskey + "\"");
             result.Append((string.IsNullOrWhiteSpace(attributes.@class)) ? "" : "" + " class=\"" + attributes.@class + "\"");
@@ -999,11 +999,11 @@ namespace Contensive.Processor.Controllers {
             result.Append(" action=\"" + ((string.IsNullOrWhiteSpace(attributes.action)) ? "?" + core.doc.refreshQueryString : attributes.action) + "\"");
             result.Append((!attributes.autocomplete) ? "" : "" + " autocomplete=\"on\"");
             switch (attributes.enctype) {
-                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
+                case HtmlAttributesForm.HtmlEncTypeEnum.application_x_www_form_urlencoded: {
                         result.Append(" enctype=\"application/x-www-form-urlencoded\"");
                         break;
                     }
-                case CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.text_plain: {
+                case HtmlAttributesForm.HtmlEncTypeEnum.text_plain: {
                         result.Append(" enctype=\"text/plain\"");
                         break;
                     }
@@ -1014,18 +1014,18 @@ namespace Contensive.Processor.Controllers {
                         break;
                     }
             }
-            if (!attributes.enctype.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlEncTypeEnum.none)) {
+            if (!attributes.enctype.Equals(HtmlAttributesForm.HtmlEncTypeEnum.none)) {
             }
-            result.Append(" method=" + ((attributes.method.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlMethodEnum.get)) ? "\"get\"" : "\"post\""));
+            result.Append(" method=" + ((attributes.method.Equals(HtmlAttributesForm.HtmlMethodEnum.get)) ? "\"get\"" : "\"post\""));
             result.Append((string.IsNullOrWhiteSpace(attributes.name)) ? "" : "" + " name=\"" + attributes.name + "\"");
             result.Append((!attributes.novalidate) ? "" : "" + " novalidate");
-            result.Append((attributes.target.Equals(CPBase.BaseModels.HtmlAttributesForm.HtmlAttributeTarget.none)) ? "" : "" + " enctype=\"" + attributes.target + "\"");
+            result.Append((attributes.target.Equals(HtmlAttributesForm.HtmlAttributeTarget.none)) ? "" : "" + " enctype=\"" + attributes.target + "\"");
             result.Append(getHtmlAttributesGlobal(attributes));
             return result + ">" + innerHtml + "</form>";
         }
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName, string htmlClass, string htmlId) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0,1).Equals("?") ? "" : "?") + actionQueryString ,
                 style = "display: inline",
                 name = htmlName,
@@ -1036,7 +1036,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString, string htmlName) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0, 1).Equals("?") ? "" : "?") + actionQueryString,
                 style = "display: inline",
                 name = htmlName,
@@ -1045,7 +1045,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static string form(CoreController core, string innerHtml, string actionQueryString) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 action = string.IsNullOrEmpty(actionQueryString) ? "" : (actionQueryString.Substring(0,1).Equals("?") ? "" : "?") + actionQueryString ,
                 style = "display: inline",
                 method = HtmlAttributesForm.HtmlMethodEnum.post
@@ -1053,7 +1053,7 @@ namespace Contensive.Processor.Controllers {
         }
         //
         public static string form(CoreController core, string innerHtml) {
-            return form(core, innerHtml, new CPBase.BaseModels.HtmlAttributesForm() {
+            return form(core, innerHtml, new HtmlAttributesForm() {
                 style = "display: inline",
                 method = HtmlAttributesForm.HtmlMethodEnum.post
             });

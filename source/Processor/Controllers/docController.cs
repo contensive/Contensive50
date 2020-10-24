@@ -6,6 +6,7 @@ using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor.Models.Domain;
+using Microsoft.ClearScript;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -506,10 +507,15 @@ namespace Contensive.Processor.Controllers {
         //
         public void addRefreshQueryString(string Name, string Value = "") {
             try {
-                string[] temp = null;
-                //
+                if (Name.Equals("bid",StringComparison.InvariantCultureIgnoreCase) && !core.webServer.requestPage.Equals(core.siteProperties.serverPageDefault, StringComparison.InvariantCultureIgnoreCase)) {
+                    //
+                    // -- special case, only allow bid if the page equals the defaultpage
+                    return;
+                }
                 if (Name.IndexOf("=") + 1 > 0) {
-                    temp = Name.Split('=');
+                    //
+                    // -- legacy case, name is in name=value format
+                    string[] temp =  Name.Split('=');
                     refreshQueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, temp[0], temp[1], true);
                 } else {
                     refreshQueryString = GenericController.modifyQueryString(core.doc.refreshQueryString, Name, Value, true);

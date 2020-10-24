@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Contensive.Models.Db;
 using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor {
     //
