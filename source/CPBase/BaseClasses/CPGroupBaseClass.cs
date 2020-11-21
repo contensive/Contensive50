@@ -2,6 +2,9 @@
 using System;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// Methods and Properties for Groups
+    /// </summary>
     public abstract class CPGroupBaseClass {
         //
         //==========================================================================================
@@ -110,7 +113,6 @@ namespace Contensive.BaseClasses {
         /// Remove the current user from a group
         /// </summary>
         /// <param name="groupNameIdOrGuid"></param>
-        /// <param name="UserId"></param>
         public abstract void RemoveUser(string groupNameIdOrGuid);
         //
         //==========================================================================================

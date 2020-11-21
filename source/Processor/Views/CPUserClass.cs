@@ -419,8 +419,12 @@ namespace Contensive.Processor {
         // todo  obsolete
         //
         public override void Track()   {
-            int localId = Id;
+            //
+            // -- reading the id causes forces the user to be tracked. private nonsense to defeat compile warning
+            ignore_localId = Id;
         }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "<Pending>")]
+        private int ignore_localId;
         //
         //====================================================================================================
         // deprecated methods

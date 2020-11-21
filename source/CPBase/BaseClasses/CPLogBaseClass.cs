@@ -50,6 +50,7 @@ namespace Contensive.BaseClasses {
         /// Log a message at the info level.
         /// </summary>
         /// <param name="logMessage"></param>
+        /// <param name="level"></param>
         public abstract void Add(LogLevel level, string logMessage);
         //
         //====================================================================================================

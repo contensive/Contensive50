@@ -89,8 +89,7 @@ namespace Contensive.Processor.Controllers {
                 if (_mockNow != null) {
                     return (DateTime)_mockNow;
                 }
-                long fileTime;
-                GetSystemTimePreciseAsFileTime(out fileTime);
+                GetSystemTimePreciseAsFileTime(out long fileTime);
                 return DateTimeOffset.FromFileTime(fileTime).DateTime;
                 //return DateTime.Now;
             }

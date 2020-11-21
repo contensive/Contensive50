@@ -3,7 +3,13 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// helper methods to support processes, properties and methods used throughout
+    /// </summary>
     public abstract class CPUtilsBaseClass {
+        /// <summary>
+        /// When an addon is executed, this is a description of the context of the method. Used to support features like html-comments only appropriate for some context
+        /// </summary>
         public enum addonContext {
             /// <summary>
             /// Addon placed on a page.
@@ -78,13 +84,26 @@ namespace Contensive.BaseClasses {
             /// </summary>
 			ContextRemoteMethodJson = 18
         }
-        //
+        /// <summary>
+        /// When an addon is executed from content with {% JSON %}, this object describes the record in which the command was executed
+        /// </summary>
         public class addonExecuteHostRecordContext {
+            /// <summary>
+            /// the content for the record (metadata that describes the table)
+            /// </summary>
             public string contentName;
+            /// <summary>
+            /// record's id
+            /// </summary>
             public int recordId;
+            /// <summary>
+            /// field name
+            /// </summary>
             public string fieldName;
         }
-        //
+        /// <summary>
+        /// When an addon is execute, this object describes the environment in which the addon will be used.
+        /// </summary>
         public class addonExecuteContext {
             /// <summary>
             /// This caption is used if the addon cannot be executed.
@@ -215,7 +234,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Decodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&key2=value2)
+        /// Decodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&amp;amp;key2=value2)
         /// </summary>
         /// <param name="source"></param>
         /// <returns></returns>
@@ -282,7 +301,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Encodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&key2=value2)
+        /// Encodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&amp;key2=value2)
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
@@ -307,7 +326,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&c=4), keys ( a and c ), delimiter ( & ), values ( b and 4 )
+        /// get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
         /// </summary>
         /// <param name="key"></param>
         /// <param name="keyValueDelimitedString"></param>
@@ -315,7 +334,20 @@ namespace Contensive.BaseClasses {
         /// <param name="delimiter"></param>
         /// <returns></returns>
         public abstract string GetArgument(string key, string keyValueDelimitedString, string defaultValue, string delimiter);
+        /// <summary>
+        /// get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="keyValueDelimitedString"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public abstract string GetArgument(string key, string keyValueDelimitedString, string defaultValue);
+        /// <summary>
+        /// get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="keyValueDelimitedString"></param>
+        /// <returns></returns>
         public abstract string GetArgument(string key, string keyValueDelimitedString);
         //
         //====================================================================================================
@@ -368,63 +400,189 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// Update or add a key=value pair within a url like "/path/page?key=value&key=value"
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
         /// </summary>
         /// <param name="url"></param>
         /// <param name="key"></param>
         /// <param name="value"></param>
         /// <param name="addIfMissing"></param>
         /// <returns></returns>
-        public abstract string ModifyLinkQueryString(string url, string key, string value);
-        //
         public abstract string ModifyLinkQueryString(string url, string key, string value, bool addIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public abstract string ModifyLinkQueryString(string url, string key, string value);
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, int value);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, int value, bool addIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, double value);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, double value, bool addIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, bool value);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, bool value, bool addIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, DateTime value);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="addIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyLinkQueryString(string url, string key, DateTime value, bool addIfMissing);
         //
         //====================================================================================================
         /// <summary>
-        /// Update or add a key=value pair within key value pair string like "key=value&key=value"
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
         /// </summary>
         /// <param name="WorkingQuery"></param>
         /// <param name="QueryName"></param>
         /// <param name="QueryValue"></param>
         /// <param name="AddIfMissing"></param>
         /// <returns></returns>
-        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue);
-        //
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue, bool AddIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <returns></returns>
+        public abstract string ModifyQueryString(string WorkingQuery, string QueryName, string QueryValue);
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <param name="AddIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, int QueryValue, bool AddIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <param name="AddIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, double QueryValue, bool AddIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <param name="AddIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, bool QueryValue, bool AddIfMissing);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue);
-        //
+        /// <summary>
+        /// Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+        /// </summary>
+        /// <param name="WorkingQuery"></param>
+        /// <param name="QueryName"></param>
+        /// <param name="QueryValue"></param>
+        /// <param name="AddIfMissing"></param>
+        /// <returns></returns>
         public abstract string ModifyQueryString(string WorkingQuery, string QueryName, DateTime QueryValue, bool AddIfMissing);
         //
         //====================================================================================================
+        /// <summary>
+        /// return the components of a url
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="return_protocol"></param>
+        /// <param name="return_domain"></param>
+        /// <param name="return_path"></param>
+        /// <param name="return_page"></param>
+        /// <param name="return_queryString"></param>
+        public abstract void SeparateURL(string url, ref string return_protocol, ref string return_domain, ref string return_path, ref string return_page, ref string return_queryString);
         /// <summary>
         /// return the components of a url
         /// </summary>
@@ -435,7 +593,6 @@ namespace Contensive.BaseClasses {
         /// <param name="return_path"></param>
         /// <param name="return_page"></param>
         /// <param name="return_queryString"></param>
-        public abstract void SeparateURL(string url, ref string return_protocol, ref string return_domain, ref string return_path, ref string return_page, ref string return_queryString);
         public abstract void SeparateURL(string url, ref string return_protocol, ref string return_domain, ref string return_port, ref string return_path, ref string return_page, ref string return_queryString);
         //
         //====================================================================================================
@@ -491,7 +648,6 @@ namespace Contensive.BaseClasses {
         /// <summary>
         ///Returns current DateTime.Now if cp.Mock.DateTime is not set, else returns Mock.DateTime
         /// </summary>
-        /// <param name="source"></param>
         /// <returns></returns>
         public abstract DateTime GetDateTimeMockable();
         //
@@ -505,119 +661,177 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         // deprecated
-        //
-        [Obsolete("Deprecated, use AppendLog", false)]
-        public abstract void AppendLogFile(string Text);
-        //
-        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)]
-        public abstract void AppendLog(string pathFilename, string logText);
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string idGuidOrName);
-        //
-        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
-        //
-        [Obsolete("Deprecated. use cp.addon.execute()", false)]
-        public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
-        //
-        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)]
-        public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
-        //
-        [Obsolete("Deprecated. Use native methods to convert date formats.", false)]
-        public abstract DateTime DecodeGMTDate(string GMTDate);
-        //
-        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", false)]
-        public abstract void Upgrade(bool isNewApp);
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract string GetPleaseWaitEnd();
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract string GetPleaseWaitStart();
-        //
-        [Obsolete("Use System.Web.HttpUtility.JavaScriptStringEncode()", false)]
-        public abstract string EncodeJavascript(string source);
-        //
-        [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", false)]
-        public abstract string EncodeQueryString(string Source);
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
-        //
-        [Obsolete("Use string.PadRight() and string.PadLeft()", false)]
-        public abstract string GetIntegerString(int Value, int DigitCount);
-        //
-        [Obsolete("Use new StringReader(str).ReadLine()", false)]
-        public abstract string GetLine(string Body);
-        //
-        [Obsolete("Use Process.GetCurrentProcess().Id", false)]
-        public abstract int GetProcessID();
-        //
-        [Obsolete("Use SeparateUrl", false)]
-        public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
-        //
-        [Obsolete("Use System.Threading.Thread.Sleep()", false)]
-        public abstract void Sleep(int timeMSec);
-        //
-        [Obsolete("Deprecated, some server audits fail if Md5 use detected.")]
-        public abstract string hashMd5(string source);
-        ////
-        //
-        //====================================================================================================
+        /// <summary>
+        /// Deprecated, use AppendLog
+        /// </summary>
+        /// <param name="Text"></param>
+        [Obsolete("Deprecated, use AppendLog", false)] public abstract void AppendLogFile(string Text);
+        /// <summary>
+        /// Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="logText"></param>
+        [Obsolete("Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages", false)] public abstract void AppendLog(string pathFilename, string logText);
+        /// <summary>
+        /// Deprecated. use cp.addon.execute()
+        /// </summary>
+        /// <param name="idGuidOrName"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. use cp.addon.execute()", false)] public abstract string ExecuteAddon(string idGuidOrName);
+        /// <summary>
+        /// Deprecated. use cp.addon.execute() and manage the wrapper manually.
+        /// </summary>
+        /// <param name="IdGuidOrName"></param>
+        /// <param name="WrapperId"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. use cp.addon.execute() and manage the wrapper manually.", false)] public abstract string ExecuteAddon(string IdGuidOrName, int WrapperId);
+        /// <summary>
+        /// Deprecated. use cp.addon.execute()
+        /// </summary>
+        /// <param name="IdGuidOrName"></param>
+        /// <param name="context"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. use cp.addon.execute()", false)] public abstract string ExecuteAddon(string IdGuidOrName, addonContext context);
+        /// <summary>
+        /// Deprecated. use cp.addon.executeAsync()
+        /// </summary>
+        /// <param name="IdGuidOrName"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. use cp.addon.executeAsync()", false)] public abstract string ExecuteAddonAsProcess(string IdGuidOrName);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="URL"></param>
+        /// <param name="ServerHost"></param>
+        /// <param name="ServerVirtualPath"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract string ConvertLinkToShortLink(string URL, string ServerHost, string ServerVirtualPath);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="URL"></param>
+        /// <param name="PathPagePrefix"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract string ConvertShortLinkToLink(string URL, string PathPagePrefix);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="GMTDate"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated. Use native methods to convert date formats.", false)] public abstract DateTime DecodeGMTDate(string GMTDate);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="isNewApp"></param>
+        [Obsolete("Installation upgrade through the cp interface is deprecated. Please use the command line tool.", false)]        public abstract void Upgrade(bool isNewApp);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract string GetPleaseWaitEnd();
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract string GetPleaseWaitStart();
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        [Obsolete("Use System.Web.HttpUtility.JavaScriptStringEncode()", false)] public abstract string EncodeJavascript(string source);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="Source"></param>
+        /// <returns></returns>
+        [Obsolete("Encode each key value first with EncodeResponseVariable(), then assemble them into the querystring.", false)] public abstract string EncodeQueryString(string Source);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="Date0"></param>
+        /// <param name="Date1"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract DateTime GetFirstNonZeroDate(DateTime Date0, DateTime Date1);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="Integer0"></param>
+        /// <param name="Integer1"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated", false)] public abstract int GetFirstNonZeroInteger(int Integer0, int Integer1);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="Value"></param>
+        /// <param name="DigitCount"></param>
+        /// <returns></returns>
+        [Obsolete("Use string.PadRight() and string.PadLeft()", false)] public abstract string GetIntegerString(int Value, int DigitCount);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="Body"></param>
+        /// <returns></returns>
+        [Obsolete("Use new StringReader(str).ReadLine()", false)] public abstract string GetLine(string Body);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Use Process.GetCurrentProcess().Id", false)] public abstract int GetProcessID();
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="SourceURL"></param>
+        /// <param name="Protocol"></param>
+        /// <param name="Host"></param>
+        /// <param name="Port"></param>
+        /// <param name="Path"></param>
+        /// <param name="Page"></param>
+        /// <param name="QueryString"></param>
+        [Obsolete("Use SeparateUrl", false)] public abstract void ParseURL(string SourceURL, ref string Protocol, ref string Host, ref string Port, ref string Path, ref string Page, ref string QueryString);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="timeMSec"></param>
+        [Obsolete("Use System.Threading.Thread.Sleep()", false)] public abstract void Sleep(int timeMSec);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, some server audits fail if Md5 use detected.")] public abstract string hashMd5(string source);
         /// <summary>
         /// Install an addon collection file asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
         /// <param name="privateFile"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
-        public abstract int installCollectionFromFile(string privateFile);
-        //
-        //====================================================================================================
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)] public abstract int installCollectionFromFile(string privateFile);
         /// <summary>
         /// Install all addon collections in a folder asynchonously. Optionally delete the folder. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
         /// <param name="privateFolder"></param>
         /// <param name="deleteFolderWhenDone"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
-        public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
-        //
-        //====================================================================================================
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)] public abstract int installCollectionsFromFolder(string privateFolder, bool deleteFolderWhenDone);
         /// <summary>
         /// Install all addon collections in a folder asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
         /// <param name="privateFolder"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)]
-        public abstract int installCollectionsFromFolder(string privateFolder);
-        //
-        //====================================================================================================
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFile().", false)] public abstract int installCollectionsFromFolder(string privateFolder);
         /// <summary>
         /// Install an addon collections from the collection library asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
         /// <param name="collectionGuid"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLibrary().", false)]
-        public abstract int installCollectionFromLibrary(string collectionGuid);
-        //
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLibrary().", false)] public abstract int installCollectionFromLibrary(string collectionGuid);
         //====================================================================================================
         /// <summary>
         /// Install an addon collections from an endpoint asynchonously. The task is queued and the taskId is returned. Use cp.tasks.getTaskStatus to determine status
         /// </summary>
         /// <param name="link"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLink().", false)]
-        public abstract int installCollectionFromLink(string link);
+        [Obsolete("Deprecated, use CP.Addon.InstallCollectionFromLink().", false)] public abstract int installCollectionFromLink(string link);
     }
 }
 

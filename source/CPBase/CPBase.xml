@@ -2026,7 +2026,6 @@
             Invalidate all cache entries dependent on this tableKey
             </summary>
             <param name="tableName"></param>
-            <param name="recordId"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateTableDependencyKey(System.String,System.String)">
             <summary>
@@ -2169,7 +2168,7 @@
             </summary>
             <param name="key"></param>
             <param name="value"></param>
-            <param name="tag"></param>
+            <param name="dependentKey"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Store(System.String,System.Object,System.DateTime,System.String)">
             <summary>
@@ -2184,8 +2183,138 @@
             <summary>
             Store a ptr to a cache entry. For example you may store an object by its recordId, but need to reference it by its guid. Create the cache key with the id, and a cache ptr which refers the guid to the cacheKey and a Get of the ptr will return the cache entry for the id.
             </summary>
+            <param name="keyPtr"></param>
             <param name="key"></param>
-            <param name="value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.UpdateLastModified(System.String)">
+            <summary>
+            Use InvalidateTableDependencyKey() instead
+            </summary>
+            <param name="tableName"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateKeyForDbRecord(System.Int32,System.String)">
+            <summary>
+            use CreateRecordKey() instead
+            </summary>
+            <param name="recordId"></param>
+            <param name="tableName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateKeyForDbRecord(System.Int32,System.String,System.String)">
+            <summary>
+            use CreateRecordKey() instead
+            </summary>
+            <param name="recordId"></param>
+            <param name="tableName"></param>
+            <param name="dataSourceName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateDependencyKeyInvalidateOnChange(System.String)">
+            <summary>
+            use CreateTabledependencyKey() instead
+            </summary>
+            <param name="tablename"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.CreateDependencyKeyInvalidateOnChange(System.String,System.String)">
+            <summary>
+            use CreateTabledependencyKey() instead
+            </summary>
+            <param name="tablename"></param>
+            <param name="datasource"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object)">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object,System.DateTime)">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="invalidationDate"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object,System.Collections.Generic.List{System.String})">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="tagList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object,System.DateTime,System.Collections.Generic.List{System.String})">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="invalidationDate"></param>
+            <param name="tagList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object,System.String)">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.SetKey(System.String,System.Object,System.DateTime,System.String)">
+            <summary>
+            use Store() instead
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="invalidationDate"></param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Clear(System.String)">
+            <summary>
+            Use Clear(dependentKeyList)
+            </summary>
+            <param name="ContentNameList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Read(System.String)">
+            <summary>
+            Use GetText(key) instead
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.InvalidateTag(System.String)">
+            <summary>
+            Use Invalidate(key)
+            </summary>
+            <param name="tag"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Save(System.String,System.String)">
+            <summary>
+            Use Store()
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Save(System.String,System.String,System.String)">
+            <summary>
+            Use Store()
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="tagCommaList"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPCacheBaseClass.Save(System.String,System.String,System.String,System.DateTime)">
+            <summary>
+            Use Store()
+            </summary>
+            <param name="key"></param>
+            <param name="Value"></param>
+            <param name="tagCommaList"></param>
+            <param name="ClearOnDate"></param>
         </member>
         <member name="P:Contensive.BaseClasses.CPContentBaseClass.LatestContentModifiedDate">
             <summary>
@@ -3976,6 +4105,11 @@
             <param name="key"></param>
             <param name="value"></param>
         </member>
+        <member name="T:Contensive.BaseClasses.CPEmailBaseClass">
+            <summary>
+            Methods to send and manage email.
+            </summary>
+        </member>
         <member name="P:Contensive.BaseClasses.CPEmailBaseClass.fromAddressDefault">
             <summary>
             Returns the site's default email from address
@@ -3997,6 +4131,36 @@
             <param name="userErrorMessage"></param>
             <remarks></remarks>
         </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.send(System.String,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Sends an email to an email address. Return false if the email could not be sent
+            </summary>
+            <param name="toAddress"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.send(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Sends an email to an email address. Return false if the email could not be sent
+            </summary>
+            <param name="toAddress"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.send(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends an email to an email address. Return false if the email could not be sent
+            </summary>
+            <param name="toAddress"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+        </member>
         <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendForm(System.String,System.String,System.String,System.String@)">
             <summary>
             Sends an email that includes all the form elements in the current webpage response.
@@ -4007,12 +4171,27 @@
             <param name="userErrorMessage"></param>
             <remarks></remarks>
         </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendForm(System.String,System.String,System.String)">
+            <summary>
+            Sends an email that includes all the form elements in the current webpage response.
+            </summary>
+            <param name="toAddress"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+        </member>
         <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendPassword(System.String,System.String@)">
             <summary>
             Send a list of usernames and passwords to the account(s) that include the given email address. If false, the email could not be sent.
             </summary>
             <param name="userEmailAddress"></param>
+            <param name="userErrorMessage"></param>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendPassword(System.String)">
+            <summary>
+            Send a list of usernames and passwords to the account(s) that include the given email address. If false, the email could not be sent.
+            </summary>
+            <param name="userEmailAddress"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.String,System.String,System.Int32,System.String@)">
             <summary>
@@ -4021,23 +4200,232 @@
             <param name="emailName"></param>
             <param name="additionalCopy"></param>
             <param name="additionalUserID"></param>
+            <param name="userErrorMessage"></param>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.String,System.String,System.Int32)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailName"></param>
+            <param name="additionalCopy"></param>
+            <param name="additionalUserID"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.String,System.String)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailName"></param>
+            <param name="additionalCopy"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.String)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailName"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.Int32,System.String,System.Int32,System.String@)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailId"></param>
+            <param name="additionalCopy"></param>
+            <param name="additionalUserID"></param>
+            <param name="userErrorMessage"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.Int32,System.String,System.Int32)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailId"></param>
+            <param name="additionalCopy"></param>
+            <param name="additionalUserID"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.Int32,System.String)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailId"></param>
+            <param name="additionalCopy"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendSystem(System.Int32)">
+            <summary>
+            Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+            </summary>
+            <param name="emailId"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.String,System.String,System.String,System.String,System.Boolean,System.Boolean,System.String@)">
             <summary>
-            Sends an email to everyone in a group list. The list can be of Group Ids or names. Group names in the list can not contain commas.
+            Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
             </summary>
-            <param name="groupNameOrIdList"></param>
+            <param name="groupName"></param>
             <param name="fromAddress"></param>
             <param name="subject"></param>
             <param name="body"></param>
             <param name="sendImmediately"></param>
             <param name="bodyIsHTML"></param>
+            <param name="userErrorMessage"></param>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.String,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+            </summary>
+            <param name="groupName"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+            </summary>
+            <param name="groupName"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.String,System.String,System.String,System.String)">
+            <summary>
+            Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+            </summary>
+            <param name="groupName"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Int32,System.String,System.String,System.String,System.Boolean,System.Boolean,System.String@)">
+            <summary>
+            Sends an email to everyone in a group.
+            </summary>
+            <param name="groupId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+            <param name="userErrorMessage"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Int32,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a group.
+            </summary>
+            <param name="groupId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Int32,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a group.
+            </summary>
+            <param name="groupId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Sends an email to everyone in a group.
+            </summary>
+            <param name="groupId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.String},System.String,System.String,System.String,System.Boolean,System.Boolean,System.String@)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupNameList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+            <param name="userErrorMessage"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.String},System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupNameList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.String},System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupNameList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.String},System.String,System.String,System.String)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupNameList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.Int32},System.String,System.String,System.String,System.Boolean,System.Boolean,System.String@)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupIdList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+            <param name="userErrorMessage"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.Int32},System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupIdList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.Int32},System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupIdList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendGroup(System.Collections.Generic.List{System.Int32},System.String,System.String,System.String)">
+            <summary>
+            Sends an email to everyone in a list of groups.
+            </summary>
+            <param name="groupIdList"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.Int32,System.String,System.String,System.String,System.Boolean,System.Boolean,System.String@)">
             <summary>
-            Send an email using the values in a user record.
+            Send an email a user.
             </summary>
             <param name="toUserId"></param>
             <param name="fromAddress"></param>
@@ -4045,7 +4433,82 @@
             <param name="body"></param>
             <param name="sendImmediately"></param>
             <param name="bodyIsHTML"></param>
+            <param name="userErrorMessage"></param>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.Int32,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Send an email a user.
+            </summary>
+            <param name="toUserId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+            <param name="bodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.Int32,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Send an email a user.
+            </summary>
+            <param name="toUserId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+            <param name="sendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.Int32,System.String,System.String,System.String)">
+            <summary>
+            Send an email a user.
+            </summary>
+            <param name="toUserId"></param>
+            <param name="fromAddress"></param>
+            <param name="subject"></param>
+            <param name="body"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.validateEmail(System.String)">
+            <summary>
+            Send an email a user.
+            </summary>
+            <param name="toAddress"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.validateUserEmail(System.Int32)">
+            <summary>
+            Validate a user email
+            </summary>
+            <param name="toUserId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.String,System.String,System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            use setUser with argument int toUserId
+            </summary>
+            <param name="ToUserID"></param>
+            <param name="FromAddress"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="SendImmediately"></param>
+            <param name="BodyIsHTML"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.String,System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            use setUser with argument int toUserId
+            </summary>
+            <param name="ToUserID"></param>
+            <param name="FromAddress"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
+            <param name="SendImmediately"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPEmailBaseClass.sendUser(System.String,System.String,System.String,System.String)">
+            <summary>
+            use setUser with argument int toUserId
+            </summary>
+            <param name="ToUserID"></param>
+            <param name="FromAddress"></param>
+            <param name="Subject"></param>
+            <param name="Body"></param>
         </member>
         <member name="T:Contensive.BaseClasses.CPFileBaseClass">
             <summary>
@@ -4139,8 +4602,25 @@
             Type
             </summary>
             <param name="folderName"></param>
+            <param name="pageSize"></param>
+            <param name="pageNumber"></param>
             <returns></returns>
             <remarks></remarks>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPFileBaseClass.fileList(System.String,System.Int32)">
+            <summary>
+            Get a crlf delimited list of files in a given path. Each row is a tab delimited list of attributes for each file. The attributes are:
+            </summary>
+            <param name="folderName"></param>
+            <param name="pageSize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPFileBaseClass.fileList(System.String)">
+            <summary>
+            Get a crlf delimited list of files in a given path. Each row is a tab delimited list of attributes for each file. The attributes are:
+            </summary>
+            <param name="folderName"></param>
+            <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPFileBaseClass.folderList(System.String)">
             <summary>
@@ -4442,6 +4922,11 @@
             <param name="entity"></param>
             <returns></returns>
         </member>
+        <member name="T:Contensive.BaseClasses.CPGroupBaseClass">
+            <summary>
+            Methods and Properties for Groups
+            </summary>
+        </member>
         <member name="M:Contensive.BaseClasses.CPGroupBaseClass.Add(System.String)">
             <summary>
             Add a new group
@@ -4535,7 +5020,6 @@
             Remove the current user from a group
             </summary>
             <param name="groupNameIdOrGuid"></param>
-            <param name="UserId"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPGroupBaseClass.RemoveUser(System.String,System.Int32)">
             <summary>
@@ -4728,18 +5212,23 @@
             <param name="holeHeight"></param>
             <param name="imageAltSizeList"></param>
         </member>
+        <member name="T:Contensive.BaseClasses.CPJSONBaseClass">
+            <summary>
+            provate consistent JSON methods in a single updateable layer
+            </summary>
+        </member>
         <member name="M:Contensive.BaseClasses.CPJSONBaseClass.Serialize(System.Object)">
             <summary>
             Serialize an object to JSON
             </summary>
-            <param name="groupName"></param>
+            <param name="obj"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPJSONBaseClass.Deserialize``1(System.String)">
             <summary>
             Deserialize a
             </summary>
             <typeparam name="T"></typeparam>
-            <param name="sourceObject"></param>
+            <param name="JSON"></param>
             <returns></returns>
         </member>
         <member name="T:Contensive.BaseClasses.CPLogBaseClass">
@@ -4794,6 +5283,7 @@
             Log a message at the info level.
             </summary>
             <param name="logMessage"></param>
+            <param name="level"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPLogBaseClass.Trace(System.String)">
             <summary>
@@ -5120,6 +5610,34 @@
             <param name="key"></param>
             <param name="value"></param>
         </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.SetProperty(System.String,System.Boolean)">
+            <summary>
+            set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.SetProperty(System.String,System.DateTime)">
+            <summary>
+            set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.SetProperty(System.String,System.Int32)">
+            <summary>
+            set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.SetProperty(System.String,System.Double)">
+            <summary>
+            set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+        </member>
         <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetText(System.String,System.String)">
             <summary>
             Read a site property as a string. If the key is not set, sets and returns the default value.
@@ -5234,7 +5752,6 @@
             Report an error, logging it and sending notifications as the app is confirgured. Does not rethrow the error.
             </summary>
             <param name="Ex"></param>
-            <param name="message"></param>
         </member>
         <member name="M:Contensive.BaseClasses.CPSiteBaseClass.ErrorReport(System.Exception,System.String)">
             <summary>
@@ -5248,6 +5765,44 @@
             When debugging is true, add this message and timestamp to the debug trace.
             </summary>
             <param name="message"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.LogWarning(System.String,System.String,System.String,System.String)">
+            <summary>
+            Log a message at level Warn
+            </summary>
+            <param name="name"></param>
+            <param name="description"></param>
+            <param name="typeOfWarningKey"></param>
+            <param name="instanceKey"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.LogAlarm(System.String)">
+            <summary>
+            Log a message at level Alarm
+            </summary>
+            <param name="cause"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddLinkAlias(System.String,System.Int32,System.String)">
+            <summary>
+            Add a link alias record for this page.
+            </summary>
+            <param name="linkAlias">The link alias to add.</param>
+            <param name="pageId">the id of the page to be displayed by this link alias</param>
+            <param name="queryStringSuffix">The query string to be added to the url that may effect how addons on the page render.</param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.AddLinkAlias(System.String,System.Int32)">
+            <summary>
+            Add a link alias record for this page.
+            </summary>
+            <param name="linkAlias"></param>
+            <param name="pageId"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.ThrowEvent(System.String)">
+            <summary>
+            An addon can throw an Event that then executes other addons that bind to that event in their record. 
+            For example, ecommerce throws an event 'fulfillment'. An item like a giftcard can be emailed on fulfillment which occurs differently on different types of accounts.
+            </summary>
+            <param name="eventNameIdOrGuid"></param>
+            <returns></returns>
         </member>
         <member name="P:Contensive.BaseClasses.CPSiteBaseClass.FilePath">
             <summary>
@@ -5268,6 +5823,128 @@
             </summary>
             <param name="collectionGuid"></param>
             <param name="returnUserError"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetBoolean(System.String,System.String)">
+            <summary>
+            Use correct defaultValue type
+            </summary>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetDate(System.String,System.String)">
+            <summary>
+            Use correct defaultValue type
+            </summary>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetInteger(System.String,System.String)">
+            <summary>
+            Use correct defaultValue type
+            </summary>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetNumber(System.String,System.String)">
+            <summary>
+            Use correct defaultValue type
+            </summary>
+            <param name="key"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetProperty(System.String,System.String)">
+            <summary>
+            Use GetText()
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.GetProperty(System.String)">
+            <summary>
+            Use GetText()
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.MultiDomainMode">
+            <summary>
+            Deprecated
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.PhysicalFilePath">
+            <summary>
+            Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.PhysicalInstallPath">
+            <summary>
+            Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.PhysicalWWWPath">
+            <summary>
+            Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.TrapErrors">
+            <summary>
+            Deprecated
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.AppPath">
+            <summary>
+            Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.AppRootPath">
+            <summary>
+            Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.
+            </summary>
+        </member>
+        <member name="P:Contensive.BaseClasses.CPSiteBaseClass.VirtualPath">
+            <summary>
+            Deprecated. This was a slash followed by the application name.
+            </summary>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.IsTesting">
+            <summary>
+            Deprecated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.RequestTask(System.String,System.String,System.String,System.String)">
+            <summary>
+            Use CP.Utils.ExportCsv()
+            </summary>
+            <param name="command"></param>
+            <param name="SQL"></param>
+            <param name="exportName"></param>
+            <param name="filename"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.LandingPageId(System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="domainName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.LandingPageId">
+            <summary>
+            Deprecated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPSiteBaseClass.EncodeAppRootPath(System.String)">
+            <summary>
+            Use CP.Utils.EncodeAppRootPath()
+            </summary>
+            <param name="link"></param>
             <returns></returns>
         </member>
         <member name="T:Contensive.BaseClasses.CPUserBaseClass">
@@ -5675,6 +6352,16 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:Contensive.BaseClasses.CPUtilsBaseClass">
+            <summary>
+            helper methods to support processes, properties and methods used throughout
+            </summary>
+        </member>
+        <member name="T:Contensive.BaseClasses.CPUtilsBaseClass.addonContext">
+            <summary>
+            When an addon is executed, this is a description of the context of the method. Used to support features like html-comments only appropriate for some context
+            </summary>
+        </member>
         <member name="F:Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextPage">
             <summary>
             Addon placed on a page.
@@ -5763,6 +6450,31 @@
         <member name="F:Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextRemoteMethodJson">
             <summary>
             Executes as a remote method. If return is a string, it is returned. If the return is any other type, it is serialized to JSON.
+            </summary>
+        </member>
+        <member name="T:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext">
+            <summary>
+            When an addon is executed from content with {% JSON %}, this object describes the record in which the command was executed
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext.contentName">
+            <summary>
+            the content for the record (metadata that describes the table)
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext.recordId">
+            <summary>
+            record's id
+            </summary>
+        </member>
+        <member name="F:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteHostRecordContext.fieldName">
+            <summary>
+            field name
+            </summary>
+        </member>
+        <member name="T:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext">
+            <summary>
+            When an addon is execute, this object describes the environment in which the addon will be used.
             </summary>
         </member>
         <member name="P:Contensive.BaseClasses.CPUtilsBaseClass.addonExecuteContext.errorContextMessage">
@@ -5895,7 +6607,13 @@
             <param name="source"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPUtilsBaseClass.DecodeResponseVariable(System.String)" -->
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.DecodeResponseVariable(System.String)">
+            <summary>
+            Decodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&amp;amp;key2=value2)
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeAppRootPath(System.String)">
             <summary>
             convert a file link (like /ccLibraryFiles/imageFilename/000001/this.png) to a full URL
@@ -5948,7 +6666,13 @@
             <param name="expression"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeRequestVariable(System.String)" -->
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeRequestVariable(System.String)">
+            <summary>
+            Encodes a querystring response argument (key or value) you would expect to see within a querystring (key1=value1&amp;key2=value2)
+            </summary>
+            <param name="Source"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeText(System.Object)">
             <summary>
             Convert to string. If no valid rendition exists, returns empty.
@@ -5964,7 +6688,33 @@
             <param name="exportName">The name of the export data, used in the downloads table</param>
             <param name="filename">The filename for the export, saved in the downloads table</param>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPUtilsBaseClass.GetArgument(System.String,System.String,System.String,System.String)" -->
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetArgument(System.String,System.String,System.String,System.String)">
+            <summary>
+            get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
+            </summary>
+            <param name="key"></param>
+            <param name="keyValueDelimitedString"></param>
+            <param name="defaultValue"></param>
+            <param name="delimiter"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetArgument(System.String,System.String,System.String)">
+            <summary>
+            get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
+            </summary>
+            <param name="key"></param>
+            <param name="keyValueDelimitedString"></param>
+            <param name="defaultValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetArgument(System.String,System.String)">
+            <summary>
+            get a value from a key=value delimited string. ex keyValueDelimitedString (a=b&amp;amp;c=4), keys ( a and c ), delimiter ( &amp;amp; ), values ( b and 4 )
+            </summary>
+            <param name="key"></param>
+            <param name="keyValueDelimitedString"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetFilename(System.String)">
             <summary>
             Return the filename part of a path (after the left-most slash), either Unix or Dos
@@ -6007,9 +6757,208 @@
             <param name="delimiter"></param>
             <returns></returns>
         </member>
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.String)" -->
-        <!-- Badly formed XML comment ignored for member "M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.String)" -->
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.String)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Int32)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Double)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Double,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.DateTime)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyLinkQueryString(System.String,System.String,System.DateTime,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within a url like "/path/page?key=value&amp;key=value"
+            </summary>
+            <param name="url"></param>
+            <param name="key"></param>
+            <param name="value"></param>
+            <param name="addIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.String,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <param name="AddIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.String)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Int32)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Int32,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <param name="AddIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Double)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Double,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <param name="AddIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <param name="AddIfMissing"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.DateTime)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ModifyQueryString(System.String,System.String,System.DateTime,System.Boolean)">
+            <summary>
+            Update or add a key=value pair within key value pair string like "key=value&amp;key=value"
+            </summary>
+            <param name="WorkingQuery"></param>
+            <param name="QueryName"></param>
+            <param name="QueryValue"></param>
+            <param name="AddIfMissing"></param>
+            <returns></returns>
+        </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.SeparateURL(System.String,System.String@,System.String@,System.String@,System.String@,System.String@)">
+            <summary>
+            return the components of a url
+            </summary>
+            <param name="url"></param>
+            <param name="return_protocol"></param>
+            <param name="return_domain"></param>
+            <param name="return_path"></param>
+            <param name="return_page"></param>
+            <param name="return_queryString"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.SeparateURL(System.String,System.String@,System.String@,System.String@,System.String@,System.String@,System.String@)">
             <summary>
             return the components of a url
             </summary>
@@ -6068,12 +7017,172 @@
              <summary>
             Returns current DateTime.Now if cp.Mock.DateTime is not set, else returns Mock.DateTime
              </summary>
-             <param name="source"></param>
              <returns></returns>
         </member>
         <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.DecodeHTML(System.String)">
             <summary>
             wrapped dotnet namespace for use in scripting
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.AppendLogFile(System.String)">
+            <summary>
+            Deprecated, use AppendLog
+            </summary>
+            <param name="Text"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.AppendLog(System.String,System.String)">
+            <summary>
+            Deprecated, file logging is no longer supported. Use AppendLog(message) to log Info level messages
+            </summary>
+            <param name="pathFilename"></param>
+            <param name="logText"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ExecuteAddon(System.String)">
+            <summary>
+            Deprecated. use cp.addon.execute()
+            </summary>
+            <param name="idGuidOrName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ExecuteAddon(System.String,System.Int32)">
+            <summary>
+            Deprecated. use cp.addon.execute() and manage the wrapper manually.
+            </summary>
+            <param name="IdGuidOrName"></param>
+            <param name="WrapperId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ExecuteAddon(System.String,Contensive.BaseClasses.CPUtilsBaseClass.addonContext)">
+            <summary>
+            Deprecated. use cp.addon.execute()
+            </summary>
+            <param name="IdGuidOrName"></param>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ExecuteAddonAsProcess(System.String)">
+            <summary>
+            Deprecated. use cp.addon.executeAsync()
+            </summary>
+            <param name="IdGuidOrName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ConvertLinkToShortLink(System.String,System.String,System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="URL"></param>
+            <param name="ServerHost"></param>
+            <param name="ServerVirtualPath"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ConvertShortLinkToLink(System.String,System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="URL"></param>
+            <param name="PathPagePrefix"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.DecodeGMTDate(System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="GMTDate"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.Upgrade(System.Boolean)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="isNewApp"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetPleaseWaitEnd">
+            <summary>
+            Deprecated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetPleaseWaitStart">
+            <summary>
+            Deprecated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeJavascript(System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.EncodeQueryString(System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="Source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetFirstNonZeroDate(System.DateTime,System.DateTime)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="Date0"></param>
+            <param name="Date1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetFirstNonZeroInteger(System.Int32,System.Int32)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="Integer0"></param>
+            <param name="Integer1"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetIntegerString(System.Int32,System.Int32)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="Value"></param>
+            <param name="DigitCount"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetLine(System.String)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="Body"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.GetProcessID">
+            <summary>
+            Deprecated
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.ParseURL(System.String,System.String@,System.String@,System.String@,System.String@,System.String@,System.String@)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="SourceURL"></param>
+            <param name="Protocol"></param>
+            <param name="Host"></param>
+            <param name="Port"></param>
+            <param name="Path"></param>
+            <param name="Page"></param>
+            <param name="QueryString"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.Sleep(System.Int32)">
+            <summary>
+            Deprecated
+            </summary>
+            <param name="timeMSec"></param>
+        </member>
+        <member name="M:Contensive.BaseClasses.CPUtilsBaseClass.hashMd5(System.String)">
+            <summary>
+            Deprecated
             </summary>
             <param name="source"></param>
             <returns></returns>

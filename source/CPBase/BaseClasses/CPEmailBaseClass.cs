@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// Methods to send and manage email.
+    /// </summary>
     public abstract class CPEmailBaseClass {
         //
         //====================================================================================================
@@ -27,8 +30,32 @@ namespace Contensive.BaseClasses {
         /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email to an email address. Return false if the email could not be sent
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Sends an email to an email address. Return false if the email could not be sent
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void send(string toAddress, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Sends an email to an email address. Return false if the email could not be sent
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void send(string toAddress, string fromAddress, string subject, string body);
         //
         //====================================================================================================
@@ -41,6 +68,12 @@ namespace Contensive.BaseClasses {
         /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void sendForm(string toAddress, string fromAddress, string subject, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email that includes all the form elements in the current webpage response.
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
         public abstract void sendForm(string toAddress, string fromAddress, string subject);
         //
         //====================================================================================================
@@ -48,8 +81,13 @@ namespace Contensive.BaseClasses {
         /// Send a list of usernames and passwords to the account(s) that include the given email address. If false, the email could not be sent.
         /// </summary>
         /// <param name="userEmailAddress"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void sendPassword(string userEmailAddress, ref string userErrorMessage);
+        /// <summary>
+        /// Send a list of usernames and passwords to the account(s) that include the given email address. If false, the email could not be sent.
+        /// </summary>
+        /// <param name="userEmailAddress"></param>
         public abstract void sendPassword(string userEmailAddress);
         //
         //====================================================================================================
@@ -59,52 +97,213 @@ namespace Contensive.BaseClasses {
         /// <param name="emailName"></param>
         /// <param name="additionalCopy"></param>
         /// <param name="additionalUserID"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void sendSystem(string emailName, string additionalCopy, int additionalUserID, ref string userErrorMessage);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailName"></param>
+        /// <param name="additionalCopy"></param>
+        /// <param name="additionalUserID"></param>
         public abstract void sendSystem(string emailName, string additionalCopy, int additionalUserID);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailName"></param>
+        /// <param name="additionalCopy"></param>
         public abstract void sendSystem(string emailName, string additionalCopy);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailName"></param>
         public abstract void sendSystem(string emailName);
-        //
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="additionalCopy"></param>
+        /// <param name="additionalUserID"></param>
+        /// <param name="userErrorMessage"></param>
         public abstract void sendSystem(int emailId, string additionalCopy, int additionalUserID, ref string userErrorMessage);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="additionalCopy"></param>
+        /// <param name="additionalUserID"></param>
         public abstract void sendSystem(int emailId, string additionalCopy, int additionalUserID);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailId"></param>
+        /// <param name="additionalCopy"></param>
         public abstract void sendSystem(int emailId, string additionalCopy);
+        /// <summary>
+        /// Send a system email record. If the EmailIdOrName field contains a number, it is assumed first to be an Id. If false, the email could not be sent
+        /// </summary>
+        /// <param name="emailId"></param>
         public abstract void sendSystem(int emailId);
         //
         //====================================================================================================
         /// <summary>
-        /// Sends an email to everyone in a group list. The list can be of Group Ids or names. Group names in the list can not contain commas.
+        /// Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
         /// </summary>
-        /// <param name="groupNameOrIdList"></param>
+        /// <param name="groupName"></param>
         /// <param name="fromAddress"></param>
         /// <param name="subject"></param>
         /// <param name="body"></param>
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
-        //
         public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void sendGroup(string groupName, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Sends an email to everyone in a group. (legacy support: if groupName is a valid guid it is assumed to be)
+        /// </summary>
+        /// <param name="groupName"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void sendGroup(string groupName, string fromAddress, string subject, string body);
-        //
+        /// <summary>
+        /// Sends an email to everyone in a group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email to everyone in a group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Sends an email to everyone in a group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void sendGroup(int groupId, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Sends an email to everyone in a group.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void sendGroup(int groupId, string fromAddress, string subject, string body);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupNameList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         //
         public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupNameList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupNameList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupNameList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void sendGroup(List<string> groupNameList, string fromAddress, string subject, string body);
-        //
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupIdList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupIdList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupIdList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Sends an email to everyone in a list of groups.
+        /// </summary>
+        /// <param name="groupIdList"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void sendGroup(List<int> groupIdList, string fromAddress, string subject, string body);
         //
         //====================================================================================================
         /// <summary>
-        /// Send an email using the values in a user record.
+        /// Send an email a user.
         /// </summary>
         /// <param name="toUserId"></param>
         /// <param name="fromAddress"></param>
@@ -112,58 +311,79 @@ namespace Contensive.BaseClasses {
         /// <param name="body"></param>
         /// <param name="sendImmediately"></param>
         /// <param name="bodyIsHTML"></param>
+        /// <param name="userErrorMessage"></param>
         /// <remarks></remarks>
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML, ref string userErrorMessage);
+        /// <summary>
+        /// Send an email a user.
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
+        /// <param name="bodyIsHTML"></param>
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately, bool bodyIsHTML);
+        /// <summary>
+        /// Send an email a user.
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="sendImmediately"></param>
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body, bool sendImmediately);
+        /// <summary>
+        /// Send an email a user.
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <param name="fromAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
         public abstract void sendUser(int toUserId, string fromAddress, string subject, string body);
-        //
+        /// <summary>
+        /// Send an email a user.
+        /// </summary>
+        /// <param name="toAddress"></param>
+        /// <returns></returns>
         public abstract bool validateEmail(string toAddress);
-        //
+        /// <summary>
+        /// Validate a user email
+        /// </summary>
+        /// <param name="toUserId"></param>
+        /// <returns></returns>
         public abstract bool validateUserEmail(int toUserId);
         //
         //====================================================================================================
         // deprecated
         //
-        //
-        [Obsolete("user setUser with argument int toUserId", false)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        //
-        [Obsolete("user setUser with argument int toUserId", false)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately);
-        //
-        [Obsolete("user setUser with argument int toUserId", false)]
-        public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body);
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract string fromAddressDefault { get; }
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body, bool SendImmediately);
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void send(string ToAddress, string FromAddress, string Subject, string Body);
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void sendForm(string ToAddress, string FromAddress, string Subject);
-        //
-        //[Obsolete("Use SendToGroup()", false)]
-        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
-        ////
-        //[Obsolete("Use SendToGroup()", false)]
-        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body, bool SendImmediately);
-        ////
-        //[Obsolete("Use SendToGroup()", false)]
-        //public abstract void sendGroup(string GroupNameOrIdList, string FromAddress, string Subject, string Body);
-
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void sendPassword(string UserEmailAddress);
-        ////
-        //[Obsolete("Use uppercase version", false)]
-        //public abstract void sendSystem(string EmailIdOrName, string AdditionalCopy = "", int AdditionalUserID = 0);
+        /// <summary>
+        /// use setUser with argument int toUserId
+        /// </summary>
+        /// <param name="ToUserID"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        /// <param name="SendImmediately"></param>
+        /// <param name="BodyIsHTML"></param>
+        [Obsolete("use setUser with argument int toUserId", false)] public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately, bool BodyIsHTML);
+        /// <summary>
+        /// use setUser with argument int toUserId
+        /// </summary>
+        /// <param name="ToUserID"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        /// <param name="SendImmediately"></param>
+        [Obsolete("use setUser with argument int toUserId", false)] public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body, bool SendImmediately);
+        /// <summary>
+        /// use setUser with argument int toUserId
+        /// </summary>
+        /// <param name="ToUserID"></param>
+        /// <param name="FromAddress"></param>
+        /// <param name="Subject"></param>
+        /// <param name="Body"></param>
+        [Obsolete("use setUser with argument int toUserId", false)] public abstract void sendUser(string ToUserID, string FromAddress, string Subject, string Body);
     }
 }
 

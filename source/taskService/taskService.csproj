@@ -39,9 +39,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Processor\Processor.csproj" />
   </ItemGroup>
-
+<!--
   <ItemGroup>
     <Reference Include="System.Configuration.Install" />
   </ItemGroup>
-
+-->
 </Project>

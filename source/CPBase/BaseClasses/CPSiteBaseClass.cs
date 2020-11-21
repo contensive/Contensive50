@@ -29,13 +29,29 @@ namespace Contensive.BaseClasses {
         /// <param name="key"></param>
         /// <param name="value"></param>
         public abstract void SetProperty(string key, string value);
-        //
+        /// <summary>
+        /// set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, bool value);
-        //
+        /// <summary>
+        /// set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, DateTime value);
-        //
+        /// <summary>
+        /// set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, int value);
-        //
+        /// <summary>
+        /// set a site-wide property. Read back with cp.site.GetText(), .getBoolean(), etc
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetProperty(string key, double value);
         //
         //====================================================================================================
@@ -156,7 +172,6 @@ namespace Contensive.BaseClasses {
         /// Report an error, logging it and sending notifications as the app is confirgured. Does not rethrow the error.
         /// </summary>
         /// <param name="Ex"></param>
-        /// <param name="message"></param>
         public abstract void ErrorReport(System.Exception Ex);
         /// <summary>
         /// Report an error, logging it and sending notifications as the app is confirgured. Does not rethrow the error.
@@ -173,21 +188,44 @@ namespace Contensive.BaseClasses {
         public abstract void TestPoint(string message);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Log a message at level Warn
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="typeOfWarningKey"></param>
+        /// <param name="instanceKey"></param>
         public abstract void LogWarning(string name, string description, string typeOfWarningKey, string instanceKey);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Log a message at level Alarm
+        /// </summary>
+        /// <param name="cause"></param>
         public abstract void LogAlarm(string cause);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Add a link alias record for this page.
+        /// </summary>
+        /// <param name="linkAlias">The link alias to add.</param>
+        /// <param name="pageId">the id of the page to be displayed by this link alias</param>
+        /// <param name="queryStringSuffix">The query string to be added to the url that may effect how addons on the page render.</param>
         public abstract void AddLinkAlias(string linkAlias, int pageId, string queryStringSuffix);
-        //
+        /// <summary>
+        /// Add a link alias record for this page.
+        /// </summary>
+        /// <param name="linkAlias"></param>
+        /// <param name="pageId"></param>
         public abstract void AddLinkAlias(string linkAlias, int pageId);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// An addon can throw an Event that then executes other addons that bind to that event in their record. 
+        /// For example, ecommerce throws an event 'fulfillment'. An item like a giftcard can be emailed on fulfillment which occurs differently on different types of accounts.
+        /// </summary>
+        /// <param name="eventNameIdOrGuid"></param>
+        /// <returns></returns>
         public abstract string ThrowEvent(string eventNameIdOrGuid);
         //
         //====================================================================================================
@@ -196,8 +234,7 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// deprecated. Use CP.Http.CdnFilePathPrefix or CP.Http.CdnFilepathPrefixAbsolute
         /// </summary>
-        [Obsolete("Use CP.Http.CdnFilePathPrefix or CP.Http.CdnFilepathPrefixAbsolute", false)]
-        public abstract string FilePath { get; }
+        [Obsolete("Use CP.Http.CdnFilePathPrefix or CP.Http.CdnFilepathPrefixAbsolute", false)]        public abstract string FilePath { get; }
         //
         /// <summary>
         /// deprecated. Use CP.Addon.InstallCollectionFile()
@@ -205,8 +242,7 @@ namespace Contensive.BaseClasses {
         /// <param name="privatePathFilename"></param>
         /// <param name="returnUserError"></param>
         /// <returns></returns>
-        [Obsolete("Use CP.Addon.InstallCollectionFile()", false)]
-        public abstract bool installCollectionFile(string privatePathFilename, ref string returnUserError);
+        [Obsolete("Use CP.Addon.InstallCollectionFile()", false)]        public abstract bool installCollectionFile(string privatePathFilename, ref string returnUserError);
         //
         /// <summary>
         /// Use CP.Addon.InstallCollectionFromLibrary()
@@ -214,90 +250,109 @@ namespace Contensive.BaseClasses {
         /// <param name="collectionGuid"></param>
         /// <param name="returnUserError"></param>
         /// <returns></returns>
-        [Obsolete("Use CP.Addon.InstallCollectionFromLibrary()", false)]
-        public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
-        //
-        //
-        [Obsolete("Use correct defaultValue type",true)]
-        public abstract bool GetBoolean(string key, string defaultValue);
-        //
-        //
-        [Obsolete("Use correct defaultValue type", false)]
-        public abstract DateTime GetDate(string key, string defaultValue);
-        //
-        //
-        [Obsolete("Use correct defaultValue type", false)]
-        public abstract int GetInteger(string key, string defaultValue);
-        //
-        //
-        [Obsolete("Use correct defaultValue type", false)]
-        public abstract double GetNumber(string key, string defaultValue);
-        //
-        //
-        [Obsolete("Use GetText()", false)]
-        public abstract string GetProperty(string key, string value);
-        //
-        //
-        [Obsolete("Use GetText()", false)]
-        public abstract string GetProperty(string key);
-        //
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract bool MultiDomainMode { get; }
-        //
-        //
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string PhysicalFilePath { get; }
-        //
-        //
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string PhysicalInstallPath { get; }
-        //
-        //
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string PhysicalWWWPath { get; }
-        //
-        //
-        // 20151121 - not needed, removed to resolve compile issue with com compatibility
-        //Public MustOverride Sub ErrorReport(ByVal Err As Microsoft.VisualBasic.ErrObject, Optional ByVal Message As String = "")
-        //
-        //
-        [Obsolete("Deprecated", false)]
-        public abstract bool TrapErrors { get; }
-        //
-        //
-        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]
-        public abstract string AppPath { get; }
-        //
-        //
-        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]
-        public abstract string AppRootPath { get; }
-        //
-        //
-        [Obsolete("Deprecated. This was a slash followed by the application name.", false)]
-        public abstract string VirtualPath { get; }
-        //
-        //
-        [Obsolete("Deprecated.", false)]
-        public abstract bool IsTesting();
-        //
-        // removed because VB doesnt see upper/lowecase. 2 replacement methods cover both cases, and case will be corrected in C#
-        //[Obsolete("Use uppercase method", false)]
-        //public abstract void addLinkAlias(string linkAlias, int pageId, string queryStringSuffix = "");
-        //
-        [Obsolete("Use CP.Utils.ExportCsv()", false)]
-        public abstract void RequestTask(string command, string SQL, string exportName, string filename);
-        //
-        //
-        [Obsolete("Deprecated.", false)]
-        public abstract int LandingPageId(string domainName);
-        //
-        //
-        [Obsolete("Deprecated.", false)]
-        public abstract int LandingPageId();
-        //
-        //
-        [Obsolete("Use CP.Utils.EncodeAppRootPath()", false)]
-        public abstract string EncodeAppRootPath(string link);
+        [Obsolete("Use CP.Addon.InstallCollectionFromLibrary()", false)]        public abstract bool installCollectionFromLibrary(string collectionGuid, ref string returnUserError);
+        /// <summary>
+        /// Use correct defaultValue type
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        [Obsolete("Use correct defaultValue type",true)]        public abstract bool GetBoolean(string key, string defaultValue);
+        /// <summary>
+        /// Use correct defaultValue type
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        [Obsolete("Use correct defaultValue type", false)]        public abstract DateTime GetDate(string key, string defaultValue);
+        /// <summary>
+        /// Use correct defaultValue type
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        [Obsolete("Use correct defaultValue type", false)]        public abstract int GetInteger(string key, string defaultValue);
+        /// <summary>
+        /// Use correct defaultValue type
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        [Obsolete("Use correct defaultValue type", false)]        public abstract double GetNumber(string key, string defaultValue);
+        /// <summary>
+        /// Use GetText()
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [Obsolete("Use GetText()", false)]        public abstract string GetProperty(string key, string value);
+        /// <summary>
+        /// Use GetText()
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        [Obsolete("Use GetText()", false)]        public abstract string GetProperty(string key);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        [Obsolete("Deprecated", false)]        public abstract bool MultiDomainMode { get; }
+        /// <summary>
+        /// Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+        /// </summary>
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]        public abstract string PhysicalFilePath { get; }
+        /// <summary>
+        /// Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+        /// </summary>
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]        public abstract string PhysicalInstallPath { get; }
+        /// <summary>
+        /// Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.
+        /// </summary>
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]        public abstract string PhysicalWWWPath { get; }
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        [Obsolete("Deprecated", false)]        public abstract bool TrapErrors { get; }
+        /// <summary>
+        /// Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.
+        /// </summary>
+        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]        public abstract string AppPath { get; }
+        /// <summary>
+        /// Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.
+        /// </summary>
+        [Obsolete("Deprecated. This was the url path to the application for virtually hosted sites. Should be a blank.", false)]        public abstract string AppRootPath { get; }
+        /// <summary>
+        /// Deprecated. This was a slash followed by the application name.
+        /// </summary>
+        [Obsolete("Deprecated. This was a slash followed by the application name.", false)]        public abstract string VirtualPath { get; }
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated.", false)]        public abstract bool IsTesting();
+        /// <summary>
+        /// Use CP.Utils.ExportCsv()
+        /// </summary>
+        /// <param name="command"></param>
+        /// <param name="SQL"></param>
+        /// <param name="exportName"></param>
+        /// <param name="filename"></param>
+        [Obsolete("Use CP.Utils.ExportCsv()", false)]        public abstract void RequestTask(string command, string SQL, string exportName, string filename);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <param name="domainName"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated.", false)]        public abstract int LandingPageId(string domainName);
+        /// <summary>
+        /// Deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated.", false)]        public abstract int LandingPageId();
+        /// <summary>
+        /// Use CP.Utils.EncodeAppRootPath()
+        /// </summary>
+        /// <param name="link"></param>
+        /// <returns></returns>
+        [Obsolete("Use CP.Utils.EncodeAppRootPath()", false)]        public abstract string EncodeAppRootPath(string link);
     }
 }

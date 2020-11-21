@@ -95,17 +95,24 @@ namespace Contensive.BaseClasses {
         /// Type
         /// </summary>
         /// <param name="folderName"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string fileList(string folderName, int pageSize, int pageNumber);
-        //
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string fileList(string folderName, int pageSize);
-        //
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string fileList(string folderName);
-        //
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract string fileList(string folderName, int pageSize, int pageNumber);
+        /// <summary>
+        /// Get a crlf delimited list of files in a given path. Each row is a tab delimited list of attributes for each file. The attributes are:
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract string fileList(string folderName, int pageSize);
+        /// <summary>
+        /// Get a crlf delimited list of files in a given path. Each row is a tab delimited list of attributes for each file. The attributes are:
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract string fileList(string folderName);
         /// <summary>
         /// Get a crlf delimited list of folders in a given path. Each row is a tab delimited list of attributes for each folder. The attributes are:
         /// Name
@@ -118,31 +125,27 @@ namespace Contensive.BaseClasses {
         /// <param name="folderName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string folderList(string folderName);
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract string folderList(string folderName);
         /// <summary>
         /// Returns true if a file exists
         /// </summary>
         /// <param name="pathFileName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract bool fileExists(string pathFileName);
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract bool fileExists(string pathFileName);
         /// <summary>
         /// Returns true if a folder exists
         /// </summary>
         /// <param name="folderName"></param>
         /// <returns></returns>
         /// <remarks></remarks>
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract bool folderExists(string folderName);
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract bool folderExists(string folderName);
         /// <summary>
         /// Returns a URL to a file in the File.cdn store
         /// </summary>
         /// <param name="virtualFilename"></param>
         /// <returns></returns>
-        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
-        public abstract string getVirtualFileLink(string virtualFilename);
+        [Obsolete("Deprecated, please use cp.cdnFiles, cp.privateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)] public abstract string getVirtualFileLink(string virtualFilename);
     }
 
 }

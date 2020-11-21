@@ -113,7 +113,6 @@ namespace Contensive.BaseClasses {
         /// Invalidate all cache entries dependent on this tableKey
         /// </summary>
         /// <param name="tableName"></param>
-        /// <param name="recordId"></param>
         public abstract void InvalidateTable(string tableName);
         //
         //====================================================================================================
@@ -159,9 +158,7 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <param name="dataSourceName"></param>
         /// <returns></returns>        
-        public abstract string CreateRecordKey(int recordId, string tableName, string datasourceName);
-        //
-        //public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName, string datasourceName);
+        public abstract string CreateRecordKey(int recordId, string tableName, string dataSourceName);
         //
         //====================================================================================================
         /// <summary>
@@ -170,9 +167,7 @@ namespace Contensive.BaseClasses {
         /// <param name="recordId"></param>
         /// <param name="tableName"></param>
         /// <returns></returns>
-
         public abstract string CreateRecordKey(int recordId, string tableName);
-        //public abstract BaseModels.CacheKeyHashBaseModel CreateRecordKeyHash(int recordId, string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -190,14 +185,6 @@ namespace Contensive.BaseClasses {
         /// <param name="objectName"></param>
         /// <returns></returns>
         public abstract string CreateKey(string objectName);
-        //
-        //====================================================================================================
-        //
-        //public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName, string objectUniqueIdentifier);
-        //
-        //====================================================================================================
-        //
-        //public abstract BaseModels.CacheKeyHashBaseModel CreateKeyHash(string objectName);
         //
         //====================================================================================================
         /// <summary>
@@ -239,25 +226,6 @@ namespace Contensive.BaseClasses {
         /// <param name="tableName"></param>
         /// <returns></returns>
         public abstract string CreatePtrKeyforDbRecordUniqueName(string name, string tableName);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Create a Ptr key for a db model object based on the record name. Only for tables where the name is unique
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
-        /// <returns></returns>
-        //public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName, string dataSourceName);
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Create a Ptr key for a db model object based on the record name.
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        //public abstract BaseModels.CacheKeyHashBaseModel CreatePtrKeyHashforDbRecordUniqueName(string name, string tableName);
         //
         //====================================================================================================
         /// <summary>
@@ -312,7 +280,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         /// <param name="key"></param>
         /// <param name="value"></param>
-        /// <param name="tag"></param>
+        /// <param name="dependentKey"></param>
         public abstract void Store(string key, object value, string dependentKey);
         //
         //====================================================================================================
@@ -329,8 +297,8 @@ namespace Contensive.BaseClasses {
         /// <summary>
         /// Store a ptr to a cache entry. For example you may store an object by its recordId, but need to reference it by its guid. Create the cache key with the id, and a cache ptr which refers the guid to the cacheKey and a Get of the ptr will return the cache entry for the id.
         /// </summary>
+        /// <param name="keyPtr"></param>
         /// <param name="key"></param>
-        /// <param name="value"></param>
         public abstract void StorePtr(string keyPtr, string key);
         //
         //====================================================================================================
@@ -339,57 +307,119 @@ namespace Contensive.BaseClasses {
         //
         //public abstract void Save(string key, string Value);
         //public abstract void Save(string key, string Value, string tagCommaList);
-        //
-        [Obsolete("Use InvalidateTableDependencyKey() instead", false)]
-        public abstract void UpdateLastModified(string tableName);
-        //
-        [Obsolete("use CreateRecordKey() instead", false)]
-        public abstract string CreateKeyForDbRecord(int recordId, string tableName);
-        //
-        [Obsolete("use CreateRecordKey() instead", false)]
-        public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
-        //
-        [Obsolete("use CreateTabledependencyKey() instead", false)]
-        public abstract string CreateDependencyKeyInvalidateOnChange(string tablename);
-        //
-        [Obsolete("use CreateTabledependencyKey() instead", false)]
-        public abstract string CreateDependencyKeyInvalidateOnChange(string tablename, string datasource);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value, DateTime invalidationDate);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value, List<string> tagList);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value, DateTime invalidationDate, List<string> tagList);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value, string tag);
-        //
-        [Obsolete("use Store() instead", false)]
-        public abstract void SetKey(string key, object Value, DateTime invalidationDate, string tag);
-        //
-        [Obsolete("Use Clear(dependentKeyList)", false)]
-        public abstract void Clear(string ContentNameList);
-        //
-        [Obsolete("Use GetText(key) instead", false)]
-        public abstract string Read(string key);
-        //
-        [Obsolete("Use Invalidate(key)", false)]
-        public abstract void InvalidateTag(string tag);
-        //
-        [Obsolete("Use Store()", false)]
-        public abstract void Save(string key, string Value);
-        //
-        [Obsolete("Use Store()", false)]
-        public abstract void Save(string key, string Value, string tagCommaList);
-        //
-        [Obsolete("Use Store()", false)]
-        public abstract void Save(string key, string Value, string tagCommaList, DateTime ClearOnDate);
+        /// <summary>
+        /// Use InvalidateTableDependencyKey() instead
+        /// </summary>
+        /// <param name="tableName"></param>
+        [Obsolete("Use InvalidateTableDependencyKey() instead", false)] public abstract void UpdateLastModified(string tableName);
+        /// <summary>
+        /// use CreateRecordKey() instead
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
+        [Obsolete("use CreateRecordKey() instead", false)] public abstract string CreateKeyForDbRecord(int recordId, string tableName);
+        /// <summary>
+        /// use CreateRecordKey() instead
+        /// </summary>
+        /// <param name="recordId"></param>
+        /// <param name="tableName"></param>
+        /// <param name="dataSourceName"></param>
+        /// <returns></returns>
+        [Obsolete("use CreateRecordKey() instead", false)] public abstract string CreateKeyForDbRecord(int recordId, string tableName, string dataSourceName);
+        /// <summary>
+        /// use CreateTabledependencyKey() instead
+        /// </summary>
+        /// <param name="tablename"></param>
+        /// <returns></returns>
+        [Obsolete("use CreateTabledependencyKey() instead", false)] public abstract string CreateDependencyKeyInvalidateOnChange(string tablename);
+        /// <summary>
+        /// use CreateTabledependencyKey() instead
+        /// </summary>
+        /// <param name="tablename"></param>
+        /// <param name="datasource"></param>
+        /// <returns></returns>
+        [Obsolete("use CreateTabledependencyKey() instead", false)] public abstract string CreateDependencyKeyInvalidateOnChange(string tablename, string datasource);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="invalidationDate"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value, DateTime invalidationDate);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="tagList"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value, List<string> tagList);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="tagList"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value, DateTime invalidationDate, List<string> tagList);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="tag"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value, string tag);
+        /// <summary>
+        /// use Store() instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="invalidationDate"></param>
+        /// <param name="tag"></param>
+        [Obsolete("use Store() instead", false)] public abstract void SetKey(string key, object Value, DateTime invalidationDate, string tag);
+        /// <summary>
+        /// Use Clear(dependentKeyList)
+        /// </summary>
+        /// <param name="ContentNameList"></param>
+        [Obsolete("Use Clear(dependentKeyList)", false)] public abstract void Clear(string ContentNameList);
+        /// <summary>
+        /// Use GetText(key) instead
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        [Obsolete("Use GetText(key) instead", false)] public abstract string Read(string key);
+        /// <summary>
+        /// Use Invalidate(key)
+        /// </summary>
+        /// <param name="tag"></param>
+        [Obsolete("Use Invalidate(key)", false)] public abstract void InvalidateTag(string tag);
+        /// <summary>
+        /// Use Store()
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        [Obsolete("Use Store()", false)] public abstract void Save(string key, string Value);
+        /// <summary>
+        /// Use Store()
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="tagCommaList"></param>
+        [Obsolete("Use Store()", false)] public abstract void Save(string key, string Value, string tagCommaList);
+        /// <summary>
+        /// Use Store()
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
+        /// <param name="tagCommaList"></param>
+        /// <param name="ClearOnDate"></param>
+        [Obsolete("Use Store()", false)] public abstract void Save(string key, string Value, string tagCommaList, DateTime ClearOnDate);
     }
 
 }

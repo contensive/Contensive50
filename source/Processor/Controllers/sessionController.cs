@@ -619,14 +619,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <returns></returns>
         public bool isAuthenticatedAdmin() {
-            bool result = false;
             try {
-                result = visit.visitAuthenticated && (user.admin || user.developer);
+                return visit.visitAuthenticated && (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //========================================================================
@@ -636,14 +634,12 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <returns></returns>
         public bool isAuthenticatedDeveloper() {
-            bool result = false;
             try {
-                result = visit.visitAuthenticated && (user.admin || user.developer);
+                return visit.visitAuthenticated && (user.admin || user.developer);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //========================================================================
@@ -654,18 +650,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentName"></param>
         /// <returns></returns>
         public bool isAuthenticatedContentManager(ContentMetadataModel contentMetadata) {
-            bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin()) { return true; }
                 if (!isAuthenticated) { return false; }
                 //
                 // -- for specific Content
-                returnIsContentManager = PermissionController.getUserContentPermissions(core, contentMetadata).allowEdit;
+                return PermissionController.getUserContentPermissions(core, contentMetadata).allowEdit;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return false;
             }
-            return returnIsContentManager;
         }
         //
         //========================================================================
@@ -676,10 +670,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentName"></param>
         /// <returns></returns>
         public bool isAuthenticatedContentManager(string ContentName) {
-            bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin()) { return true; }
-                if (!isAuthenticated) { return false; }
                 //
                 if (string.IsNullOrEmpty(ContentName)) {
                     //
@@ -689,13 +681,12 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- for specific Content
                     ContentMetadataModel cdef = ContentMetadataModel.createByUniqueName(core, ContentName);
-                    returnIsContentManager = PermissionController.getUserContentPermissions(core, cdef).allowEdit;
+                    return PermissionController.getUserContentPermissions(core, cdef).allowEdit;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                return false;
+                throw;
             }
-            return returnIsContentManager;
         }
         //
         //========================================================================
@@ -706,37 +697,33 @@ namespace Contensive.Processor.Controllers {
         /// <param name="ContentName"></param>
         /// <returns></returns>
         public bool isAuthenticatedContentManager() {
-            bool returnIsContentManager = false;
             try {
                 if (core.session.isAuthenticatedAdmin()) { return true; }
-                if (!isAuthenticated) { return false; }
+                if (_isAuthenticatedContentManagerAnything_loaded && _isAuthenticatedContentManagerAnything_userId.Equals(user.id)) return _isAuthenticatedContentManagerAnything;
                 //
-                // Is a CM for any content def
-                if ((!_isAuthenticatedContentManagerAnything_loaded) || (_isAuthenticatedContentManagerAnything_userId != user.id)) {
-                    using (var csData = new CsModel(core)) {
-                        string sql = "SELECT ccGroupRules.ContentID"
-                            + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
-                            + " WHERE ("
-                                + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(user.id) + ")"
-                                + " AND(ccMemberRules.active<>0)"
-                                + " AND(ccGroupRules.active<>0)"
-                                + " AND(ccGroupRules.ContentID Is not Null)"
-                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                + ")";
-                        _isAuthenticatedContentManagerAnything = csData.openSql(sql);
-                    }
-                    //
-                    _isAuthenticatedContentManagerAnything_userId = user.id;
-                    _isAuthenticatedContentManagerAnything_loaded = true;
+                // -- Is a CM for any content def
+                using (var csData = new CsModel(core)) {
+                    string sql = ""
+                        + " SELECT ccGroupRules.ContentID"
+                        + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
+                        + " WHERE ("
+                            + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(user.id) + ")"
+                            + " AND(ccMemberRules.active<>0)"
+                            + " AND(ccGroupRules.active<>0)"
+                            + " AND(ccGroupRules.ContentID Is not Null)"
+                            + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                            + ")";
+                    _isAuthenticatedContentManagerAnything = csData.openSql(sql);
                 }
-                returnIsContentManager = _isAuthenticatedContentManagerAnything;
+                //
+                _isAuthenticatedContentManagerAnything_userId = user.id;
+                _isAuthenticatedContentManagerAnything_loaded = true;
+                return _isAuthenticatedContentManagerAnything;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnIsContentManager;
         }
-
         private bool _isAuthenticatedContentManagerAnything_loaded = false;
         private int _isAuthenticatedContentManagerAnything_userId;
         private bool _isAuthenticatedContentManagerAnything;
@@ -767,6 +754,8 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
+
+
         //
         //===================================================================================================
         /// <summary>
@@ -776,6 +765,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         public int getUserIdForUsernameCredentials(string username, string password) {
             int returnUserId = 0;
             try {
@@ -845,22 +835,23 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     bool recordIsAdmin = csData.getBoolean("admin");
                                     bool recordIsDeveloper = !csData.getBoolean("admin");
-                                    if (allowNoPasswordLogin && (csData.getText("password") == "") && (!recordIsAdmin) && (recordIsDeveloper)) {
+                                    if (allowNoPasswordLogin && string.IsNullOrEmpty(csData.getText("password")) && (!recordIsAdmin) && recordIsDeveloper) {
                                         returnUserId = csData.getInteger("ID");
                                         //
                                         // verify they are in no content manager groups
                                         //
                                         using (var csRules = new CsModel(core)) {
                                             //
-                                            string SQL = "SELECT ccGroupRules.ContentID"
-                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
-                                + " WHERE ("
-                                + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(returnUserId) + ")"
-                                + " AND(ccMemberRules.active<>0)"
-                                + " AND(ccGroupRules.active<>0)"
-                                + " AND(ccGroupRules.ContentID Is not Null)"
-                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                + ");";
+                                            string SQL = ""
+                                                + " SELECT ccGroupRules.ContentID"
+                                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
+                                                + " WHERE ("
+                                                + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(returnUserId) + ")"
+                                                + " AND(ccMemberRules.active<>0)"
+                                                + " AND(ccGroupRules.active<>0)"
+                                                + " AND(ccGroupRules.ContentID Is not Null)"
+                                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                                + ");";
                                             if (csRules.openSql(SQL)) { returnUserId = 0; }
                                         }
                                     }
@@ -902,27 +893,18 @@ namespace Contensive.Processor.Controllers {
         /// <param name="returnErrorCode"></param>
         /// <returns></returns>
         public bool isNewCredentialOK(string Username, string Password, ref string returnErrorMessage, ref int returnErrorCode) {
-            bool returnOk = false;
             try {
-                returnOk = false;
+                bool returnOk = false;
                 if (string.IsNullOrEmpty(Username)) {
                     //
                     // ----- username blank, stop here
-                    //
                     returnErrorCode = 1;
                     returnErrorMessage = "A valid login requires a non-blank username.";
                 } else if (string.IsNullOrEmpty(Password)) {
                     //
                     // ----- password blank, stop here
-                    //
                     returnErrorCode = 4;
                     returnErrorMessage = "A valid login requires a non-blank password.";
-                    //    ElseIf Not main_VisitCookieSupport Then
-                    //        '
-                    //        ' No Cookie Support, can not log in
-                    //        '
-                    //        errorCode = 2
-                    //        errorMessage = "You currently have cookie support disabled in your browser. Without cookies, your browser can not support the level of security required to login."
                 } else {
                     using (var csData = new CsModel(core)) {
                         if (csData.open("People", "username=" + DbController.encodeSQLText(Username), "id", false, 2, "ID")) {
@@ -935,11 +917,11 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
+                return returnOk;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnOk;
         }
         //
         //========================================================================
@@ -979,23 +961,22 @@ namespace Contensive.Processor.Controllers {
         /// <param name="authContext"></param>
         /// <returns></returns>
         public static bool authenticateById(CoreController core, int userId, SessionController authContext) {
-            bool result = false;
             try {
-                result = recognizeById(core, userId, authContext);
-                if (result) {
-                    //
-                    // Log them in
-                    authContext.visit.visitAuthenticated = true;
-                    if (authContext.visit.startTime == DateTime.MinValue) {
-                        authContext.visit.startTime = core.doc.profileStartTime;
-                    }
-                    authContext.visit.save(core.cpParent);
-                }
+                if (authContext.visit.visitAuthenticated) return true;
+                if (!recognizeById(core, userId, authContext)) return false;
+                //
+                // -- recognize success, log them in to that user
+                authContext.visit.visitAuthenticated = true;
+                //
+                // -- verify start time for visit
+                if (authContext.visit.startTime != DateTime.MinValue) authContext.visit.startTime = core.doc.profileStartTime;
+                //
+                authContext.visit.save(core.cpParent);
+                return true;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //========================================================================
         /// <summary>
@@ -1210,34 +1191,20 @@ namespace Contensive.Processor.Controllers {
         //
         //   Checks the username and password
         //
-        public bool isLoginOK(string Username, string Password, string ErrorMessage = "", int ErrorCode = 0) {
-            bool result = (getUserIdForUsernameCredentials(Username, Password) != 0);
-            if (!result) {
-                ErrorMessage = ErrorController.getUserError(core);
-            }
-            return result;
+        public bool isLoginOK(string Username, string Password) {
+            return !getUserIdForUsernameCredentials(Username, Password).Equals(0);
         }
         //
         // ================================================================================================
         //
-        public string getAuthoringStatusMessage(bool IsContentWorkflowAuthoring, bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires, bool RecordApproved, string ApprovedBy, bool RecordSubmitted, string SubmittedBy, bool RecordDeleted, bool RecordInserted, bool RecordModified, string ModifiedBy) {
-            string result = "";
-            //
-            string Copy = null;
-            string Delimiter = "";
-            int main_EditLockExpiresMinutes = encodeInteger((main_EditLockExpires - core.doc.profileStartTime).TotalMinutes);
+        public string getAuthoringStatusMessage(bool RecordEditLocked, string main_EditLockName, DateTime main_EditLockExpires) {
+            if (!RecordEditLocked) return Msg_WorkflowDisabled;
             //
             // ----- site does not support workflow authoring
-            //
-            if (RecordEditLocked) {
-                Copy = GenericController.strReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName);
-                Copy = GenericController.strReplace(Copy, "<EDITEXPIRES>", main_EditLockExpires.ToString());
-                Copy = GenericController.strReplace(Copy, "<EDITEXPIRESMINUTES>", GenericController.encodeText(main_EditLockExpiresMinutes));
-                result += Delimiter + Copy;
-                Delimiter = "<br>";
-            }
-            result += Delimiter + Msg_WorkflowDisabled;
-            Delimiter = "<br>";
+            string result = strReplace(Msg_EditLock, "<EDITNAME>", main_EditLockName);
+            result = strReplace(result, "<EDITEXPIRES>", main_EditLockExpires.ToString());
+            result = strReplace(result, "<EDITEXPIRESMINUTES>", encodeText(encodeInteger((main_EditLockExpires - core.doc.profileStartTime).TotalMinutes)));
+            result += "<br>" + Msg_WorkflowDisabled;
             return result;
         }
         //

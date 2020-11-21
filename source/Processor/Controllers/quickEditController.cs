@@ -44,7 +44,7 @@ namespace Contensive.Processor.Controllers {
                 WorkflowController.recordWorkflowStatusClass authoringStatus = WorkflowController.getWorkflowStatus(core, PageContentModel.tableMetadata.contentName, core.doc.pageController.page.id);
                 PermissionController.UserContentPermissions userContentPermissions = PermissionController.getUserContentPermissions(core, cdef);
                 bool AllowMarkReviewed = DbBaseModel.containsField<PageContentModel>("DateReviewed");
-                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage(false, editLock.isEditLocked, editLock.editLockByMemberName, encodeDate(editLock.editLockExpiresDate), authoringStatus.isWorkflowApproved, authoringStatus.workflowApprovedMemberName, authoringStatus.isWorkflowSubmitted, authoringStatus.workflowSubmittedMemberName, authoringStatus.isWorkflowDeleted, authoringStatus.isWorkflowInserted, authoringStatus.isWorkflowModified, authoringStatus.workflowModifiedByMemberName);
+                string OptionsPanelAuthoringStatus = core.session.getAuthoringStatusMessage( editLock.isEditLocked, editLock.editLockByMemberName, encodeDate(editLock.editLockExpiresDate));
                 //
                 // Set Editing Authoring Control
                 //
@@ -85,12 +85,12 @@ namespace Contensive.Processor.Controllers {
                 if (!userContentPermissions.allowSave) {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberId) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName) + "</td>"
                     + "\r</tr>";
                 } else {
                     result += ""
                     + "\r<tr>"
-                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName, "", true, true, rootPageId, !userContentPermissions.allowSave, true, PageContentModel.tableMetadata.contentName, false, contactMemberId) + "</td>"
+                    + cr2 + "<td colspan=\"2\" class=\"qeRow\">" + getQuickEditingBody(core, PageContentModel.tableMetadata.contentName) + "</td>"
                     + "\r</tr>";
                 }
                 result += "\r<tr>"
@@ -166,7 +166,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         //
-        internal static string getQuickEditingBody(CoreController core, string ContentName, string OrderByClause, bool AllowChildList, bool Authoring, int rootPageId, bool readOnlyField, bool AllowReturnLink, string RootPageContentName, bool ArchivePage, int contactMemberID) {
+        internal static string getQuickEditingBody(CoreController core, string ContentName) {
             string pageCopy = core.doc.pageController.page.copyfilename.content;
             //
             // ----- Page Copy
