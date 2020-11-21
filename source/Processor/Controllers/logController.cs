@@ -329,6 +329,8 @@ namespace Contensive.Processor.Controllers {
             }
             //
         }
+        //
+        //================================================================================================
         /// <summary>
         /// Appends a log file in the /alarms folder in program files. The diagnostic monitor should signal a fail.
         /// </summary>
@@ -336,7 +338,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cause"></param>
         public static void logAlarm(CoreController core, string cause) {
             LogController.logFatal(core, "logAlarm: " + cause);
-            core.programDataFiles.appendFile("Alarms/", "LogAlarm called, cause [" + cause + "]");
+            DateTime now = DateTime.Now;
+            core.programDataFiles.appendFile("Alarms/" + now.Year.ToString("0000") + now.Month.ToString("00") + now.Day.ToString("00") + "-alarms.log", getMessageLine(core, now.ToString() + ", [" + cause + "]"));
 
         }
     }
