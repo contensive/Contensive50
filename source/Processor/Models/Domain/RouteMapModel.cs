@@ -67,67 +67,95 @@ namespace Contensive.Processor.Models.Domain {
                         routeDictionary = new Dictionary<string, RouteClass>()
                     };
                     string physicalFile = "~/" + core.siteProperties.serverPageDefault;
-                    //
-                    // -- admin route
-                    string adminRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
-                    if (!string.IsNullOrWhiteSpace(adminRoute)) {
-                        result.routeDictionary.Add(adminRoute, new RouteClass {
-                            physicalRoute = physicalFile,
-                            virtualRoute = adminRoute,
-                            routeType = RouteTypeEnum.admin
-                        });
+                    {
+                        //
+                        // -- admin route
+                        string localRoute = GenericController.normalizeRoute(core.appConfig.adminRoute);
+                        if (!string.IsNullOrWhiteSpace(localRoute)) {
+                            //
+                            // -- add routeSuffix wildcard to all remote methods that do not have a wildcard so /a/b/c will match addons a, or a/b, or a/b/c
+                            string mapRoute = localRoute;
+                            if (!localRoute.Contains("{*")) {
+                                mapRoute += ((localRoute.Substring(localRoute.Length - 1, 1).Equals("/")) ? "" : "/") + "{*routeSuffix}";
+                            }
+                            //
+                            result.routeDictionary.Add(localRoute, new RouteClass {
+                                physicalRoute = physicalFile,
+                                virtualRoute = mapRoute,
+                                routeType = RouteTypeEnum.admin
+                            });
+                        }
                     }
-                    //
-                    // -- remote methods
-                    foreach (var remoteMethod in core.addonCache.getRemoteMethodAddonList()) {
-                        string route = GenericController.normalizeRoute(remoteMethod.name);
-                        if (!string.IsNullOrWhiteSpace(route)) {
-                            if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logWarn(core, new GenericException("Route [" + route + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
-                            } else {
-                                //
-                                // -- add routeSuffix wildcard to all remote methods so /a/b/c will match addons a, or a/b, or a/b/c
-                                string virtualRoute = route + ((route.Substring(route.Length - 1, 1).Equals("/")) ? "" : "/") + "{*routeSuffix}";
-                                result.routeDictionary.Add(route, new RouteClass {
-                                    physicalRoute = physicalFile,
-                                    virtualRoute = virtualRoute,
-                                    routeType = RouteTypeEnum.remoteMethod,
-                                    remoteMethodAddonId = remoteMethod.id
-                                });
+                    {
+                        //
+                        // -- remote methods
+                        foreach (var remoteMethod in core.addonCache.getRemoteMethodAddonList()) {
+                            string localRoute = GenericController.normalizeRoute(remoteMethod.name);
+                            if (!string.IsNullOrWhiteSpace(localRoute)) {
+                                if (result.routeDictionary.ContainsKey(localRoute)) {
+                                    LogController.logWarn(core, new GenericException("Route [" + localRoute + "] cannot be added because it is a matches the Admin Route or another Remote Method."));
+                                } else {
+                                    //
+                                    // -- add routeSuffix wildcard to all remote methods that do not have a wildcard so /a/b/c will match addons a, or a/b, or a/b/c
+                                    string mapRoute = localRoute;
+                                    if (!localRoute.Contains("{*")) {
+                                        mapRoute += ((localRoute.Substring(localRoute.Length - 1, 1).Equals("/")) ? "" : "/") + "{*routeSuffix}";
+                                    }
+                                    //
+                                    result.routeDictionary.Add(localRoute, new RouteClass {
+                                        physicalRoute = physicalFile,
+                                        virtualRoute = mapRoute,
+                                        routeType = RouteTypeEnum.remoteMethod,
+                                        remoteMethodAddonId = remoteMethod.id
+                                    });
+                                }
                             }
                         }
                     }
-                    //
-                    // -- link forwards
-                    foreach (var linkForward in DbBaseModel.createList<LinkForwardModel>(core.cpParent, "name Is Not null")) {
-                        string route = GenericController.normalizeRoute(linkForward.sourceLink);
-                        if (!string.IsNullOrEmpty(route)) {
-                            if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logError(core, new GenericException("Link Forward Route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
-                            } else {
-                                result.routeDictionary.Add(route, new RouteClass {
-                                    physicalRoute = physicalFile,
-                                    virtualRoute = route,
-                                    routeType = RouteTypeEnum.linkForward,
-                                    linkForwardId = linkForward.id
-                                });
+                    {
+                        //
+                        // -- link forwards
+                        foreach (var linkForward in DbBaseModel.createList<LinkForwardModel>(core.cpParent, "name Is Not null")) {
+                            string localRoute = GenericController.normalizeRoute(linkForward.sourceLink);
+                            if (!string.IsNullOrEmpty(localRoute)) {
+                                if (result.routeDictionary.ContainsKey(localRoute)) {
+                                    LogController.logError(core, new GenericException("Link Forward Route [" + localRoute + "] cannot be added because it is a matches the Admin Route, a Remote Method or another Link Forward."));
+                                } else {
+                                    //
+                                    // -- link alias does not modify the route 
+                                    result.routeDictionary.Add(localRoute, new RouteClass {
+                                        physicalRoute = physicalFile,
+                                        virtualRoute = localRoute,
+                                        routeType = RouteTypeEnum.linkForward,
+                                        linkForwardId = linkForward.id
+                                    });
+                                }
                             }
                         }
                     }
-                    //
-                    // -- link aliases
-                    foreach (var linkAlias in DbBaseModel.createList<LinkAliasModel>(core.cpParent, "name Is Not null")) {
-                        string route = GenericController.normalizeRoute(linkAlias.name);
-                        if (!string.IsNullOrEmpty(route)) {
-                            if (result.routeDictionary.ContainsKey(route)) {
-                                LogController.logError(core, new GenericException("Link Alias route [" + route + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
-                            } else {
-                                result.routeDictionary.Add(route, new RouteClass {
-                                    physicalRoute = physicalFile,
-                                    virtualRoute = route,
-                                    routeType = RouteTypeEnum.linkAlias,
-                                    linkAliasId = linkAlias.id
-                                });
+                    {
+                        //
+                        // -- link aliases
+                        foreach (var linkAlias in DbBaseModel.createList<LinkAliasModel>(core.cpParent, "name Is Not null")) {
+                            string localRoute = GenericController.normalizeRoute(linkAlias.name);
+                            if (!string.IsNullOrEmpty(localRoute)) {
+                                if (result.routeDictionary.ContainsKey(localRoute)) {
+                                    LogController.logError(core, new GenericException("Link Alias route [" + localRoute + "] cannot be added because it is a matches the Admin Route, a Remote Method, a Link Forward o another Link Alias."));
+                                } else {
+                                    //
+                                    // -- add routeSuffix wildcard to all remote methods that do not have a wildcard so /a/b/c will match addons a, or a/b, or a/b/c
+                                    string mapRoute = localRoute;
+                                    if (!localRoute.Contains("{*")) {
+                                        mapRoute += ((localRoute.Substring(localRoute.Length - 1, 1).Equals("/")) ? "" : "/") + "{*routeSuffix}";
+                                    }
+                                    //
+                                    result.routeDictionary.Add(localRoute, new RouteClass {
+                                        physicalRoute = physicalFile,
+                                        virtualRoute = mapRoute,
+                                        routeType = RouteTypeEnum.linkAlias,
+                                        linkAliasId = linkAlias.id
+                                    });
+                                }
                             }
                         }
                     }

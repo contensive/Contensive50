@@ -117,7 +117,7 @@ Public Class ConfigurationClass
                     RouteTable.Routes.Remove(RouteTable.Routes(newRouteKeyValuePair.Key))
                     RouteTable.Routes.MapPageRoute(newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.virtualRoute, newRouteKeyValuePair.Value.physicalRoute)
                 Catch ex As Exception
-                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute [" & newRouteKeyValuePair.Key & "]")
+                    cp.Site.ErrorReport(ex, "Unexpected exception adding virtualRoute, key [" & newRouteKeyValuePair.Key & "], route [" & newRouteKeyValuePair.Value.virtualRoute & "]")
                 End Try
             Next
         End SyncLock
