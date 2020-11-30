@@ -1,14 +1,14 @@
 ﻿
-using System;
-using System.Reflection;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
 using Contensive.BaseClasses;
-using System.Linq;
 using Contensive.Exceptions;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
 using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text;
 
 namespace Contensive.Models.Db {
     //
@@ -59,7 +59,12 @@ namespace Contensive.Models.Db {
     //       - when building the model, if a database record is opened, a dependantObject Tag is created for the tablename+'id'+id
     //       - when building the model, if another model is added, that model returns its cachenames in the cacheNameList to be added as dependentObjects
     //
-    //
+    /// <summary>
+    /// The superclass from which all database models are derived. 
+    /// DbBaseClass provides the generic properties and methods to manage a database table model. 
+    /// To create a database model, inherit this class, add a property tableMetadata of type DbBaseTableMetadataModel,
+    /// and add properties for each database field.
+    /// </summary>
     public class DbBaseModel : DbBaseFieldsModel {
         //
         //====================================================================================================
@@ -82,25 +87,25 @@ namespace Contensive.Models.Db {
             // 
             // 
             /// <summary>
-            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// Set to the pathFilename of a file in tempFiles and the file will by copied to this field during save.
             /// </summary>
             public string tempFileCopySource { get; set; } = null;
             // 
             // 
             /// <summary>
-            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// Set to the pathFilename of a file in privateFiles and the file will by copied to this field during save.
             /// </summary>
             public string privateFileCopySource { get; set; } = null;
             // 
             // 
             /// <summary>
-            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// Set to the pathFilename of a file in wwwFiles and the file will by copied to this field during save.
             /// </summary>
             public string wwwFileCopySource { get; set; } = null;
             // 
             // 
             /// <summary>
-            /// Set to the pathFilename of a file in TempFiles and the file will by copied to this field during save.
+            /// Set to the pathFilename of a file in cdnFiles and the file will by copied to this field during save.
             /// </summary>
             public string cdnFileCopySource { get; set; } = null;
             //
@@ -120,7 +125,8 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// The base type for a field that contains a filename and points to an external file that contains text-like content, like a css file or javascript file
+        /// The base type for a field that contains a filename and points to an external file that contains text-like content, 
+        /// like a css file or javascript file
         /// </summary>
         public class FieldTypeTextFileBase {
             //
@@ -148,12 +154,15 @@ namespace Contensive.Models.Db {
             //
             //====================================================================================================
             //
+            /// <summary>
+            /// The filename used to save the content for this model. 
+            /// </summary>
             public string filename {
                 set {
                     _filename = value;
                     //
                     // -- mark content updated if the content was updated, or if the content is not blank (so old content is written to the new updated filename)
-                    contentUpdated = contentUpdated || (!string.IsNullOrEmpty(_content));
+                    contentUpdated = contentUpdated || (!string.IsNullOrEmpty(local_content));
                 }
                 get {
                     return _filename;
@@ -161,10 +170,12 @@ namespace Contensive.Models.Db {
             }
             private string _filename = "";
             //
-            // -- content in the file. loaded as needed, not during model create. 
+            /// <summary>
+            /// The content in the file. Set this property and save() and the filename is handled.
+            /// </summary>
             public string content {
                 set {
-                    _content = value;
+                    local_content = value;
                     contentUpdated = true;
                     contentLoaded = true;
                 }
@@ -173,23 +184,27 @@ namespace Contensive.Models.Db {
                         // todo if internalcp is not set, throw an error
                         if ((!string.IsNullOrEmpty(filename)) && (cpInternal != null)) {
                             contentLoaded = true;
-                            _content = cpInternal.CdnFiles.Read(filename);
+                            local_content = cpInternal.CdnFiles.Read(filename);
                         }
                     }
-                    return _content;
+                    return local_content;
                 }
             }
+            private string local_content { get; set; } = "";
             //
-            // -- internal storage for content
-            private string _content { get; set; } = "";
-            //
-            // -- When field is deserialized from cache, contentLoaded flag is used to deferentiate between unloaded content and blank conent.
+            /// <summary>
+            /// When field is deserialized from cache, contentLoaded flag is used to deferentiate between unloaded content and blank conent.
+            /// </summary>
             public bool contentLoaded { get; set; } = false;
             //
-            // -- When content is updated, the model.save() writes the file
+            /// <summary>
+            /// When content is updated, the model.save() writes the file
+            /// </summary>
             public bool contentUpdated { get; set; } = false;
             //
-            // -- set by load(). Used by field to read content from filename when needed
+            /// <summary>
+            /// set by load(). Used by field to read content from filename when needed
+            /// </summary>
             [NonSerialized] public CPBaseClass cpInternal = null;
         }
         //
@@ -297,7 +312,6 @@ namespace Contensive.Models.Db {
         /// Need a better fix -- maybe cache the base objects in one key and the derived class's properties in an 'extended' (or 'derived' cache).
         /// </summary>
         /// <param name="sourceType"></param>
-        /// <param name="stackDepth"></param>
         /// <returns></returns>
         private static bool allowRecordCaching(Type sourceType) {
             //
@@ -398,6 +412,7 @@ namespace Contensive.Models.Db {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
+        /// <param name="createdModifiedById">The id the people record to be set as created and modifield.</param>
         /// <returns></returns>
         public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp, int createdModifiedById) where T : DbBaseModel {
             var defaultValues = new Dictionary<string, string>();
@@ -405,6 +420,13 @@ namespace Contensive.Models.Db {
             return defaultValues;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Return a dictionary of strings representing the default values for each field. User EncodeBoolean(), EncodeDate(), etc. methods to manage types
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         public static Dictionary<string, string> getDefaultValues<T>(CPBaseClass cp) where T : DbBaseModel
             => getDefaultValues<T>(cp, cp.User.Id);
         //
@@ -416,7 +438,6 @@ namespace Contensive.Models.Db {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
-        /// <param name="DefaultValues"></param>
         /// <returns></returns>
         public static T addDefault<T>(CPBaseClass cp) where T : DbBaseModel {
             Dictionary<string, string> defaultValues = getDefaultValues<T>(cp);
@@ -424,7 +445,13 @@ namespace Contensive.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Add a record to the table and return the object, setting the new record to default values.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public static T addDefault<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
             Dictionary<string, string> defaultValues = getDefaultValues<T>(cp);
             return addDefault<T>(cp, defaultValues, userId);
@@ -444,11 +471,12 @@ namespace Contensive.Models.Db {
         }
         //====================================================================================================
         /// <summary>
-        /// Add a new record to the db and open it. 
-        /// Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
+        /// Add a new record to the db and open it. Starting a new model with this method will use the default values in Contensive metadata (active, contentcontrolid, etc).
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
+        /// <param name="DefaultValues"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> DefaultValues, int userId) where T : DbBaseModel {
             var callersCacheNameList = new List<string>();
@@ -457,13 +485,16 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Add a new record to the db populated with default values from the content definition and return an object of it
+        ///  Add a new record to the db populated with default values from the content definition and return an object of it
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
+        /// <param name="defaultValues"></param>
+        /// <param name="userId"></param>
         /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
         public static T addDefault<T>(CPBaseClass cp, Dictionary<string, string> defaultValues, int userId, ref List<string> callersCacheNameList) where T : DbBaseModel {
-            T instance = default(T);
+            T instance;
             try {
                 instance = addEmpty<T>(cp, userId);
                 if (instance != null) {
@@ -606,11 +637,11 @@ namespace Contensive.Models.Db {
         /// Add a new empty record to the db and return an object of it.
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="callersCacheNameList"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         public static T addEmpty<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
             try {
-                T result = default(T);
+                T result = default;
                 if (isAppInvalid(cp)) { return result; }
                 return create<T>(cp, cp.Db.Add(derivedTableName(typeof(T)), userId));
             } catch (Exception ex) {
@@ -640,7 +671,7 @@ namespace Contensive.Models.Db {
         /// <param name="callersCacheNameList">Any cachenames effected by this record will be added to this list. If the method consumer creates a cache object, add these cachenames to its dependent cachename list.</param>
         public static T create<T>(CPBaseClass cp, int recordId, ref List<string> callersCacheNameList) where T : DbBaseModel {
             try {
-                T result = default(T);
+                T result = default;
                 if (isAppInvalid(cp)) { return result; }
                 if (recordId <= 0) { return result; }
                 result = (allowRecordCaching(typeof(T))) ? readRecordCache<T>(cp, recordId) : null;
@@ -713,9 +744,10 @@ namespace Contensive.Models.Db {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="recordGuid"></param>
+        /// <param name="callersCacheNameList">A list of cache keys whose invalidation will invalidate this data</param>
         public static T create<T>(CPBaseClass cp, string recordGuid, ref List<string> callersCacheNameList) where T : DbBaseModel {
             try {
-                T result = default(T);
+                T result = default;
                 if (isAppInvalid(cp)) { return result; }
                 if (string.IsNullOrEmpty(recordGuid)) { return result; }
                 result = (allowRecordCaching(typeof(T))) ? readRecordCacheByGuidPtr<T>(cp, recordGuid) : null;
@@ -754,7 +786,7 @@ namespace Contensive.Models.Db {
         /// <param name="callersCacheNameList">method will add the cache name to this list.</param>
         public static T createByUniqueName<T>(CPBaseClass cp, string recordName, ref List<string> callersCacheNameList) where T : DbBaseModel {
             try {
-                T result = default(T);
+                T result = default;
                 if (isAppInvalid(cp)) { return result; }
                 if (!string.IsNullOrEmpty(recordName)) {
                     //
@@ -782,11 +814,11 @@ namespace Contensive.Models.Db {
         /// open an existing object
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="sqlCriteria"></param>
+        /// <param name="row"></param>
         /// <param name="callersCacheKeyList"></param>
         private static T loadRecord<T>(CPBaseClass cp, DataRow row, ref List<string> callersCacheKeyList) where T : DbBaseModel {
             try {
-                T instance = default(T);
+                T instance = default;
                 if (row != null) {
                     Type instanceType = typeof(T);
                     instance = (T)Activator.CreateInstance(instanceType);
@@ -949,6 +981,8 @@ namespace Contensive.Models.Db {
         /// save the instance properties to a record with matching id. If id is not provided, a new record is created.
         /// </summary>
         /// <param name="cp"></param>
+        /// <param name="userId"></param>
+        /// <param name="asyncSave"></param>
         /// <returns></returns>
         public int save(CPBaseClass cp, int userId, bool asyncSave) {
             try {
@@ -1155,7 +1189,7 @@ namespace Contensive.Models.Db {
                 if (isAppInvalid(cp)) { return; }
                 if (string.IsNullOrEmpty(guid)) { return; }
                 // todo change cache invalidate to key ptr, and we do not need to open the record first
-                DbBaseModel instance = create<DbBaseModel>(cp, guid);
+                DbBaseModel instance = create<T>(cp, guid);
                 if (instance == null) { return; }
                 invalidateCacheOfRecord<T>(cp, instance.id);
                 cp.Db.Delete(derivedTableName(typeof(T)), guid);
@@ -1167,10 +1201,15 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// create a list of objects based on the sql criteria and sort order, and add a cache object to an argument
+        /// Create a list of objects based on the sql criteria and sort order, and add a cache object to an argument.
         /// </summary>
+        /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
+        /// <param name="callersCacheNameList"></param>
         /// <returns></returns>
         public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber, List<string> callersCacheNameList) where T : DbBaseModel {
             try {
@@ -1192,18 +1231,35 @@ namespace Contensive.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a list of objects based on the sql criteria and sort order, and add a cache object to an argument.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
         public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize, int pageNumber) where T : DbBaseModel
             => createList<T>(cp, sqlCriteria, sqlOrderBy, pageSize, pageNumber, new List<string>());
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a list of objects based on the sql criteria and sort order, and add a cache object to an argument.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy, int pageSize) where T : DbBaseModel
             => createList<T>(cp, sqlCriteria, sqlOrderBy, pageSize, 1, new List<string>());
         //
         //====================================================================================================
         /// <summary>
-        /// create a list of objects based on the sql criteria and sort order
+        /// create a list of objects based on the sql criteria and sort order.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
@@ -1215,22 +1271,34 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// create a list of objects based on the sql criteria
+        /// create a list of objects from a sql criteria.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
-        /// <returns></returns>
+        /// <returns>Returns a list of objects.</returns>
         public static List<T> createList<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel
             => createList<T>(cp, sqlCriteria, "id", 99999, 1, new List<string> { });
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a list of objects from all active records.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         public static List<T> createList<T>(CPBaseClass cp) where T : DbBaseModel
             => createList<T>(cp, "", "id", 99999, 1, new List<string> { });
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a single object from the first row of a sql query. If no records found, null is returned.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sqlOrderBy"></param>
+        /// <returns></returns>
         public static T createFirstOfList<T>(CPBaseClass cp, string sqlCriteria, string sqlOrderBy) where T : DbBaseModel {
             var list = createList<T>(cp, sqlCriteria, sqlOrderBy, 1, 1, new List<string>());
             if (list.Count == 0) { return null; }
@@ -1241,10 +1309,9 @@ namespace Contensive.Models.Db {
         /// <summary>
         /// get the name of the record, returning empty string if the record is null
         /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="recordId"></param>record
+        /// <param name="record"></param>record
         /// <returns></returns>
-        private static string getRecordName<T>(CPBaseClass cp, T record) where T : DbBaseModel {
+        private static string getRecordName<T>( T record) where T : DbBaseModel {
             return (record != null) ? record.name : string.Empty;
         }
         //
@@ -1257,7 +1324,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public static string getRecordName<T>(CPBaseClass cp, int recordId) where T : DbBaseModel {
             try {
-                return getRecordName<T>(cp, create<T>(cp, recordId));
+                return getRecordName<T>(create<T>(cp, recordId));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;
@@ -1273,7 +1340,7 @@ namespace Contensive.Models.Db {
         /// <returns></returns>
         public static string getRecordName<T>(CPBaseClass cp, string guid) where T : DbBaseModel {
             try {
-                return getRecordName<T>(cp, create<T>(cp, guid));
+                return getRecordName<T>(create<T>(cp, guid));
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;
@@ -1310,11 +1377,11 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// Create an empty model object.
-        /// Populate only control fields (guid, active, created/modified)
+        /// Create an empty model object. Populate only control fields (guid, active, created/modified)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="cp"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
         public static T createEmpty<T>(CPBaseClass cp, int userId) where T : DbBaseModel {
             try {
@@ -1365,14 +1432,44 @@ namespace Contensive.Models.Db {
             }
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Create an sql select for this model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="criteria"></param>
+        /// <returns></returns>
         public static string getSelectSql<T>(CPBaseClass cp, List<string> fieldList, string criteria) where T : DbBaseModel => getSelectSql<T>(cp, fieldList, criteria, null);
         //
+        //====================================================================================================
+        /// <summary>
+        /// Create an sql select for this model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="fieldList"></param>
+        /// <returns></returns>
         public static string getSelectSql<T>(CPBaseClass cp, List<string> fieldList) where T : DbBaseModel => getSelectSql<T>(cp, fieldList, null, null);
         //
+        //====================================================================================================
+        /// <summary>
+        /// Create an sql select for this model
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         public static string getSelectSql<T>(CPBaseClass cp) where T : DbBaseModel => getSelectSql<T>(cp, null, null, null);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Create a sql query for a count of active records
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         public static string getCountSql<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel {
             var sb = (new StringBuilder("select count(*)"))
                 .Append(" from ").Append(derivedTableName(typeof(T)))
@@ -1415,14 +1512,15 @@ namespace Contensive.Models.Db {
         //
         //====================================================================================================
         /// <summary>
-        /// return true if this type contains the field specified
+        /// return true if this type contains a property matching the field name argument
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public static bool containsField<T>(string fieldName) {
+            if (string.IsNullOrEmpty(fieldName)) return false;
             foreach (PropertyInfo instanceProperty in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                if (instanceProperty.Name.ToLower() == "parentid") { return true; }
+                if (instanceProperty.Name.Equals(fieldName,StringComparison.InvariantCultureIgnoreCase)) { return true; }
             }
             return false;
         }
@@ -1483,6 +1581,7 @@ namespace Contensive.Models.Db {
         /// <param name="parentRecordId"></param>
         /// <param name="childRecordId"></param>
         /// <param name="parentIdList"></param>
+        /// <param name="parentIdFieldVerified"></param>
         public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList, bool parentIdFieldVerified) {
             if ((!parentIdFieldVerified) && (!containsField<T>("parentid"))) { return false; }
             if ((childRecordId < 1) || (parentRecordId < 1)) { return false; }
@@ -1503,6 +1602,16 @@ namespace Contensive.Models.Db {
             }
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Returns true if the parentRecordId is parent of the childRecordId
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cp"></param>
+        /// <param name="parentRecordId"></param>
+        /// <param name="childRecordId"></param>
+        /// <param name="parentIdList"></param>
+        /// <returns></returns>
         public static bool isChildOf<T>(CPBaseClass cp, int parentRecordId, int childRecordId, List<int> parentIdList)
             => isChildOf<T>(cp, parentRecordId, childRecordId, parentIdList, false);
         //
@@ -1527,7 +1636,6 @@ namespace Contensive.Models.Db {
         /// invalidate all cache entries for the table (set invalidate-table-objects-date for this table -- see cache controller for definitions)
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="recordId"></param>
         public static void invalidateCacheOfTable<T>(CPBaseClass cp) where T : DbBaseModel {
             try {
                 if (isAppInvalid(cp)) { return; }
@@ -1647,17 +1755,30 @@ namespace Contensive.Models.Db {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Returns true if the argment type is nullable
+        /// </summary>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static bool isNullable(Type type) {
             return Nullable.GetUnderlyingType(type) != null;
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Get count of all records in the table
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static int getCount<T>(CPBaseClass core) where T : DbBaseModel => getCount<T>(core, "");
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Return a dictionary of name/values
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
         private static Dictionary<string, string> getLowerCaseKey(Dictionary<string, string> source) {
             var result = new Dictionary<string, string>();
             foreach (var kvp in source) {

@@ -46,6 +46,10 @@
     <NeutralLanguage>en-US</NeutralLanguage>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
   <ItemGroup Label="Nuget">
     <None Include="resources\web.config.transform">
       <Pack>True</Pack>
