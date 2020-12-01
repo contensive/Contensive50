@@ -19,12 +19,13 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <summary>
         /// Print the index form, values and all creates a sql with leftjoins, and renames lookups as TableLookupxName where x is the TarGetFieldPtr of the field that is FieldTypeLookup
         /// </summary>
-        /// <param name="adminData.content"></param>
-        /// <param name="editRecord"></param>
+        /// <param name="cp"></param>
+        /// <param name="core"></param>
+        /// <param name="adminData"></param>
         /// <param name="IsEmailContent"></param>
         /// <returns></returns>
-        public static string get(CPClass cp, CoreController core, AdminDataModel adminData, bool IsEmailContent) {
-            string result = "";
+        public static string get(CPClass cp, CoreController core, AdminDataModel adminData) {
+            string result;
             try {
                 //
                 // --- make sure required fields are present
@@ -37,11 +38,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // Bad content name
                     Stream.add(AdminErrorController.get(core, "No content definition could be found for ContentID [" + adminData.adminContent.id + "]. This could be a menu error. Please contact your application developer for more assistance.", "No content definition for ContentID [" + adminData.adminContent.id + "] could be found."));
-                } else if (adminData.adminContent.tableName == "") {
+                } else if (string.IsNullOrEmpty(adminData.adminContent.tableName)) {
                     //
                     // No tablename
                     Stream.add(AdminErrorController.get(core, "The content definition [" + adminData.adminContent.name + "] is not associated with a valid database table. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] ContentTablename is empty."));
-                } else if (adminData.adminContent.fields.Count == 0) {
+                } else if (adminData.adminContent.fields.Count.Equals(0)) {
                     //
                     // No Fields
                     Stream.add(AdminErrorController.get(core, "This content [" + adminData.adminContent.name + "] cannot be accessed because it has no fields. Please contact your application developer for more assistance.", "Content [" + adminData.adminContent.name + "] has no field records."));
@@ -272,13 +273,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                 filterLastEdited = filterLastEdited + " by " + core.session.user.name;
             }
             if (IndexConfig.lastEditedPast30Days) {
-                filterLastEdited = filterLastEdited + " in the past 30 days";
+                filterLastEdited += " in the past 30 days";
             }
             if (IndexConfig.lastEditedPast7Days) {
-                filterLastEdited = filterLastEdited + " in the week";
+                filterLastEdited += " in the week";
             }
             if (IndexConfig.lastEditedToday) {
-                filterLastEdited = filterLastEdited + " today";
+                filterLastEdited += " today";
             }
             if (!string.IsNullOrEmpty(filterLastEdited)) {
                 filterLine.Append(", last edited" + filterLastEdited);
@@ -343,15 +344,14 @@ namespace Contensive.Processor.Addons.AdminSite {
             if ((content.tableName.ToLowerInvariant() == "ccmembers") && (IndexConfig.groupListCnt > 0)) {
                 string GroupList = "";
                 for (int Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
-                    if (IndexConfig.groupList[Ptr] != "") {
+                    if (!string.IsNullOrEmpty(IndexConfig.groupList[Ptr])) {
                         GroupList += "\t" + IndexConfig.groupList[Ptr];
                     }
                 }
                 if (!string.IsNullOrEmpty(GroupList)) {
                     string[] groups = GroupList.Split('\t');
                     var filterGroups = new StringBuilder();
-                    int ptr = 0;
-                    for (ptr = 0; ptr <= groups.GetUpperBound(0); ptr++) {
+                    for (int ptr = 0; ptr <= groups.GetUpperBound(0); ptr++) {
                         if (!string.IsNullOrWhiteSpace(groups[ptr])) {
                             filterGroups.Append(", '" + groups[ptr] + "'");
                         }
@@ -379,20 +379,16 @@ namespace Contensive.Processor.Addons.AdminSite {
             // ----- TitleBar
             //
             string Title = HtmlController.div("<strong>" + content.name + "</strong><div style=\"float:right;\">" + pageNavigation + "</div>");
-            int TitleRows = 0;
             if (!filterLine.Length.Equals(0)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexFilterRemoveAll=1";
                 Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Filter: " + HtmlController.encodeHtml(filterLine.ToString().Substring(1)));
-                TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(sortLine)) {
                 string link = "/" + core.appConfig.adminRoute + "?cid=" + content.id + "&af=1&IndexSortRemoveAll=1";
                 Title += HtmlController.div(getDeleteLink(link) + "&nbsp;Sort: " + HtmlController.encodeHtml(sortLine.Substring(6)));
-                TitleRows = TitleRows + 1;
             }
             if (!string.IsNullOrEmpty(ContentAccessLimitMessage)) {
                 Title += "<div style=\"clear:both\">" + ContentAccessLimitMessage + "</div>";
-                TitleRows = TitleRows + 1;
             }
             return Title;
         }
@@ -447,13 +443,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                             case ButtonNext:
                                 //
                                 // Go to next page
-                                IndexConfig.pageNumber = IndexConfig.pageNumber + 1;
+                                IndexConfig.pageNumber += 1;
                                 IndexConfig.recordTop = DbController.getStartRecord(IndexConfig.recordsPerPage, IndexConfig.pageNumber);
                                 break;
                             case ButtonPrevious:
                                 //
                                 // Go to previous page
-                                IndexConfig.pageNumber = IndexConfig.pageNumber - 1;
+                                IndexConfig.pageNumber -= 1;
                                 if (IndexConfig.pageNumber <= 0) {
                                     IndexConfig.pageNumber = 1;
                                 }
@@ -673,6 +669,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                throw;
             }
         }
         //   
@@ -825,7 +822,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                         return_ContentAccessLimitMessage = return_ContentAccessLimitMessage + ", '<a href=\"?cid=" + ContentId + "\">" + MetadataController.getContentNameByID(core, ContentId) + "</a>'";
                                         string SubContactList = "";
                                         SubContactList += "," + ContentId;
-                                        SubContentCnt = SubContentCnt + 1;
+                                        SubContentCnt += 1;
                                     }
                                 }
                             }
@@ -1042,7 +1039,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                                     break;
                                                                 }
                                                         }
-                                                    } else if (field.lookupList != "") {
+                                                    } else if (!string.IsNullOrEmpty(field.lookupList)) {
                                                         //
                                                         // LookupList
                                                         switch (FindMatchOption) {
@@ -1155,7 +1152,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         }
                     }
                     if (sort.direction > 1) {
-                        return_SQLOrderBy = return_SQLOrderBy + " Desc";
+                        return_SQLOrderBy += " Desc";
                     }
                     orderByDelim = ",";
                 }
@@ -1244,7 +1241,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (IndexConfig.groupListCnt > 0) {
                         for (Ptr = 0; Ptr < IndexConfig.groupListCnt; Ptr++) {
                             GroupName = IndexConfig.groupList[Ptr];
-                            if (IndexConfig.groupList[Ptr] != "") {
+                            if (!string.IsNullOrEmpty(IndexConfig.groupList[Ptr])) {
                                 if (GroupName.Length > 30) {
                                     GroupName = GroupName.left(15) + "..." + GroupName.Substring(GroupName.Length - 15);
                                 }

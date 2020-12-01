@@ -32,7 +32,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             if (field.required) {
                 fieldCaption = "&nbsp;*" + fieldCaption;
             }
-            adminData.formInputCount = adminData.formInputCount + 1;
+            adminData.formInputCount += 1;
             bool fieldForceReadOnly = false;
             //
             // Read only Special Cases
@@ -221,7 +221,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, GenericController.encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                     editorWrapperSyle = "max-width:400px";
-                                } else if (field.lookupList != "") {
+                                } else if (!string.IsNullOrEmpty(field.lookupList)) {
                                     EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), editorReadOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                     editorWrapperSyle = "max-width:400px";
@@ -237,7 +237,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- date, readonly
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, encodeDate(fieldValueObject), editorReadOnly, fieldHtmlId, field.required);
                                 editorWrapperSyle = "max-width:400px";
                                 break;
                             }
@@ -395,11 +395,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                         case CPContentBaseClass.FieldTypeIdEnum.Lookup: {
                                 //
                                 // ----- Lookup
-                                if (field.lookupContentId != 0) {
+                                if (!field.lookupContentId.Equals(0)) {
                                     EditorString = AdminUIEditorController.getLookupContentEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupContentId, ref IsEmptyList, field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required, "");
                                     editorEnv.formFieldList += "," + field.nameLc;
                                     editorWrapperSyle = "max-width:400px";
-                                } else if (field.lookupList != "") {
+                                } else if (!string.IsNullOrEmpty(field.lookupList)) {
                                     EditorString = AdminUIEditorController.getLookupListEditor(core, field.nameLc, encodeInteger(fieldValueObject), field.lookupList.Split(',').ToList(), field.readOnly, fieldHtmlId, whyReadOnlyMsg, field.required);
                                     editorEnv.formFieldList += "," + field.nameLc;
                                     editorWrapperSyle = "max-width:400px";
@@ -415,7 +415,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 //
                                 // ----- Date
                                 editorEnv.formFieldList += "," + field.nameLc;
-                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required, whyReadOnlyMsg);
+                                EditorString = AdminUIEditorController.getDateTimeEditor(core, field.nameLc, GenericController.encodeDate(fieldValueObject), field.readOnly, fieldHtmlId, field.required);
                                 editorWrapperSyle = "max-width:400px";
                                 break;
                             }

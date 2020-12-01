@@ -45,16 +45,16 @@ namespace Contensive.Processor {
         }
 
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly, bool required)
-            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, required, "");
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, required);
 
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId, bool readOnly)
-            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, false, "");
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, readOnly, htmlId, false);
 
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue, string htmlId)
-            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, htmlId, false, "");
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, htmlId, false);
 
         public override string GetDateTimeEditor(string htmlName, DateTime? htmlValue)
-            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, "", false, "");
+            => Controllers.AdminUIEditorController.getDateTimeEditor(core, htmlName, htmlValue, false, "", false);
 
         public override string GetEditRow(string caption, string editor)
             => Controllers.AdminUIController.getEditRow(core, editor, caption, "");

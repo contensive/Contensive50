@@ -310,7 +310,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- delete legacy corehelp collection. Created with fields that have only field name, legacy install layed collections over the application collection
                     //    new install loads fields directly from collection, which coreHelp then marks all fields inactive.
-                    core.db.delete("{6e905db1-d3f0-40af-aac4-4bd78e680fae}", "ccaddoncollections");
+                    core.db.delete("ccaddoncollections", "{6e905db1-d3f0-40af-aac4-4bd78e680fae}");
                 }
                 // -- Reload
                 core.cache.invalidateAll();

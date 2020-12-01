@@ -964,7 +964,7 @@ namespace Contensive.Processor.Controllers {
                                                                                     break;
                                                                                 }
                                                                             case "date": {
-                                                                                    Copy = AdminUIEditorController.getDateTimeEditor(core, fieldName, encodeDate(fieldValue), fieldReadOnly, "", false, "");
+                                                                                    Copy = AdminUIEditorController.getDateTimeEditor(core, fieldName, encodeDate(fieldValue), fieldReadOnly, "", false);
                                                                                     break;
                                                                                 }
                                                                             case "file": {

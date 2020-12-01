@@ -61,7 +61,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         //
-        public static string getDateTimeEditor(CoreController core, string fieldName, DateTime? FieldValueDate, bool readOnly, string htmlId, bool fieldRequired, string WhyReadOnlyMsg) {
+        public static string getDateTimeEditor(CoreController core, string fieldName, DateTime? FieldValueDate, bool readOnly, string htmlId, bool fieldRequired) {
             htmlId = !string.IsNullOrEmpty(htmlId) ? htmlId : "id" + getRandomInteger(core).ToString();
             string inputDate = HtmlController.inputDate(core, fieldName + "-date", FieldValueDate, "", "component-" + htmlId + "-date", "form-control", readOnly, fieldRequired, false);
             DateTime? FieldValueTime = FieldValueDate;
@@ -233,7 +233,7 @@ namespace Contensive.Processor.Controllers {
                 using (var csData = new CsModel(core)) {
                     csData.openRecord(lookupContentMetacontent.name, fieldValue, "Name,ContentControlID");
                     if (csData.ok()) {
-                        if (csData.getText("Name") == "") {
+                        if (string.IsNullOrEmpty(csData.getText("Name"))) {
                             result += AdminUIEditorController.getTextEditor(core, fieldName + "-readonly-fpo", "No Name", readOnly, htmlId);
                         } else {
                             result += AdminUIEditorController.getTextEditor(core, fieldName + "-readonly-fpo", csData.getText("Name"), readOnly, htmlId);
@@ -752,7 +752,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                return HtmlController.div("Ther was an error displaying the related data for this field.");
+                return HtmlController.div("There was an error displaying the related data for this field.");
             }
         }
         //
@@ -785,7 +785,7 @@ namespace Contensive.Processor.Controllers {
                         int membershipSize = 0;
                         foreach (var memberRule in memberRuleList) {
                             if (membershipCount >= membershipSize) {
-                                membershipSize = membershipSize + 100;
+                                membershipSize += 100;
                                 Array.Resize(ref membershipListGroupId, membershipSize + 1);
                                 Array.Resize(ref membershipListDateExpires, membershipSize + 1);
                                 Array.Resize(ref membershipListActive, membershipSize + 1);
@@ -839,7 +839,7 @@ namespace Contensive.Processor.Controllers {
                                     idHidden = HtmlController.inputHidden("Memberrules." + GroupCount + ".ID", GroupID),
                                     checkboxInput = HtmlController.checkbox("MemberRules." + GroupCount, GroupActive),
                                     groupCaption = GroupCaption,
-                                    expiresInput = getDateTimeEditor(core, "MemberRules." + GroupCount + ".DateExpires", DateExpire,false,"",false,""),
+                                    expiresInput = getDateTimeEditor(core, "MemberRules." + GroupCount + ".DateExpires", DateExpire,false,"",false),
                                     //expiresInput = HtmlController.inputDate(core, "MemberRules." + GroupCount + ".DateExpires", DateExpire, "","", "text form-control", false,false,false),
                                     //expiresInput = HtmlController.inputText_Legacy(core, "MemberRules." + GroupCount + ".DateExpires", DateExpireValue, 1, 20, "", false, false, "text form-control", -1, false, "expires"),
                                     relatedButtonList = relatedButtonList,

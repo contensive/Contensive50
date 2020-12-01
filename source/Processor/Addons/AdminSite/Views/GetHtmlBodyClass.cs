@@ -300,7 +300,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         switch (adminData.adminForm) {
                             //
                             case AdminFormIndex: {
-                                    adminBody = ListView.get(cp, cp.core, adminData, (adminData.adminContent.tableName.ToLowerInvariant() == "ccemail"));
+                                    adminBody = ListView.get(cp, cp.core, adminData);
                                     break;
                                 }
                             case AdminFormEdit: {

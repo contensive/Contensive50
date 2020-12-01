@@ -1150,8 +1150,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
-        /// <param name="dataSourceName"></param>
-        public void delete(string guid, string tableName) {
+        public void delete(string tableName, string guid ) {
             try {
                 if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
                 if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
@@ -1164,12 +1163,10 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// DeleteTableRecords
+        /// Delete all table rows that match the sql criteria
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
-        //
         public void deleteRows(string tableName, string criteria) {
             try {
                 if (string.IsNullOrEmpty(tableName)) { throw new ArgumentException("TableName cannot be blank"); }
@@ -1183,9 +1180,8 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// 
+        /// Return an sql select based on the arguments
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="from"></param>
         /// <param name="fieldList"></param>
         /// <param name="where"></param>
@@ -1203,29 +1199,57 @@ namespace Contensive.Processor.Controllers {
             if (!string.IsNullOrWhiteSpace(groupBy)) { sql += " group by " + groupBy; }
             return sql;
         }
-        //
+        /// <summary>
+        /// Return an sql select based on the arguments
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="where"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="groupBy"></param>
+        /// <returns></returns>
         public string getSQLSelect(string from, string fieldList, string where, string orderBy, string groupBy) => getSQLSelect(from, fieldList, where, orderBy, groupBy, 0);
-        //
+        /// <summary>
+        /// Return an sql select based on the arguments
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="where"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
         public string getSQLSelect(string from, string fieldList, string where, string orderBy) => getSQLSelect(from, fieldList, where, orderBy, "", 0);
-        //
+        /// <summary>
+        /// Return an sql select based on the arguments
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="fieldList"></param>
+        /// <param name="where"></param>
+        /// <returns></returns>
         public string getSQLSelect(string from, string fieldList, string where) => getSQLSelect(from, fieldList, where, "", "", 0);
-        //
+        /// <summary>
+        /// Return an sql select based on the arguments
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="fieldList"></param>
+        /// <returns></returns>
         public string getSQLSelect(string from, string fieldList) => getSQLSelect(from, fieldList, "", "", "", 0);
-        //
+        /// <summary>
+        /// Return an sql select based on the arguments
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
         public string getSQLSelect(string from) => getSQLSelect(from, "", "", "", "", 0);
         //
         //========================================================================
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <returns></returns>
-        //
         public string getSQLIndexList(string TableName) {
             string returnList = "";
             try {
-                Models.Domain.TableSchemaModel ts = Models.Domain.TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
+                TableSchemaModel ts = TableSchemaModel.getTableSchema(core, TableName, dataSourceName);
                 if (ts != null) {
                     foreach (TableSchemaModel.IndexSchemaModel index in ts.indexes) {
                         returnList += "," + index.index_name;
