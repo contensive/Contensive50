@@ -763,77 +763,96 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// set cookie in iis response
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="value"></param>
-        /// <param name="dateExpires"></param>
-        /// <param name="domain"></param>
-        /// <param name="path"></param>
-        /// <param name="secure"></param>
-        public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
-            try {
-                string s = null;
-                //
-                if (core.doc.continueProcessing) {
-                    {
+        /// <param name="name">The cookie key</param>
+        /// <param name="value">The cookie value</param>
+        /// <param name="dateExpires">If MinDate, no expiration and the cookie is not persistent. If not MinDate, the cookied expires on the is date and is persistent.</param>
+        /// <param name="domain">The domain for this cookie. Typically the requestDomain.</param>
+        /// <param name="path">the path for the cookie. typically "/"</param>
+        /// <param name="secure">If true, this cookie will only be served over https.</param>
+        
+            public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
+
+                try {
 #if NETFRAMEWORK
-                        if (iisContext != null) {
-                            //
-                            // Pass cookie to iis
-                            iisContext.Response.Cookies[name].Value = value;
-                            if (!isMinDate(dateExpires)) {
-                                iisContext.Response.Cookies[name].Expires = dateExpires;
-                            }
-                            if (!string.IsNullOrEmpty(domain)) {
-                                iisContext.Response.Cookies[name].Domain = domain;
-                            }
-                            if (!string.IsNullOrEmpty(path)) {
-                                iisContext.Response.Cookies[name].Path = path;
-                            }
-                            if (secure) {
-                                iisContext.Response.Cookies[name].Secure = secure;
-                            }
-                        } else 
+                if (iisContext != null) {
+                    //System.Web.HttpCookie newCookie = new System.Web.HttpCookie(name) {
+                    //    Value = value,
+                    //    HttpOnly = true,
+                    //    SameSite = System.Web.SameSiteMode.None
+                    //};
+                    //if (!isMinDate(dateExpires)) {
+                    //    newCookie.Expires = dateExpires;
+                    //}
+                    //if (!string.IsNullOrEmpty(domain)) {
+                    //    newCookie.Domain = domain;
+                    //}
+                    //if (!string.IsNullOrEmpty(path)) {
+                    //    newCookie.Path = path;
+                    //}
+                    //if (secure) {
+                    //    newCookie.Secure = secure;
+                    //}
+                    //iisContext.Response.Cookies.Add(newCookie);
+
+                    //
+                    // -- add cookie by accessing the array (auto adds if missing, seems messy but recommended)
+                    //iisContext.Response.Cookies[name].HttpOnly = true;
+                    //iisContext.Response.Cookies[name].SameSite = System.Web.SameSiteMode.None;
+                    iisContext.Response.Cookies[name].Value = value;
+                    if (!isMinDate(dateExpires)) {
+                        iisContext.Response.Cookies[name].Expires = dateExpires;
+                    }
+                    if (!string.IsNullOrEmpty(domain)) {
+                        iisContext.Response.Cookies[name].Domain = domain;
+                    }
+                    if (!string.IsNullOrEmpty(path)) {
+                        iisContext.Response.Cookies[name].Path = path;
+                    }
+                    if (secure) {
+                        iisContext.Response.Cookies[name].Secure = secure;
+                    }
+                } else
 #endif
                         {
-                            //
-                            // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
-                            if (bufferCookies != "") {
-                                bufferCookies += Environment.NewLine;
-                            }
-                            bufferCookies += name;
-                            bufferCookies += Environment.NewLine + value;
-                            //
-                            s = "";
-                            if (!isMinDate(dateExpires)) {
-                                s = dateExpires.ToString(CultureInfo.InvariantCulture);
-                            }
-                            bufferCookies += Environment.NewLine + s;
-                            //
-                            s = "";
-                            if (!string.IsNullOrEmpty(domain)) {
-                                s = domain;
-                            }
-                            bufferCookies += Environment.NewLine + s;
-                            //
-                            s = "/";
-                            if (!string.IsNullOrEmpty(path)) {
-                                s = path;
-                            }
-                            bufferCookies += Environment.NewLine + s;
-                            //
-                            s = "false";
-                            if (secure) {
-                                s = "true";
-                            }
-                            bufferCookies += Environment.NewLine + s;
-                        }
+                    //
+                    // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
+                    if (bufferCookies != "") {
+                        bufferCookies += Environment.NewLine;
                     }
+                    bufferCookies += name;
+                    bufferCookies += Environment.NewLine + value;
+                    bufferCookies += Environment.NewLine + (isMinDate(dateExpires) ? "" : dateExpires.ToString(CultureInfo.InvariantCulture));
+                    bufferCookies += Environment.NewLine + (string.IsNullOrEmpty(domain) ? "" : domain);
+                    bufferCookies += Environment.NewLine + (string.IsNullOrEmpty(path) ? "" : path);
+                    bufferCookies += Environment.NewLine + (secure ? "true" : "false");
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set cookie in iis response. creates a cookie, to the current requestDomain, with "/" path, not secure
+        /// </summary>
+        /// <param name="name">The cookie key</param>
+        /// <param name="value">The cookie value</param>
+        /// <param name="dateExpires">If MinDate, no expiration and the cookie is not persistent. If not MinDate, the cookied expires on the is date and is persistent.</param>
+        public void addResponseCookie(string name, string value, DateTime dateExpires) {
+            addResponseCookie(name, value, dateExpires, requestDomain, "/", false);
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// set cookie in iis response. creates a non-persistent cookie, to the current requestDomain, with "/" path, not secure
+        /// </summary>
+        /// <param name="name">The cookie key</param>
+        /// <param name="value">The cookie value</param>
+        public void addResponseCookie(string name, string value) {
+            addResponseCookie(name, value, DateTime.MinValue);        
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// Set iis response status
@@ -980,7 +999,7 @@ namespace Contensive.Processor.Controllers {
                                 // -- redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
                                 iisContext.Response.Redirect(NonEncodedLink, false);
                                 iisContext.ApplicationInstance.CompleteRequest();
-                            } else 
+                            } else
 #endif
                             {
                                 bufferRedirect = NonEncodedLink;

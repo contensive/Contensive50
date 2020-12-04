@@ -999,7 +999,7 @@ namespace Contensive.Processor {
         internal const string cache_linkForward_cacheName = "cache_linkForward";
         //
         internal const string cookieNameVisit = "visit";
-        internal const string main_cookieNameVisitor = "visitor";
+        internal const string cookieNameVisitor = "visitor";
         internal const string html_quickEdit_fpo = "<quickeditor>";
         //
         internal const string cacheNameAddonStyleRules = "addon styles";

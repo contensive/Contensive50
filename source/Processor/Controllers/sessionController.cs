@@ -148,6 +148,10 @@ namespace Contensive.Processor.Controllers {
         //========================================================================
         /// <summary>
         /// create a new session
+        /// - set session-visit from visit-cookie
+        /// - if session-visit not valid (new visit) set session-visit to new visit
+        /// - set session-visit-user from link-eid
+        /// - ses session-visit-user
         /// </summary>
         /// <param name="core"></param>
         /// <param name="trackVisits">When true, the session is initialized with a visit, visitor, user. Set false for background processing. 
@@ -175,15 +179,32 @@ namespace Contensive.Processor.Controllers {
                     return resultSessionContext;
                 }
                 //
+                // -- load cookies
                 string appNameCookiePrefix = encodeCookieName(core.appConfig.name);
                 string visitCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
+                string visitorCookie = core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisitor);
+                //
+                // -- handle autologin, autoRecognize
+                //
+                // -- 201203-1614, moved from below
+                var visitorToken = SecurityController.decodeToken(core, visitorCookie);
+                if (visitorToken.id != 0) {
+                    //
+                    // -- visitor cookie good, load session visitor
+                    VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, visitorToken.id);
+                    if (testVisitor != null) {
+                        resultSessionContext.visitor = testVisitor;
+                    }
+                }
+                //
+                // -- handle link login
+                //
                 string memberLinkinEid = core.docProperties.getText("eid");
                 int memberLinkRecognizeId = 0;
-                //
-                LogController.logTrace(core, "visitCookie [" + visitCookie + "], MemberLinkinEID [" + memberLinkinEid + "]");
-                //
                 var linkToken = new SecurityController.TokenData();
                 if (!string.IsNullOrEmpty(memberLinkinEid)) {
+                    //
+                    LogController.logTrace(core, "MemberLinkinEID [" + memberLinkinEid + "]");
                     //
                     // -- attempt link authentication
                     if (core.siteProperties.getBoolean("AllowLinkLogin", true)) {
@@ -194,21 +215,31 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- allow Link Recognize
                         linkToken = SecurityController.decodeToken(core, memberLinkinEid);
+                        memberLinkRecognizeId = ((linkToken != null) && !linkToken.id.Equals(0)) ? linkToken.id : 0;
                     } else {
                         //
                         // -- block link login
                         memberLinkinEid = "";
                     }
+                    //
+                    // -- expire linkToken after 15 minutes
+                    if (linkToken.expires.CompareTo(core.dateTimeNowMockable) < 0) { linkToken.id = 0; }
                 }
                 //
-                // -- expire linkToken after 15 minutes
-                if (linkToken.expires.CompareTo(core.dateTimeNowMockable) < 0) { linkToken.id = 0; }
-                //
                 // -- determine visit
+                //
                 bool AllowOnNewVisitEvent = false;
+                //
+                LogController.logTrace(core, "visitCookie [" + visitCookie + "]");
+                //
                 if ((trackVisits) || (!string.IsNullOrEmpty(visitCookie)) || (linkToken.id != 0) || (memberLinkRecognizeId != 0)) {
                     //
                     // -- Visit Tracking
+                    bool visit_changes = false;
+                    bool visitor_changes = false;
+                    bool user_changes = false;
+                    //
+                    // -- 201203-1614
                     //
                     var visitToken = new SecurityController.TokenData();
                     if (!string.IsNullOrEmpty(visitCookie)) {
@@ -246,11 +277,19 @@ namespace Contensive.Processor.Controllers {
                             resultSessionContext.visit.cookieSupport = true;
                             if (resultSessionContext.visit.visitorId > 0) {
                                 //
-                                // -- try visit's visitor object
-                                VisitorModel testVisitor = DbBaseModel.create<VisitorModel>(core.cpParent, resultSessionContext.visit.visitorId);
-                                if (testVisitor != null) {
-                                    resultSessionContext.visitor = testVisitor;
+                                // -- load visitor record if it does not match visitor cookie
+                                if (!resultSessionContext.visit.visitorId.Equals(resultSessionContext.visitor.id)) {
+                                    VisitorModel testVisitor = DbBaseModel.create<VisitorModel>(core.cpParent, resultSessionContext.visit.visitorId);
+                                    if (testVisitor != null) {
+                                        resultSessionContext.visitor = testVisitor;
+                                        visitor_changes = true;
+                                    }
                                 }
+                            }
+                            if ((resultSessionContext.visit != null) && !resultSessionContext.visit.visitAuthenticated && !resultSessionContext.visitor.memberId.Equals(0) && core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
+                                //
+                                // auto login if good visit, not authenticated, valid visitor with valid memberid, and site property allowAutoLogin true
+
                             }
                             if (resultSessionContext.visit.memberId > 0) {
                                 //
@@ -267,12 +306,10 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    bool visit_changes = false;
-                    bool visitor_changes = false;
-                    bool user_changes = false;
                     if (resultSessionContext.visit.id.Equals(0)) {
                         //
                         // -- create new visit record
+                        //
                         LogController.logTrace(core, "SessionController, create new visit");
                         resultSessionContext.visit = DbBaseModel.addEmpty<VisitModel>(core.cpParent);
                         if (string.IsNullOrEmpty(resultSessionContext.visit.name)) {
@@ -304,28 +341,28 @@ namespace Contensive.Processor.Controllers {
                         if (resultSessionContext.visitor.id == 0) {
                             //
                             // -- visit.visitor not valid, create visitor from cookie
-                            string CookieVisitor = GenericController.encodeText(core.webServer.getRequestCookie(appNameCookiePrefix + main_cookieNameVisitor));
-                            if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
-                                //
-                                // -- auto recognize, setup user based on visitor
-                                var visitorToken = SecurityController.decodeToken(core, CookieVisitor);
-                                if (visitorToken.id != 0) {
-                                    //
-                                    // -- visitor cookie good
-                                    VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, visitorToken.id);
-                                    if (testVisitor != null) {
-                                        resultSessionContext.visitor = testVisitor;
-                                        visitor_changes = true;
-                                    }
-                                }
-                            }
+                            //string CookieVisitor = GenericController.encodeText(core.webServer.getRequestCookie(appNameCookiePrefix + main_cookieNameVisitor));
+                            //if (core.siteProperties.getBoolean("AllowAutoRecognize", true)) {
+                            //    //
+                            //    // -- auto recognize, setup user based on visitor
+                            //    var visitorToken = SecurityController.decodeToken(core, CookieVisitor);
+                            //    if (visitorToken.id != 0) {
+                            //        //
+                            //        // -- visitor cookie good
+                            //        VisitorModel testVisitor = VisitorModel.create<VisitorModel>(core.cpParent, visitorToken.id);
+                            //        if (testVisitor != null) {
+                            //            resultSessionContext.visitor = testVisitor;
+                            //            visitor_changes = true;
+                            //        }
+                            //    }
+                            //}
                         }
                         //
                         if (resultSessionContext.visitor.id == 0) {
                             //
                             // -- create new visitor
                             resultSessionContext.visitor = VisitorModel.addEmpty<VisitorModel>(core.cpParent);
-                            visitor_changes = false;
+                            visitor_changes = true;
                             //
                             resultSessionContext.visit.visitorNew = true;
                             visit_changes = true;
@@ -478,8 +515,9 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // -- new visit, update the persistant visitor cookie
+                        //
                         if (trackVisits) {
-                            core.webServer.addResponseCookie(appNameCookiePrefix + main_cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, encodeDate(resultSessionContext.visit.startTime).AddYears(1)), encodeDate(resultSessionContext.visit.startTime).AddYears(1), "", appRootPath, false);
+                            core.webServer.addResponseCookie(appNameCookiePrefix + cookieNameVisitor, SecurityController.encodeToken(core, resultSessionContext.visitor.id, encodeDate(resultSessionContext.visit.startTime).AddYears(1)), encodeDate(resultSessionContext.visit.startTime).AddYears(1));
                         }
                         //
                         // -- OnNewVisit Add-on call
@@ -521,6 +559,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- create guest identity if no identity
+                    //
                     if (resultSessionContext.user.id < 1) {
                         //
                         // if a user record has not been created, do not automatically create it.
@@ -585,6 +624,8 @@ namespace Contensive.Processor.Controllers {
                         visitCookie = visitCookieNew;
                     }
                 }
+                //
+                // -- execute onNewVisit addons
                 if (AllowOnNewVisitEvent) {
                     LogController.logTrace(core, "execute NewVisit Event");
                     foreach (var addon in core.addonCache.getOnNewVisitAddonList()) {
@@ -600,7 +641,7 @@ namespace Contensive.Processor.Controllers {
                 LogController.logTrace(core, "write visit cookie");
                 visitCookie = SecurityController.encodeToken(core, resultSessionContext.visit.id, core.doc.profileStartTime.AddMinutes(60));
                 // -- very trial-error fix - W4S site does not send cookies from ajax calls right after changing from requestAppRootPath to appRootPath
-                core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie, default, "", @"/", false);
+                core.webServer.addResponseCookie(appNameCookiePrefix + Constants.cookieNameVisit, visitCookie);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

@@ -215,6 +215,16 @@ namespace Contensive.Processor.Controllers {
                     } else {
                         returnResult = core.session.authenticateById(LocalMemberId, core.session);
                         if (returnResult) {
+                            //
+                            // -- implement auto login - if login-success and siteproperty.allowAutoLogin and form.autologin and not person.login, then set person.autoLogin=true
+                            if (core.docProperties.getBoolean("autoLogin") && core.siteProperties.getBoolean("AllowAutoLogin")) {
+                                PersonModel LocalMember = PersonModel.create<PersonModel>(core.cpParent, LocalMemberId);
+                                if ((LocalMember != null) && !LocalMember.autoLogin) {
+                                    LocalMember.autoLogin = true;
+                                    LocalMember.save(core.cpParent);
+                                }
+                            }
+
                             LogController.addSiteActivity(core, "successful username/password login", core.session.user.id, core.session.user.organizationId);
                         } else {
                             LogController.addSiteActivity(core, "bad username/password login", core.session.user.id, core.session.user.organizationId);

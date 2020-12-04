@@ -115,19 +115,19 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void SetCookie(string name, string value) {
-            cp.core.webServer.addResponseCookie(name, value, DateTime.MinValue, "", "", false);
+            cp.core.webServer.addResponseCookie(name, value);
         }
         //
         //====================================================================================================
         //
         public override void SetCookie(string name, string value, DateTime dateExpires) {
-            cp.core.webServer.addResponseCookie(name, value, dateExpires, "", "", false);
+            cp.core.webServer.addResponseCookie(name, value, dateExpires);
         }
         //
         //====================================================================================================
         //
         public override void SetCookie(string CookieName, string CookieValue, DateTime DateExpires, string Domain) {
-            cp.core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "", false);
+            cp.core.webServer.addResponseCookie(CookieName, CookieValue, DateExpires, Domain, "/", false);
         }
         //
         //====================================================================================================

@@ -3,6 +3,9 @@ using System;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Addons.Primitives {
+    /// <summary>
+    /// Process the form request from the default login form in Addons\Authentication
+    /// </summary>
     public class ProcessLoginDefaultClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================

@@ -1153,7 +1153,7 @@ namespace Contensive.Processor.Controllers {
         public void delete(string tableName, string guid ) {
             try {
                 if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
-                if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
+                //if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
                 executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid));
             } catch (Exception ex) {
                 LogController.logError(core, ex);

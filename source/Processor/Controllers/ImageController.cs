@@ -89,6 +89,12 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- image size does not exist, create it
                 imageAltSizeList.Add(imageAltsize);
+                //
+                // -- future actions will open this file. Verify it exists to prevent hard errors
+                if (!core.cdnFiles.fileExists(imagePathFilename)) {
+                    LogController.logError(core, new ArgumentException("Image.getBestFit called but source file not found, imagePathFilename [" + imagePathFilename + "]"));
+                    return imagePathFilename.Replace(@"\", "/");
+                }
                 // 
                 // -- first resize - determine the if the width or the height is the rezie fit
                 // -- then crop to the final size

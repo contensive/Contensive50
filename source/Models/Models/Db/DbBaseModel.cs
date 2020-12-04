@@ -1828,17 +1828,17 @@ namespace Contensive.Models.Db {
         /// <param name="tablename"></param>
         /// <param name="fieldname"></param>
         /// <param name="recordId"></param>
-        /// <param name="fileSystem"></param>
+        /// <param name="srcFileSystem"></param>
         /// <param name="srcPathFilename"></param>
-        public static void processFileFieldCopy(CPBaseClass cp, string tablename, string fieldname, int recordId, CPFileSystemBaseClass fileSystem, string srcPathFilename) {
-            if (!string.IsNullOrWhiteSpace(srcPathFilename)) {
-                // 
-                // -- copy a file from cdnFiles 
-                string srcFilename = fileSystem.GetFilename(srcPathFilename);
-                string dstPathFilename = cp.Db.CreateUploadFieldPathFilename(tablename, fieldname, recordId, srcFilename);
-                fileSystem.Copy(srcPathFilename, dstPathFilename, cp.CdnFiles);
-                cp.Db.ExecuteNonQuery("update " + tablename + " set " + fieldname + "=" + cp.Db.EncodeSQLText(dstPathFilename) + " where id=" + recordId);
-            }
+        public static void processFileFieldCopy(CPBaseClass cp, string tablename, string fieldname, int recordId, CPFileSystemBaseClass srcFileSystem, string srcPathFilename) {
+            if (string.IsNullOrWhiteSpace(srcPathFilename)) { return; }
+            if (!srcFileSystem.FileExists(srcPathFilename)) { return; }
+            // 
+            // -- copy a file from cdnFiles 
+            string srcFilename = srcFileSystem.GetFilename(srcPathFilename);
+            string dstPathFilename = cp.Db.CreateUploadFieldPathFilename(tablename, fieldname, recordId, srcFilename);
+            srcFileSystem.Copy(srcPathFilename, dstPathFilename, cp.CdnFiles);
+            cp.Db.ExecuteNonQuery("update " + tablename + " set " + fieldname + "=" + cp.Db.EncodeSQLText(dstPathFilename) + " where id=" + recordId);
         }
     }
 }
