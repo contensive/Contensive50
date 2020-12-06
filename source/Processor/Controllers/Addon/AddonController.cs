@@ -474,18 +474,25 @@ namespace Contensive.Processor.Controllers {
                                             result.Append(AddonControllerScript.execute_Script_VBScript(core, ref addon));
                                         }
                                     } catch (Exception ex) {
-                                        hint = "14.5";
-                                        string addonDescription = getAddonDescription(core, addon);
-                                        throw new GenericException("There was an error executing the script component of Add-on [" + addonDescription + "]. The exception was [" + ex + "]." + ((ex.InnerException != null) ? " There was an inner exception [" + ex.InnerException.Message + "]" : ""));
+                                        //
+                                        // -- exeption in outside code
+                                        LogController.logError(core, ex, "Exception in script component of addon [" + getAddonDescription(core, addon) + "]");
                                     }
                                 }
                                 //
                                 // -- DotNet
                                 hint = "15";
                                 if (!string.IsNullOrEmpty(addon.dotNetClass)) {
-                                    result.Append(execute_dotNetClass(executeContext, addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId)));
+                                    try {
+                                        //
+                                        // -- executing outside code, swallow exceptions
+                                        result.Append(execute_dotNetClass(addon, AddonCollectionModel.create<AddonCollectionModel>(core.cpParent, addon.collectionId)));
+                                    } catch (Exception ex) {
+                                        //
+                                        // -- exeption in outside code
+                                        LogController.logError(core, ex, "Exception in dotnet component of addon [" + getAddonDescription(core, addon) + "]");
+                                    }
                                 }
-
                             }
                             //
                             //   Add Wrappers to content
@@ -1238,7 +1245,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="addon"></param>
         /// <param name="addonCollection"></param>
         /// <returns></returns>
-        private string execute_dotNetClass(CPUtilsBaseClass.addonExecuteContext executeContext, AddonModel addon, AddonCollectionModel addonCollection) {
+        private string execute_dotNetClass(AddonModel addon, AddonCollectionModel addonCollection) {
             string result = "";
             try {
                 LogController.logTrace(core, "execute_assembly dotNetClass [" + addon.dotNetClass + "], enter");

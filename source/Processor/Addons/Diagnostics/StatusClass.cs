@@ -1,24 +1,15 @@
 ﻿
-using System;
-using System.Reflection;
-using System.Xml;
-using System.Diagnostics;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.SqlClient;
-using Contensive.Processor;
-
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using System.Text;
 using Contensive.Models.Db;
+using System;
 using System.Globalization;
+using System.Text;
 //
 namespace Contensive.Processor.Addons.Diagnostics {
-    //
+    /// <summary>
+    /// Run system diagnostics, including both the internal diagnostic class, and every addon with [] diagnostic set
+    /// If every method returns the first two characters "OK", then the first two characters are OK,
+    /// else the failing test is output and the status message should not include the characters (without "OK")
+    /// </summary>
     public class StatusClass : Contensive.BaseClasses.AddonBaseClass {
         //
         private const string asdf = "";

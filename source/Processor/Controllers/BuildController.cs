@@ -78,7 +78,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // -- verify iis configuration
                         LogController.logInfo(core, logPrefix + ", verify iis configuration");
-                        core.webServer.verifySite(core.appConfig.name, primaryDomain, core.appConfig.localWwwPath, "default.aspx");
+                        core.webServer.verifySite(core.appConfig.name, primaryDomain, core.appConfig.localWwwPath);
                         //
                         // -- verify root developer
                         LogController.logInfo(core, logPrefix + ", verify developer user");

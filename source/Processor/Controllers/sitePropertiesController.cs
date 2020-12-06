@@ -143,10 +143,19 @@ namespace Contensive.Processor.Controllers {
         //
         internal bool allowAutoLogin {
             get {
-                return booleanPropertyBase("allowAutoLogin", false, ref _AllowAutoLogin);
+                return booleanPropertyBase("allowautologin", false, ref _AllowAutoLogin);
             }
         }
         private bool? _AllowAutoLogin = null;
+        //
+        //====================================================================================================
+        //
+        internal bool allowAutoRecognize {
+            get {
+                return booleanPropertyBase("allowautorecognize", false, ref _allowAutoRecognize);
+            }
+        }
+        private bool? _allowAutoRecognize = null;
         //
         //====================================================================================================
         //

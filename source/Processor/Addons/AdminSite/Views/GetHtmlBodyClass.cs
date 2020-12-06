@@ -17,7 +17,7 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// <summary>
         /// addon method, deliver complete Html admin site
         /// </summary>
-        /// <param name="cp"></param>
+        /// <param name="cpBase"></param>
         /// <returns></returns>
         public override object Execute(CPBaseClass cpBase) {
             string result = "";
@@ -42,7 +42,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         + "<li class=\"ccListItem\">To have your account access changed to include this area, please contact the <a href=\"mailto:" + cp.core.siteProperties.getText("EmailAdmin") + "\">system administrator</A>. "
                         + "\r</ul>"
                         + "";
-                    result += ""
+                    result = ""
                         + "<div style=\"display:table;padding:100px 0 0 0;margin:0 auto;\">"
                         + cp.core.html.getPanelHeader("Unauthorized Access")
                         + cp.core.html.getPanel(result, "ccPanel", "ccPanelHilite", "ccPanelShadow", "400", 15)
@@ -225,7 +225,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     if (adminData.editRecord.id != 0) {
                         cp.core.doc.addRefreshQueryString("id", GenericController.encodeText(adminData.editRecord.id));
                     }
-                    if (adminData.titleExtension != "") {
+                    if (!string.IsNullOrEmpty(adminData.titleExtension)) {
                         cp.core.doc.addRefreshQueryString(RequestNameTitleExtension, GenericController.encodeRequestVariable(adminData.titleExtension));
                     }
                     if (adminData.recordTop != 0) {
@@ -902,7 +902,7 @@ namespace Contensive.Processor.Addons.AdminSite {
 
                                     case ButtonMarkReviewed: {
                                             adminData.admin_Action = Constants.AdminActionMarkReviewed;
-                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth);
                                             break;
 
                                         }
@@ -916,7 +916,7 @@ namespace Contensive.Processor.Addons.AdminSite {
 
                                     case ButtonDelete: {
                                             adminData.admin_Action = Constants.AdminActionDelete;
-                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth);
                                             break;
 
                                         }
@@ -937,14 +937,14 @@ namespace Contensive.Processor.Addons.AdminSite {
 
                                     case ButtonOK: {
                                             adminData.admin_Action = Constants.AdminActionSave;
-                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth);
                                             break;
 
                                         }
 
                                     case ButtonCancel: {
                                             adminData.admin_Action = Constants.AdminActionNop;
-                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth, adminData.adminContent.name, editRecord.id);
+                                            adminData.adminForm = GetForm_Close(cp, adminData.ignore_legacyMenuDepth);
                                             break;
 
                                         }
@@ -1068,35 +1068,28 @@ namespace Contensive.Processor.Addons.AdminSite {
                 LogController.logError(cp.core, ex);
             }
         }
-        //
         //       
         //=============================================================================================
-        //   Get
-        //=============================================================================================
-        //
-        private int GetForm_Close(CPClass cp, int MenuDepth, string ContentName, int RecordID) {
-            int tempGetForm_Close = 0;
-            try {
-                //
-                if (MenuDepth > 0) {
-                    tempGetForm_Close = AdminFormClose;
-                } else {
-                    tempGetForm_Close = AdminFormIndex;
-                }
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-            }
-            return tempGetForm_Close;
+        /// <summary>
+        /// Get the form close
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="MenuDepth"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="RecordID"></param>
+        /// <returns></returns>
+        private int GetForm_Close(CPClass cp, int MenuDepth) {
+            if (MenuDepth > 0) { return AdminFormClose; }
+            return AdminFormIndex;
         }
         //
-        //=============================================================================================
-        ////
-        //========================================================================
-        //
         //=================================================================================
-        //
-        //=================================================================================
-        //
+        /// <summary>
+        /// Save the index config
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="core"></param>
+        /// <param name="IndexConfig"></param>
         public static void setIndexSQL_SaveIndexConfig(CPClass cp, CoreController core, IndexConfigClass IndexConfig) {
             //
             // --Find words
@@ -1104,7 +1097,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             foreach (var kvp in IndexConfig.findWords) {
                 IndexConfigFindWordClass findWord = kvp.Value;
                 if ((!string.IsNullOrEmpty(findWord.Name)) && (findWord.MatchOption != FindWordMatchEnum.MatchIgnore)) {
-                    SubList = SubList + Environment.NewLine + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
+                    SubList += Environment.NewLine + findWord.Name + "\t" + findWord.Value + "\t" + (int)findWord.MatchOption;
                 }
             }
             string FilterText = "";
@@ -1123,7 +1116,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 //
                 for (int ptr = 0; ptr < IndexConfig.groupListCnt; ptr++) {
                     if (!string.IsNullOrEmpty(IndexConfig.groupList[ptr])) {
-                        SubList = SubList + Environment.NewLine + IndexConfig.groupList[ptr];
+                        SubList += Environment.NewLine + IndexConfig.groupList[ptr];
                     }
                 }
             }
@@ -1173,7 +1166,7 @@ namespace Contensive.Processor.Addons.AdminSite {
             SubList = "";
             foreach (var column in IndexConfig.columns) {
                 if (!string.IsNullOrEmpty(column.Name)) {
-                    SubList = SubList + Environment.NewLine + column.Name + "\t" + column.Width;
+                    SubList += Environment.NewLine + column.Name + "\t" + column.Width;
                 }
             }
             FilterText = "";
@@ -1187,15 +1180,13 @@ namespace Contensive.Processor.Addons.AdminSite {
             foreach (var kvp in IndexConfig.sorts) {
                 IndexConfigSortClass sort = kvp.Value;
                 if (!string.IsNullOrEmpty(sort.fieldName)) {
-                    SubList = SubList + Environment.NewLine + sort.fieldName + "\t" + sort.direction;
+                    SubList += Environment.NewLine + sort.fieldName + "\t" + sort.direction;
                 }
             }
             if (!string.IsNullOrEmpty(SubList)) {
                 FilterText += Environment.NewLine + "Sorts" + SubList + Environment.NewLine;
             }
             cp.core.userProperty.setProperty(AdminDataModel.IndexConfigPrefix + encodeText(IndexConfig.contentID), FilterText);
-            //
-
         }
     }
 }

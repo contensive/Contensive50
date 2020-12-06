@@ -5,11 +5,19 @@ using static Contensive.Processor.Constants;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class RootView {
+    //
+    //========================================================================
+    /// <summary>
+    /// Root page view
+    /// </summary>
+    public static class RootView {
         //
         //========================================================================
-        //   Print the root form
-        //
+        /// <summary>
+        /// Root page view
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static string getForm_Root(CoreController core) {
             string returnHtml = "";
             try {

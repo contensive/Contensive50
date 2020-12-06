@@ -651,7 +651,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // forwarding does not work in the admin site
                         //
-                    } else if ((core.domain.typeId == 2) && (core.domain.forwardUrl != "")) {
+                    } else if (core.domain.typeId.Equals(2) && !string.IsNullOrEmpty( core.domain.forwardUrl )) {
                         //
                         // forward to a URL
                         if (GenericController.strInstr(1, core.domain.forwardUrl, "://") == 0) {
@@ -711,20 +711,8 @@ namespace Contensive.Processor.Controllers {
                     // ----- Style tag
                     adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
                     //
-                    // todo ???? this is always false
-                    if (requestDomain.ToLowerInvariant() != GenericController.toLCase(requestDomain)) {
-                        string Copy = "Redirecting to domain [" + requestDomain + "] because this site is configured to run on the current domain [" + requestDomain + "]";
-                        if (requestQueryString != "") {
-                            redirect(requestProtocol + requestDomain + requestPath + requestPage + "?" + requestQueryString, Copy, false, false);
-                        } else {
-                            redirect(requestProtocol + requestDomain + requestPath + requestPage, Copy, false, false);
-                        }
-                        core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
-                        return core.doc.continueProcessing;
-                    }
-                    //
                     // ----- Create core.main_ServerFormActionURL if it has not been overridden manually
-                    if (serverFormActionURL == "") {
+                    if (string.IsNullOrEmpty( serverFormActionURL )) {
                         serverFormActionURL = requestProtocol + requestDomain + requestPath + requestPage;
                     }
                 }
@@ -739,8 +727,11 @@ namespace Contensive.Processor.Controllers {
 #endif
         //
         //========================================================================
-        // Read a cookie to the stream
-        //
+        /// <summary>
+        /// get the cookie value if the cookie name is in the request
+        /// </summary>
+        /// <param name="CookieName"></param>
+        /// <returns></returns>
         public string getRequestCookie(string CookieName) {
             if (requestCookies.ContainsKey(CookieName)) {
                 return requestCookies[CookieName].value;
@@ -749,12 +740,16 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Add a cookie to the request cookies - used to setup the collection
+        /// </summary>
+        /// <param name="cookieKey"></param>
+        /// <param name="cookieValue"></param>
         public void addRequestCookie(string cookieKey, string cookieValue) {
             if (requestCookies.ContainsKey(cookieKey)) {
                 requestCookies.Remove(cookieKey);
             }
-            requestCookies.Add(cookieKey, new WebServerController.CookieClass {
+            requestCookies.Add(cookieKey, new CookieClass {
                 name = cookieKey,
                 value = cookieValue
             });
@@ -769,35 +764,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domain">The domain for this cookie. Typically the requestDomain.</param>
         /// <param name="path">the path for the cookie. typically "/"</param>
         /// <param name="secure">If true, this cookie will only be served over https.</param>
-        
-            public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
 
-                try {
+        public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
+
+            try {
 #if NETFRAMEWORK
                 if (iisContext != null) {
-                    //System.Web.HttpCookie newCookie = new System.Web.HttpCookie(name) {
-                    //    Value = value,
-                    //    HttpOnly = true,
-                    //    SameSite = System.Web.SameSiteMode.None
-                    //};
-                    //if (!isMinDate(dateExpires)) {
-                    //    newCookie.Expires = dateExpires;
-                    //}
-                    //if (!string.IsNullOrEmpty(domain)) {
-                    //    newCookie.Domain = domain;
-                    //}
-                    //if (!string.IsNullOrEmpty(path)) {
-                    //    newCookie.Path = path;
-                    //}
-                    //if (secure) {
-                    //    newCookie.Secure = secure;
-                    //}
-                    //iisContext.Response.Cookies.Add(newCookie);
-
                     //
                     // -- add cookie by accessing the array (auto adds if missing, seems messy but recommended)
-                    //iisContext.Response.Cookies[name].HttpOnly = true;
-                    //iisContext.Response.Cookies[name].SameSite = System.Web.SameSiteMode.None;
+                    iisContext.Response.Cookies[name].HttpOnly = true;
+                    iisContext.Response.Cookies[name].SameSite = System.Web.SameSiteMode.Lax;
                     iisContext.Response.Cookies[name].Value = value;
                     if (!isMinDate(dateExpires)) {
                         iisContext.Response.Cookies[name].Expires = dateExpires;
@@ -813,10 +789,10 @@ namespace Contensive.Processor.Controllers {
                     }
                 } else
 #endif
-                        {
+                {
                     //
                     // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
-                    if (bufferCookies != "") {
+                    if (!string.IsNullOrEmpty(bufferCookies)) {
                         bufferCookies += Environment.NewLine;
                     }
                     bufferCookies += name;
@@ -850,7 +826,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="name">The cookie key</param>
         /// <param name="value">The cookie value</param>
         public void addResponseCookie(string name, string value) {
-            addResponseCookie(name, value, DateTime.MinValue);        
+            addResponseCookie(name, value, DateTime.MinValue);
         }
         //
         //====================================================================================================
@@ -896,8 +872,8 @@ namespace Contensive.Processor.Controllers {
                         iisContext.Response.AddHeader(HeaderName, HeaderValue);
                     }
 #endif
-                    if (bufferResponseHeader != "") {
-                        bufferResponseHeader = bufferResponseHeader + Environment.NewLine;
+                    if (!string.IsNullOrEmpty(bufferResponseHeader)) {
+                        bufferResponseHeader += Environment.NewLine;
                     }
                     bufferResponseHeader = bufferResponseHeader + GenericController.strReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.strReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
                 }
@@ -1150,13 +1126,10 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Verify a site exists, it not add it, it is does, verify all its settings
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="appName"></param>
         /// <param name="DomainName"></param>
         /// <param name="rootPublicFilesPath"></param>
-        /// <param name="defaultDocOrBlank"></param>
-        /// '
-        public void verifySite(string appName, string DomainName, string rootPublicFilesPath, string defaultDocOrBlank) {
+        public void verifySite(string appName, string DomainName, string rootPublicFilesPath) {
             try {
                 verifyAppPool(appName);
                 verifyWebsite(appName, DomainName, rootPublicFilesPath, appName);
@@ -1169,7 +1142,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// verify the application pool. If it exists, update it. If not, create it
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="poolName"></param>
         public void verifyAppPool(string poolName) {
             try {
@@ -1194,6 +1166,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex, "verifyAppPool");
+                throw;
             }
         }
         //
@@ -1201,14 +1174,12 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// verify the website. If it exists, update it. If not, create it
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="appName"></param>
         /// <param name="domainName"></param>
         /// <param name="phyPath"></param>
         /// <param name="appPool"></param>
         public void verifyWebsite(string appName, string domainName, string phyPath, string appPool) {
             try {
-
                 using (ServerManager iisManager = new ServerManager()) {
                     //
                     // -- verify the site exists
@@ -1244,6 +1215,7 @@ namespace Contensive.Processor.Controllers {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex, "verifyWebsite");
+                throw;
             }
         }
         //
@@ -1251,10 +1223,8 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Verify the binding
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="site"></param>
-        /// <param name="bindingInformation"></param>
-        /// <param name="bindingProtocol"></param>
+        /// <param name="domainName"></param>
         private void verifyWebsiteBinding(Site site, string domainName) {
             try {
                 string bindingInformation = "*:80:" + domainName;

@@ -98,7 +98,7 @@ namespace Contensive.Processor.Addons.NewApp {
                     LogController.logInfo(cp.core, "Verify website.");
                     //
                     const string iisDefaultDoc = "default.aspx";
-                    cp.core.webServer.verifySite(appName, domainName, cp.core.appConfig.localWwwPath, iisDefaultDoc);
+                    cp.core.webServer.verifySite(appName, domainName, cp.core.appConfig.localWwwPath);
                     //
                     LogController.logInfo(cp.core, "Run db upgrade.");
                     BuildController.upgrade(cp.core, true, true);

@@ -10,17 +10,22 @@ using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
     //
-    public class LoginController {
+    //========================================================================
+    /// <summary>
+    /// methods to manage common authentication.
+    /// </summary>
+    public static class LoginController {
         //
         //========================================================================
         /// <summary>
         /// A complete html page with the login form in the middle. If it processes successfully it returns and empty response. (legacy, sorry)
         /// </summary>
         /// <param name="forceDefaultLogin"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
         public static string getLoginPage(CoreController core, bool forceDefaultLogin) {
-            string result = "";
             try {
+                string result;
                 if (forceDefaultLogin) {
                     result = getLoginForm_Default(core);
                 } else {
@@ -354,7 +359,7 @@ namespace Contensive.Processor.Controllers {
                                             while (!usernameOK && (Ptr < 100)) {
                                                 Username = EMailName + encodeInteger(Math.Floor(encodeNumber(Microsoft.VisualBasic.VBMath.Rnd() * 9999)));
                                                 usernameOK = !core.session.isLoginOK(Username, "test");
-                                                Ptr = Ptr + 1;
+                                                Ptr += 1;
                                             }
                                             if (usernameOK) {
                                                 updateUser = true;
@@ -374,7 +379,7 @@ namespace Contensive.Processor.Controllers {
                                         if (string.IsNullOrEmpty(Password)) {
                                             for (Ptr = 0; Ptr <= 8; Ptr++) {
                                                 int Index = encodeInteger(Microsoft.VisualBasic.VBMath.Rnd() * passwordChrsLength);
-                                                Password = Password + strMid(passwordChrs, Index, 1);
+                                                Password += strMid(passwordChrs, Index, 1);
                                             }
                                             updateUser = true;
                                         }
@@ -384,7 +389,7 @@ namespace Contensive.Processor.Controllers {
                                             csData.set("username", Username);
                                             csData.set("password", Password);
                                         }
-                                        recordCnt = recordCnt + 1;
+                                        recordCnt += 1;
                                     }
                                     csData.goNext();
                                 }
@@ -431,7 +436,7 @@ namespace Contensive.Processor.Controllers {
                                 if (!csData.ok()) {
                                     LogController.logError(core, new Exception("Could not open the current members account to set the username and password."));
                                 } else {
-                                    if ((csData.getText("username") != "") || (csData.getText("password") != "") || (csData.getBoolean("admin")) || (csData.getBoolean("developer"))) {
+                                    if ((!string.IsNullOrEmpty(csData.getText("username"))) || !string.IsNullOrEmpty(csData.getText("password")) || csData.getBoolean("admin") || csData.getBoolean("developer")) {
                                         //
                                         // if the current account can be logged into, you can not join 'into' it
                                         //

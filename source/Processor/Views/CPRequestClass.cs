@@ -42,14 +42,14 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// return a string that includes the simple name value pairs for all request cookies
+        /// return a url encoded string that includes the simple name value pairs for all request cookies
         /// </summary>
         /// <returns></returns>
         public override string CookieString {
             get {
                 string returnCookies = "";
                 foreach (KeyValuePair<string, WebServerController.CookieClass> kvp in cp.core.webServer.requestCookies) {
-                    returnCookies += "&" + kvp.Key + "=" + kvp.Value.value;
+                    returnCookies += "&" + GenericController.encodeRequestVariable( kvp.Key ) + "=" + GenericController.encodeRequestVariable( kvp.Value.value);
                 }
                 if (returnCookies.Length > 0) {
                     returnCookies = returnCookies.Substring(1);

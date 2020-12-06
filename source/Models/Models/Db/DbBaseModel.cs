@@ -1311,7 +1311,7 @@ namespace Contensive.Models.Db {
         /// </summary>
         /// <param name="record"></param>record
         /// <returns></returns>
-        private static string getRecordName<T>( T record) where T : DbBaseModel {
+        private static string getRecordName<T>(T record) where T : DbBaseModel {
             return (record != null) ? record.name : string.Empty;
         }
         //
@@ -1467,10 +1467,9 @@ namespace Contensive.Models.Db {
         /// Create a sql query for a count of active records
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="cp"></param>
         /// <param name="sqlCriteria"></param>
         /// <returns></returns>
-        public static string getCountSql<T>(CPBaseClass cp, string sqlCriteria) where T : DbBaseModel {
+        public static string getCountSql<T>(string sqlCriteria) where T : DbBaseModel {
             var sb = (new StringBuilder("select count(*)"))
                 .Append(" from ").Append(derivedTableName(typeof(T)))
                 .Append(" where (active>0)");
@@ -1520,7 +1519,7 @@ namespace Contensive.Models.Db {
         public static bool containsField<T>(string fieldName) {
             if (string.IsNullOrEmpty(fieldName)) return false;
             foreach (PropertyInfo instanceProperty in typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public)) {
-                if (instanceProperty.Name.Equals(fieldName,StringComparison.InvariantCultureIgnoreCase)) { return true; }
+                if (instanceProperty.Name.Equals(fieldName, StringComparison.InvariantCultureIgnoreCase)) { return true; }
             }
             return false;
         }
@@ -1744,7 +1743,7 @@ namespace Contensive.Models.Db {
             try {
                 int result = 0;
                 if (isAppInvalid(cp)) { return result; }
-                using (var dt = cp.Db.ExecuteQuery(getCountSql<T>(cp, sqlCriteria))) {
+                using (var dt = cp.Db.ExecuteQuery(getCountSql<T>(sqlCriteria))) {
                     if (dt.Rows.Count == 0) return result;
                     return cp.Utils.EncodeInteger(dt.Rows[0][0]);
                 }
@@ -1802,15 +1801,15 @@ namespace Contensive.Models.Db {
             if (!string.IsNullOrWhiteSpace(fileField.cdnFileCopySource))
                 // 
                 // -- copy a file from cdnFiles 
-                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.CdnFiles, fileField.cdnFileCopySource);
+                processFileFieldCopy(cp, tablename, fieldname, recordId, cp.CdnFiles, fileField.cdnFileCopySource);
             else if (!string.IsNullOrWhiteSpace(fileField.tempFileCopySource))
                 // 
                 // -- copy a file from tempFiles 
-                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.TempFiles, fileField.tempFileCopySource);
+                processFileFieldCopy(cp, tablename, fieldname, recordId, cp.TempFiles, fileField.tempFileCopySource);
             else if (!string.IsNullOrWhiteSpace(fileField.wwwFileCopySource))
                 // 
                 // -- copy a file from wwwfiles 
-                processFileFieldCopy(cp,  tablename, fieldname, recordId, cp.WwwFiles, fileField.wwwFileCopySource);
+                processFileFieldCopy(cp, tablename, fieldname, recordId, cp.WwwFiles, fileField.wwwFileCopySource);
             else if (!string.IsNullOrWhiteSpace(fileField.uploadRequestName)) {
                 // 
                 // -- upload a file from the request

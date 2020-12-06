@@ -2898,6 +2898,17 @@
     <BlockEditTools>Yes</BlockEditTools>
     <DotNetClass>Contensive.Processor.Addons.Diagnostics.StatusClass</DotNetClass>
   </Addon>
+  <Addon name="AuthStatus" guid="{AF37902B-BCC2-45E4-AF36-E322346731BD}" type="Add-on">
+    <Category></Category>
+    <Admin>No</Admin>
+    <Content>No</Content>
+    <Template>No</Template>
+    <Email>No</Email>
+    <RemoteMethod>Yes</RemoteMethod>
+    <IsInline>Yes</IsInline>
+    <BlockEditTools>Yes</BlockEditTools>
+    <DotNetClass>Contensive.Processor.Addons.Diagnostics.AuthStatusClass</DotNetClass>
+  </Addon>
   <Addon name="Server Diagnostic" guid="{58239C18-1B40-4401-9E6F-25E057327393}" type="Add-on">
     <Category></Category>
     <Admin>No</Admin>

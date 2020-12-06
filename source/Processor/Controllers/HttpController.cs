@@ -85,8 +85,7 @@ namespace Contensive.Processor.Controllers {
             http.userAgent = userAgent;
             if (!string.IsNullOrEmpty(_setCookie)) {
                 string[] cookies = _setCookie.Split(';');
-                int CookiePointer = 0;
-                for (CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
+                for (int CookiePointer = 0; CookiePointer <= cookies.GetUpperBound(0); CookiePointer++) {
                     string[] CookiePart = cookies[CookiePointer].Split('=');
                     http.addCookie(CookiePart[0], CookiePart[1]);
                 }
