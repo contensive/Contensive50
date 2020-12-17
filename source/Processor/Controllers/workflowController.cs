@@ -6,6 +6,9 @@ using System.Linq;
 using Contensive.Models.Db;
 //
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// workflow methods. Workflow editing is deprecated. This class handles edit locking
+    /// </summary>
     public class WorkflowController : IDisposable {
         public enum AuthoringControls {
             /// <summary>
@@ -44,17 +47,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static string getAuthoringControlCriteria(string tableRecordKey, DateTime dateTimeMockable)
             => "(contentRecordKey=" + tableRecordKey + ")and((DateExpires>" + DbController.encodeSQLDate(dateTimeMockable) + ")or(DateExpires Is null))";
-        //
-        //=================================================================================
-        /// <summary>
-        /// create sql criteria for all authoring control records related to a tableid and recordid
-        /// </summary>
-        /// <param name="tableId"></param>
-        /// <param name="recordId"></param>
-        /// <returns></returns>
-        //private static string getAuthoringControlCriteria(int tableId, int recordId) {
-        //    return getAuthoringControlCriteria(getTableRecordKey(tableId, recordId));
-        //}
         //
         //==========================================================================================
         /// <summary>
@@ -95,10 +87,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Get a record lock status. If session.user is the lock holder, returns unlocked
         /// </summary>
-        /// <param name="ContentName"></param>
+        /// <param name="core"></param>
         /// <param name="recordId"></param>
-        /// <param name="ReturnMemberID"></param>
-        /// <param name="ReturnDateExpires"></param>
+        /// <param name="tableId"></param>
         /// <returns></returns>
         public static editLockClass getEditLock(CoreController core, int tableId, int recordId) {
             try {
@@ -128,54 +119,40 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Returns true if the record is locked to the current member
         /// </summary>
-        /// <param name="tableName"></param>
+        /// <param name="core"></param>
+        /// <param name="tableId"></param>
         /// <param name="recordId"></param>
         /// <returns></returns>
         public static bool isRecordLocked(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).isEditLocked;
         //
         //========================================================================
         /// <summary>
-        /// Edit Lock member name
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <returns></returns>
-        public static string getEditLockMemberName(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockByMemberName;
-        //
-        //========================================================================
-        /// <summary>
-        /// Edit Lock dat expires
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <returns></returns>
-        public static DateTime? getEditLockDateExpires(CoreController core, int tableId, int recordId) => getEditLock(core, tableId, recordId).editLockExpiresDate;
-        //
-        //========================================================================
-        /// <summary>
         /// Clears the edit lock for this record
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
+        /// <param name="core"></param>
+        /// <param name="tableId"></param>
+        /// <param name="recordId"></param>
         public static void clearEditLock(CoreController core, int tableId, int recordId) {
             string criteria = "(contentRecordKey=" + getTableRecordKey(tableId, recordId) + ")";
             DbBaseModel.deleteRows<AuthoringControlModel>(core.cpParent, criteria);
         }
         //
-        //========================================================================
+        //=======================================================================
         /// <summary>
         /// Sets the edit lock for this record
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
+        /// <param name="core"></param>
+        /// <param name="tableId"></param>
+        /// <param name="recordId"></param>
         public static void setEditLock(CoreController core, int tableId, int recordId) => setEditLock(core, tableId, recordId, core.session.user.id);
         //
         //=================================================================================
         /// <summary>
         /// Set a record locked
         /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
+        /// <param name="core"></param>
+        /// <param name="tableId"></param>
+        /// <param name="recordId"></param>
         /// <param name="userId"></param>
         public static void setEditLock(CoreController core, int tableId, int recordId, int userId) {
             string contentRecordKey = getTableRecordKey(tableId, recordId);
@@ -186,33 +163,6 @@ namespace Contensive.Processor.Controllers {
             editLock.createdBy = userId;
             editLock.dateAdded = core.dateTimeNowMockable;
             editLock.save(core.cpParent, userId);
-        }
-        //
-        //=====================================================================================================
-        /// <summary>
-        /// Clear the Approved Authoring Control
-        /// </summary>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
-        /// <param name="authoringControl"></param>
-        /// <param name="MemberID"></param>
-        public static void clearAuthoringControl(CoreController core, string ContentName, int RecordID, AuthoringControls authoringControl, int MemberID) {
-            try {
-                string Criteria = getAuthoringControlCriteria(core, ContentName, RecordID) + "And(ControlType=" + authoringControl + ")";
-                switch (authoringControl) {
-                    case AuthoringControls.Editing:
-                        MetadataController.deleteContentRecords(core, "Authoring Controls", Criteria + "And(CreatedBy=" + DbController.encodeSQLNumber(MemberID) + ")", MemberID);
-                        break;
-                    case AuthoringControls.Submitted:
-                    case AuthoringControls.Approved:
-                    case AuthoringControls.Modified:
-                        MetadataController.deleteContentRecords(core, "Authoring Controls", Criteria, MemberID);
-                        break;
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
         }
         //
         //=====================================================================================================

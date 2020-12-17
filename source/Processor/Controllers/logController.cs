@@ -41,24 +41,17 @@ namespace Contensive.Processor.Controllers {
         //
         //=============================================================================
         /// <summary>
-        /// v51+ logging - each class has its own NLog logger and calls these methods for uniform output.
-        /// use: logger.Log(LogLevel.Info, LogController.getMessageLine( core, "Sample informational message"));
+        /// create the error log message with core
         /// </summary>
         /// <param name="core"></param>
         /// <param name="message"></param>
         /// <returns></returns>
-        public static string getMessageLine(string appName, string message) {
-            string threadName = System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("000");
-            return "app [" + appName + "], thread [" + threadName + "], " + message.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
-        }
-        //
         public static string getMessageLine(CoreController core, string message) {
-            string appName = ((core.appConfig != null) ? core.appConfig.name : "no-app");
-            return getMessageLine(appName, message);
-        }
-        //
-        public static string getMessageLine(CoreController core, Exception ex) {
-            return getMessageLine(core, ex.ToString());
+            string result = "app [" + ((core.appConfig != null) ? core.appConfig.name : "no-app") + "]";
+            result += ", thread [" + System.Threading.Thread.CurrentThread.ManagedThreadId.ToString("000") + "]";
+            result += ", url [" + ((core.webServer == null) ? "non-web" : string.IsNullOrEmpty(core.webServer.requestPathPage) ? "empty" : core.webServer.requestPathPage) + "]";
+            result += ", " + message.Replace(Environment.NewLine, " ").Replace("\n", " ").Replace("\r", " ");
+            return result;
         }
         //
         //=============================================================================
@@ -144,7 +137,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// log any level with NLOG without messageLine formatting. Only use in extreme cases where the application environment is not stable.
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="messageLine"></param>
         /// <param name="level"></param>
         public static void logLocalOnly(string messageLine, BaseClasses.CPLogBaseClass.LogLevel level) {
@@ -183,37 +175,64 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
+        /// <param name="cause"></param>
         public static void logError(CoreController core, Exception ex, string cause) {
             log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
         public static void logError(CoreController core, Exception ex) {
             log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Error);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
+        /// <param name="cause"></param>
         public static void logWarn(CoreController core, Exception ex, string cause) {
             log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
         public static void logWarn(CoreController core, Exception ex) {
             log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Warn);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
+        /// <param name="cause"></param>
         public static void logFatal(CoreController core, Exception ex, string cause) {
             log(core, cause + ", exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Standard log
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="ex"></param>
         public static void logFatal(CoreController core, Exception ex) {
             log(core, "exception [" + ex + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
         }
@@ -228,8 +247,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="SubjectMemberID"></param>
         /// <param name="SubjectOrganizationID"></param>
         /// <param name="Link"></param>
-        /// <param name="VisitorID"></param>
-        /// <param name="VisitID"></param>
         public static void addSiteActivity(CoreController core, string Message, int ByMemberID, int SubjectMemberID, int SubjectOrganizationID, string Link = "", int VisitorId = 0, int VisitId = 0) {
             try {
                 //
@@ -294,8 +311,6 @@ namespace Contensive.Processor.Controllers {
         //
         public static void addSiteWarning(CoreController core, string Name, string ignore, string location, int PageID, string Description, string issueCategory, string ignore2) {
             int warningId = 0;
-            //
-            warningId = 0;
             string SQL = "select top 1 ID from ccSiteWarnings"
                 + " where (name=" + DbController.encodeSQLText(Name) + ")"
                 + " and(generalKey=" + DbController.encodeSQLText(issueCategory) + ")"

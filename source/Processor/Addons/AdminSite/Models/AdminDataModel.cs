@@ -84,12 +84,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         /// <summary>
-        /// the current number of WherePairCount in use
-        /// </summary>
-        //public int wherePairCount { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// 
         /// </summary>
         public int recordTop { get; set; }

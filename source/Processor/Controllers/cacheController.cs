@@ -650,16 +650,6 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Convert a key to be used in the server cache. Normalizes name, adds app name and code version
-        /// </summary>
-        /// <param name="key">The cache key to be converted</param>
-        /// <returns></returns>
-        //private CacheKeyHashClass createServerKeyHash(string key) {
-        //    return createKeyHash(core.appConfig.name + "-" + key);
-        //}
-        //
-        //====================================================================================================
-        /// <summary>
         /// return the standard key for records. Store for this key should only be the object model for this id. Get for this key should return null or an object of the model.
         /// </summary>
         /// <param name="recordId"></param>

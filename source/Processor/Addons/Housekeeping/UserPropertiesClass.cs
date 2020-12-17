@@ -4,7 +4,9 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep user properties
+    /// </summary>
     public static class UserProperyClass {
 
         //====================================================================================================

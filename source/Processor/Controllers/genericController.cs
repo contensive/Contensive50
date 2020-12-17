@@ -435,7 +435,7 @@ namespace Contensive.Processor.Controllers {
         //========================================================================================================
         /// <summary>
         /// Decodes an argument parsed from an AddonConstructorString for all non-allowed characters.
-        ///       AddonConstructorString is a & delimited string of name=value[selector]descriptor
+        ///       AddonConstructorString is a &amp; delimited string of name=value[selector]descriptor
         ///       to get a value from an AddonConstructorString, first use getargument() to get the correct value[selector]descriptor
         ///       then remove everything to the right of any '['
         ///       call encodeAddonConstructorargument before parsing them together
@@ -584,7 +584,7 @@ namespace Contensive.Processor.Controllers {
         //=================================================================================
         /// <summary>
         /// Get the value of a name in a string of name value pairs parsed with vrlf and =
-        ///   ex delimiter '&' -> name1=value1&name2=value2"
+        ///   ex delimiter amp -> name1=value1 amp name2=value2"
         ///   There can be no extra spaces between the delimiter, the name and the "="
         /// </summary>
         /// <param name="key"></param>
@@ -726,7 +726,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// encode the name or value part of a querystring, to be parsed with & and = 
+        /// encode the name or value part of a querystring, to be parsed with &amp; and = 
         /// </summary>
         /// <param name="Source"></param>
         /// <returns></returns>
@@ -1419,7 +1419,7 @@ namespace Contensive.Processor.Controllers {
         //
         // ====================================================================================================
         /// <summary>
-        /// Encode a date to minvalue, if date is < minVAlue,m set it to minvalue, if date < 1/1/1000 (the beginning of time), it returns date.minvalue
+        /// Encode a date to minvalue, if date is less-than minVAlue,m set it to minvalue, if date less-than 1/1/1000 (the beginning of time), it returns date.minvalue
         /// </summary>
         /// <param name="sourceDate"></param>
         /// <returns></returns>
@@ -1555,19 +1555,16 @@ namespace Contensive.Processor.Controllers {
                     // might be valid with the brackets, add them
                     //
                     returnValue = true;
-                    //source = "{" & source & "}"
                 } else if (Source.Length == 32) {
                     //
                     // might be valid with the brackets and the dashes, add them
                     //
                     returnValue = true;
-                    //source = "{" & Mid(source, 1, 8) & "-" & Mid(source, 9, 4) & "-" & Mid(source, 13, 4) & "-" & Mid(source, 17, 4) & "-" & Mid(source, 21) & "}"
                 } else {
                     //
                     // not valid
                     //
                     returnValue = false;
-                    //        source = ""
                 }
             } catch (Exception ex) {
                 throw new GenericException("Exception in isGuid", ex);
@@ -1579,6 +1576,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// temp methods to convert from vb, refactor out
         /// </summary>
+        /// <param name="startBase1"></param>
         /// <param name="string1"></param>
         /// <param name="string2"></param>
         /// <param name="text1Binary2"></param>
@@ -1600,24 +1598,39 @@ namespace Contensive.Processor.Controllers {
         }
         //
         // ====================================================================================================
-        public static int strInstr(string string1, string string2, int text1Binary2) {
-            return strInstr(1, string1, string2, text1Binary2);
-        }
-        //
-        // ====================================================================================================
-        //
+        /// <summary>
+        /// vb replacement
+        /// </summary>
+        /// <param name="string1"></param>
+        /// <param name="string2"></param>
+        /// <returns></returns>
         public static int strInstr(string string1, string string2) {
             return strInstr(1, string1, string2, 2);
         }
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// vb replacement
+        /// </summary>
+        /// <param name="startBase1"></param>
+        /// <param name="string1"></param>
+        /// <param name="string2"></param>
+        /// <returns></returns>
         public static int strInstr(int startBase1, string string1, string string2) {
             return strInstr(startBase1, string1, string2, 2);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// vb replacement
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="oldValue"></param>
+        /// <param name="replacement"></param>
+        /// <param name="startIgnore"></param>
+        /// <param name="countIgnore"></param>
+        /// <param name="compare"></param>
+        /// <returns></returns>
         public static string strReplace(string expression, string oldValue, string replacement, int startIgnore, int countIgnore, int compare) {
             if (string.IsNullOrEmpty(expression)) {
                 return expression;

@@ -194,7 +194,14 @@ namespace Contensive.Processor.Controllers {
                     core.cache.storeObject(imageExistsKey, true);
                     return newImageFilename.Replace(@"\", "/");
                 }
+            } catch( UnknownImageFormatException ex) {
+                //
+                // -- unknown image error, return original image
+                LogController.logWarn(core, ex, "Unknown image type [" + imagePathFilename + "]");
+                return imagePathFilename.Replace(@"\", "/");
             } catch (Exception ex) {
+                //
+                // -- unknown exception
                 LogController.logError(core, ex);
                 throw;
             }

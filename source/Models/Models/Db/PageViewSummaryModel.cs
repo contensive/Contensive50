@@ -1,6 +1,8 @@
 ﻿
 namespace Contensive.Models.Db {
-    //
+    /// <summary>
+    /// Summary tables for page viewings
+    /// </summary>
     public class PageViewSummaryModel : DbBaseModel {
         //
         //====================================================================================================

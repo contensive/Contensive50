@@ -1,12 +1,18 @@
-﻿//
+﻿
 using Contensive.Processor.Controllers;
 using System;
 //
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep daily tasks
+    /// </summary>
     public static class DailyTasksClass {
         //====================================================================================================
-        //
+        /// <summary>
+        /// Housekeep daily tasks
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="env"></param>
         public static void housekeepDaily(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
