@@ -1,20 +1,34 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
+using System;
 
 namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// Housekeep user properties
     /// </summary>
     public static class UserProperyClass {
-
+        //
         //====================================================================================================
         /// <summary>
-        /// delete orphan user properties
+        /// execute hourly tasks
         /// </summary>
         /// <param name="core"></param>
-        public static void housekeep(CoreController core) {
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// daily housekeep. delete orphan user properties
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeDailyTasks(CoreController core) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, userproperites");

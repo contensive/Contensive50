@@ -1,13 +1,19 @@
-
+﻿
 
 <script runat="server">
 
     Sub Page_Load()
         Contensive.Processor.Controllers.LogController.logLocalOnly("Page_Load", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Trace)
         Try
+            If (HttpContext.Current.Request.HttpMethod = "OPTIONS") Then
+                '
+                ' -- preflight options call, just return ok status
+                HttpContext.Current.Response.End()
+                Exit Sub
+            End If
             If (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true") Then
                 '
-                ' -- initialize with web.config settings (everything in VS project, no contensive server.config needed)
+                ' -- initialize with web.config settings
                 Dim serverConfig As Contensive.Processor.Models.Domain.ServerConfigModel = DefaultSite.ConfigurationClass.getServerConfig()
                 Using cp As New Contensive.Processor.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
                     Response.Write(cp.executeRoute())

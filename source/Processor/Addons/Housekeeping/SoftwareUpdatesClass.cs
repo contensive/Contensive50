@@ -1,13 +1,20 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
+using System;
 using System.Xml;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Software updates
+    /// </summary>
     public static class SoftwareUpdatesClass {
         //====================================================================================================
-        //
+        /// <summary>
+        /// Daily, download software updates. This is a legacy process but is preserved to force
+        /// and update if a patch is required.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static bool downloadAndInstall(CoreController core) {
             bool loadOK = true;
             try {

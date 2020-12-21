@@ -1,18 +1,38 @@
-﻿//
-using System;
+﻿
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Constants;
-using System.Xml;
+using System;
 using System.Collections.Generic;
-using static Contensive.BaseClasses.CPFileSystemBaseClass;
 using System.Globalization;
+using System.Xml;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep addon folder
+    /// </summary>
     public static class AddonFolderClass {
-        //====================================================================================================
         //
-        public static void housekeep(CoreController core) {
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute Daily Tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeDailyTasks(CoreController core) {
             try {
                 //
                 LogController.logInfo(core, "HousekeepDaily, addon folder");

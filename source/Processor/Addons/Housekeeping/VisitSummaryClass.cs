@@ -1,11 +1,27 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
+using System;
 using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep this content
+    /// </summary>
     public static class VisitSummaryClass {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
         //
         //=========================================================================================
         /// <summary>
@@ -13,7 +29,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="env"></param>
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+        public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, visitsummary");

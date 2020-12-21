@@ -1,15 +1,38 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
+using System;
 using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep visits
+    /// </summary>
     public static class VisitClass {
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
             try {
                 //
-                LogController.logInfo(core, "Housekeep, visits");
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Daily tasks
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="env"></param>
+        public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
+            try {
+                //
+                LogController.logInfo(core, "Housekeep, executeDailyTasks");
                 {
                     //
                     LogController.logInfo(core, "Deleting visits with no DateAdded");
@@ -21,6 +44,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     LogController.logInfo(core, "Deleting visits with no visitor");
                     //
+                    core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery("delete from ccvisits from ccvisits v left join ccvisitors r on r.id=v.visitorid where (r.id is null)");
                 }
                 if (env.archiveDeleteNoCookie) {
@@ -30,7 +54,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery("delete from ccvisits where (CookieSupport=0)and(LastVisitTime<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
                 }
-                DateTime OldestVisitDate = default(DateTime);
+                DateTime OldestVisitDate = default;
                 //
                 // Get Oldest Visit
                 using (var csData = new CsModel(core)) {
@@ -46,7 +70,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 if (OldestVisitDate == DateTime.MinValue) {
                     LogController.logInfo(core, "No visit records were removed because no visit records were found while requesting the oldest visit.");
                 } else {
-                    DateTime ArchiveDate = core.dateTimeNowMockable.AddDays(-env.visitArchiveAgeDays).Date;
+                    DateTime ArchiveDate = core.dateTimeNowMockable.AddDays(-env.archiveAgeDays).Date;
                     int DaystoRemove = encodeInteger(ArchiveDate.Subtract(OldestVisitDate).TotalDays);
                     if (DaystoRemove > 30) {
                         ArchiveDate = OldestVisitDate.AddDays(30);
@@ -55,7 +79,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         LogController.logInfo(core, "No records were removed because Oldest Visit Date [" + OldestVisitDate + "] >= ArchiveDate [" + ArchiveDate + "].");
                     } else {
                         LogController.logInfo(core, "Removing records from [" + OldestVisitDate + "] to [" + ArchiveDate + "].");
-                        DateTime SingleDate = default(DateTime);
+                        DateTime SingleDate = default;
                         SingleDate = OldestVisitDate;
                         do {
                             houseKeep_App_Daily_RemoveVisitRecords(core, SingleDate);

@@ -6,7 +6,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// Housekeep this content
     /// </summary>
-    public static class FieldHelpClass {
+    public static class MenuEntryClass {
         //
         //====================================================================================================
         /// <summary>
@@ -30,34 +30,21 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="env"></param>
         public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             try {
+                string SQL = "";
                 //
-                LogController.logInfo(core, "Housekeep, fieldhelp");
+                SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.AddonID where m.addonid<>0 and a.id is null)";
+                core.db.executeNonQuery(SQL);
                 //
-                // Field help with no field
+                SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAggregateFunctions a on a.id=m.helpaddonid where m.helpaddonid<>0 and a.id is null)";
+                core.db.executeNonQuery(SQL);
                 //
-                LogController.logInfo(core, "Deleting field help with no field.");
-                string sql = ""
-                    + "delete from ccfieldhelp where id in ("
-                    + " select h.id"
-                    + " from ccfieldhelp h"
-                    + " left join ccfields f on f.id=h.fieldid where f.id is null"
-                    + ")";
-                core.db.executeNonQuery(sql);
-                //
-                // Field help duplicates - messy, but I am not sure where they are coming from, and this patchs the edit page performance problem
-                //
-                LogController.logInfo(core, "Deleting duplicate field help records.");
-                sql = ""
-                    + "delete from ccfieldhelp where id in ("
-                    + " select b.id"
-                    + " from ccfieldhelp a"
-                    + " left join ccfieldhelp b on a.fieldid=b.fieldid where a.id< b.id"
-                    + ")";
-                core.db.executeNonQuery(sql);
+                SQL = "delete from ccmenuEntries where id in (select m.ID from ccMenuEntries m left join ccAddonCollections c on c.id=m.helpcollectionid Where m.helpcollectionid <> 0 And c.Id Is Null)";
+                core.db.executeNonQuery(SQL);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
         }
+        //
     }
 }

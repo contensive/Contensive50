@@ -1,20 +1,43 @@
-﻿//
-using System;
+﻿
 using Contensive.Processor.Controllers;
+using System;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Activity Log
+    /// </summary>
     public static class ActivityLogClass {
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute Daily Tasks
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="env"></param>
+        public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, activitylog");
                 {
                     //
                     //
-                    LogController.logInfo(core, "Deleting activities older than 30 days.");
+                    LogController.logInfo(core, "Deleting activities older than archiveAgeDays (" + env.archiveAgeDays + ").");
                     //
-                    core.db.executeNonQuery("delete from ccactivitylog where (DateAdded is null)or(DateAdded<DATEADD(day,-30,CAST(GETDATE() AS DATE)))");
+                    core.db.executeNonQuery("delete from ccactivitylog where (DateAdded is null)or(DateAdded<DATEADD(day,-" + env.archiveAgeDays + ",CAST(GETDATE() AS DATE)))");
 
                 }
                 {

@@ -1152,7 +1152,17 @@ namespace Contensive.Processor.Controllers {
         /// <param name="tableName"></param>
         public void delete(string tableName, string guid ) {
             try {
-                if (string.IsNullOrWhiteSpace(tableName)) { throw new GenericException("tablename cannot be blank"); }
+                if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(guid)) { 
+                    throw new GenericException("tablename and guid cannot be blank"); 
+                }
+                if (isGuid(tableName) && !isGuid(guid)) {
+                    //
+                    // legacy api had arguments reversed
+                    string tmp = guid;
+                    guid = tableName;
+                    tableName = tmp;
+                }
+                // -- allow for non-guid formated guid values (can just be unique)
                 //if (!isGuid(guid)) { throw new GenericException("Guid is not valid [" + guid + "]"); }
                 executeNonQuery("delete from " + tableName + " where ccguid=" + encodeSQLText(guid));
             } catch (Exception ex) {

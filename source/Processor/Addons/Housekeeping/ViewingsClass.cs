@@ -1,11 +1,34 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
+using System;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep this content
+    /// </summary>
     public static class ViewingsClass {
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute Daily Tasks
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="env"></param>
+        public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, viewings");
@@ -14,7 +37,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     //
                     // delete old viewings
                     core.db.sqlCommandTimeout = 1800;
-                    core.db.executeNonQuery("delete from ccviewings where (dateadded < DATEADD(day,-" + env.visitArchiveAgeDays + ",CAST(GETDATE() AS DATE)))");
+                    core.db.executeNonQuery("delete from ccviewings where (dateadded < DATEADD(day,-" + env.archiveAgeDays + ",CAST(GETDATE() AS DATE)))");
                 } catch (Exception) {
                     LogController.logWarn(core, "exception deleting old viewings");
                 }

@@ -1,14 +1,34 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using Contensive.Processor;
+using System;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
-    public class EmailBounceListClass  {
-        public static void housekeep(CoreController core, HouseKeepEnvironmentModel env) {
+    /// <summary>
+    /// Housekeep this content
+    /// </summary>
+    public class EmailBounceListClass {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute Daily Tasks
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="env"></param>
+        public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             //
             core.cpParent.Db.ExecuteNonQuery("update ccmembers set allowbulkemail=1 from ccmembers m left join emailbouncelist b on b.name LIKE CONCAT('%', m.[email], '%') where b.id is not null and m.email is not null");
             //

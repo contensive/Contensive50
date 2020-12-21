@@ -1,8 +1,6 @@
 ﻿
-using System;
-using Amazon.S3.Model.Internal.MarshallTransformations;
 using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Domain;
+using System;
 //
 namespace Contensive.Processor.Addons.Housekeeping {
     //
@@ -74,9 +72,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
         //
         //====================================================================================================
         /// <summary>
-        /// days that we keep simple archive records like visits. Not for summary files like visitsummary
+        /// days that we keep simple archive records like visits, viewings, activitylogs. Not for summary files like visitsummary
+        /// minimum 2 days for sites with no archive features
+        /// 
         /// </summary>
-        public int visitArchiveAgeDays {
+        public int archiveAgeDays {
             get {
                 //
                 // -- Get ArchiveAgeDays - use this as the oldest data they care about
@@ -95,7 +95,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// </summary>
         public DateTime visitArchiveDate {
             get {
-                return core.dateTimeNowMockable.AddDays(-visitArchiveAgeDays).Date;
+                return core.dateTimeNowMockable.AddDays(-archiveAgeDays).Date;
             }
         }
         //
@@ -150,7 +150,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public bool archiveDeleteNoCookie { get { return core.siteProperties.getBoolean("ArchiveDeleteNoCookie", true); } }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// constructor
+        /// </summary>
+        /// <param name="core"></param>
         public HouseKeepEnvironmentModel(CoreController core) {
             try {
                 this.core = core;

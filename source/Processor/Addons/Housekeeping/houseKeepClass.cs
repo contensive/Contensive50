@@ -1,13 +1,27 @@
 ﻿
-using System;
 using Contensive.BaseClasses;
 using Contensive.Processor.Controllers;
+using System;
 //
 namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// support for housekeeping functions
     /// </summary>
     public class HouseKeepClass : AddonBaseClass {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
         //
         //====================================================================================================
         /// <summary>
@@ -27,11 +41,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 core.db.sqlCommandTimeout = 1800;
                 //
                 // -- hourly tasks
-                HourlyTasksClass.housekeep(core, env);
+                HourlyTasksClass.executeHourlyTasks(core, env);
                 //
                 // -- daily tasks
                 if (env.forceHousekeep || env.runDailyTasks) {
-                    DailyTasksClass.housekeepDaily(core, env);
+                    DailyTasksClass.executeDailyTasks(core, env);
                 }
                 core.db.sqlCommandTimeout = TimeoutSave;
             } catch (Exception ex) {

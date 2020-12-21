@@ -1,19 +1,34 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
-using System.Threading.Tasks;
+using System;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep this content
+    /// </summary>
     public static class VisitorPropertyClass {
-
+        //
+        //====================================================================================================
+        /// <summary>
+        /// execute hourly tasks
+        /// </summary>
+        /// <param name="core"></param>
+        public static void executeHourlyTasks(CoreController core) {
+            try {
+                //
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
         //====================================================================================================
         /// <summary>
         /// delete orphan visitor properties
         /// </summary>
         /// <param name="core"></param>
-        public static void housekeep(CoreController core) {
+        public static void executeDailyTasks(CoreController core) {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, visitorproperties");

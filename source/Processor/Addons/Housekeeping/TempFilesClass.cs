@@ -1,13 +1,14 @@
 ﻿
-using System;
 using Contensive.Processor.Controllers;
+using System;
 using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Addons.Housekeeping {
-    //
+    /// <summary>
+    /// Housekeep the temp file system
+    /// </summary>
     public static class TempFilesClass {
-
+        //
         //====================================================================================================
         /// <summary>
         /// delete all files over 1 hour old
