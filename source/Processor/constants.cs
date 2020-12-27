@@ -55,7 +55,7 @@ namespace Contensive.Processor {
         /// change this const
         /// update the URLs in the base5.xml file
         /// </summary>
-        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20201011/";
+        public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20201227/";
         //
         //========================================================================
         // cache names
@@ -1117,5 +1117,10 @@ namespace Contensive.Processor {
         /// deprecated. legacy was "/" and it was used in path in front of path. Path now includes a leading slash
         /// </summary>
         internal const string appRootPath = "";
+        /// <summary>
+        /// Login failed generic message
+        /// </summary>
+        public const string loginFailedError = "Incorrect login. Please try again.";
+
     }
 }

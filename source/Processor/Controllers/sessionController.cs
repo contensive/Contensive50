@@ -709,48 +709,34 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-
-
         //
         //===================================================================================================
         /// <summary>
         /// Returns the ID of a member given their Username and Password.
         /// If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         public int getUserIdForUsernameCredentials(string username, string password) {
-            const string badLoginUserError = "Your login failed. Please try again.";
             try {
                 //
                 bool allowEmailLogin = core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin);
                 if (string.IsNullOrEmpty(username)) {
                     //
                     // -- username blank, stop here
-                    if (allowEmailLogin) {
-                        ErrorController.addUserError(core, "A valid login requires a non-blank username or email.");
-                        return 0;
-                    } else {
-                        ErrorController.addUserError(core, "A valid login requires a non-blank username.");
-                        return 0;
-                    }
+                    return 0;
                 }
                 bool allowNoPasswordLogin = core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin);
                 if (string.IsNullOrEmpty(password) && !allowNoPasswordLogin) {
                     //
-                    // ----- password blank, stop here
-                    //
-                    ErrorController.addUserError(core, "A valid login requires a non-blank password.");
+                    // -- password blank, stop here
                     return 0;
                 }
                 if (visit.loginAttempts >= core.siteProperties.maxVisitLoginAttempts) {
                     //
                     // ----- already tried 5 times
-                    //
-                    ErrorController.addUserError(core, badLoginUserError);
                     return 0;
                 }
                 string Criteria;
@@ -771,7 +757,6 @@ namespace Contensive.Processor.Controllers {
                     if (!cs.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2)) {
                         //
                         // -- username not found, stop here
-                        ErrorController.addUserError(core, badLoginUserError);
                         return 0;
                     }
                     if (allowNoPasswordLogin) {
@@ -780,7 +765,6 @@ namespace Contensive.Processor.Controllers {
                         if (cs.getRowCount().Equals(1)) {
                             return cs.getInteger("id");
                         }
-                        ErrorController.addUserError(core, badLoginUserError);
                         return 0;
                     }
                     //
@@ -788,7 +772,6 @@ namespace Contensive.Processor.Controllers {
                     if ((!allowDuplicateUserNames) && (cs.getRowCount() > 1)) {
                         //
                         // -- AllowDuplicates is false, and there are more then one record
-                        ErrorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
                         return 0;
                     }
                     //
@@ -819,7 +802,6 @@ namespace Contensive.Processor.Controllers {
                                 if (csRules.openSql(SQL)) {
                                     //
                                     // -- user is a content manager, do not allow no-password logins
-                                    ErrorController.addUserError(core, "You must use a password to login using this account");
                                     return 0;
                                 }
                             }
@@ -827,7 +809,6 @@ namespace Contensive.Processor.Controllers {
                         cs.goNext();
                     }
                 }
-                ErrorController.addUserError(core, "You must use a password to login using this account");
                 return 0;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -887,22 +868,23 @@ namespace Contensive.Processor.Controllers {
         /// <param name="AllowAutoLogin"></param>
         /// <returns></returns>
         public bool authenticate(string username, string password, bool AllowAutoLogin = false) {
-            bool result = false;
             try {
                 int userId = getUserIdForUsernameCredentials(username, password);
-                if (userId != 0) {
-                    result = authenticateById(userId, this);
-                    if (result) {
-                        LogController.addSiteActivity(core, "successful password login, username [" + username + "]", user.id, user.organizationId);
-                    } else {
-                        LogController.addSiteActivity(core, "unsuccessful password login, username [" + username + "]", user.id, user.organizationId);
-                    }
+                if (!userId.Equals(0) && authenticateById(userId, this)) {
+                    //
+                    // -- successful
+                    LogController.addSiteActivity(core, "successful login, credential [" + username + "]", user.id, user.organizationId);
+                    return true;
                 }
+                //
+                // -- failed to authenticate
+                ErrorController.addUserError(core, loginFailedError);
+                LogController.addSiteActivity(core, "unsuccessful login, credential [" + username + "]", user.id, user.organizationId);
+                return false;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return result;
         }
         //
         //========================================================================
@@ -1168,8 +1150,13 @@ namespace Contensive.Processor.Controllers {
             return (b.IsMatch(browserUserAgent) || v.IsMatch(browserUserAgent.Substring(0, 4)));
         }
         //
-        //   Checks the username and password
-        //
+        // ================================================================================================
+        /// <summary>
+        /// Return true if this username/password are valid without authenticating
+        /// </summary>
+        /// <param name="Username"></param>
+        /// <param name="Password"></param>
+        /// <returns></returns>
         public bool isLoginOK(string Username, string Password) {
             return !getUserIdForUsernameCredentials(Username, Password).Equals(0);
         }

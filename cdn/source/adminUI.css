@@ -1272,7 +1272,7 @@ Exception list
 */
 ul.ccExceptionList {
     padding: 10px 20px;
-    margin: 0;
+    margin: 20px auto;
     background-color: red;
     list-style-type: none;
 }
@@ -1280,6 +1280,7 @@ ul.ccExceptionList {
 li.ccExceptionListRow {
     padding: 0;
     margin: 10px auto;
+	color: white;
 }
 /*
 * edit addon link wrapper

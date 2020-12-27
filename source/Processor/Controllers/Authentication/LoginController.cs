@@ -111,7 +111,7 @@ namespace Contensive.Processor.Controllers {
                     }
                     //
                     // -- add user errors
-                    if (!core.doc.errorList.Count.Equals(0)) {
+                    if (!core.doc.userErrorList.Count.Equals(0)) {
                         layout = layout.Replace("{{userError}}", ErrorController.getUserError(core));
                     } else {
                         layout = layout.Replace("{{userError}}", "");
@@ -209,16 +209,18 @@ namespace Contensive.Processor.Controllers {
                     core.docProperties.getText("password")
                 );
                 if (userId == 0) {
+                    //
+                    // -- gegtUserId failed, userError already added
                     if (core.session.isAuthenticated || core.session.isRecognized()) { core.session.logout(); }
                     core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                     core.session.visit.save(core.cpParent);
-                    ErrorController.addUserError(core, "The login failed. Please try again.");
+                    ErrorController.addUserError(core, loginFailedError);
                     return false;
                 }
                 if (!core.session.authenticateById(userId, core.session)) {
                     core.session.visit.loginAttempts = core.session.visit.loginAttempts + 1;
                     core.session.visit.save(core.cpParent);
-                    ErrorController.addUserError(core, "The login failed. Please try again.");
+                    ErrorController.addUserError(core, loginFailedError);
                     return false;
                 }
                 //

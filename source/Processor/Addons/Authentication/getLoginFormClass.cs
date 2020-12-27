@@ -1,25 +1,29 @@
-﻿//
-using System;
+﻿
 using Contensive.Processor.Controllers;
+using System;
 //
 namespace Contensive.Processor.Addons.Login {
-    public class GetLoginFormClass : Contensive.BaseClasses.AddonBaseClass {
+    //
+    //====================================================================================================
+    /// <summary>
+    /// Execute the current login form. This is the default form, or another addon if configured.
+    /// </summary>
+    public class GetLoginFormClass : BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// Login Form
+        /// Execute the current login form. This is the default form, or another addon if configured.
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
-        public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string returnHtml = "";
+        public override object Execute(BaseClasses.CPBaseClass cp) {
             try {
                 bool forceDefaultLogin = cp.Doc.GetBoolean("Force Default Login");
-                returnHtml = LoginController.getLoginForm(((CPClass)cp).core, forceDefaultLogin);
+                return LoginController.getLoginForm(((CPClass)cp).core, forceDefaultLogin);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
+                throw;
             }
-            return returnHtml;
         }
     }
 }
