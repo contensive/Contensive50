@@ -1512,7 +1512,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     blockDuplicateUsername = !(core.siteProperties.getBoolean("allowduplicateusername", false));
                                 }
                                 if (GenericController.toLCase(field.nameLc) == "email") {
-                                    blockDuplicateEmail = (core.siteProperties.getBoolean("allowemaillogin", false));
+                                    blockDuplicateEmail = (core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin, false));
                                 }
                             }
                             if ((blockDuplicateUsername || blockDuplicateEmail || field.uniqueName) && (!ResponseFieldIsEmpty)) {

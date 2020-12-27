@@ -86,7 +86,7 @@ namespace Contensive.Processor {
         //====================================================================================================
         //
         public override void sendPassword(string UserEmailAddress, ref string userErrorMessage) {
-            LoginController.sendPassword(cp.core, UserEmailAddress, ref userErrorMessage);
+            PasswordRecoveryController.sendPassword(cp.core, UserEmailAddress, ref userErrorMessage);
         }
         //
         public override void sendPassword(string UserEmailAddress) {

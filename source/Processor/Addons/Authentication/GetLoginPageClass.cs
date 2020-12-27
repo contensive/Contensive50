@@ -1,26 +1,26 @@
-﻿//
-using System;
+﻿
 using Contensive.Processor.Controllers;
-//
+using System;
+
 namespace Contensive.Processor.Addons.Login {
-    //
-    public class GetLoginPageClass : Contensive.BaseClasses.AddonBaseClass {
+    /// <summary>
+    /// Returns a full login page (form plus complete html doc)
+    /// </summary>
+    public class GetLoginPageClass : BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// addon method, deliver complete Html admin site
+        /// Returns a full login page (form plus complete html doc)
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string returnHtml = "";
             try {
-                CoreController core = ((CPClass)cp).core;
-                returnHtml = LoginController.getLoginPage(core, false);
+                return LoginController.getLoginPage(((CPClass)cp).core, false);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
+                throw;
             }
-            return returnHtml;
         }
     }
 }

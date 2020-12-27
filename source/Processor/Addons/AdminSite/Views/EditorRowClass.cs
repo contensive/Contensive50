@@ -23,7 +23,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 fieldCaption = "&nbsp;**" + fieldCaption;
             } else {
                 if (field.nameLc.ToLowerInvariant() == "email") {
-                    if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && ((core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                    if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && ((core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin, false)))) {
                         fieldCaption = "&nbsp;***" + fieldCaption;
                         editorEnv.needUniqueEmailMessage = true;
                     }

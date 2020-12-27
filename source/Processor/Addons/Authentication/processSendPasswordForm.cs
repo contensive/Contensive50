@@ -3,7 +3,7 @@ using System;
 using Contensive.Processor.Controllers;
 //
 namespace Contensive.Processor.Addons.Primitives {
-    public class processSendPasswordFormClass : Contensive.BaseClasses.AddonBaseClass {
+    public class processPasswordRecoveryFormClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
@@ -16,7 +16,7 @@ namespace Contensive.Processor.Addons.Primitives {
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
-                LoginController.processSendPasswordForm(core);
+                PasswordRecoveryController.processPasswordRecoveryForm(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

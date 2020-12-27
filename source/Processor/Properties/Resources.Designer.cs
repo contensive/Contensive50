@@ -115,89 +115,19 @@ namespace Contensive.Processor.Properties {
         /// <summary>
         ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
         ///	&lt;h4 class=&quot;form-signin-heading&quot;&gt;Forget Your Password&lt;/h4&gt;
-        ///	&lt;!--&lt;p&gt;If you are a member of the system and cannot remember your password, enter your email address below and we will email your matching username(s) and password(s).&lt;/p&gt;--&gt;
         ///	&lt;div class=&quot;pt-2&quot;&gt;
         ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only pt-2&quot;&gt;Email address&lt;/label&gt;
-        ///		&lt;input type=&quot;email&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///		&lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;inputEmail&quot; class=&quot;form-control pt-2&quot; placeholder=&quot;Email&quot; required autofocus&gt;
         ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;        /// [rest of string was truncated]&quot;;.
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;button class=&quot;btn btn-success btn-block&quot; type=&quot;submit&quot;&gt;Send Password&lt;/button&gt;
+        ///	&lt;/div&gt;
+        ///&lt;/div&gt; &lt;!-- /container-fluid --&gt;
+        ///.
         /// </summary>
         public static string defaultForgetPassword_html {
             get {
                 return ResourceManager.GetString("defaultForgetPassword_html", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
-        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
-        ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///	&lt;/div&gt;
-        ///    [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string defaultLogin_autoLogin_html {
-            get {
-                return ResourceManager.GetString("defaultLogin_autoLogin_html", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
-        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
-        ///    &lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///    &lt;input type=&quot;email&quot; name=&quot;email&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
-        ///    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///    &lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///    &lt;div class=&quot;checkbox pt-2&quot;&gt;
-        ///        &lt;label&gt;
-        ///        [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string defaultLogin_email_autoLogin_html {
-            get {
-                return ResourceManager.GetString("defaultLogin_email_autoLogin_html", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
-        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
-        ///    &lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///    &lt;/div [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string defaultLogin_email_html {
-            get {
-                return ResourceManager.GetString("defaultLogin_email_html", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
-        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
-        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
-        ///	&lt;/div&gt;
-        ///	&lt;div class=&quot;pt-2&quot;&gt;
-        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
-        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
-        ///	&lt;/div&gt;
-        ///	&lt;d [rest of string was truncated]&quot;;.
-        /// </summary>
-        public static string defaultLogin_html {
-            get {
-                return ResourceManager.GetString("defaultLogin_html", resourceCulture);
             }
         }
         
@@ -257,6 +187,154 @@ namespace Contensive.Processor.Properties {
         public static string GroupRuleEditorRow2 {
             get {
                 return ResourceManager.GetString("GroupRuleEditorRow2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
+        ///    &lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///    &lt;/div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_email_nopassword {
+            get {
+                return ResourceManager.GetString("login_email_nopassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
+        ///    &lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///    &lt;/div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_email_nopassword_auto {
+            get {
+                return ResourceManager.GetString("login_email_nopassword_auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
+        ///    &lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///    &lt;/div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_email_password {
+            get {
+                return ResourceManager.GetString("login_email_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputEmail&quot; class=&quot;sr-only&quot;&gt;Email address&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputEmail&quot; class=&quot;form-control&quot; placeholder=&quot;Username or Email&quot; required autofocus&gt;
+        ///    &lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///    &lt;/div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_email_password_auto {
+            get {
+                return ResourceManager.GetString("login_email_password_auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Username&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div cl [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_username_nopassword {
+            get {
+                return ResourceManager.GetString("login_username_nopassword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Username&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///    &lt;div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_username_nopassword_auto {
+            get {
+                return ResourceManager.GetString("login_username_nopassword_auto", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Username&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div cl [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_username_password {
+            get {
+                return ResourceManager.GetString("login_username_password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;div class=&quot;container-fluid&quot;&gt;
+        ///    &lt;h4 class=&quot;form-signin-heading&quot;&gt;Login&lt;/h4&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///		&lt;label for=&quot;inputUsername&quot; class=&quot;sr-only&quot;&gt;Username&lt;/label&gt;
+        ///		&lt;input type=&quot;text&quot; name=&quot;username&quot; id=&quot;inputUsername&quot; class=&quot;form-control&quot; placeholder=&quot;Username&quot; required autofocus&gt;
+        ///	&lt;/div&gt;
+        ///	&lt;div class=&quot;pt-2&quot;&gt;
+        ///	    &lt;label for=&quot;inputPassword&quot; class=&quot;sr-only&quot;&gt;Password&lt;/label&gt;
+        ///		&lt;input type=&quot;password&quot; name=&quot;password&quot; id=&quot;inputPassword&quot; class=&quot;form-control&quot; placeholder=&quot;Password&quot; required&gt;
+        ///	&lt;/div&gt;
+        ///    &lt;div [rest of string was truncated]&quot;;.
+        /// </summary>
+        public static string login_username_password_auto {
+            get {
+                return ResourceManager.GetString("login_username_password_auto", resourceCulture);
             }
         }
         

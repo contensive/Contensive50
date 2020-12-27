@@ -15,13 +15,13 @@ namespace Contensive.Processor.Addons.Primitives {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string result = "";
             try {
                 LoginController.processLoginFormDefault(((CPClass)cp).core);
+                return "";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
+                throw;
             }
-            return result;
         }
     }
 }

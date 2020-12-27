@@ -2811,7 +2811,7 @@ namespace Contensive.Processor.Controllers {
                         // Username
                         //
                         string Caption = null;
-                        if (core.siteProperties.getBoolean("allowEmailLogin", false)) {
+                        if (core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin, false)) {
                             Caption = "Username&nbsp;or&nbsp;Email";
                         } else {
                             Caption = "Username";
@@ -2824,7 +2824,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // Username
                         //
-                        if (core.siteProperties.getBoolean("allownopasswordLogin", false)) {
+                        if (core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin, false)) {
                             Caption = "Password&nbsp;(optional)";
                         } else {
                             Caption = "Password";

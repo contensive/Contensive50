@@ -348,7 +348,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 foreach (KeyValuePair<string, Contensive.Processor.Models.Domain.ContentFieldMetadataModel> keyValuePair in adminData.adminContent.fields) {
                                     ContentFieldMetadataModel field = keyValuePair.Value;
                                     if (GenericController.toLCase(field.nameLc) == "email") {
-                                        if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean("allowemaillogin", false)))) {
+                                        if ((adminData.adminContent.tableName.ToLowerInvariant() == "ccmembers") && (GenericController.encodeBoolean(cp.core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin, false)))) {
                                             adminData.editRecord.fieldsLc[field.nameLc].value = "";
                                         }
                                     }

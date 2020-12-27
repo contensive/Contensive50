@@ -16,7 +16,7 @@ namespace Contensive.Processor.Addons.Primitives {
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
-                LoginController.processJoinForm(core);
+                RegisterController.processRegisterForm(core);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

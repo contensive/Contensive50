@@ -146,9 +146,9 @@ namespace Contensive.Processor.Controllers {
                                     result = (new Contensive.Processor.Addons.Primitives.ProcessAddonSettingsEditorClass()).Execute(core.cpParent).ToString();
                                     break;
                                 }
-                            case FormTypeSendPassword: {
+                            case FormTypePasswordRecovery: {
                                     //
-                                    result = (new Contensive.Processor.Addons.Primitives.processSendPasswordFormClass()).Execute(core.cpParent).ToString();
+                                    result = (new Contensive.Processor.Addons.Primitives.processPasswordRecoveryFormClass()).Execute(core.cpParent).ToString();
                                     break;
                                 }
                             case FormTypeLogin:

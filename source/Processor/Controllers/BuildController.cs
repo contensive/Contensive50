@@ -163,7 +163,7 @@ namespace Contensive.Processor.Controllers {
                     if (repair) {
                         //
                         // -- repair, set values to what the default system uses
-                        core.siteProperties.setProperty(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue);
+                        core.siteProperties.setProperty(sitePropertyName_ServerPageDefault, sitePropertyDefaultValue_ServerPageDefault);
                         core.siteProperties.setProperty("AdminURL", "/" + core.appConfig.adminRoute);
                     }
                     //

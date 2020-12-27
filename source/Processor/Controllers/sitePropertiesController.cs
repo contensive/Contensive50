@@ -61,10 +61,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int defaultRouteId {
             get {
-                return getInteger(spDefaultRouteAddonId);
+                return getInteger(sitePropertyName_DefaultRouteAddonId);
             }
             set {
-                setProperty(spDefaultRouteAddonId, value);
+                setProperty(sitePropertyName_DefaultRouteAddonId, value);
             }
         }
         //
@@ -202,7 +202,7 @@ namespace Contensive.Processor.Controllers {
         //
         public string serverPageDefault {
             get {
-                return textPropertyBase(siteproperty_serverPageDefault_name, siteproperty_serverPageDefault_defaultValue, ref _ServerPageDefault_local);
+                return textPropertyBase(sitePropertyName_ServerPageDefault, sitePropertyDefaultValue_ServerPageDefault, ref _ServerPageDefault_local);
             }
         }
         private string _ServerPageDefault_local = null;

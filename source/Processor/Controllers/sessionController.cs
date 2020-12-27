@@ -714,7 +714,8 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         /// <summary>
-        /// Returns the ID of a member given their Username and Password, If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
+        /// Returns the ID of a member given their Username and Password.
+        /// If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
         /// </summary>
         /// <param name="core"></param>
         /// <param name="username"></param>
@@ -722,119 +723,116 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
         public int getUserIdForUsernameCredentials(string username, string password) {
-            int returnUserId = 0;
+            const string badLoginUserError = "Your login failed. Please try again.";
             try {
                 //
-                const string badLoginUserError = "Your login was not successful. Please try again.";
-                string iLoginFieldValue = GenericController.encodeText(username);
-                string iPassword = GenericController.encodeText(password);
-                bool allowEmailLogin = core.siteProperties.getBoolean("allowEmailLogin");
-                bool allowNoPasswordLogin = core.siteProperties.getBoolean("allowNoPasswordLogin");
-                if (string.IsNullOrEmpty(iLoginFieldValue)) {
+                bool allowEmailLogin = core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin);
+                if (string.IsNullOrEmpty(username)) {
                     //
-                    // ----- loginFieldValue blank, stop here
-                    //
+                    // -- username blank, stop here
                     if (allowEmailLogin) {
                         ErrorController.addUserError(core, "A valid login requires a non-blank username or email.");
+                        return 0;
                     } else {
                         ErrorController.addUserError(core, "A valid login requires a non-blank username.");
+                        return 0;
                     }
-                } else if ((!allowNoPasswordLogin) && (string.IsNullOrEmpty(iPassword))) {
+                }
+                bool allowNoPasswordLogin = core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin);
+                if (string.IsNullOrEmpty(password) && !allowNoPasswordLogin) {
                     //
                     // ----- password blank, stop here
                     //
                     ErrorController.addUserError(core, "A valid login requires a non-blank password.");
-                } else if (visit.loginAttempts >= core.siteProperties.maxVisitLoginAttempts) {
+                    return 0;
+                }
+                if (visit.loginAttempts >= core.siteProperties.maxVisitLoginAttempts) {
                     //
                     // ----- already tried 5 times
                     //
                     ErrorController.addUserError(core, badLoginUserError);
+                    return 0;
+                }
+                string Criteria;
+                if (allowEmailLogin) {
+                    //
+                    // login by username or email
+                    //
+                    Criteria = "((username=" + DbController.encodeSQLText(username) + ")or(email=" + DbController.encodeSQLText(username) + "))";
                 } else {
-                    string Criteria = null;
-                    if (allowEmailLogin) {
+                    //
+                    // login by username only
+                    //
+                    Criteria = "(username=" + DbController.encodeSQLText(username) + ")";
+                }
+                Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
+                bool allowDuplicateUserNames = core.siteProperties.getBoolean("AllowDuplicateUsernames", false);
+                using (var cs = new CsModel(core)) {
+                    if (!cs.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2)) {
                         //
-                        // login by username or email
-                        //
-                        Criteria = "((username=" + DbController.encodeSQLText(iLoginFieldValue) + ")or(email=" + DbController.encodeSQLText(iLoginFieldValue) + "))";
-                    } else {
-                        //
-                        // login by username only
-                        //
-                        Criteria = "(username=" + DbController.encodeSQLText(iLoginFieldValue) + ")";
+                        // -- username not found, stop here
+                        ErrorController.addUserError(core, badLoginUserError);
+                        return 0;
                     }
-                    Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
-                    using (var csData = new CsModel(core)) {
-                        csData.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2);
-                        if (!csData.ok()) {
+                    if (allowNoPasswordLogin) {
+                        //
+                        // -- no password. must be one and only one result
+                        if (cs.getRowCount().Equals(1)) {
+                            return cs.getInteger("id");
+                        }
+                        ErrorController.addUserError(core, badLoginUserError);
+                        return 0;
+                    }
+                    //
+                    // -- password required
+                    if ((!allowDuplicateUserNames) && (cs.getRowCount() > 1)) {
+                        //
+                        // -- AllowDuplicates is false, and there are more then one record
+                        ErrorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
+                        return 0;
+                    }
+                    //
+                    // -- search all found records for the correct password
+                    while (cs.ok()) {
+                        //
+                        // -- search for matching password
+                        if (!string.IsNullOrEmpty(password) && password.Equals(cs.getText("password"), StringComparison.InvariantCultureIgnoreCase)) {
                             //
-                            // ----- loginFieldValue not found, stop here
+                            // -- password match
+                            return cs.getInteger("ID");
+                        }
+                        if (allowNoPasswordLogin && string.IsNullOrEmpty(cs.getText("password")) && (!cs.getBoolean("admin")) && !cs.getBoolean("developer")) {
                             //
-                            ErrorController.addUserError(core, badLoginUserError);
-                        } else if ((!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowDuplicateUsernames", false))) && (csData.getRowCount() > 1)) {
-                            //
-                            // ----- AllowDuplicates is false, and there are more then one record
-                            //
-                            ErrorController.addUserError(core, "This user account can not be used because the username is not unique on this website. Please contact the site administrator.");
-                        } else {
-                            //
-                            // ----- search all found records for the correct password
-                            //
-                            while (csData.ok()) {
-                                returnUserId = 0;
-                                //
-                                // main_Get Id if password good
-                                //
-                                if (string.IsNullOrEmpty(iPassword)) {
+                            // -- no-password-login + no password given + account has no password + account not admin/dev/cm
+                            // -- verify they are in no content manager groups
+                            using (var csRules = new CsModel(core)) {
+                                string SQL = ""
+                                    + " SELECT ccGroupRules.ContentID"
+                                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
+                                    + " WHERE ("
+                                    + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(cs.getInteger("ID")) + ")"
+                                    + " AND(ccMemberRules.active<>0)"
+                                    + " AND(ccGroupRules.active<>0)"
+                                    + " AND(ccGroupRules.ContentID Is not Null)"
+                                    + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                                    + ");";
+                                if (csRules.openSql(SQL)) {
                                     //
-                                    // no-password-login -- allowNoPassword + no password given + account has no password + account not admin/dev/cm
-                                    //
-                                    bool recordIsAdmin = csData.getBoolean("admin");
-                                    bool recordIsDeveloper = !csData.getBoolean("admin");
-                                    if (allowNoPasswordLogin && string.IsNullOrEmpty(csData.getText("password")) && (!recordIsAdmin) && recordIsDeveloper) {
-                                        returnUserId = csData.getInteger("ID");
-                                        //
-                                        // verify they are in no content manager groups
-                                        //
-                                        using (var csRules = new CsModel(core)) {
-                                            //
-                                            string SQL = ""
-                                                + " SELECT ccGroupRules.ContentID"
-                                                + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
-                                                + " WHERE ("
-                                                + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(returnUserId) + ")"
-                                                + " AND(ccMemberRules.active<>0)"
-                                                + " AND(ccGroupRules.active<>0)"
-                                                + " AND(ccGroupRules.ContentID Is not Null)"
-                                                + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                                + ");";
-                                            if (csRules.openSql(SQL)) { returnUserId = 0; }
-                                        }
-                                    }
-                                } else {
-                                    //
-                                    // password login
-                                    //
-                                    if (GenericController.toLCase(csData.getText("password")) == GenericController.toLCase(iPassword)) {
-                                        returnUserId = csData.getInteger("ID");
-                                    }
+                                    // -- user is a content manager, do not allow no-password logins
+                                    ErrorController.addUserError(core, "You must use a password to login using this account");
+                                    return 0;
                                 }
-                                if (returnUserId != 0) {
-                                    break;
-                                }
-                                csData.goNext();
-                            }
-                            if (returnUserId == 0) {
-                                ErrorController.addUserError(core, badLoginUserError);
                             }
                         }
-                        csData.close();
+                        cs.goNext();
                     }
                 }
+                ErrorController.addUserError(core, "You must use a password to login using this account");
+                return 0;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnUserId;
         }
         //
         //====================================================================================================

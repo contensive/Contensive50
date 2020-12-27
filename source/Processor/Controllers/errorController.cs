@@ -11,18 +11,26 @@ namespace Contensive.Processor.Controllers {
     public class ErrorController : IDisposable {
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// add an error to the user error list. User errors are for errors the user can correct
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Message"></param>
         public static void addUserError(CoreController core, string Message) {
             if(!core.doc.userErrorList.Contains(Message)) { core.doc.userErrorList.Add(Message); }
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// return a ul, li list with all the user errors available
+        /// </summary>
+        /// <param name="core"></param>
+        /// <returns></returns>
         public static string getUserError(CoreController core) {
             if ( core.doc.userErrorList.Count.Equals(0)) { return string.Empty; }
             string result = "";
             foreach ( var userError in core.doc.userErrorList ) {
-                result += "\r<li class=\"ccExceptionListRow\">" + GenericController.encodeText(userError) + "</LI>";
+                result += "\r<li class=\"ccExceptionListRow\">" + GenericController.encodeText(userError) + "</li>";
             }
             core.doc.userErrorList.Clear();
             return "<ul class=\"ccExceptionList\">" + result + "\r</ul>";

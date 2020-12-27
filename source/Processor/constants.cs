@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Processor {
+    /// <summary>
+    /// Contants for the projects
+    /// </summary>
     public static class Constants {
         //
         // -- data layers, 
@@ -42,13 +45,16 @@ namespace Contensive.Processor {
         //
         internal const int codeVersion = 0;
         //
-        // to update cdn
-        // source is in the /cdn folder of the repository
-        // edit the upload script and set the datestring
-        // create the folder on the cdn
-        // run the upload script
-        // change this const
-        // update the URLs in the base5.xml file
+        /// <summary>
+        /// Cdn for css and js
+        /// to update cdn
+        /// source is in the /cdn folder of the repository
+        /// edit the upload script and set the datestring
+        /// create the folder on the cdn
+        /// run the upload script
+        /// change this const
+        /// update the URLs in the base5.xml file
+        /// </summary>
         public const string cdnPrefix = "https://s3.amazonaws.com/cdn.contensive.com/assets/20201011/";
         //
         //========================================================================
@@ -60,6 +66,38 @@ namespace Contensive.Processor {
         /// default number of days that a cache is invalidated
         /// </summary>
         internal const double invalidationDaysDefault = 365;
+        //
+        //=======================================================================
+        //   sitepropertyNames
+        //=======================================================================
+        //
+        /// <summary>
+        /// default iis script document
+        /// </summary>
+        public const string sitePropertyName_ServerPageDefault = "serverPageDefault";
+        //
+        /// <summary>
+        /// default iis script document
+        /// </summary>
+        public const string sitePropertyDefaultValue_ServerPageDefault = "default.aspx";
+        //
+        internal const string sitePropertyName_DefaultRouteAddonId = "Default Route AddonId";
+        /// <summary>
+        /// if true, login form(s) shuold from peristent visitor cookie
+        /// </summary>
+        internal const string sitePropertyName_AllowAutoLogin = "AllowAutoLogin";
+        /// <summary>
+        /// if true, login forms should accept either username or email
+        /// </summary>
+        internal const string sitePropertyName_AllowEmailLogin = "allowEmailLogin";
+        /// <summary>
+        /// AWS key to use for this site, for SES email and related Queue access
+        /// </summary>
+        internal const string sitePropertyName_SendEmailWithAmazonSES = "AWS Use Amazon SES";
+        /// <summary>
+        /// if true, you can login with just your username or email, without a password
+        /// </summary>
+        internal const string sitePropertyName_AllowNoPasswordLogin = "allowNoPasswordLogin";
         //
         //========================================================================
         // html
@@ -310,7 +348,7 @@ namespace Contensive.Processor {
         internal const string FormTypePageAuthoring = "2s09lmpalb";
         internal const string FormTypeMyProfile = "89aLi180j5";
         internal const string FormTypeLogin = "login";
-        internal const string FormTypeSendPassword = "lk0q56am09";
+        internal const string FormTypePasswordRecovery = "lk0q56am09";
         internal const string FormTypeJoin = "6df38abv00";
         internal const string FormTypeHelpBubbleEditor = "9df019d77sA";
         internal const string FormTypeAddonSettingsEditor = "4ed923aFGw9d";
@@ -885,25 +923,6 @@ namespace Contensive.Processor {
         internal const int ToolsActionDefineContentFieldFromTableFieldsFromTable = 13;
         internal const int ToolsActionFindAndReplace = 14;
         internal const int ToolsActionIISReset = 15;
-        //
-        //=======================================================================
-        //   sitepropertyNames
-        //=======================================================================
-        //
-        public static string siteproperty_serverPageDefault_name => _siteproperty_serverPageDefault_name;
-
-        internal const string _siteproperty_serverPageDefault_name = "serverPageDefault";
-        //
-        internal const string siteproperty_serverPageDefault_defaultValue = "default.aspx";
-        //
-        internal const string spAllowPageWithoutSectionDisplay = "Allow Page Without Section Display";
-        //
-        internal const bool spAllowPageWithoutSectionDisplay_default = true;
-        //
-        internal const string spDefaultRouteAddonId = "Default Route AddonId";
-        //
-        // -- AWS key to use for this site, for SES email and related Queue access
-        internal const string spSendEmailWithAmazonSES = "AWS Use Amazon SES";
         //
         //=======================================================================
         //   content replacements

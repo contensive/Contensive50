@@ -20,7 +20,7 @@ namespace Contensive.Processor.Addons.Primitives {
                 string Emailtext = core.docProperties.getText("email");
                 if (!string.IsNullOrEmpty(Emailtext)) {
                     string sendStatus = "";
-                    LoginController.sendPassword(core, Emailtext, ref sendStatus);
+                    PasswordRecoveryController.sendPassword(core, Emailtext, ref sendStatus);
                     result += ""
                         + "<div style=\"width:300px;margin:100px auto 0 auto;\">"
                         + "<p>An attempt to send login information for email address '" + Emailtext + "' has been made.</p>"

@@ -91,9 +91,13 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 LogController.logError(core, ex);
             }
         }
-
-        //====================================================================================================
         //
+        //====================================================================================================
+        /// <summary>
+        /// delete old visits
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="DeleteBeforeDate"></param>
         public static void houseKeep_App_Daily_RemoveVisitRecords(CoreController core, DateTime DeleteBeforeDate) {
             try {
                 //

@@ -872,9 +872,9 @@ namespace Contensive.Processor.Controllers {
                 // -- read back the marked record and if it is there, then no other process is likely looking at it so it can be sent
                 // -- this will help prevent duplicate sends, and if the process aborts, only one queued email per queue will be stuck
                 List<EmailQueueModel> queueSampleList = DbBaseModel.createList<EmailQueueModel>(core.cpParent, "", "immediate,id desc", 100, 1);
-                bool sendWithSES = core.siteProperties.getBoolean(Constants.spSendEmailWithAmazonSES);
+                bool sendWithSES = core.siteProperties.getBoolean(Constants.sitePropertyName_SendEmailWithAmazonSES);
                 //
-                LogController.logInfo(core, "sending queued email with " + (sendWithSES ? "AWS SES" : "SMTP") + ", based on site property [" + Constants.spSendEmailWithAmazonSES + "]");
+                LogController.logInfo(core, "sending queued email with " + (sendWithSES ? "AWS SES" : "SMTP") + ", based on site property [" + Constants.sitePropertyName_SendEmailWithAmazonSES + "]");
                 //
                 using (var sesClient = AwsSesController.getSesClient(core)) {
                     foreach (EmailQueueModel queueSample in queueSampleList) {
