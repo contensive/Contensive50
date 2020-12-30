@@ -1,4 +1,4 @@
-﻿//
+﻿
 namespace Contensive.Processor.Addons.Login {
     /// <summary>
     /// Addon that returns a login button form, or if you are logged in, a link to my account and a logout button

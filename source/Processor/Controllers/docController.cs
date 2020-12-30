@@ -75,30 +75,18 @@ namespace Contensive.Processor.Controllers {
         //
         public Dictionary<CPHtml5BaseClass.EditorContentType, string> wysiwygAddonList;
         //
-        // -- others to be sorted
         public int editWrapperCnt { get; set; } = 0;
         /// <summary>
         /// The accumulated body built as each component adds elements. Available to addons at onBodyEnd. Can be used to create addon filters
         /// </summary>
         public string body { get; set; } = "";
-        //
-        // -- todo
-        public bool legacySiteStyles_Loaded { get; set; } = false;
-        //
-        // -- todo
-        public int menuSystemCloseCount { get; set; } = 0;
-        //
-        // -- todo
-        internal int helpDialogCnt { get; set; } = 0;
         /// <summary>
         /// querystring required to return to the current state (perform a refresh)
         /// </summary>
         public string refreshQueryString { get; set; } = "";
         //
-        // -- todo
         public int redirectContentID { get; set; } = 0;
         //
-        // -- todo
         public int redirectRecordID { get; set; } = 0;
         /// <summary>
         /// when true (default), stream is buffered until page is done
@@ -113,77 +101,66 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int adminWarningPageID { get; set; } = 0;
         //
-        // -- todo
         public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
         //
-        // -- todo
         public int inputDateCnt { get; set; } = 0;
         //
-        // -- todo
         internal List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
         //
-        // -- todo
         public int formInputTextCnt { get; set; } = 0;
         //
-        // -- todo
         public string quickEditCopy { get; set; } = "";
         //
-        // -- todo
-        public string siteStructure { get; set; } = "";
-        //
-        // -- todo
-        public bool siteStructure_LocalLoaded { get; set; } = false;
-        //
-        // -- todo
         public string bodyContent { get; set; } = ""; // stored here so cp.doc.content valid during bodyEnd event
         //
-        // -- todo
         public int landingPageID { get; set; } = 0;
         //
-        // -- todo
         public string redirectLink { get; set; } = "";
         //
-        // -- todo
         public string redirectReason { get; set; } = "";
-        //
-        // -- todo
+        /// <summary>
+        /// 
+        /// </summary>
         public bool redirectBecausePageNotFound { get; set; } = false;
-        //
         /// <summary>
         /// exceptions collected during document construction
         /// </summary>
         internal List<string> errorList { get; set; }
-        //
         /// <summary>
         /// user errors collected during this document
         /// </summary>
         internal List<string> userErrorList = new List<string>();
-        //
-        // todo convert to list
         /// <summary>
         /// List of test points displayed on debug footer
         /// </summary>
         public string testPointMessage { get; set; } = "";
-        //
-        // -- todo
-        public bool visitPropertyAllowDebugging { get; set; } = false; // if true, send main_TestPoint messages to the stream
-        //
-        // -- todo
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool visitPropertyAllowDebugging { get; set; } = false;
+        /// <summary>
+        /// if true, send main_TestPoint messages to the stream
+        /// </summary>
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
-        //
-        // -- todo
-        public DateTime profileStartTime { get; set; } // set in constructor
-        //
-        // -- todo
-        public bool allowDebugLog { get; set; } = false; // turn on in script -- use to write /debug.log in content files for whatever is needed
-        //
-        // -- todo
-        public bool blockExceptionReporting { get; set; } = false; // used so error reporting can not call itself
-        //
-        // -- todo
-        public bool continueProcessing { get; set; } = false; // when false, routines should not add to the output and immediately exit
-        //
-        // -- todo
+        /// <summary>
+        /// set in constructor
+        /// </summary>
+        public DateTime profileStartTime { get; set; }
+        /// <summary>
+        /// turn on in script -- use to write /debug.log in content files for whatever is needed
+        /// </summary>
+        public bool allowDebugLog { get; set; } = false;
+        /// <summary>
+        /// used so error reporting can not call itself
+        /// </summary>
+        public bool blockExceptionReporting { get; set; } = false;
+        /// <summary>
+        /// when false, routines should not add to the output and immediately exit
+        /// </summary>
+        public bool continueProcessing { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
         /// <summary>
         /// If ContentId in this list, they are not a content manager
@@ -209,19 +186,25 @@ namespace Contensive.Processor.Controllers {
         /// list of content names verified that this user CAN NOT edit
         /// </summary>
         internal List<string> contentNotEditingList = new List<string>();
-        //
         /// <summary>
         /// Dictionary of addons running to track recursion, addonId and count of recursive entries. When executing an addon, check if it is in the list, if so, check if the recursion count is under the limit (addonRecursionDepthLimit). If not add it or increment the count. On exit, decrement the count and remove if 0.
         /// </summary>
         internal Dictionary<int, int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public Stack<AddonModel> addonModelStack = new Stack<AddonModel>();
-        //
-        // -- todo
+        /// <summary>
+        /// 
+        /// </summary>
         public int addonInstanceCnt { get; set; } = 0;
-        //
-        // -- Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
+        /// <summary>
+        /// Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
+        /// </summary>
         public string emailBlockListStore { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
         public bool emailBlockListStoreLoaded { get; set; }
         //
         //====================================================================================================
@@ -237,81 +220,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
         private string _landingLink = "";
-        //
-        //
-        public void sendPublishSubmitNotice(string ContentName, int RecordID, string RecordName) {
-            try {
-                Models.Domain.ContentMetadataModel CDef = null;
-                string Copy = null;
-                string Link = null;
-                string FromAddress = null;
-                //
-                FromAddress = core.siteProperties.getText("EmailPublishSubmitFrom", core.siteProperties.emailAdmin);
-                CDef = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
-                Link = "/" + core.appConfig.adminRoute + "?af=" + AdminFormPublishing;
-                Copy = Msg_AuthoringSubmittedNotification;
-                Copy = GenericController.strReplace(Copy, "<DOMAINNAME>", "<a href=\"" + HtmlController.encodeHtml(Link) + "\">" + core.webServer.requestDomain + "</a>");
-                Copy = GenericController.strReplace(Copy, "<RECORDNAME>", RecordName);
-                Copy = GenericController.strReplace(Copy, "<CONTENTNAME>", ContentName);
-                Copy = GenericController.strReplace(Copy, "<RECORDID>", RecordID.ToString());
-                Copy = GenericController.strReplace(Copy, "<SUBMITTEDDATE>", core.doc.profileStartTime.ToString());
-                Copy = GenericController.strReplace(Copy, "<SUBMITTEDNAME>", core.session.user.name);
-                //
-                EmailController.queueGroupEmail(core, core.siteProperties.getText("WorkflowEditorGroup", "Site Managers"), FromAddress, "Authoring Submitted Notification", Copy, false, true);
-                //
-                return;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-        }
-        //
-        //=============================================================================
-        //   main_Get the link for a Content Record by the ContentName and RecordID
-        //=============================================================================
-        //
-        public string getContentWatchLinkByName(string ContentName, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
-            string result = "";
-            try {
-                string ContentRecordKey = Models.Domain.ContentMetadataModel.getContentId(core, GenericController.encodeText(ContentName)) + "." + GenericController.encodeInteger(RecordID);
-                result = getContentWatchLinkByKey(ContentRecordKey, DefaultLink, IncrementClicks);
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-            }
-            return result;
-        }
-        //
-        //=============================================================================
-        /// <summary>
-        /// Get the link for a Content Record by its ContentRecordKey
-        /// </summary>
-        /// <param name="ContentRecordKey"></param>
-        /// <param name="DefaultLink"></param>
-        /// <param name="IncrementClicks"></param>
-        /// <returns></returns>
-        public string getContentWatchLinkByKey(string ContentRecordKey, string DefaultLink, bool IncrementClicks) {
-            string result = "";
-            try {
-                using (var csData = new CsModel(core)) {
-                    if (csData.open("Content Watch", "ContentRecordKey=" + DbController.encodeSQLText(ContentRecordKey), "", false, 0, "Link,Clicks")) {
-                        result = csData.getText("Link");
-                        if (GenericController.encodeBoolean(IncrementClicks)) { csData.set("Clicks", csData.getInteger("clicks") + 1); }
-                    } else {
-                        result = GenericController.encodeText(DefaultLink);
-                    }
-                }
-                return GenericController.encodeVirtualPath(result, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //
-        public string getContentWatchLinkByKey(string ContentRecordKey, string DefaultLink) => getContentWatchLinkByKey(ContentRecordKey, DefaultLink, false);
-        //
-        public string getContentWatchLinkByKey(string ContentRecordKey) => getContentWatchLinkByKey(ContentRecordKey, "", false);
         //
         //====================================================================================================
         // Replace with main_GetPageArgs()
@@ -342,108 +250,6 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex);
                 throw;
             }
-        }
-        //
-        //====================================================================================================
-        // main_Get a page link if you know nothing about the page
-        //   If you already have all the info, lik the parents templateid, etc, call the ...WithArgs call
-        //====================================================================================================
-        //
-        public string main_GetPageDynamicLink(int PageID, bool UseContentWatchLink) {
-            //
-            int CCId = 0;
-            string DefaultLink = null;
-            int SectionId = 0;
-            bool IsRootPage = false;
-            int templateId = 0;
-            string MenuLinkOverRide = "";
-            //
-            //
-            // Convert default page to default link
-            //
-            DefaultLink = core.siteProperties.serverPageDefault;
-            if (DefaultLink.left(1) != "/") {
-                DefaultLink = "/" + core.siteProperties.serverPageDefault;
-            }
-            //
-            return main_GetPageDynamicLinkWithArgs(CCId, PageID, DefaultLink, IsRootPage, templateId, SectionId, MenuLinkOverRide, UseContentWatchLink);
-        }
-        //====================================================================================================
-        /// <summary>
-        /// main_GetPageDynamicLinkWithArgs
-        /// </summary>
-        /// <param name="contentControlID"></param>
-        /// <param name="PageID"></param>
-        /// <param name="DefaultLink"></param>
-        /// <param name="IsRootPage"></param>
-        /// <param name="templateId"></param>
-        /// <param name="SectionID"></param>
-        /// <param name="MenuLinkOverRide"></param>
-        /// <param name="UseContentWatchLink"></param>
-        /// <returns></returns>
-        internal string main_GetPageDynamicLinkWithArgs(int contentControlID, int PageID, string DefaultLink, bool IsRootPage, int templateId, int SectionID, string MenuLinkOverRide, bool UseContentWatchLink) {
-            string resultLink = "";
-            try {
-                if (!string.IsNullOrEmpty(MenuLinkOverRide)) {
-                    //
-                    // -- redirect to this page record
-                    resultLink = "?rc=" + contentControlID + "&ri=" + PageID;
-                } else {
-                    if (UseContentWatchLink) {
-                        //
-                        // -- Legacy method - lookup link from a table set during the last page hit
-                        resultLink = getContentWatchLinkByID(contentControlID, PageID, DefaultLink, false);
-                    } else {
-                        //
-                        // -- Current method - all pages are in the Template, Section, Page structure
-                        if (templateId != 0) {
-                            PageTemplateModel template = DbBaseModel.create<PageTemplateModel>(core.cpParent, templateId);
-                            if (template != null) {
-                                resultLink = ""; // template.Link
-                            }
-                        }
-                        if (string.IsNullOrEmpty(resultLink)) {
-                            //
-                            // -- not found, use default
-                            if (!string.IsNullOrEmpty(DefaultLink)) {
-                                //
-                                // if default given, use that
-                                resultLink = DefaultLink;
-                            } else {
-                                //
-                                // -- fallback, use content watch
-                                resultLink = getContentWatchLinkByID(contentControlID, PageID, "", false);
-                            }
-                        }
-                        if ((PageID == 0) || (IsRootPage)) {
-                            //
-                            // -- Link to Root Page, no bid, and include sectionid if not 0
-                            if (IsRootPage && (SectionID != 0)) {
-                                resultLink = GenericController.modifyLinkQuery(resultLink, "sid", SectionID.ToString(), true);
-                            }
-                            resultLink = GenericController.modifyLinkQuery(resultLink, rnPageId, "", false);
-                        } else {
-                            resultLink = GenericController.modifyLinkQuery(resultLink, rnPageId, GenericController.encodeText(PageID), true);
-                            if (PageID != 0) {
-                                resultLink = GenericController.modifyLinkQuery(resultLink, "sid", "", false);
-                            }
-                        }
-                    }
-                }
-                resultLink = GenericController.encodeVirtualPath(resultLink, core.appConfig.cdnFileUrl, appRootPath, core.webServer.requestDomain);
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-            return resultLink;
-        }
-        //
-        //=============================================================================
-        //   main_Get the link for a Content Record by the ContentID and RecordID
-        //=============================================================================
-        //
-        public string getContentWatchLinkByID(int ContentID, int RecordID, string DefaultLink = "", bool IncrementClicks = true) {
-            return getContentWatchLinkByKey(GenericController.encodeText(ContentID) + "." + GenericController.encodeText(RecordID), DefaultLink, IncrementClicks);
         }
         //
         //=============================================================================
@@ -483,28 +289,12 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //---------------------------------------------------------------------------
-        //   Create the default landing page if it is missing
-        //---------------------------------------------------------------------------
-        //
-        public int createPageGetID(string PageName, string ContentName, int CreatedBy, string pageGuid) {
-            int Id = 0;
-            using (var csData = new CsModel(core)) {
-                if (csData.insert(ContentName)) {
-                    Id = csData.getInteger("ID");
-                    csData.set("name", PageName);
-                    csData.set("active", "1");
-                    {
-                        csData.set("ccGuid", pageGuid);
-                    }
-                    csData.save();
-                }
-            }
-            return Id;
-        }
-        //
-        //
-        //
+        //====================================================================================================
+        /// <summary>
+        /// Add name/value to refresh query string
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="Value"></param>
         public void addRefreshQueryString(string Name, string Value = "") {
             try {
                 if (Name.Equals("bid",StringComparison.InvariantCultureIgnoreCase) && !core.webServer.requestPage.Equals(core.siteProperties.serverPageDefault, StringComparison.InvariantCultureIgnoreCase)) {
@@ -574,43 +364,6 @@ namespace Contensive.Processor.Controllers {
             }
         }
     }
-
-    ////
-    //// -- htmlAssetTypes
-    //public enum HtmlAssetTypeEnum {
-    //    script, // -- script at end of body (code or link)
-    //    style, // -- css style at end of body (code or link)
-    //    scriptOnLoad // -- special case, text is assumed to be script to run on load
-    //}
-    ////
-    //// -- assets to be added to the head section (and end-of-body) of html documents
-    //public class HtmlAssetClass {
-    //    /// <summary>
-    //    ///  the type of asset, css, js, etc
-    //    /// </summary>
-    //    public HtmlAssetTypeEnum assetType { get; set; }
-    //    /// <summary>
-    //    /// if true, asset goes in head else it goes at end of body
-    //    /// </summary>
-    //    public bool inHead { get; set; }
-    //    /// <summary>
-    //    /// if true, the content property is a link to the asset, else use the content as the asset
-    //    /// </summary>
-    //    public bool isLink { get; set; }
-    //    /// <summary>
-    //    /// either link or content depending on the isLink property
-    //    /// </summary>
-    //    public string content { get; set; }
-    //    /// <summary>
-    //    /// message used during debug to show where the asset came from
-    //    /// </summary>
-    //    public string addedByMessage { get; set; }
-    //    /// <summary>
-    //    /// if this asset was added from an addon, this is the addonId.
-    //    /// </summary>
-    //    public int sourceAddonId { get; set; }
-    //    public bool canBeMerged { get; set; }
-    //}
     //
     // -- metaDescription
     public class HtmlMetaClass {

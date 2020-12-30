@@ -1,21 +1,23 @@
-﻿//
+﻿
+using Contensive.BaseClasses;
+using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Controllers;
 using static Contensive.Processor.Constants;
-using Contensive.BaseClasses;
 //
 namespace Contensive.Processor.Addons.Primitives {
+    /// <summary>
+    /// Process Logout/Login addons
+    /// </summary>
     public class ProcessLogoutLoginMethodClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// getFieldEditorPreference remote method
+        /// Process Logout/Login addons
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
-            string result = "";
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
@@ -30,8 +32,8 @@ namespace Contensive.Processor.Addons.Primitives {
                 });
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
+                throw;
             }
-            return result;
         }
     }
 }

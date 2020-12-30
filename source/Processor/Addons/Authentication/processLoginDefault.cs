@@ -1,6 +1,6 @@
-﻿//
-using System;
+﻿
 using Contensive.Processor.Controllers;
+using System;
 //
 namespace Contensive.Processor.Addons.Primitives {
     /// <summary>

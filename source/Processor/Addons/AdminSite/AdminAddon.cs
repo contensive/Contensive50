@@ -95,7 +95,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     for (int wpCnt = 0; wpCnt <= 99; wpCnt++) {
                         string key = cp.Doc.GetText("wl" + wpCnt);
                         if (string.IsNullOrEmpty(key)) { break; }
-                        wherePairs.Add(key.ToLower(), cp.Doc.GetText("wr" + wpCnt));
+                        wherePairs.Add(key.ToLowerInvariant(), cp.Doc.GetText("wr" + wpCnt));
                     }
                     //
                     // -- read wc (whereclause) into wherepair dictionary also
@@ -111,14 +111,14 @@ namespace Contensive.Processor.Addons.AdminSite {
                                 }
                                 string[] NVSplit = NameValue.Split('=');
                                 if (NVSplit.GetUpperBound(0) > 0) {
-                                    wherePairs.Add(NVSplit[0].ToLower(), NVSplit[1]);
+                                    wherePairs.Add(NVSplit[0].ToLowerInvariant(), NVSplit[1]);
                                 }
                             }
                         }
                     }
 
                     int adminForm = cp.Doc.GetInteger(rnAdminForm);
-                    var adminData = new AdminDataModel(cp.core, new AdminDataRequest() {
+                    var adminData = new AdminDataModel(cp.core, new AdminDataRequest {
                         contentId = cp.Doc.GetInteger("cid"),
                         id = cp.Doc.GetInteger("id"),
                         guid = cp.Doc.GetText("guid"),
@@ -210,7 +210,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             adminData.adminForm = AdminFormIndex;
                         }
                     }
-                    int HelpLevel = cp.core.docProperties.getInteger("helplevel");
                     int HelpAddonId = cp.core.docProperties.getInteger("helpaddonid");
                     int HelpCollectionId = cp.core.docProperties.getInteger("helpcollectionid");
                     if (HelpCollectionId == 0) {
@@ -297,8 +296,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         adminBody = GetCollectionHelp(cp, HelpCollectionId, "");
                     } else if (adminData.adminForm != 0) {
                         //
-                        // -- formindex requires valkid content
-                        if ((adminData.adminContent.tableName == null) && ((adminData.adminForm == AdminFormIndex) || (adminData.adminForm == AdminFormIndex))) { adminData.adminForm = AdminFormRoot; }
+                        // -- formindex requires valid content
+                        if ((adminData.adminContent.tableName == null) || (adminData.adminForm == AdminFormIndex)) { adminData.adminForm = AdminFormRoot; }
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch
@@ -450,7 +449,6 @@ namespace Contensive.Processor.Addons.AdminSite {
                             if (addon != null) {
                                 addonId = addon.id;
                                 AddonName = addon.name;
-                                string AddonHelpCopy = addon.help;
                                 cp.core.doc.addRefreshQueryString(RequestNameRunAddon, addonId.ToString());
                             }
                             string InstanceOptionString = cp.core.userProperty.getText("Addon [" + AddonName + "] Options", "");
@@ -574,22 +572,22 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         //====================================================================================================
         //
-        private string GetCollectionHelp(CPClass cp, int HelpCollectionID, string UsedIDString) {
-            string returnHelp = "";
+        private string GetCollectionHelp(CPClass cp, int helpCollectionID, string usedIDString) {
             try {
+                string returnHelp = "";
                 string Collectionname = "";
-                string CollectionHelpCopy = "";
+                string collectionHelpCopy = "";
                 string CollectionHelpLink = "";
                 DateTime CollectionDateAdded = default(DateTime);
                 DateTime CollectionLastUpdated = default(DateTime);
-                string IncludeHelp = "";
+                string includeHelp = "";
                 //
-                if (GenericController.strInstr(1, "," + UsedIDString + ",", "," + HelpCollectionID + ",") == 0) {
+                if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
-                        csData.openRecord("Add-on Collections", HelpCollectionID);
+                        csData.openRecord("Add-on Collections", helpCollectionID);
                         if (csData.ok()) {
                             Collectionname = csData.getText("Name");
-                            CollectionHelpCopy = csData.getText("help");
+                            collectionHelpCopy = csData.getText("help");
                             CollectionDateAdded = csData.getDate("dateadded");
                             CollectionLastUpdated = csData.getDate("lastupdated");
                             CollectionHelpLink = csData.getText("helplink");
@@ -602,19 +600,19 @@ namespace Contensive.Processor.Addons.AdminSite {
                     // Add-ons
                     //
                     using (var csData = new CsModel(cp.core)) {
-                        csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + HelpCollectionID, "name");
+                        csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + helpCollectionID, "name");
                         while (csData.ok()) {
-                            IncludeHelp = IncludeHelp + "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
+                            includeHelp += "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
                             csData.goNext();
                         }
                     }
                     //
-                    if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(CollectionHelpCopy))) {
-                        CollectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
+                    if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(collectionHelpCopy))) {
+                        collectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
                     } else if (!string.IsNullOrEmpty(CollectionHelpLink)) {
-                        CollectionHelpCopy = ""
+                        collectionHelpCopy = ""
                             + "<p>For information about this collection please visit <a href=\"" + CollectionHelpLink + "\">" + CollectionHelpLink + "</a>.</p>"
-                            + CollectionHelpCopy;
+                            + collectionHelpCopy;
                     }
                     //
                     returnHelp = ""
@@ -624,17 +622,17 @@ namespace Contensive.Processor.Addons.AdminSite {
                             + "<div>Installed " + CollectionDateAdded + "</div>"
                             + "<div>Last Updated " + CollectionLastUpdated + "</div>"
                         + "</div>"
-                        + "<div class=\"body\">" + CollectionHelpCopy + "</div>";
-                    if (!string.IsNullOrEmpty(IncludeHelp)) {
-                        returnHelp += IncludeHelp;
+                        + "<div class=\"body\">" + collectionHelpCopy + "</div>";
+                    if (!string.IsNullOrEmpty(includeHelp)) {
+                        returnHelp += includeHelp;
                     }
                     returnHelp += "</div>";
                 }
+                return returnHelp;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
                 throw;
             }
-            return returnHelp;
         }
         //
         //==============================================================================================
@@ -676,24 +674,13 @@ namespace Contensive.Processor.Addons.AdminSite {
                         getFieldHelpMsgs(cp, ParentId, FieldName, ref return_Default, ref return_Custom);
                     }
                 }
-                //
                 return;
-                //
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
+                throw;
             }
         }
         // 
-        //   Save Whats New values if present
-        //
-        //   does NOT check AuthoringLocked -- you must check before calling
-        //========================================================================
-        //
-        ////
-        //========================================================================
-        // GetForm_Top
-        //   Prints the admin page before the content form window.
-        //   After this, print the content window, then PrintFormBottom()
         //========================================================================
         //
         private string getAdminHeader(CPClass cp, AdminDataModel adminData, string BackgroundColor = "") {
@@ -729,47 +716,12 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
         }
         //
-        //========================================================================
-        // Get Menu Link
-        //========================================================================
-        //
-        private string GetMenuLink(CPClass cp, string LinkPage, int LinkCID) {
-            string tempGetMenuLink = null;
-            try {
-                //
-                int ContentId = 0;
-                //
-                if (!string.IsNullOrEmpty(LinkPage) || (LinkCID != 0)) {
-                    tempGetMenuLink = LinkPage;
-                    if (!string.IsNullOrEmpty(tempGetMenuLink)) {
-                        if (tempGetMenuLink.left(1) == "?" || tempGetMenuLink.left(1) == "#") {
-                            tempGetMenuLink = "/" + cp.core.appConfig.adminRoute + tempGetMenuLink;
-                        }
-                    } else {
-                        tempGetMenuLink = "/" + cp.core.appConfig.adminRoute;
-                    }
-                    ContentId = GenericController.encodeInteger(LinkCID);
-                    if (ContentId != 0) {
-                        tempGetMenuLink = GenericController.modifyLinkQuery(tempGetMenuLink, "cid", ContentId.ToString(), true);
-                    }
-                }
-                return tempGetMenuLink;
-                //
-                // ----- Error Trap
-                //
-            } catch (Exception ex) {
-                LogController.logError(cp.core, ex);
-            }
-            return tempGetMenuLink;
-        }
-        //
         /// <summary>
         /// 
         /// </summary>
         /// <param name="adminData.content"></param>
         /// <param name="editRecord"></param>
         //
-
         private void ProcessForms(CPClass cp, AdminDataModel adminData) {
             try {
                 // todo
