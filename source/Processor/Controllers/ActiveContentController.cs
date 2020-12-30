@@ -832,7 +832,7 @@ namespace Contensive.Processor.Controllers {
                                                                                             // if the actual image is a few rounding-error pixels off does not matter
                                                                                             // if either is 0, let altsize be 0, set real value for image height/width
                                                                                             //
-                                                                                            string ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                            string ImageAltSize = ImageWidth + "x" + ImageHeight.ToString();
                                                                                             string NewImageFilename = null;
                                                                                             //
                                                                                             // determine if we are OK, or need to rebuild
@@ -915,11 +915,11 @@ namespace Contensive.Processor.Controllers {
                                                                                                                 //
                                                                                                                 if (ImageWidth == 0) {
                                                                                                                     ImageWidth = imageEditor.width;
-                                                                                                                    ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                                    ImageAltSize = ImageWidth + "x" + ImageHeight.ToString();
                                                                                                                 }
                                                                                                                 if (ImageHeight == 0) {
                                                                                                                     ImageHeight = imageEditor.height;
-                                                                                                                    ImageAltSize = ImageWidth.ToString() + "x" + ImageHeight.ToString();
+                                                                                                                    ImageAltSize = ImageWidth + "x" + ImageHeight.ToString();
                                                                                                                 }
                                                                                                                 //
                                                                                                                 // set HTML attributes so image properties will display

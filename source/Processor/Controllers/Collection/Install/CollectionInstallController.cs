@@ -75,7 +75,7 @@ namespace Contensive.Processor.Controllers {
                 {
                     //
                     // now treat as a regular collection and install - to pickup everything else 
-                    string installTempPath = "installBaseCollection" + GenericController.getRandomInteger(core).ToString() + "\\";
+                    string installTempPath = "installBaseCollection" + GenericController.getRandomInteger(core) + "\\";
                     try {
                         core.tempFiles.createPath(installTempPath);
                         core.programFiles.copyFile(baseCollectionFilename, installTempPath + baseCollectionFilename, core.tempFiles);

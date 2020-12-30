@@ -212,7 +212,7 @@ namespace Contensive.Processor.Addons.PageManager {
                 //
                 // ----- If there is a list, add the list start and list end
                 //
-                string result = activeList.ToString() + inactiveList.ToString();
+                string result = activeList + inactiveList.ToString();
                 if (!string.IsNullOrEmpty(result)) {
                     result = "\r<ul id=\"childPageList_" + parentPageID + "_" + requestedListName + "\" class=\"ccChildList\">" + result + "\r</ul>";
                 }

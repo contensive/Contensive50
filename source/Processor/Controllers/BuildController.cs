@@ -30,7 +30,7 @@ namespace Contensive.Processor.Controllers {
         public static void upgrade(CoreController core, bool isNewBuild, bool repair) {
             try {
                 //
-                LogController.logInfo(core, "AppBuilderController.upgrade, app [" + core.appConfig.name + "], repair [" + repair.ToString() + "]");
+                LogController.logInfo(core, "AppBuilderController.upgrade, app [" + core.appConfig.name + "], repair [" + repair + "]");
                 string logPrefix = "upgrade[" + core.appConfig.name + "]";
                 //
                 {
@@ -64,7 +64,7 @@ namespace Contensive.Processor.Controllers {
                     // -- verify base collection
                     LogController.logInfo(core, logPrefix + ", install base collection");
                     var context = new Stack<string>();
-                    context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair.ToString() + "]");
+                    context.Push("NewAppController.upgrade call installbasecollection, repair [" + repair + "]");
                     var collectionsInstalledList = new List<string>();
                     List<string> nonCriticalErrorList = new List<string>();
                     CollectionInstallController.installBaseCollection(core, context, isNewBuild, repair, ref nonCriticalErrorList, logPrefix, collectionsInstalledList);
@@ -126,7 +126,7 @@ namespace Contensive.Processor.Controllers {
                         if ((root != null) && (group != null)) {
                             //
                             // -- verify root is in site managers
-                            var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(groupid=" + group.id.ToString() + ")and(MemberID=" + root.id.ToString() + ")");
+                            var memberRuleList = DbBaseModel.createList<MemberRuleModel>(core.cpParent, "(groupid=" + group.id + ")and(MemberID=" + root.id + ")");
                             if (memberRuleList.Count() == 0) {
                                 var memberRule = DbBaseModel.addEmpty<MemberRuleModel>(core.cpParent);
                                 memberRule.groupId = group.id;

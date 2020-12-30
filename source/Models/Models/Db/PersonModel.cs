@@ -159,7 +159,7 @@ namespace Contensive.Models.Db {
                     + " left join ccEmailGroups r on r.groupid=g.id)"
                     + " "
                     + " where "
-                    + " (r.EmailID=" + emailId.ToString() + ")"
+                    + " (r.EmailID=" + emailId + ")"
                     + " and(r.Active<>0)"
                     + " and(g.Active<>0)"
                     + " and(g.AllowBulkEmail<>0)"

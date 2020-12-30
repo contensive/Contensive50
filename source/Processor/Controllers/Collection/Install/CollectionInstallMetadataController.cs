@@ -735,7 +735,7 @@ namespace Contensive.Processor.Controllers {
                     LCaseParentName = GenericController.toLCase(ParentName);
                     foreach (var kvp in menus) {
                         MetadataMiniCollectionModel.MiniCollectionMenuModel testMenu = kvp.Value;
-                        if (GenericController.strInstr(1, "," + UsedIDList + ",", "," + Ptr.ToString() + ",") == 0) {
+                        if (GenericController.strInstr(1, "," + UsedIDList + ",", "," + Ptr + ",") == 0) {
                             if (LCaseParentName == GenericController.toLCase(testMenu.name) && (menu.isNavigator == testMenu.isNavigator)) {
                                 Prefix = GetMenuNameSpace(core, menus, testMenu, UsedIDList + "," + menu.guid);
                                 if (string.IsNullOrEmpty(Prefix)) {

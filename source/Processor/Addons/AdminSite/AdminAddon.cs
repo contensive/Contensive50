@@ -575,7 +575,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         //
         private string GetCollectionHelp(CPClass cp, int helpCollectionID, string usedIDString) {
             try {
-                string returnHelp = "";
                 string Collectionname = "";
                 string collectionHelpCopy = "";
                 string CollectionHelpLink = "";
@@ -583,52 +582,51 @@ namespace Contensive.Processor.Addons.AdminSite {
                 DateTime CollectionLastUpdated = default(DateTime);
                 var includeHelp = new StringBuilder();
                 //
-                if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) {
-                    using (var csData = new CsModel(cp.core)) {
-                        csData.openRecord("Add-on Collections", helpCollectionID);
-                        if (csData.ok()) {
-                            Collectionname = csData.getText("Name");
-                            collectionHelpCopy = csData.getText("help");
-                            CollectionDateAdded = csData.getDate("dateadded");
-                            CollectionLastUpdated = csData.getDate("lastupdated");
-                            CollectionHelpLink = csData.getText("helplink");
-                            if (CollectionLastUpdated == DateTime.MinValue) {
-                                CollectionLastUpdated = CollectionDateAdded;
-                            }
-                        }
-                    }
-                    //
-                    // Add-ons
-                    //
-                    using (var csData = new CsModel(cp.core)) {
-                        csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + helpCollectionID, "name");
-                        while (csData.ok()) {
-                            includeHelp.Append( "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>");
-                            csData.goNext();
-                        }
-                    }
-                    //
-                    if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(collectionHelpCopy))) {
-                        collectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
-                    } else if (!string.IsNullOrEmpty(CollectionHelpLink)) {
-                        collectionHelpCopy = ""
-                            + "<p>For information about this collection please visit <a href=\"" + CollectionHelpLink + "\">" + CollectionHelpLink + "</a>.</p>"
-                            + collectionHelpCopy;
-                    }
-                    //
-                    returnHelp = ""
-                        + "<div class=\"ccHelpCon\">"
-                        + "<div class=\"title\">" + Collectionname + " Collection</div>"
-                        + "<div class=\"byline\">"
-                            + "<div>Installed " + CollectionDateAdded + "</div>"
-                            + "<div>Last Updated " + CollectionLastUpdated + "</div>"
-                        + "</div>"
-                        + "<div class=\"body\">" + collectionHelpCopy + "</div>";
-                    if (includeHelp.Length>0) {
-                        returnHelp += includeHelp.ToString();
-                    }
-                    returnHelp += "</div>";
+                if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) { 
+                    return ""; 
                 }
+                using (var csData = new CsModel(cp.core)) {
+                    csData.openRecord("Add-on Collections", helpCollectionID);
+                    if (csData.ok()) {
+                        Collectionname = csData.getText("Name");
+                        collectionHelpCopy = csData.getText("help");
+                        CollectionDateAdded = csData.getDate("dateadded");
+                        CollectionLastUpdated = csData.getDate("lastupdated");
+                        CollectionHelpLink = csData.getText("helplink");
+                        if (CollectionLastUpdated == DateTime.MinValue) {
+                            CollectionLastUpdated = CollectionDateAdded;
+                        }
+                    }
+                }
+                //
+                // Add-ons
+                //
+                using (var csData = new CsModel(cp.core)) {
+                    csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + helpCollectionID, "name");
+                    while (csData.ok()) {
+                        includeHelp.Append("<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>");
+                        csData.goNext();
+                    }
+                }
+                //
+                if ((string.IsNullOrEmpty(CollectionHelpLink)) && (string.IsNullOrEmpty(collectionHelpCopy))) {
+                    collectionHelpCopy = "<p>No help information could be found for this collection. Please use the online resources at <a href=\"http://support.contensive.com/Learning-Center\">http://support.contensive.com/Learning-Center</a> or contact Contensive Support support@contensive.com by email.</p>";
+                } else if (!string.IsNullOrEmpty(CollectionHelpLink)) {
+                    collectionHelpCopy = ""
+                        + "<p>For information about this collection please visit <a href=\"" + CollectionHelpLink + "\">" + CollectionHelpLink + "</a>.</p>"
+                        + collectionHelpCopy;
+                }
+                //
+                string returnHelp = ""
+                    + "<div class=\"ccHelpCon\">"
+                    + "<div class=\"title\">" + Collectionname + " Collection</div>"
+                    + "<div class=\"byline\">"
+                        + "<div>Installed " + CollectionDateAdded + "</div>"
+                        + "<div>Last Updated " + CollectionLastUpdated + "</div>"
+                    + "</div>"
+                    + "<div class=\"body\">" + collectionHelpCopy + "</div>"
+                    + ((includeHelp.Length > 0) ? includeHelp.ToString() : "")
+                    + "</div>";
                 return returnHelp;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);

@@ -137,7 +137,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// 
         /// </summary>
-        public bool visitPropertyAllowDebugging { get; set; } = false;
+        public bool visitPropertyAllowDebugging { get; set; };
         /// <summary>
         /// if true, send main_TestPoint messages to the stream
         /// </summary>
@@ -149,15 +149,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// turn on in script -- use to write /debug.log in content files for whatever is needed
         /// </summary>
-        public bool allowDebugLog { get; set; } = false;
+        public bool allowDebugLog { get; set; };
         /// <summary>
         /// used so error reporting can not call itself
         /// </summary>
-        public bool blockExceptionReporting { get; set; } = false;
+        public bool blockExceptionReporting { get; set; };
         /// <summary>
         /// when false, routines should not add to the output and immediately exit
         /// </summary>
-        public bool continueProcessing { get; set; } = false;
+        public bool continueProcessing { get; set; };
         /// <summary>
         /// 
         /// </summary>
@@ -181,11 +181,11 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// list of content names that have been verified editable by this user
         /// </summary>
-        internal List<string> contentIsEditingList = new List<string>();
+        internal List<string> contentIsEditingList { get; set; } = new List<string>();
         /// <summary>
         /// list of content names verified that this user CAN NOT edit
         /// </summary>
-        internal List<string> contentNotEditingList = new List<string>();
+        internal List<string> contentNotEditingList { get; set; } = new List<string>();
         /// <summary>
         /// Dictionary of addons running to track recursion, addonId and count of recursive entries. When executing an addon, check if it is in the list, if so, check if the recursion count is under the limit (addonRecursionDepthLimit). If not add it or increment the count. On exit, decrement the count and remove if 0.
         /// </summary>
@@ -193,7 +193,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// 
         /// </summary>
-        public Stack<AddonModel> addonModelStack = new Stack<AddonModel>();
+        public Stack<AddonModel> addonModelStack { get; set; } = new Stack<AddonModel>();
         /// <summary>
         /// 
         /// </summary>

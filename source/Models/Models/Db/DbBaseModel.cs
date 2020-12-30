@@ -1127,7 +1127,7 @@ namespace Contensive.Models.Db {
                 if (sqlPairs.Count > 0) {
                     // -- moved to top, so new/save will create a record, and so FieldTypeFile can create filename before the end
                     //if (id == 0) { id = cp.Db.Add(tableName, userId); }
-                    cp.Db.Update(tableName, "(id=" + id.ToString() + ")", sqlPairs, asyncSave);
+                    cp.Db.Update(tableName, "(id=" + id + ")", sqlPairs, asyncSave);
                 }
                 string cacheKey = cp.Cache.CreateRecordKey(id, tableName, datasourceName);
                 if (!allowRecordCaching(this.GetType())) {

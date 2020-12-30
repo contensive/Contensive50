@@ -1,57 +1,163 @@
 ﻿
+using Contensive.BaseClasses;
 using System;
 using System.Text;
-using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// List Report
+    /// </summary>
     public class ListReportController {
-        const int columnSize = 99;
-        const int rowSize = 19999;
-        public static readonly string cr = System.Environment.NewLine + "\t";
-        public static readonly string cr2 = cr + "\t";
-        //
-        struct ColumnStruct {
-            public string name;
-            public string caption;
-            public string captionClass;
-            public string cellClass;
-            public bool sortable;
-            public bool visible;
-            public bool downloadable;
+        /// <summary>
+        /// 
+        /// </summary>
+        public static int columnSize { get; } = 99;
+        /// <summary>
+        /// 
+        /// </summary>
+        public static int rowSize { get; } = 19999;
+        /// <summary>
+        /// 
+        /// </summary>
+        public static string cr { get; set; } = System.Environment.NewLine + "\t";
+        /// <summary>
+        /// 
+        /// </summary>
+        public static string cr2 { get; set; } = cr + "\t";
+        /// <summary>
+        /// 
+        /// </summary>
+        public struct ColumnStruct {
+            /// <summary>
+            /// 
+            /// </summary>
+            public string name { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public string caption { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public string captionClass { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public string cellClass { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool sortable { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool visible { get; set; }
+            /// <summary>
+            /// 
+            /// </summary>
+            public bool downloadable { get; set; }
         }
-        bool ReportTooLong = false;
-        readonly ColumnStruct[] columns = new ColumnStruct[columnSize];
-        bool formIncludeHeader = false;
+        /// <summary>
+        /// 
+        /// </summary>
+       public bool ReportTooLong { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
+        public ColumnStruct[] columns = new ColumnStruct[columnSize];
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool formIncludeHeader { get; set; } = false;
         //
-        int columnMax = -1;
-        int columnPtr = -1;
-        //
-        int rowCnt = -1;
-        //
-        string localGuid = "";
-        string localName = "";
-        string localTitle = "";
-        string localWarning = "";
-        string localDescription = "";
-        string localFrameRqs = "";
-        bool localFrameRqsSet = false;
-        string localHiddenList = "";
-        string localButtonList = "";
-        string localFormId = "";
-        string localFormActionQueryString = "";
-        bool localFormActionQueryStringSet = false;
-        //string localPreForm = "";
-        string localHtmlBeforeTable = "";
-        string localHtmlAfterTable = "";
-        string localHtmlLeftOfTable = "";
-        bool localIncludeForm = false;
-        bool localIsEmptyReport = true;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        public int columnMax { get; set; } = -1;
+        /// <summary>
+        /// 
+        /// </summary>
+        public int columnPtr { get; set; } = -1;
+        /// <summary>
+        /// 
+        /// </summary>
+        public int rowCnt { get; set; } = -1;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localGuid { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localName { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localTitle { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localWarning { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localDescription { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localFrameRqs { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool localFrameRqsSet { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localHiddenList { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localButtonList { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localFormId { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localFormActionQueryString { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool localFormActionQueryStringSet { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localHtmlBeforeTable { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localHtmlAfterTable { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string localHtmlLeftOfTable { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool localIncludeForm { get; set; } = false;
+        /// <summary>
+        /// 
+        /// </summary>
+        public bool localIsEmptyReport { get; set; } = true;
         //
         readonly string[,] localReportCells = new string[rowSize, columnSize];
         readonly string[,] localDownloadData = new string[rowSize, columnSize];
         readonly string[] localRowClasses = new string[rowSize];
         readonly bool[] localExcludeRowFromDownload = new bool[rowSize];
+        /// <summary>
+        /// 
+        /// </summary>
         public bool localIsOuterContainer = false;
         //
         //-------------------------------------------------
@@ -66,7 +172,9 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //-------------------------------------------------
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public bool includeBodyPadding {
             get {
                 return _includeBodyPadding;
@@ -78,7 +186,9 @@ namespace Contensive.Processor.Controllers {
         bool _includeBodyPadding = true;
         //
         //-------------------------------------------------
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public bool includeBodyColor {
             get {
                 return _includeBodyColor;
@@ -90,7 +200,9 @@ namespace Contensive.Processor.Controllers {
         bool _includeBodyColor = true;
         //
         //-------------------------------------------------
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public bool isOuterContainer {
             get {
                 return localIsOuterContainer;
@@ -100,17 +212,14 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
-        //-------------------------------------------------
-        // getResult
-        //-------------------------------------------------
-        //
+        /// <summary>
+        /// get result
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <returns></returns>
         public string getHtml(CPBaseClass cp) {
-            StringBuilder s = new StringBuilder("");
-            string row = "";
+            var s = new StringBuilder("");
             StringBuilder rowList = new StringBuilder("");
-            int rowPtr = 0;
-            int colPtr = 0;
-            int colPtrDownload = 0;
             string styleClass;
             string content;
             string userErrors;
@@ -140,6 +249,8 @@ namespace Contensive.Processor.Controllers {
             if (userErrors != "") {
                 warning = userErrors;
             }
+            int colPtr;
+            int colPtrDownload;
             //
             // headers
             //
@@ -194,6 +305,7 @@ namespace Contensive.Processor.Controllers {
             // body
             //
             rowList = new StringBuilder("");
+            string row;
             if (localIsEmptyReport) {
                 styleClass = columns[0].cellClass;
                 if (styleClass != "") {
@@ -216,6 +328,7 @@ namespace Contensive.Processor.Controllers {
                     + indent(row)
                     + cr + "</tr>");
             } else {
+                int rowPtr;
                 // -- display th report
                 for (rowPtr = 0; rowPtr <= rowCnt; rowPtr++) {
                     row = "";
@@ -329,7 +442,7 @@ namespace Contensive.Processor.Controllers {
                         + indent(localButtonList)
                         + cr + "</div>";
                 }
-                s = new StringBuilder(cr + cp.Html.Form(localButtonList + s.ToString() + localButtonList + localHiddenList, "", "", "", localFormActionQueryString, ""));
+                s = new StringBuilder(cr + cp.Html.Form(localButtonList + s + localButtonList + localHiddenList, "", "", "", localFormActionQueryString, ""));
                 //body = ""
                 //    + cr + cp.Html.Form( localButtonList + body + localHiddenList )
                 //    + cr + "<form action=\"" + localFormAction + "\" method=\"post\" enctype=\"MULTIPART/FORM-DATA\">"
@@ -841,7 +954,7 @@ namespace Contensive.Processor.Controllers {
                             colName = colCaption;
                         }
                         if ((colName != "") && (reportId != 0)) {
-                            if (!cs.Open("Admin Framework Report Columns", "(reportId=" + reportId.ToString() + ")and(name=" + cp.Db.EncodeSQLText(colName) + ")", "id", true, "", 9999, 1)) {
+                            if (!cs.Open("Admin Framework Report Columns", "(reportId=" + reportId + ")and(name=" + cp.Db.EncodeSQLText(colName) + ")", "id", true, "", 9999, 1)) {
                                 cs.Close();
                                 cs.Insert("Admin Framework Report Columns");
                                 cs.SetField("reportId", reportId.ToString());

@@ -216,7 +216,7 @@ namespace Contensive.Processor.Controllers {
             errorMsg += "\nex [" + ex.Message + "]";
             if (ex.Data.Count > 0) {
                 foreach (DictionaryEntry de in ex.Data) {
-                    errorMsg += "\nkey [" + de.Key.ToString() + "] = [" + de.Value + "]";
+                    errorMsg += "\nkey [" + de.Key + "] = [" + de.Value + "]";
                 }
             }
             if (ex.ErrorDetails != null) { errorMsg += "\n" + ex.ErrorDetails; }

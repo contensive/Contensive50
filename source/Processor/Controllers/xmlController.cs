@@ -130,10 +130,10 @@ namespace Contensive.Processor.Controllers {
         /// 
         /// </summary>
         /// <param name="ContentName"></param>
-        /// <param name="IncludeBaseFields"></param>
         /// <returns></returns>
-        public string getXMLContentDefinition3(string ContentName = "", bool IncludeBaseFields = false) {
+        public string getXMLContentDefinition3(string ContentName) {
             try {
+                bool IncludeBaseFields = false;
                 // 
                 const string ContentSelectList = ""
                     + " id,name,active,adminonly,allowadd"

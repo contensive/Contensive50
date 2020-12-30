@@ -153,7 +153,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             dataTableRows.Append(Environment.NewLine + "<tr>");
                             //
                             // --- row number column
-                            dataTableRows.Append("<td align=right " + rowColor + ">" + (rowNumber + 1).ToString() + "</td>");
+                            dataTableRows.Append("<td align=right " + rowColor + ">" + (rowNumber + 1) + "</td>");
                             //
                             // --- edit column
                             dataTableRows.Append("<td align=center " + rowColor + ">" + getRecordEditAnchorTag(adminUrlBase + "&id=" + recordId) + "</td>");

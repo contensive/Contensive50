@@ -28,7 +28,7 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     result = getLoginForm(core, false, requirePassword);
                 }
-                if (string.IsNullOrWhiteSpace(result)) return result;
+                if (string.IsNullOrWhiteSpace(result)) { return result; }
                 return "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;border:1px solid #bbb;border-radius:5px;\">" + result + "</div>";
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -196,7 +196,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="requestPassword">The password submitted from the request</param>
         /// <param name="passwordRequestValid">true if the request includes a password property. if true, the no-password mode is blocked and a password is required. Typically used to create an admin/developer login</param>
         /// <returns></returns>
-        public static bool processLoginFormDefault(CoreController core, string requestUsername, string  requestPassword, bool passwordRequestValid) {
+        public static bool processLoginFormDefault(CoreController core, string requestUsername, string requestPassword, bool passwordRequestValid) {
             try {
                 if (!core.session.visit.cookieSupport) {
                     //
