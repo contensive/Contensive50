@@ -9,74 +9,102 @@ using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
 
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// 
+    /// </summary>
     public class XmlController {
-        const string ApplicationNameLocal = "unknown";
-        private CPBaseClass cp;
-        // 
-        // ----- This should match the Lookup List in the NavIconType field in the Navigator Entry content definition
-        // 
-        public const int NavTypeIDAddon = 1;
-        public const int NavTypeIDReport = 2;
-        public const int NavTypeIDSetting = 3;
-        public const int NavTypeIDTool = 4;
-        // 
-        public const string NavIconTypeList = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help";
-        public const int NavIconTypeCustom = 1;
-        public const int NavIconTypeAdvanced = 2;
-        public const int NavIconTypeContent = 3;
-        public const int NavIconTypeFolder = 4;
-        public const int NavIconTypeEmail = 5;
-        public const int NavIconTypeUser = 6;
-        public const int NavIconTypeReport = 7;
-        public const int NavIconTypeSetting = 8;
-        public const int NavIconTypeTool = 9;
-        public const int NavIconTypeRecord = 10;
-        public const int NavIconTypeAddon = 11;
-        public const int NavIconTypeHelp = 12;
-        // 
-        public const string FieldDescriptorInteger = "Integer";
-        public const string FieldDescriptorText = "Text";
-        public const string FieldDescriptorLongText = "LongText";
-        public const string FieldDescriptorBoolean = "Boolean";
-        public const string FieldDescriptorDate = "Date";
-        public const string FieldDescriptorFile = "File";
-        public const string FieldDescriptorLookup = "Lookup";
-        public const string FieldDescriptorRedirect = "Redirect";
-        public const string FieldDescriptorCurrency = "Currency";
-        public const string FieldDescriptorImage = "Image";
-        public const string FieldDescriptorFloat = "Float";
-        public const string FieldDescriptorManyToMany = "ManyToMany";
-        public const string FieldDescriptorTextFile = "TextFile";
-        public const string FieldDescriptorCSSFile = "CSSFile";
-        public const string FieldDescriptorXMLFile = "XMLFile";
-        public const string FieldDescriptorJavascriptFile = "JavascriptFile";
-        public const string FieldDescriptorLink = "Link";
-        public const string FieldDescriptorResourceLink = "ResourceLink";
-        public const string FieldDescriptorMemberSelect = "MemberSelect";
-        public const string FieldDescriptorHTML = "HTML";
-        public const string FieldDescriptorHTMLFile = "HTMLFile";
-        // 
-        public const string FieldDescriptorLcaseInteger = "integer";
-        public const string FieldDescriptorLcaseText = "text";
-        public const string FieldDescriptorLcaseLongText = "longtext";
-        public const string FieldDescriptorLcaseBoolean = "boolean";
-        public const string FieldDescriptorLcaseDate = "date";
-        public const string FieldDescriptorLcaseFile = "file";
-        public const string FieldDescriptorLcaseLookup = "lookup";
-        public const string FieldDescriptorLcaseRedirect = "redirect";
-        public const string FieldDescriptorLcaseCurrency = "currency";
-        public const string FieldDescriptorLcaseImage = "image";
-        public const string FieldDescriptorLcaseFloat = "float";
-        public const string FieldDescriptorLcaseManyToMany = "manytomany";
-        public const string FieldDescriptorLcaseTextFile = "textfile";
-        public const string FieldDescriptorLcaseCSSFile = "cssfile";
-        public const string FieldDescriptorLcaseXMLFile = "xmlfile";
-        public const string FieldDescriptorLcaseJavascriptFile = "javascriptfile";
-        public const string FieldDescriptorLcaseLink = "link";
-        public const string FieldDescriptorLcaseResourceLink = "resourcelink";
-        public const string FieldDescriptorLcaseMemberSelect = "memberselect";
-        public const string FieldDescriptorLcaseHTML = "html";
-        public const string FieldDescriptorLcaseHTMLFile = "htmlfile";
+        /// <summary>
+        /// 
+        /// </summary>
+        private readonly CPBaseClass cp;
+        /// <summary>
+        /// This should match the Lookup List in the NavIconType field in the Navigator Entry content definition
+        /// </summary>
+        public string navIconTypeList { get; set; } = "Custom,Advanced,Content,Folder,Email,User,Report,Setting,Tool,Record,Addon,help";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorInteger { get; set; } = "Integer";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorText { get; set; } = "Text";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorLongText { get; set; } = "LongText";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorBoolean { get; set; } = "Boolean";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorDate { get; set; } = "Date";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorFile { get; set; } = "File";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorLookup { get; set; } = "Lookup";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorRedirect { get; set; } = "Redirect";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorCurrency { get; set; } = "Currency";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorImage { get; set; } = "Image";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorFloat { get; set; } = "Float";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorManyToMany { get; set; } = "ManyToMany";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorTextFile { get; set; } = "TextFile";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorCSSFile { get; set; } = "CSSFile";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorXMLFile { get; set; } = "XMLFile";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorJavascriptFile { get; set; } = "JavascriptFile";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorLink { get; set; } = "Link";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorResourceLink { get; set; } = "ResourceLink";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorMemberSelect { get; set; } = "MemberSelect";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorHTML { get; set; } = "HTML";
+        /// <summary>
+        /// 
+        /// </summary>
+        public string fieldDescriptorHTMLFile { get; set; } = "HTMLFile";
         // 
         // ====================================================================================================
         /// <summary>
@@ -89,13 +117,22 @@ namespace Contensive.Processor.Controllers {
         }
         // 
         // ====================================================================================================
-        private class tableClass {
+        /// <summary>
+        /// 
+        /// </summary>
+        private class TableClass {
             public string tableName;
             public string dataSourceName;
         }
         // 
         // ====================================================================================================
-        public string GetXMLContentDefinition3(string ContentName = "", bool IncludeBaseFields = false) {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="ContentName"></param>
+        /// <param name="IncludeBaseFields"></param>
+        /// <returns></returns>
+        public string getXMLContentDefinition3(string ContentName = "", bool IncludeBaseFields = false) {
             try {
                 // 
                 const string ContentSelectList = ""
@@ -159,11 +196,11 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // Build table lookup
                     // 
-                    Dictionary<int, tableClass> tables = new Dictionary<int, tableClass>();
+                    Dictionary<int, TableClass> tables = new Dictionary<int, TableClass>();
                     SQL = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID";
                     if (cs.OpenSQL(SQL)) {
                         do {
-                            tableClass table = new tableClass();
+                            TableClass table = new TableClass();
                             table.tableName = cs.GetText("TableName");
                             table.dataSourceName = cs.GetText("DataSourceName");
                             tables.Add(cs.GetInteger("id"), table);
@@ -618,7 +655,7 @@ namespace Contensive.Processor.Controllers {
                         NavIconType = cp.Utils.EncodeInteger(GetRSXMLAttribute(dt, "NavIconType"));
                         NavIconTitle = GetRSXMLAttribute(dt, "NavIconTitle");
                         sb.Append(" NavIconTitle=\"" + NavIconTitle + "\"");
-                        SplitArray = Strings.Split(NavIconTypeList + ",help", ",");
+                        SplitArray = Strings.Split(navIconTypeList + ",help", ",");
                         SplitIndex = NavIconType - 1;
                         if ((SplitIndex >= 0) & (SplitIndex <= Information.UBound(SplitArray))) { sb.Append(" NavIconType=\"" + SplitArray[SplitIndex] + "\""); }
                         sb.Append(" guid=\"" + GetRSXMLAttribute(dt, "ccGuid") + "\"");
@@ -808,107 +845,107 @@ namespace Contensive.Processor.Controllers {
             try {
                 switch (fieldType) {
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Boolean: {
-                            result = FieldDescriptorBoolean;
+                            result = fieldDescriptorBoolean;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Currency: {
-                            result = FieldDescriptorCurrency;
+                            result = fieldDescriptorCurrency;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Date: {
-                            result = FieldDescriptorDate;
+                            result = fieldDescriptorDate;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.File: {
-                            result = FieldDescriptorFile;
+                            result = fieldDescriptorFile;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Float: {
-                            result = FieldDescriptorFloat;
+                            result = fieldDescriptorFloat;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileImage: {
-                            result = FieldDescriptorImage;
+                            result = fieldDescriptorImage;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Link: {
-                            result = FieldDescriptorLink;
+                            result = fieldDescriptorLink;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.ResourceLink: {
-                            result = FieldDescriptorResourceLink;
+                            result = fieldDescriptorResourceLink;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Integer: {
-                            result = FieldDescriptorInteger;
+                            result = fieldDescriptorInteger;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.LongText: {
-                            result = FieldDescriptorLongText;
+                            result = fieldDescriptorLongText;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Lookup: {
-                            result = FieldDescriptorLookup;
+                            result = fieldDescriptorLookup;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
-                            result = FieldDescriptorMemberSelect;
+                            result = fieldDescriptorMemberSelect;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Redirect: {
-                            result = FieldDescriptorRedirect;
+                            result = fieldDescriptorRedirect;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
-                            result = FieldDescriptorManyToMany;
+                            result = fieldDescriptorManyToMany;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileText: {
-                            result = FieldDescriptorTextFile;
+                            result = fieldDescriptorTextFile;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileCSS: {
-                            result = FieldDescriptorCSSFile;
+                            result = fieldDescriptorCSSFile;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileXML: {
-                            result = FieldDescriptorXMLFile;
+                            result = fieldDescriptorXMLFile;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileJavascript: {
-                            result = FieldDescriptorJavascriptFile;
+                            result = fieldDescriptorJavascriptFile;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.Text: {
-                            result = FieldDescriptorText;
+                            result = fieldDescriptorText;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.HTML: {
-                            result = FieldDescriptorHTML;
+                            result = fieldDescriptorHTML;
                             break;
                         }
 
                     case (int)CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
-                            result = FieldDescriptorHTMLFile;
+                            result = fieldDescriptorHTMLFile;
                             break;
                         }
 
@@ -921,7 +958,7 @@ namespace Contensive.Processor.Controllers {
                                 // 
                                 // If field type is ignored, call it a text field
                                 // 
-                                result = FieldDescriptorText;
+                                result = fieldDescriptorText;
                             break;
                         }
                 }

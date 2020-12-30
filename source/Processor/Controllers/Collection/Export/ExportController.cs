@@ -125,7 +125,7 @@ namespace Contensive.Processor.Controllers {
                             content.save(cp);
                         }
                         XmlController xmlTool = new XmlController(cp);
-                        string Node = xmlTool.GetXMLContentDefinition3(content.name);
+                        string Node = xmlTool.getXMLContentDefinition3(content.name);
                         // 
                         // remove the <collection> top node
                         // 
