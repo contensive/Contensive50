@@ -7,6 +7,7 @@ using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 
@@ -580,7 +581,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                 string CollectionHelpLink = "";
                 DateTime CollectionDateAdded = default(DateTime);
                 DateTime CollectionLastUpdated = default(DateTime);
-                string includeHelp = "";
+                var includeHelp = new StringBuilder();
                 //
                 if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) {
                     using (var csData = new CsModel(cp.core)) {
@@ -602,7 +603,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     using (var csData = new CsModel(cp.core)) {
                         csData.open(AddonModel.tableMetadata.contentName, "CollectionID=" + helpCollectionID, "name");
                         while (csData.ok()) {
-                            includeHelp += "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>";
+                            includeHelp.Append( "<div style=\"clear:both;\">" + GetAddonHelp(cp, csData.getInteger("ID"), "") + "</div>");
                             csData.goNext();
                         }
                     }
@@ -623,8 +624,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                             + "<div>Last Updated " + CollectionLastUpdated + "</div>"
                         + "</div>"
                         + "<div class=\"body\">" + collectionHelpCopy + "</div>";
-                    if (!string.IsNullOrEmpty(includeHelp)) {
-                        returnHelp += includeHelp;
+                    if (includeHelp.Length>0) {
+                        returnHelp += includeHelp.ToString();
                     }
                     returnHelp += "</div>";
                 }
@@ -716,11 +717,6 @@ namespace Contensive.Processor.Addons.AdminSite {
             }
         }
         //
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="adminData.content"></param>
-        /// <param name="editRecord"></param>
         //
         private void ProcessForms(CPClass cp, AdminDataModel adminData) {
             try {
@@ -1032,8 +1028,6 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// </summary>
         /// <param name="cp"></param>
         /// <param name="MenuDepth"></param>
-        /// <param name="ContentName"></param>
-        /// <param name="RecordID"></param>
         /// <returns></returns>
         private int GetForm_Close(CPClass cp, int MenuDepth) {
             if (MenuDepth > 0) { return AdminFormClose; }

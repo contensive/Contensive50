@@ -603,7 +603,7 @@ namespace Contensive.Processor.Controllers {
                         }
                         //
                         // -- if root level addon, and the addon is an html document, create the html document around it and uglify if not debugging
-                        if ((executeContext.forceHtmlDocument) || ((rootLevelAddon) && (addon.htmlDocument))) {
+                        if ((executeContext.forceHtmlDocument) || (rootLevelAddon && (addon.htmlDocument))) {
                             //
                             // -- on body end addons
                             core.doc.body = resultString;
