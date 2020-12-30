@@ -11,20 +11,6 @@ namespace Contensive.BaseClasses {
         //
         //==========================================================================================
         /// <summary>
-        /// Create a new instance of a Tool Form. Tool Forms are simple forms with key elements like buttons and header with a simple body
-        /// </summary>
-        /// <returns></returns>
-        public abstract AdminUI.ToolFormBaseClass NewToolForm();
-        //
-        //==========================================================================================
-        /// <summary>
-        /// Create a new instance of a List Report. List reports have a list of data rows with filters on the left
-        /// </summary>
-        /// <returns></returns>
-        public abstract AdminUI.ListReportBaseClass NewListReport();
-        //
-        //==========================================================================================
-        /// <summary>
         /// Create an html row that includes a caption, editor and optional help content
         /// </summary>
         /// <returns></returns>
@@ -770,6 +756,23 @@ namespace Contensive.BaseClasses {
         /// <param name="htmlValue"></param>
         /// <returns></returns>
         public abstract string GetTextEditor(string htmlName, string htmlValue);
+        //
+        //==========================================================================================
+        //
+        // deprecated
+        //
+        /// <summary>
+        /// Create a new instance of a Tool Form. Tool Forms are simple forms with key elements like buttons and header with a simple body
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi.", true)]
+        public abstract AdminUI.ToolFormBaseClass NewToolForm();
+        /// <summary>
+        /// Create a new instance of a List Report. List reports have a list of data rows with filters on the left
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi.", true)]
+        public abstract AdminUI.ListReportBaseClass NewListReport();
         //
     }
 }

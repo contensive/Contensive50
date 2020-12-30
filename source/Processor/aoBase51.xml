@@ -2721,7 +2721,7 @@
     <Template>No</Template>
     <Email>No</Email>
     <BlockEditTools>Yes</BlockEditTools>
-    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.GetHtmlBodyClass]]></DotNetClass>
+    <DotNetClass><![CDATA[Contensive.Processor.Addons.AdminSite.AdminAddon]]></DotNetClass>
     <jsheadscriptsrc></jsheadscriptsrc>
     <styleslinkhref></styleslinkhref>
     <IncludeAddon name="Contensive Base Assets" guid="{F83EE7F9-79DA-4B3F-A1CD-45AEAD93D70F}"/>
@@ -3023,18 +3023,6 @@
       </Code>
     </Scripting>
   </Addon>
-  <Addon name="Cache Tool" guid="{7B5B8150-62BE-40F4-A66A-7CC74D99BA76}" type="Tool">
-    <Category></Category>
-    <Admin>Yes</Admin>
-    <Content>No</Content>
-    <Template>No</Template>
-    <Email>No</Email>
-    <RemoteMethod>No</RemoteMethod>
-    <IsInline>No</IsInline>
-    <BlockEditTools>Yes</BlockEditTools>
-    <Diagnostic>No</Diagnostic>
-    <DotNetClass>Contensive.Processor.Addons.Tools.CacheToolClass</DotNetClass>
-  </Addon>
   <Addon name="See Also" guid="{C4198871-A848-4B0F-95D4-ADDE08A5620D}" type="Add-on">
     <Category>Extras.Navigation</Category>
     <Admin>No</Admin>
@@ -3295,6 +3283,7 @@
   <ImportCollection name="Redactor Html Editor">{E87AFAFF-2503-44DE-A343-EFF8C64B652D}</ImportCollection>
   <ImportCollection name="CodeMirror Editors">{73121366-107D-4C4B-8F89-A4DE518FA316}</ImportCollection>
   <ImportCollection name="Personalization">{1339F712-17F7-408A-B021-92DF846BD486}</ImportCollection>
+  <ImportCollection name="Tool Basics">{0abd30d8-1ac0-4f6a-b572-106b9ef6af18}</ImportCollection>
   <!-- blocked until upgrade
   <ImportCollection name="File Manager">{0A080FBC-2814-407F-8F8C-CD06F422789D}</ImportCollection>
   <ImportCollection name="Site Explorer">{5426E6D5-05A8-4A87-B535-CD0FABA04F29}</ImportCollection>

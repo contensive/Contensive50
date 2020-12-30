@@ -72,9 +72,13 @@ namespace Contensive.Processor.Controllers {
         /// Anything that needs to be written to the Page during main_GetClosePage
         /// </summary>
         public string htmlForEndOfBody { get; set; } = "";
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public Dictionary<CPHtml5BaseClass.EditorContentType, string> wysiwygAddonList;
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public int editWrapperCnt { get; set; } = 0;
         /// <summary>
         /// The accumulated body built as each component adds elements. Available to addons at onBodyEnd. Can be used to create addon filters
@@ -84,9 +88,13 @@ namespace Contensive.Processor.Controllers {
         /// querystring required to return to the current state (perform a refresh)
         /// </summary>
         public string refreshQueryString { get; set; } = "";
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public int redirectContentID { get; set; } = 0;
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public int redirectRecordID { get; set; } = 0;
         /// <summary>
         /// when true (default), stream is buffered until page is done
@@ -100,23 +108,39 @@ namespace Contensive.Processor.Controllers {
         /// PageID that goes with the warning
         /// </summary>
         public int adminWarningPageID { get; set; } = 0;
-        //
-        public int checkListCnt { get; set; } = 0; // cnt of the main_GetFormInputCheckList calls - used for javascript
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        public int checkListCnt { get; set; } = 0;
+        /// <summary>
+        /// 
+        /// </summary>
         public int inputDateCnt { get; set; } = 0;
         //
         internal List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public int formInputTextCnt { get; set; } = 0;
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public string quickEditCopy { get; set; } = "";
-        //
-        public string bodyContent { get; set; } = ""; // stored here so cp.doc.content valid during bodyEnd event
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        public string bodyContent { get; set; } = "";
+        /// <summary>
+        /// 
+        /// </summary>
         public int landingPageID { get; set; } = 0;
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public string redirectLink { get; set; } = "";
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public string redirectReason { get; set; } = "";
         /// <summary>
         /// 
@@ -137,7 +161,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// 
         /// </summary>
-        public bool visitPropertyAllowDebugging { get; set; };
+        public bool visitPropertyAllowDebugging { get; set; }
         /// <summary>
         /// if true, send main_TestPoint messages to the stream
         /// </summary>
@@ -149,15 +173,15 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// turn on in script -- use to write /debug.log in content files for whatever is needed
         /// </summary>
-        public bool allowDebugLog { get; set; };
+        public bool allowDebugLog { get; set; }
         /// <summary>
         /// used so error reporting can not call itself
         /// </summary>
-        public bool blockExceptionReporting { get; set; };
+        public bool blockExceptionReporting { get; set; }
         /// <summary>
         /// when false, routines should not add to the output and immediately exit
         /// </summary>
-        public bool continueProcessing { get; set; };
+        public bool continueProcessing { get; set; }
         /// <summary>
         /// 
         /// </summary>
@@ -208,7 +232,9 @@ namespace Contensive.Processor.Controllers {
         public bool emailBlockListStoreLoaded { get; set; }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         internal string landingLink {
             get {
                 if (_landingLink == "") {
@@ -222,11 +248,12 @@ namespace Contensive.Processor.Controllers {
         private string _landingLink = "";
         //
         //====================================================================================================
-        // Replace with main_GetPageArgs()
-        //
-        // Used Interally by main_GetPageLink to main_Get the TemplateID of the parents
-        //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="PageID"></param>
+        /// <param name="UsedIDList"></param>
+        /// <returns></returns>
         internal int getPageDynamicLink_GetTemplateID(int PageID, string UsedIDList) {
             int result = 0;
             try {
@@ -253,7 +280,10 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=============================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="core"></param>
         public void verifyRegistrationFormPage(CoreController core) {
             try {
                 MetadataController.deleteContentRecords(core, "Form Pages", "name=" + DbController.encodeSQLText("Registration Form"));
@@ -365,7 +395,9 @@ namespace Contensive.Processor.Controllers {
         }
     }
     //
-    // -- metaDescription
+    /// <summary>
+    /// 
+    /// </summary>
     public class HtmlMetaClass {
         /// <summary>
         /// the description, title, etc.

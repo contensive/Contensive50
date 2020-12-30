@@ -1,7 +1,5 @@
 ﻿
 using Contensive.BaseClasses.AdminUI;
-using Contensive.BaseModels;
-using Contensive.Processor.AdminUI;
 using System;
 using System.Collections.Generic;
 
@@ -361,13 +359,21 @@ namespace Contensive.Processor {
         public override string GetTextEditor(string htmlName, string htmlValue) {
             return Controllers.AdminUIEditorController.getTextEditor(core, htmlName, htmlValue);
         }
-        //
+        /// <summary>
+        /// deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi.",true)]
         public override ToolFormBaseClass NewToolForm() {
-            return new CPAdminUIToolFormClass(core);
+            throw new NotImplementedException("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi");
         }
-        //
+        /// <summary>
+        /// deprecated
+        /// </summary>
+        /// <returns></returns>
+        [Obsolete("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi.", true)]
         public override ListReportBaseClass NewListReport() {
-            return new CPAdminUIListReportClass(core);
+            throw new NotImplementedException("Deprecated. All report and tool helper classes are implemented through the NugetPackage Contensive.PortalApi");
         }
     }
 }
