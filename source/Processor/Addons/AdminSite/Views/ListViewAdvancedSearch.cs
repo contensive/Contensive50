@@ -92,7 +92,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                                     }
                                 }
                             }
-                            GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
+                            AdminAddon.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
                             return string.Empty;
                         case ButtonCancel:
                             return string.Empty;

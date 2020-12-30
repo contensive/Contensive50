@@ -1,12 +1,17 @@
-﻿//
+﻿
+using Contensive.Models.Db;
+using Contensive.Processor.Controllers;
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Controllers;
-using System.Text;
-using Contensive.Models.Db;
 using System.Globalization;
+using System.Text;
 //
 namespace Contensive.Processor.Addons.Primitives {
+    //
+    //====================================================================================================
+    /// <summary>
+    /// Remote method to authenticate
+    /// </summary>
     public class AuthenticateClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
@@ -69,8 +74,17 @@ namespace Contensive.Processor.Addons.Primitives {
             return result;
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// Authenticate with username and password
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="errorPrefix"></param>
+        /// <returns></returns>
         public static AuthenticateResponse authenticateUsernamePassword(CoreController core, string username, string password, string errorPrefix) {
-            int userId = core.session.getUserIdForUsernameCredentials(username, password);
+            int userId = core.session.getUserIdForUsernameCredentials(username, password, false);
             if (userId == 0) {
                 //
                 // -- user was not found
@@ -112,18 +126,40 @@ namespace Contensive.Processor.Addons.Primitives {
             }
 
         }
-        //
+        /// <summary>
+        /// Authenticate remote method reponse
+        /// </summary>
         public class AuthenticateResponse {
+            /// <summary>
+            /// if no errors, this is basic user data
+            /// </summary>
             public AuthenticateResponseData data = new AuthenticateResponseData();
+            /// <summary>
+            /// non-zero length list indicates an error
+            /// </summary>
             public List<string> errors = new List<string>();
 
         }
-        //
+        /// <summary>
+        /// user data returned by authenticate remote method
+        /// </summary>
         public class AuthenticateResponseData {
-            public string firstName;
-            public string lastName;
-            public string email;
-            public string avatar;
+            /// <summary>
+            /// user data on success
+            /// </summary>
+            public string firstName { get; set; }
+            /// <summary>
+            /// user data on success
+            /// </summary>
+            public string lastName { get; set; }
+            /// <summary>
+            /// user data on success
+            /// </summary>
+            public string email { get; set; }
+            /// <summary>
+            /// user data on success
+            /// </summary>
+            public string avatar { get; set; }
         }
     }
 }

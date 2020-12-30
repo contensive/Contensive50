@@ -8,6 +8,8 @@
     <PackageIcon>LogoBalls.png</PackageIcon>
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <RepositoryUrl>https://github.com/contensive/Contensive5</RepositoryUrl>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <PropertyGroup Label="Signing">

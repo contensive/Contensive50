@@ -14,18 +14,19 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// A complete html page with the login form in the middle. If it processes successfully it returns and empty response. (legacy, sorry)
+        /// A complete html page with the login form in the middle. If it processes successfully it returns and empty response to signal success.
         /// </summary>
-        /// <param name="forceDefaultLogin"></param>
         /// <param name="core"></param>
+        /// <param name="forceDefaultLogin"></param>
+        /// <param name="requirePassword">If true, the no-password mode is blocked and a password login is required</param>
         /// <returns></returns>
-        public static string getLoginPage(CoreController core, bool forceDefaultLogin) {
+        public static string getLoginPage(CoreController core, bool forceDefaultLogin, bool requirePassword) {
             try {
                 string result;
                 if (forceDefaultLogin) {
-                    result = getLoginForm_Default(core);
+                    result = getLoginForm_Default(core, requirePassword);
                 } else {
-                    result = getLoginForm(core);
+                    result = getLoginForm(core, false, requirePassword);
                 }
                 if (string.IsNullOrWhiteSpace(result)) return result;
                 return "<div class=\"ccCon bg-light pt-2 pb-4\" style=\"width:400px;margin:100px auto 0 auto;border:1px solid #bbb;border-radius:5px;\">" + result + "</div>";
@@ -40,8 +41,9 @@ namespace Contensive.Processor.Controllers {
         /// process and return the default login form. If processing is successful, a blank response is returned
         /// </summary>
         /// <param name="core"></param>
+        /// <param name="requirePassword">If true, the no-password mode is blocked and a password is required.</param>
         /// <returns></returns>
-        public static string getLoginForm_Default(CoreController core) {
+        public static string getLoginForm_Default(CoreController core, bool requirePassword) {
             string result = "";
             try {
                 //
@@ -50,7 +52,10 @@ namespace Contensive.Processor.Controllers {
                 if (formType == FormTypeLogin) {
                     //
                     // -- process a previous login for instance, and return blank if it is successful (legacy workflow)
-                    if (processLoginFormDefault(core)) {
+                    string requestUsername = core.cpParent.Doc.GetText("username");
+                    string requestPassword = core.cpParent.Doc.GetText("password");
+                    bool passwordRequestValid = core.cpParent.Doc.IsProperty("password");
+                    if (processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid)) {
                         result = "";
                         needLoginForm = false;
                     }
@@ -66,7 +71,7 @@ namespace Contensive.Processor.Controllers {
                     // -- select the correct layout
                     bool allowAutoLogin = core.siteProperties.getBoolean(sitePropertyName_AllowAutoLogin, false);
                     bool allowEmailLogin = core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin, false);
-                    bool allowNoPasswordLogin = core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin, false);
+                    bool allowNoPasswordLogin = !requirePassword && core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin, false);
                     //
                     if (allowEmailLogin && allowNoPasswordLogin && allowAutoLogin) {
                         //
@@ -143,7 +148,7 @@ namespace Contensive.Processor.Controllers {
         /// A login form that can be added to any page. This is just form with no surrounding border, etc. 
         /// </summary>
         /// <returns></returns>
-        public static string getLoginForm(CoreController core, bool forceDefaultLoginForm = false) {
+        public static string getLoginForm(CoreController core, bool forceDefaultLoginForm, bool requirePassword) {
             try {
                 string returnHtml = "";
                 int loginAddonId = 0;
@@ -173,7 +178,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // ----- When page loads, set focus on login username
                     //
-                    returnHtml = getLoginForm_Default(core);
+                    returnHtml = getLoginForm_Default(core, requirePassword);
                 }
                 return returnHtml;
             } catch (Exception ex) {
@@ -187,8 +192,11 @@ namespace Contensive.Processor.Controllers {
         /// Process the login form username and password
         /// </summary>
         /// <param name="core"></param>
+        /// <param name="requestUsername">The username submitted from the request</param>
+        /// <param name="requestPassword">The password submitted from the request</param>
+        /// <param name="passwordRequestValid">true if the request includes a password property. if true, the no-password mode is blocked and a password is required. Typically used to create an admin/developer login</param>
         /// <returns></returns>
-        public static bool processLoginFormDefault(CoreController core) {
+        public static bool processLoginFormDefault(CoreController core, string requestUsername, string  requestPassword, bool passwordRequestValid) {
             try {
                 if (!core.session.visit.cookieSupport) {
                     //
@@ -205,8 +213,9 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- attempt authentication use-cases
                 int userId = core.session.getUserIdForUsernameCredentials(
-                    core.docProperties.getText("username"),
-                    core.docProperties.getText("password")
+                    requestUsername,
+                    requestPassword,
+                    passwordRequestValid
                 );
                 if (userId == 0) {
                     //

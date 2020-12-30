@@ -16,7 +16,7 @@ namespace Contensive.Processor.Addons.Primitives {
             try {
                 CoreController core = ((CPClass)cp).core;
                 //
-                core.html.processFormToolsPanel(core.docProperties.getText("ccformsn"));
+                core.html.processFormToolsPanel();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
             }

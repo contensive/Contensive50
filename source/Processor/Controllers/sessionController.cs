@@ -712,14 +712,14 @@ namespace Contensive.Processor.Controllers {
         //
         //===================================================================================================
         /// <summary>
-        /// Returns the ID of a member given their Username and Password.
-        /// If the Id can not be found, user errors are added with main_AddUserError and 0 is returned (false)
+        /// Test the username and password against users and return the userId of the match, or 0 if not valid match
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
+        /// <param name="requirePassword">If true, the noPassword option is disabled</param>
         /// <returns></returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "<Pending>")]
-        public int getUserIdForUsernameCredentials(string username, string password) {
+        public int getUserIdForUsernameCredentials(string username, string password, bool requirePassword) {
             try {
                 //
                 bool allowEmailLogin = core.siteProperties.getBoolean(sitePropertyName_AllowEmailLogin);
@@ -728,8 +728,8 @@ namespace Contensive.Processor.Controllers {
                     // -- username blank, stop here
                     return 0;
                 }
-                bool allowNoPasswordLogin = core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin);
-                if (string.IsNullOrEmpty(password) && !allowNoPasswordLogin) {
+                bool allowNoPassword = !requirePassword && core.siteProperties.getBoolean(sitePropertyName_AllowNoPasswordLogin);
+                if (string.IsNullOrEmpty(password) && !allowNoPassword) {
                     //
                     // -- password blank, stop here
                     return 0;
@@ -742,71 +742,62 @@ namespace Contensive.Processor.Controllers {
                 string Criteria;
                 if (allowEmailLogin) {
                     //
-                    // login by username or email
-                    //
+                    // -- login by username or email
                     Criteria = "((username=" + DbController.encodeSQLText(username) + ")or(email=" + DbController.encodeSQLText(username) + "))";
                 } else {
                     //
-                    // login by username only
-                    //
+                    // -- login by username only
                     Criteria = "(username=" + DbController.encodeSQLText(username) + ")";
                 }
-                Criteria = Criteria + "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
-                bool allowDuplicateUserNames = core.siteProperties.getBoolean("AllowDuplicateUsernames", false);
+                Criteria += "and((dateExpires is null)or(dateExpires>" + DbController.encodeSQLDate(core.dateTimeNowMockable) + "))";
                 using (var cs = new CsModel(core)) {
                     if (!cs.open("People", Criteria, "id", true, user.id, "ID,password,admin,developer", PageSize: 2)) {
                         //
-                        // -- username not found, stop here
+                        // -- fail, username not found, stop here
                         return 0;
                     }
-                    if (allowNoPasswordLogin) {
+                    if (cs.getRowCount() > 1) {
                         //
-                        // -- no password. must be one and only one result
-                        if (cs.getRowCount().Equals(1)) {
-                            return cs.getInteger("id");
-                        }
+                        // -- fail, multiple matches
                         return 0;
                     }
-                    //
-                    // -- password required
-                    if ((!allowDuplicateUserNames) && (cs.getRowCount() > 1)) {
+                    if (!allowNoPassword) {
                         //
-                        // -- AllowDuplicates is false, and there are more then one record
-                        return 0;
-                    }
-                    //
-                    // -- search all found records for the correct password
-                    while (cs.ok()) {
-                        //
-                        // -- search for matching password
+                        // -- password mode
                         if (!string.IsNullOrEmpty(password) && password.Equals(cs.getText("password"), StringComparison.InvariantCultureIgnoreCase)) {
                             //
-                            // -- password match
+                            // -- success, password match
                             return cs.getInteger("ID");
                         }
-                        if (allowNoPasswordLogin && string.IsNullOrEmpty(cs.getText("password")) && (!cs.getBoolean("admin")) && !cs.getBoolean("developer")) {
+                        //
+                        // -- fail, blank or incorrect password
+                        return 0;
+                    }
+                    //
+                    // -- no-password mode
+                    if (cs.getBoolean("admin") || cs.getBoolean("developer")) {
+                        //
+                        // -- fail, no-password-mode and match is admin/dev
+                        return 0;
+                    }
+                    //
+                    // -- no-password auth cannot be content manager
+                    using (var csRules = new CsModel(core)) {
+                        string SQL = ""
+                            + " select ccGroupRules.ContentID"
+                            + " from ccGroupRules right join ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
+                            + " where (1=1)"
+                            + " and(ccMemberRules.memberId=" + cs.getInteger("ID") + ")"
+                            + " and(ccMemberRules.active>0)"
+                            + " and(ccGroupRules.active>0)"
+                            + " and(ccGroupRules.ContentID Is not Null)"
+                            + " and((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
+                            + ");";
+                        if (!csRules.openSql(SQL)) {
                             //
-                            // -- no-password-login + no password given + account has no password + account not admin/dev/cm
-                            // -- verify they are in no content manager groups
-                            using (var csRules = new CsModel(core)) {
-                                string SQL = ""
-                                    + " SELECT ccGroupRules.ContentID"
-                                    + " FROM ccGroupRules RIGHT JOIN ccMemberRules ON ccGroupRules.GroupId = ccMemberRules.GroupID"
-                                    + " WHERE ("
-                                    + "(ccMemberRules.memberId=" + DbController.encodeSQLNumber(cs.getInteger("ID")) + ")"
-                                    + " AND(ccMemberRules.active<>0)"
-                                    + " AND(ccGroupRules.active<>0)"
-                                    + " AND(ccGroupRules.ContentID Is not Null)"
-                                    + " AND((ccMemberRules.DateExpires is null)OR(ccMemberRules.DateExpires>" + DbController.encodeSQLDate(core.doc.profileStartTime) + "))"
-                                    + ");";
-                                if (csRules.openSql(SQL)) {
-                                    //
-                                    // -- user is a content manager, do not allow no-password logins
-                                    return 0;
-                                }
-                            }
+                            // -- success, match is not content manager
+                            return cs.getInteger("ID");
                         }
-                        cs.goNext();
                     }
                 }
                 return 0;
@@ -862,18 +853,18 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Login (by username and password)
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="username"></param>
         /// <param name="password"></param>
-        /// <param name="AllowAutoLogin"></param>
+        /// <param name="setUserAutoLogin"></param>
         /// <returns></returns>
-        public bool authenticate(string username, string password, bool AllowAutoLogin = false) {
+        public bool authenticate(string username, string password, bool setUserAutoLogin) {
             try {
-                int userId = getUserIdForUsernameCredentials(username, password);
+                int userId = getUserIdForUsernameCredentials(username, password, false);
                 if (!userId.Equals(0) && authenticateById(userId, this)) {
                     //
                     // -- successful
                     LogController.addSiteActivity(core, "successful login, credential [" + username + "]", user.id, user.organizationId);
+                    core.db.executeNonQuery("update ccmembers set autoLogin=" + (setUserAutoLogin ? "1" : "0") + " where id=" + userId);
                     return true;
                 }
                 //
@@ -1158,7 +1149,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Password"></param>
         /// <returns></returns>
         public bool isLoginOK(string Username, string Password) {
-            return !getUserIdForUsernameCredentials(Username, Password).Equals(0);
+            return !getUserIdForUsernameCredentials(Username, Password, false).Equals(0);
         }
         //
         // ================================================================================================

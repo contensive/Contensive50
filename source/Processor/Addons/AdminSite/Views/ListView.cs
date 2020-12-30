@@ -88,7 +88,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                         // -- Load Index page customizations
                         IndexConfigClass indexConfig = IndexConfigClass.get(core, adminData);
                         setIndexSQL_ProcessIndexConfigRequests(core, adminData, ref indexConfig);
-                        GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(cp, core, indexConfig);
+                        AdminAddon.setIndexSQL_SaveIndexConfig(cp, core, indexConfig);
                         //
                         // Get the SQL parts
                         bool AllowAccessToContent = false;

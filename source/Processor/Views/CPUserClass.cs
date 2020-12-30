@@ -43,13 +43,13 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// authenticate to the provided credentials
+        /// Return the id of the user that matches these credentials. No authentication is performed. Password is ignored in no-password mode (preferences setting)
         /// </summary>
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
         public override int GetIdByLogin(string username, string password) {
-            return cp.core.session.getUserIdForUsernameCredentials(username, password);
+            return cp.core.session.getUserIdForUsernameCredentials(username, password, false);
         }
         //
         //====================================================================================================

@@ -174,7 +174,6 @@ namespace Contensive.Processor.Controllers {
                     core.siteProperties.getText("AllowContentAutoLoad", "True");
                     core.siteProperties.getText("AllowContentSpider", "False");
                     core.siteProperties.getText("AllowContentWatchLinkUpdate", "True");
-                    core.siteProperties.getText("AllowDuplicateUsernames", "False");
                     core.siteProperties.getText("ConvertContentText2HTML", "False");
                     core.siteProperties.getText("AllowMemberJoin", "False");
                     core.siteProperties.getText("AllowPasswordEmail", "True");

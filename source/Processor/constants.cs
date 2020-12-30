@@ -349,7 +349,7 @@ namespace Contensive.Processor {
         internal const string FormTypeMyProfile = "89aLi180j5";
         internal const string FormTypeLogin = "login";
         internal const string FormTypePasswordRecovery = "lk0q56am09";
-        internal const string FormTypeJoin = "6df38abv00";
+        internal const string FormTypeRegister = "6df38abv00";
         internal const string FormTypeHelpBubbleEditor = "9df019d77sA";
         internal const string FormTypeAddonSettingsEditor = "4ed923aFGw9d";
         internal const string FormTypeAddonStyleEditor = "ar5028jklkfd0s";

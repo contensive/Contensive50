@@ -236,7 +236,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                             foreach (var column in IndexConfig.columns) {
                                 column.Width = encodeInteger((1000 * column.Width) / (double)ColumnWidthTotal);
                             }
-                            GetHtmlBodyClass.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
+                            AdminAddon.setIndexSQL_SaveIndexConfig(cp, core, IndexConfig);
                             IndexConfig = IndexConfigClass.get(core, adminData);
                         }
                     }

@@ -8,6 +8,8 @@
     <PackageProjectUrl>http://contensive.io</PackageProjectUrl>
     <PackageIcon>LogoBalls.png</PackageIcon>
     <RepositoryUrl>https://github.com/contensive/Contensive5</RepositoryUrl>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
 
   <PropertyGroup>

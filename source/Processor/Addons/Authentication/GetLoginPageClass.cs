@@ -16,7 +16,10 @@ namespace Contensive.Processor.Addons.Login {
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             try {
-                return LoginController.getLoginPage(((CPClass)cp).core, false);
+                //
+                // -- calling method can bypass
+                bool requirePassword = cp.Doc.GetBoolean("requirePassword");
+                return LoginController.getLoginPage(((CPClass)cp).core, false, requirePassword);
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 throw;

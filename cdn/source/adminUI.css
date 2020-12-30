@@ -1272,7 +1272,7 @@ Exception list
 */
 ul.ccExceptionList {
     padding: 10px 20px;
-    margin: 20px auto;
+    margin: 0;
     background-color: red;
     list-style-type: none;
 }

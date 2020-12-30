@@ -7,6 +7,7 @@ using static Contensive.Processor.Controllers.GenericController;
 using System.Diagnostics;
 using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using System.Collections.Generic;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -154,7 +155,11 @@ namespace Contensive.Processor.Controllers {
                             case FormTypeLogin:
                             case "l09H58a195": {
                                     //
-                                    result = (new Contensive.Processor.Addons.Primitives.ProcessLoginDefaultClass()).Execute(core.cpParent).ToString();
+                                    string requestUsername = core.cpParent.Doc.GetText("username");
+                                    string requestPassword = core.cpParent.Doc.GetText("password");
+                                    bool passwordRequestValid = core.cpParent.Doc.IsProperty("password");
+                                    LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
+                                    result = "";
                                     break;
                                 }
                             case FormTypeToolsPanel: {
@@ -182,9 +187,9 @@ namespace Contensive.Processor.Controllers {
                                     result = (new Contensive.Processor.Addons.Primitives.processHelpBubbleEditorClass()).Execute(core.cpParent).ToString();
                                     break;
                                 }
-                            case FormTypeJoin: {
+                            case FormTypeRegister: {
                                     //
-                                    result = (new Contensive.Processor.Addons.Primitives.processJoinFormClass()).Execute(core.cpParent).ToString();
+                                    RegisterController.processRegisterForm(core);
                                     break;
                                 }
                             default: {
@@ -225,8 +230,15 @@ namespace Contensive.Processor.Controllers {
                                         return string.Empty;
                                     }
                                     //
-                                    // -- process the login method, or return the login form
-                                    return (new Contensive.Processor.Addons.Primitives.ProcessLoginDefaultMethodClass()).Execute(core.cpParent).ToString();
+                                    // -- default login page
+                                    return core.addon.execute(addonGuidLoginPage, new CPUtilsBaseClass.addonExecuteContext {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                        argumentKeyValuePairs = new Dictionary<string, string> {
+                                            { "Force Default Login", "true" }
+                                        },
+                                        forceHtmlDocument = true,
+                                        errorContextMessage = "executing method=loginDefault"
+                                    });
                                 }
                             case HardCodedPageLogin: {
                                     //
@@ -239,7 +251,15 @@ namespace Contensive.Processor.Controllers {
                                     }
                                     //
                                     // -- process the login method, or return the login form
-                                    return (new Contensive.Processor.Addons.Primitives.ProcessLoginMethodClass()).Execute(core.cpParent).ToString();
+                                    core.doc.continueProcessing = false;
+                                    return core.addon.execute(DbBaseModel.create<AddonModel>(core.cpParent, addonGuidLoginPage), new CPUtilsBaseClass.addonExecuteContext {
+                                        addonType = CPUtilsBaseClass.addonContext.ContextPage,
+                                        argumentKeyValuePairs = new Dictionary<string, string> {
+                                            { "Force Default Login", "false" }
+                                        },
+                                        forceHtmlDocument = true,
+                                        errorContextMessage = "executing method=login"
+                                    });
                                 }
                             case HardCodedPageLogoutLogin: {
                                     //

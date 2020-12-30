@@ -1,18 +1,21 @@
 ﻿//
 namespace Contensive.Processor.Addons.Login {
+    /// <summary>
+    /// Addon that returns a login button form, or if you are logged in, a link to my account and a logout button
+    /// </summary>
     public class GetLoginButtonFormClass : Contensive.BaseClasses.AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// Login Button Form
+        /// Addon that returns a login button form, or if you are logged in, a link to my account and a logout button
         /// </summary>
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(Contensive.BaseClasses.CPBaseClass cp) {
             if ( cp.User.IsAuthenticated ) {
-                return Processor.Properties.Resources.LogoutButtonFormHtml.Replace("{{personName}}", cp.User.Name );
+                return Properties.Resources.LogoutButtonFormHtml.Replace("{{personName}}", cp.User.Name );
             }
-            return Processor.Properties.Resources.LoginButtonFormHtml;
+            return Properties.Resources.LoginButtonFormHtml;
         }
     }
 }

@@ -1,33 +1,39 @@
 ﻿
-using System;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor.Addons.Tools;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
+using System;
 using System.Collections.Generic;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Addons.AdminSite {
-    public class GetHtmlBodyClass : AddonBaseClass {
+    //
+    //====================================================================================================
+    /// <summary>
+    /// Admin site addon
+    /// </summary>
+    public class AdminAddon : AddonBaseClass {
         //
         //====================================================================================================
         /// <summary>
-        /// addon method, deliver complete Html admin site
+        /// Admin site addon
         /// </summary>
         /// <param name="cpBase"></param>
         /// <returns></returns>
         public override object Execute(CPBaseClass cpBase) {
-            string result = "";
             CPClass cp = (CPClass)cpBase;
             try {
+                string result = "";
                 if (!cp.core.session.isAuthenticated) {
                     //
                     // --- must be authenticated to continue. Force a local login
-                    return cp.core.addon.execute(addonGuidLoginPage, new BaseClasses.CPUtilsBaseClass.addonExecuteContext {
-                        errorContextMessage = "get Login Page for Html Body",
+                    cp.Doc.SetProperty("requirePassword", true);
+                    return cp.core.addon.execute(addonGuidLoginPage, new CPUtilsBaseClass.addonExecuteContext {
+                        errorContextMessage = "get Login Page for Admin Site",
                         addonType = CPUtilsBaseClass.addonContext.ContextPage
                     });
                 }
@@ -35,7 +41,7 @@ namespace Contensive.Processor.Addons.AdminSite {
                     //
                     // --- member must have proper access to continue
                     result += ""
-                        + "<p>You are attempting to enter an area which your account does not have access.</p>"
+                        + "<p>You are attempting to enter an area in which your account does not have access.</p>"
                         + "<ul class=\"ccList\">"
                         + "<li class=\"ccListItem\">To return to the public web site, use your back button, or <a href=\"" + "/" + "\">Click Here</A>."
                         + "<li class=\"ccListItem\">To login under a different account, <a href=\"/" + cp.core.appConfig.adminRoute + "?method=logout\" rel=\"nofollow\">Click Here</A>"
@@ -55,12 +61,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                 // get admin content
                 result += getHtmlBody(cp);
                 result = HtmlController.div(result, "container-fluid ccBodyAdmin ccCon");
-
-
+                return result;
             } catch (Exception ex) {
                 LogController.logError(cp.core, ex);
+                throw;
             }
-            return result;
         }
         //
         //====================================================================================================

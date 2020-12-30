@@ -1959,54 +1959,60 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
-        public void processFormToolsPanel(string legacyFormSn = "") {
+        /// <summary>
+        /// process requests from the legacy tool panel at the bottom of the page
+        /// </summary>
+        public void processFormToolsPanel() {
             try {
-                string Button = null;
-                string username = null;
                 //
                 // ----- Read in and save the Member profile values from the tools panel
                 //
                 if (core.session.user.id > 0) {
-                    if (!(!core.doc.userErrorList.Count.Equals(0))) {
-                        Button = core.docProperties.getText(legacyFormSn + "mb");
+                    if (core.doc.userErrorList.Count.Equals(0)) {
+                        string legacyFormSn = core.docProperties.getText("ccformsn");
+                        string Button = core.docProperties.getText(legacyFormSn + "mb");
                         switch (Button) {
-                            case ButtonLogout:
-                                //
-                                // Logout - This can only come from the Horizonal Tool Bar
-                                //
-                                core.session.logout();
-                                break;
-                            case ButtonLogin:
-                                //
-                                // Login - This can only come from the Horizonal Tool Bar
-                                //
-                                Controllers.LoginController.processLoginFormDefault(core);
-                                break;
-                            case ButtonApply:
-                                //
-                                // Apply
-                                //
-                                username = core.docProperties.getText(legacyFormSn + "username");
-                                if (!string.IsNullOrEmpty(username)) {
-                                    Controllers.LoginController.processLoginFormDefault(core);
+                            case ButtonLogout: {
+                                    //
+                                    // Logout - This can only come from the Horizonal Tool Bar
+                                    //
+                                    core.session.logout();
                                 }
-                                //
-                                // ----- AllowAdminLinks
-                                //
-                                core.visitProperty.setProperty("AllowEditing", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowEditing")));
-                                //
-                                // ----- Quick Editor
-                                //
-                                core.visitProperty.setProperty("AllowQuickEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowQuickEditor")));
-                                //
-                                // ----- Advanced Editor
-                                //
-                                core.visitProperty.setProperty("AllowAdvancedEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowAdvancedEditor")));
-                                //
-                                // ----- developer Only parts
-                                //
-                                core.visitProperty.setProperty("AllowDebugging", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowDebugging")));
+                                break;
+                            case ButtonLogin: {
+                                    //
+                                    // Login - This can only come from the Horizonal Tool Bar
+                                    //
+                                    string requestUsername = core.cpParent.Doc.GetText(legacyFormSn + "username");
+                                    string requestPassword = core.cpParent.Doc.GetText(legacyFormSn + "password");
+                                    bool passwordRequestValid = core.cpParent.Doc.IsProperty(legacyFormSn + "password");
+                                    LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
+                                }
+                                break;
+                            case ButtonApply: {
+                                    //
+                                    // Apply
+                                    string requestUsername = core.cpParent.Doc.GetText(legacyFormSn + "username");
+                                    string requestPassword = core.cpParent.Doc.GetText(legacyFormSn + "password");
+                                    bool passwordRequestValid = core.cpParent.Doc.IsProperty(legacyFormSn + "password");
+                                    LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
+                                    //
+                                    // ----- AllowAdminLinks
+                                    //
+                                    core.visitProperty.setProperty("AllowEditing", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowEditing")));
+                                    //
+                                    // ----- Quick Editor
+                                    //
+                                    core.visitProperty.setProperty("AllowQuickEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowQuickEditor")));
+                                    //
+                                    // ----- Advanced Editor
+                                    //
+                                    core.visitProperty.setProperty("AllowAdvancedEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowAdvancedEditor")));
+                                    //
+                                    // ----- developer Only parts
+                                    //
+                                    core.visitProperty.setProperty("AllowDebugging", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowDebugging")));
+                                }
                                 break;
                         }
                     }

@@ -15,56 +15,56 @@ namespace Contensive.Processor.Controllers {
     public static class RegisterController {
         //
         //========================================================================
-        //
+        /// <summary>
+        /// Simple registration (join) form to setup the user's people record and if approporate, authenticate
+        /// </summary>
+        /// <param name="core"></param>
         public static void processRegisterForm(CoreController core) {
             try {
-                string ErrorMessage = "";
-                string FirstName = null;
-                string LastName = null;
-                string FullName = null;
-                string Email = null;
-                int errorCode = 0;
-                //
-                string loginForm_Username = "";
-                string loginForm_Password = "";
-                loginForm_Username = core.docProperties.getText("username");
-                loginForm_Password = core.docProperties.getText("password");
-                //
-                if (!GenericController.encodeBoolean(core.siteProperties.getBoolean("AllowMemberJoin", false))) {
-                    ErrorController.addUserError(core, "This site does not accept public main_MemberShip.");
-                } else {
-                    if (!core.session.isNewCredentialOK(loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
-                        ErrorController.addUserError(core, ErrorMessage);
-                    } else {
-                        if (!(!core.doc.userErrorList.Count.Equals(0))) {
-                            using (var csData = new CsModel(core)) {
-                                csData.open("people", "ID=" + DbController.encodeSQLNumber(core.session.user.id));
-                                if (!csData.ok()) {
-                                    LogController.logError(core, new Exception("Could not open the current members account to set the username and password."));
-                                } else {
-                                    if ((!string.IsNullOrEmpty(csData.getText("username"))) || !string.IsNullOrEmpty(csData.getText("password")) || csData.getBoolean("admin") || csData.getBoolean("developer")) {
-                                        //
-                                        // if the current account can be logged into, you can not join 'into' it
-                                        //
-                                        core.session.logout();
-                                    }
-                                    FirstName = core.docProperties.getText("firstname");
-                                    LastName = core.docProperties.getText("lastname");
-                                    FullName = FirstName + " " + LastName;
-                                    Email = core.docProperties.getText("email");
-                                    csData.set("FirstName", FirstName);
-                                    csData.set("LastName", LastName);
-                                    csData.set("Name", FullName);
-                                    csData.set("username", loginForm_Username);
-                                    csData.set("password", loginForm_Password);
-                                    core.session.authenticateById(core.session.user.id, core.session);
-                                }
-                                csData.close();
-                            }
-                        }
-                    }
+                if (!core.siteProperties.getBoolean("AllowMemberJoin", false)) {
+                    //
+                    // -- public registration not allowed
+                    ErrorController.addUserError(core, "This site does not accept public registration.");
+                    return;
                 }
-                PersonModel.invalidateCacheOfRecord<PersonModel>(core.cpParent, core.session.user.id);
+                string ErrorMessage = "";
+                int errorCode = 0;
+                string loginForm_Username = core.docProperties.getText("username");
+                string loginForm_Password = core.docProperties.getText("password");
+                if (!core.session.isNewCredentialOK(loginForm_Username, loginForm_Password, ref ErrorMessage, ref errorCode)) {
+                    //
+                    // -- credentials are not valid
+                    ErrorController.addUserError(core, ErrorMessage);
+                    return;
+                }
+                if (!core.doc.userErrorList.Count.Equals(0)) {
+                    //
+                    // -- user error occured somewhere during the process, exit
+                    return;
+                }
+                using (var csPerson = new CsModel(core)) {
+                    if (!csPerson.open("people", "ID=" + core.session.user.id)) {
+                        //
+                        // -- user record not valid
+                        LogController.logError(core, new Exception("Could not open the current members account to set the username and password."));
+                        return;
+                    }
+                    if ((!string.IsNullOrEmpty(csPerson.getText("username"))) || !string.IsNullOrEmpty(csPerson.getText("password")) || csPerson.getBoolean("admin") || csPerson.getBoolean("developer")) {
+                        //
+                        // -- if the current account can be logged into, you can not join 'into' it
+                        core.session.logout();
+                    }
+                    string FirstName = core.docProperties.getText("firstname");
+                    string LastName = core.docProperties.getText("lastname");
+                    csPerson.set("FirstName", FirstName);
+                    csPerson.set("LastName", LastName);
+                    csPerson.set("Name", FirstName + " " + LastName);
+                    csPerson.set("Email", core.docProperties.getText("email"));
+                    csPerson.set("username", loginForm_Username);
+                    csPerson.set("password", loginForm_Password);
+                    core.session.authenticateById(core.session.user.id, core.session);
+                }
+                DbBaseModel.invalidateCacheOfRecord<PersonModel>(core.cpParent, core.session.user.id);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
