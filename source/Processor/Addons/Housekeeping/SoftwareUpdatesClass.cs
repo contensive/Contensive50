@@ -16,14 +16,13 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="core"></param>
         /// <returns></returns>
         public static bool downloadAndInstall(CoreController core) {
-            bool loadOK = true;
             try {
+                bool loadOK = true;
                 //
                 LogController.logInfo(core, "Housekeep, download and install");
                 //
-                var Doc = new XmlDocument() { XmlResolver = null};
+                var Doc = new XmlDocument() { XmlResolver = null };
                 string URL = "http://support.contensive.com/GetUpdates?iv=" + CoreController.codeVersion();
-                loadOK = true;
                 Doc.Load(URL);
                 if ((Doc.DocumentElement.Name.ToLowerInvariant() == GenericController.toLCase("ContensiveUpdate")) && (Doc.DocumentElement.ChildNodes.Count != 0)) {
                     foreach (XmlNode CDefSection in Doc.DocumentElement.ChildNodes) {
@@ -48,10 +47,12 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         }
                     }
                 }
+                return loadOK;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
-            return loadOK;
         }
         //
     }

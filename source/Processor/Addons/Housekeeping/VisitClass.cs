@@ -19,6 +19,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -35,17 +36,31 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 LogController.logInfo(core, "Housekeep, executeDailyTasks");
                 {
                     //
-                    LogController.logInfo(core, "Deleting visits with no DateAdded");
+                    LogController.logInfo(core, "Delete visits with no DateAdded");
                     //
                     core.db.sqlCommandTimeout = 180;
-                    core.db.executeNonQuery("delete from ccvisits where (DateAdded is null)or(DateAdded<DATEADD(year,-10,CAST(GETDATE() AS DATE)))");
+                    core.db.executeNonQuery("delete from ccvisits where (DateAdded is null)");
                 }
                 {
                     //
-                    LogController.logInfo(core, "Deleting visits with no visitor");
+                    LogController.logInfo(core, "Delete visits with no visitor, 2-days old to allow visit-summary");
                     //
                     core.db.sqlCommandTimeout = 180;
-                    core.db.executeNonQuery("delete from ccvisits from ccvisits v left join ccvisitors r on r.id=v.visitorid where (r.id is null)");
+                    core.db.executeNonQuery("delete from ccvisits from ccvisits v left join ccvisitors r on r.id=v.visitorid where (r.id is null) and (v.DateAdded<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
+                }
+                {
+                    //
+                    LogController.logInfo(core, "Delete visits with bot=true, 2-days old to allow visit-summary");
+                    //
+                    core.db.sqlCommandTimeout = 180;
+                    core.db.executeNonQuery("delete from ccvisits v where (v.bot>0) and (v.DateAdded<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
+                }
+                {
+                    //
+                    LogController.logInfo(core, "delete visits with no people (no functional use to site beyond reporting, which is limited past archive date)");
+                    //
+                    core.db.sqlCommandTimeout = 180;
+                    core.db.executeNonQuery("delete from ccvisits from ccvisits v left join ccmembers m on m.id=v.memberid where (m.id is null) and (v.DateAdded<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
                 }
                 if (env.archiveDeleteNoCookie) {
                     //
@@ -89,6 +104,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
         //

@@ -298,7 +298,9 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else if (adminData.adminForm != 0) {
                         //
                         // -- formindex requires valid content
-                        if ((adminData.adminContent.tableName == null) || (adminData.adminForm == AdminFormIndex)) { adminData.adminForm = AdminFormRoot; }
+                        if ((adminData.adminContent.tableName == null) && (adminData.adminForm == AdminFormIndex)) { 
+                            adminData.adminForm = AdminFormRoot; 
+                        }
                         //
                         // No content so far, try the forms
                         // todo - convert this to switch

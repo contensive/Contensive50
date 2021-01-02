@@ -18,6 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -43,8 +44,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
-        //
     }
 }

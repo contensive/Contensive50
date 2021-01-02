@@ -19,6 +19,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -73,35 +74,38 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     double PeriodStep = 1;
                     int HoursPerDay = 0;
                     core.db.sqlCommandTimeout = 180;
+                    //
+                    // -- search for day with missing visit summaries in the 90 days before yesterday
+                    DateTime DateofMissingSummary = DateTime.MinValue;
                     for (double PeriodDatePtr = PeriodStartDate.ToOADate(); PeriodDatePtr <= OldestDateAdded.ToOADate(); PeriodDatePtr += PeriodStep) {
                         //
                         // Verify there are 24 hour records for every day back the past 90 days
                         //
-                        DateTime DateofMissingSummary = DateTime.MinValue;
                         using (var csData = new CsModel(core)) {
                             if (csData.openSql("select count(id) as HoursPerDay from ccVisitSummary where TimeDuration=1 and DateNumber=" + encodeInteger(PeriodDatePtr) + " group by DateNumber")) {
                                 HoursPerDay = csData.getInteger("HoursPerDay");
                             }
-                            csData.close();
-                            if (HoursPerDay < 24) {
-                                DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
-                                break;
-                            }
                         }
-                        if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
-                            LogController.logInfo(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
-                            NextSummaryStartDate = DateofMissingSummary;
+                        if (HoursPerDay < 24) {
+                            DateofMissingSummary = DateTime.FromOADate(PeriodDatePtr);
+                            break;
                         }
-                        //
-                        // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
-                        //
-                        LogController.logInfo(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
-                        PeriodStep = (double)1 / (double)24;
-                        VisitSummaryClass.summarizePeriod(core, env, NextSummaryStartDate, core.dateTimeNowMockable, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
                     }
+                    if ((DateofMissingSummary != DateTime.MinValue) && (DateofMissingSummary < NextSummaryStartDate)) {
+                        LogController.logInfo(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
+                        NextSummaryStartDate = DateofMissingSummary;
+                    }
+                    //
+                    // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
+                    //
+                    LogController.logInfo(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                    PeriodStep = (double)1 / (double)24;
+                    summarizePeriod(core, env, NextSummaryStartDate, core.dateTimeNowMockable, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
         //

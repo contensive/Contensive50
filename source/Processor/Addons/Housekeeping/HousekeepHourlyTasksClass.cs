@@ -6,18 +6,24 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// exeute housekeep tasks hourly
     /// </summary>
-    public static class HourlyTasksClass {
+    public static class HousekeepHourlyTasksClass {
         //
         //====================================================================================================
         /// <summary>
         /// exeute housekeep tasks hourly
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="env"></param>
-        public static void executeHourlyTasks(CoreController core, HouseKeepEnvironmentModel env) {
+        public static void executeHourlyTasks(CoreController core) {
             try {
                 //
                 LogController.logInfo(core, "executeHourlyTasks");
+                //
+                // -- summaries - must be first
+                VisitSummaryClass.executeHourlyTasks(core);
+                ViewingSummaryClass.executeHourlyTasks(core);
+                //
+                // -- people (before visits because it uses v.bots)
+                PersonClass.executeHourlyTasks(core);
                 //
                 // -- delete temp files
                 TempFilesClass.deleteFiles(core);
@@ -53,17 +59,12 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 VisitorClass.executeHourlyTasks(core);
                 ViewingsClass.executeHourlyTasks(core);
                 //
-                // -- summary
-                VisitSummaryClass.executeHourlyTasks(core);
-                ViewingSummaryClass.executeHourlyTasks(core);
-                //
                 // -- logs
                 ActivityLogClass.executeHourlyTasks(core);
-                //
-                // -- people
-                PersonClass.executeHourlyTasks(core);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
     }

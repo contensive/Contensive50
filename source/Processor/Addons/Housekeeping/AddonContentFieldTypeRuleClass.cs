@@ -18,7 +18,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
+
             }
         }
         //
@@ -36,6 +38,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 core.db.executeNonQuery("delete from ccAddonContentFieldTypeRules where id in (select r.id from ccAddonContentFieldTypeRules r left join ccaggregatefunctions a on a.id=r.addonid where a.Id Is Null)");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
+
             }
         }
     }

@@ -6,7 +6,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
     /// <summary>
     /// Housekeep daily tasks
     /// </summary>
-    public static class DailyTasksClass {
+    public static class HousekeepDailyTasksClass {
         /// <summary>
         /// Housekeep daily tasks
         /// </summary>
@@ -16,6 +16,13 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 LogController.logInfo(core, "executeDailyTasks");
+                //
+                // -- summary (must be first)
+                VisitSummaryClass.executeDailyTasks(core, env);
+                ViewingSummaryClass.executeDailyTasks(core, env);
+                //
+                // -- people (must be before visits to delete users from bot visits
+                PersonClass.executeDailyTasks(core, env);
                 //
                 // -- Download Updates
                 SoftwareUpdatesClass.downloadAndInstall(core);
@@ -51,17 +58,11 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 VisitorClass.executeDailyTasks(core, env);
                 ViewingsClass.executeDailyTasks(core, env);
                 //
-                // -- summary
-                VisitSummaryClass.executeDailyTasks(core, env);
-                ViewingSummaryClass.executeDailyTasks(core, env);
-                //
                 // -- logs
                 ActivityLogClass.executeDailyTasks(core, env);
-                //
-                // -- people
-                PersonClass.executeDailyTasks(core, env);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }

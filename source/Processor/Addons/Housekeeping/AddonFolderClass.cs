@@ -23,7 +23,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
+
             }
         }
         //
@@ -45,8 +47,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     string collectionFileContent = core.privateFiles.readFileText(collectionFileFilename);
                     Doc.LoadXml(collectionFileContent);
                 } catch (Exception ex) {
-                    LogController.logInfo(core, "RegisterAddonFolder, Hint=[" + hint + "], Error loading Collections.xml file, ex [" + ex + "]");
-                    loadOK = false;
+                    LogController.logError(core, ex);
+                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                    throw;
                 }
                 if (loadOK) {
                     //
@@ -140,8 +143,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                                 }
                                                 //
                                                 // preserve last three folders
-                                                if (folderPtr >= (folderList.Count - 3)) {
-                                                    LogController.logInfo(core, "....last 3 folders reserved [" + dir.Name + "]");
+                                                if (folderPtr >= (folderList.Count - 5)) {
+                                                    LogController.logInfo(core, "....last 5 folders reserved [" + dir.Name + "]");
                                                     continue;
                                                 }
                                                 //
@@ -151,6 +154,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                                         }
                                     }
                                 }
+                                
                                 NodeCnt += 1;
                             }
                         }
@@ -160,6 +164,9 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 LogController.logInfo(core, "Exiting RegisterAddonFolder");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
+
             }
         }
         //

@@ -18,6 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -31,68 +32,54 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void executeDailyTasks(CoreController core, HouseKeepEnvironmentModel env) {
             try {
                 //
-                LogController.logInfo(core, "Housekeep, people");
-                //
-                // Any member records that were created outside contensive need to have CreatedByVisit=0 (past v4.1.152)
-                core.db.executeNonQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
-                //
-                // delete members from the non-cookie visits
-                // legacy records without createdbyvisit will have to be corrected by hand (or upgrade)
-                //
-                LogController.logInfo(core, "Deleting members from visits with no cookie support older than Midnight, Two Days Ago");
-                string sql = "delete from ccmembers from ccmembers m,ccvisits v where v.memberid=m.id and(m.visits=1) and(m.createdbyvisit=1) and(m.username is null) and(m.email is null) and(v.cookiesupport=0)and(v.lastvisittime<DATEADD(hour, -2, GETDATE()))";
-                try {
-                    core.db.sqlCommandTimeout = 1800;
-                    core.db.executeNonQuery(sql);
-                } catch (Exception ex) {
-                    LogController.logError(core, ex);
+                // -- if eccommerce is installed, create sqlCriteria suffix for accountid
+                string accountIdSuffix = "";
+                if (core.db.isSQLTableField("ccmembers", "accountId")) {
+                    accountIdSuffix += "and((m.accountid is null)or(m.accountId=0))";
                 }
                 //
-                // -- Remove old guest records
-                DateTime ArchiveDate = core.dateTimeNowMockable.AddDays(-env.guestArchiveAgeDays).Date;
+                // -- calc archiveDate
+                int localGuestArchiveDays = env.guestArchiveAgeDays;
+                if (localGuestArchiveDays < 2) { localGuestArchiveDays = 2; }
+                if (localGuestArchiveDays > 30) { localGuestArchiveDays = 30; }
+                DateTime ArchiveDate = core.dateTimeNowMockable.AddDays(-localGuestArchiveDays).Date;
                 string SQLTablePeople = MetadataController.getContentTablename(core, "People");
                 string DeleteBeforeDateSQL = DbController.encodeSQLDate(ArchiveDate);
                 //
-                LogController.logInfo(core, "Deleting members with  LastVisit before DeleteBeforeDate [" + ArchiveDate + "], exactly one total visit, a null username and a null email address.");
+                LogController.logInfo(core, "Housekeep, People-Daily, update createdByVisit, set null to 0, (pre v4.1.152)");
                 //
-                string SQLCriteria = "(LastVisit<" + DeleteBeforeDateSQL + ")and(createdbyvisit=1)and(Visits=1)and(Username is null)and(email is null)";
-                core.db.sqlCommandTimeout = 1800;
-                core.db.deleteTableRecordChunks("ccmembers", SQLCriteria, 1000, 10000);
+                core.db.executeNonQuery("update ccmembers set CreatedByVisit=0 where createdbyvisit is null");
                 //
-                // delete 'guests' Members with one visits but no valid visit record
+                LogController.logInfo(core, "Housekeep, People-Daily, delete people from bot visits");
                 //
-                LogController.logInfo(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
-                sql = "delete from ccmembers from ccmembers m,ccvisits v"
-                    + " where v.memberid=m.id"
-                    + " and(m.createdbyvisit=1)"
-                    + " and(m.Visits=1)"
-                    + " and(m.Username is null)"
-                    + " and(m.email is null)"
-                    + " and(m.dateadded=m.lastvisit)"
-                    + " and(v.id is null)";
-                core.db.sqlCommandTimeout = 1800;
-                core.db.executeNonQuery(sql);
+                {
+                    string sql = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id where (m.createdbyvisit=1)and(m.username is null)and(m.email is null)and(v.lastvisittime<DATEADD(hour, -" + localGuestArchiveDays + ", GETDATE()))and(v.bot>0)" + accountIdSuffix;
+                    core.db.sqlCommandTimeout = 1800;
+                    core.db.executeNonQuery(sql);
+                }
                 //
-                // delete 'guests' Members created before ArchivePeopleAgeDays
                 //
-                LogController.logInfo(core, "Deleting 'guest' members with no visits (name is default name, visits=1, username null, email null,dateadded=lastvisit)");
-                sql = "delete from ccmembers from ccmembers m left join ccvisits v on v.memberid=m.id"
-                    + " where(m.createdbyvisit=1)"
-                    + " and(m.Visits=1)"
-                    + " and(m.Username is null)"
-                    + " and(m.email is null)"
-                    + " and(m.dateadded=m.lastvisit)"
-                    + " and(v.id is null)";
-                core.db.sqlCommandTimeout = 1800;
-                core.db.executeNonQuery(sql);
+                LogController.logInfo(core, "Housekeep, People-Daily, delete guests -- people with createdByVisit=1, null username and a null email address.");
                 //
-                // -- mark all people allowbulkemail if their email address is in the emailbouncelist
-                sql = "update ccmembers set allowbulkemail=0 from ccmembers m left join emailbouncelist b on b.name LIKE CONCAT('%', m.[email], '%') where b.id is not null and m.email is not null";
-                core.db.sqlCommandTimeout = 1800;
-                core.cpParent.Db.ExecuteNonQuery(sql);
+                {
+                    string sql = "delete from ccmembers from ccmembers m where (m.createdbyvisit=1) and(m.username is null) and(m.email is null)and(m.lastvisit<DATEADD(day, -" + localGuestArchiveDays + ", GETDATE()))" + accountIdSuffix;
+                    core.db.sqlCommandTimeout = 1800;
+                    core.db.executeNonQuery(sql);
+
+                }
+                //
+                LogController.logInfo(core, "Housekeep, People-Daily, mark all people allowbulkemail if their email address is in the emailbouncelist");
+                // 
+                {
+                    string sql = "update ccmembers set allowbulkemail=0 from ccmembers m left join emailbouncelist b on b.name LIKE CONCAT('%', m.[email], '%') where b.id is not null and m.email is not null";
+                    core.db.sqlCommandTimeout = 1800;
+                    core.cpParent.Db.ExecuteNonQuery(sql);
+                }
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
     }

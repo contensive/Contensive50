@@ -10,19 +10,29 @@ namespace Contensive.Processor.Addons.Housekeeping {
         //
         //====================================================================================================
         /// <summary>
-        /// houorly housekeep tasks
+        /// hourly housekeep tasks.
         /// </summary>
         /// <param name="core"></param>
         public static void executeHourlyTasks(CoreController core) {
             {
-                //
-                LogController.logInfo(core, "executeHourlyTasks, visitproperites");
-                //
-                //
-                // -- delete properties of visits over 1 hour old
-                string sql = "delete from ccproperties from ccproperties p left join  ccvisits v on (v.id=p.keyid and p.typeid=1) where v.lastvisittime<dateadd(hour, -1, getdate())";
-                core.db.sqlCommandTimeout = 180;
-                core.db.executeNonQuery(sql);
+                try {
+                    //
+                    LogController.logInfo(core, "executeHourlyTasks, delete visit properties from  visits over 1 hour old");
+                    //
+                    string sql = "delete from ccproperties from ccproperties p left join ccvisits v on (v.id=p.keyid and p.typeid=1) where v.lastvisittime<dateadd(hour, -1, GETDATE())";
+                    core.db.sqlCommandTimeout = 180;
+                    core.db.executeNonQuery(sql);
+                    //
+                    LogController.logInfo(core, "executeHourlyTasks, delete visit properties without a visit");
+                    //
+                    sql = "delete ccproperties from ccproperties left join ccvisits on ccvisits.id=ccproperties.keyid where (ccproperties.typeid=1) and (ccvisits.id is null)";
+                    core.db.sqlCommandTimeout = 180;
+                    core.db.executeNonQuery(sql);
+                } catch (Exception ex) {
+                    LogController.logError(core, ex);
+                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                    throw;
+                }
             }
         }
         //
@@ -53,6 +63,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
         //

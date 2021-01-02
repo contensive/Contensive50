@@ -165,7 +165,9 @@ namespace Contensive.Processor.Controllers {
             "\\v8-x64.dll",
             "\\v8-ia32.dll",
             "\\v8-zlib-ia32.dll",
-            "\\v8-zlib-x64.dll"
+            "\\v8-zlib-x64.dll",
+            "\\clearscriptv8.win-x64.dll",
+            "\\clearscriptv8.win-x86.dll"
         };
         //
         //===================================================================================================

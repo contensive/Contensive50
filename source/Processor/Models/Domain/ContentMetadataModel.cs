@@ -1,16 +1,16 @@
 ﻿
+using Contensive.BaseClasses;
+using Contensive.Models.Db;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using Contensive.Processor.Controllers;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using System.Linq;
-using Contensive.BaseClasses;
-using Contensive.Processor.Exceptions;
-using Contensive.Models.Db;
 using System.Collections.Specialized;
+using System.Data;
 using System.Globalization;
+using System.Linq;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
 //
 namespace Contensive.Processor.Models.Domain {
     //
@@ -265,7 +265,7 @@ namespace Contensive.Processor.Models.Domain {
         /// Create metadata object from cache or database for provided contentId
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="contentId"></param>
+        /// <param name="content"></param>
         /// <param name="loadInvalidFields"></param>
         /// <param name="forceDbLoad"></param>
         /// <returns></returns>

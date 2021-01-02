@@ -19,6 +19,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -30,9 +31,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
         /// <param name="cp"></param>
         /// <returns></returns>
         public override object Execute(CPBaseClass cp) {
-            string result = "";
+            CoreController core = ((CPClass)cp).core;
             try {
-                CoreController core = ((CPClass)cp).core;
                 //
                 LogController.logInfo(core, "Housekeep");
                 //
@@ -41,17 +41,19 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 core.db.sqlCommandTimeout = 1800;
                 //
                 // -- hourly tasks
-                HourlyTasksClass.executeHourlyTasks(core, env);
+                HousekeepHourlyTasksClass.executeHourlyTasks(core);
                 //
                 // -- daily tasks
                 if (env.forceHousekeep || env.runDailyTasks) {
-                    DailyTasksClass.executeDailyTasks(core, env);
+                    HousekeepDailyTasksClass.executeDailyTasks(core, env);
                 }
                 core.db.sqlCommandTimeout = TimeoutSave;
+                return "";
             } catch (Exception ex) {
-                cp.Site.ErrorReport(ex);
+                LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
-            return result;
         }
     }
 }

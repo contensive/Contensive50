@@ -18,6 +18,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
                 throw;
             }
         }
@@ -32,14 +33,6 @@ namespace Contensive.Processor.Addons.Housekeeping {
             try {
                 //
                 LogController.logInfo(core, "Housekeep, visitors");
-                {
-                    //
-                    LogController.logInfo(core, "Deleting visitors with no visits");
-                    //
-                    core.db.sqlCommandTimeout = 180;
-                    core.db.executeNonQuery("delete ccVisitors from ccVisitors Left Join ccVisits on ccVisits.VisitorID=ccVisitors.ID where ccVisits.ID is null");
-                }
-                //
                 //
                 // delete nocookie visits
                 // This must happen after the housekeep summarizing, and no sooner then 48 hours ago so all hits have been summarized before deleting
@@ -53,9 +46,17 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery(sql);
                 }
-
+                {
+                    //
+                    LogController.logInfo(core, "delete visitors with no people (people from bot visits were removed so this removes visitors from bot visits, role of visitor is to connect visits and auto-login. )");
+                    //
+                    core.db.sqlCommandTimeout = 180;
+                    core.db.executeNonQuery("delete from ccvisitors from ccvisitors r left join ccmembers m on m.id=r.MemberID where m.id is null");
+                }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                throw;
             }
         }
     }
