@@ -862,11 +862,7 @@ namespace Contensive.Processor.Controllers {
                     relatedButtonList = "",
                     roleInput = AdminUIController.getButtonPrimaryAnchor("Add Role", "?af=4&cid=" + ContentMetadataModel.getContentId(core, "Group Roles"))
                 });
-#if NETFRAMEWORK
-                return Nustache.Core.Render.StringToString(Resources.GroupRuleEditorRow2, groupRuleEditor);
-#else
-                return string.Empty;
-#endif
+                return TemplatingController.renderStringToString(Resources.GroupRuleEditorRow2, groupRuleEditor);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 return string.Empty;

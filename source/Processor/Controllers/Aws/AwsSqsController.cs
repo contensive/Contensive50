@@ -31,11 +31,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 var queueRequest = new Amazon.SQS.Model.CreateQueueRequest(core.appConfig.name.ToLowerInvariant() + "_" + queueName);
                 queueRequest.Attributes.Add("VisibilityTimeout", "600");
-#if NETFRAMEWORK
-                var queueResponse = sqsClient.CreateQueue(queueRequest);
-#else        
                 var queueResponse = sqsClient.CreateQueueAsync(queueRequest).WaitSynchronously();
-#endif
                 return queueResponse.QueueUrl;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -47,11 +43,7 @@ namespace Contensive.Processor.Controllers {
         //
         public static List<string> getQueueList(CoreController core, AmazonSQSClient sqsClient) {
             var result = new List<string>();
-#if NETFRAMEWORK
-            var listQueuesResponse = sqsClient.ListQueues(core.appConfig.name.ToLowerInvariant() + "_");
-#else
             var listQueuesResponse = sqsClient.ListQueuesAsync(core.appConfig.name.ToLowerInvariant() + "_").WaitSynchronously();
-#endif
             int nameStartPos = core.appConfig.name.Length;
             foreach (var queueUrl in listQueuesResponse.QueueUrls) {
                 result.Add(queueUrl.Substring(nameStartPos));

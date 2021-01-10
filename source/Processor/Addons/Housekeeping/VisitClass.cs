@@ -53,7 +53,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     LogController.logInfo(core, "Delete visits with bot=true, 2-days old to allow visit-summary");
                     //
                     core.db.sqlCommandTimeout = 180;
-                    core.db.executeNonQuery("delete from ccvisits v where (v.bot>0) and (v.DateAdded<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
+                    core.db.executeNonQuery("delete from ccvisits from ccvisits v where (v.bot>0) and (v.DateAdded<DATEADD(day,-2,CAST(GETDATE() AS DATE)))");
                 }
                 {
                     //

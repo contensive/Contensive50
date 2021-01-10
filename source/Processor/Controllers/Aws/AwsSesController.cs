@@ -69,11 +69,7 @@ namespace Contensive.Processor.Controllers {
                 };
                 try {
                     LogController.logInfo(core, "Sending SES email" + logShortDetail);
-#if NETFRAMEWORK
-                    var response = client.SendEmail(sendRequest);
-#else
                     var response = client.SendEmailAsync(sendRequest).WaitSynchronously();
-#endif
                     return true;
                 } catch (Exception ex) {
                     reasonForFail = "Error sending email [" + ex.Message + "]" + logShortDetail;

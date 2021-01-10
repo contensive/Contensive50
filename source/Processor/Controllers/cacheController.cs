@@ -101,11 +101,19 @@ namespace Contensive.Processor.Controllers {
                 //
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
-#if NETFRAMEWORK
+//#if NETFRAMEWORK
                 if (core.serverConfig.enableRemoteCache) {
                     //
                     // -- leave off, it causes a performance hit
                     if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); }
+                    //
+                    // -- test core version
+                     services.AddEnyimMemcached(memcachedClientOptions => {
+                        memcachedClientOptions.Servers.Add(new Server {
+                            Address = "127.0.0.1",
+                            Port = 11211
+                        });
+                    });
                     //
                     // -- initialize memcached drive (Enyim)
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
@@ -124,7 +132,7 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-#endif
+//#endif
             } catch (Exception ex) {
                 //
                 // -- client does not throw its own errors, so try to differentiate by message

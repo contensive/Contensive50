@@ -95,12 +95,48 @@ namespace Contensive.Processor.Addons.Housekeeping {
                         LogController.logInfo(core, "Found a missing hourly period in the visit summary table [" + DateofMissingSummary + "], it only has [" + HoursPerDay + "] hourly summaries.");
                         NextSummaryStartDate = DateofMissingSummary;
                     }
-                    //
-                    // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
-                    //
-                    LogController.logInfo(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
-                    PeriodStep = (double)1 / (double)24;
-                    summarizePeriod(core, env, NextSummaryStartDate, core.dateTimeNowMockable, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                    {
+                        //
+                        // Now summarize all visits during all hourly periods between OldestDateAdded and the previous Hour
+                        //
+                        LogController.logInfo(core, "Summaryize visits hourly, starting [" + NextSummaryStartDate + "]");
+                        PeriodStep = (double)1 / (double)24;
+                        summarizePeriod(core, env, NextSummaryStartDate, core.dateTimeNowMockable, 1, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                    }
+                    {
+                        //
+                        // Find missing daily summaries, summarize that date
+                        //
+                        string SQL = core.db.getSQLSelect("ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                        using (var csData = new CsModel(core)) {
+                            csData.openSql(SQL);
+                            DateTime datePtr = env.oldestVisitSummaryWeCareAbout;
+                            while (datePtr <= env.yesterday) {
+                                if (!csData.ok()) {
+                                    //
+                                    // Out of data, start with this DatePtr
+                                    //
+                                    VisitSummaryClass.summarizePeriod(core, env, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                                } else {
+                                    DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
+                                    if (datePtr < workingDate) {
+                                        //
+                                        // There are missing dates, update them
+                                        //
+                                        VisitSummaryClass.summarizePeriod(core, env, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                                    }
+                                }
+                                if (csData.ok()) {
+                                    //
+                                    // if there is more data, go to the next record
+                                    //
+                                    csData.goNext();
+                                }
+                                datePtr = datePtr.AddDays(1).Date;
+                            }
+                            csData.close();
+                        }
+                    }
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -377,38 +413,38 @@ namespace Contensive.Processor.Addons.Housekeeping {
                             + ")";
                         core.db.sqlCommandTimeout = 180;
                         core.db.executeNonQuery(SQL);
-                        //
-                        // Find missing daily summaries, summarize that date
-                        //
-                        SQL = core.db.getSQLSelect("ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
-                        using (var csData = new CsModel(core)) {
-                            csData.openSql(SQL);
-                            DateTime datePtr = env.oldestVisitSummaryWeCareAbout;
-                            while (datePtr <= env.yesterday) {
-                                if (!csData.ok()) {
-                                    //
-                                    // Out of data, start with this DatePtr
-                                    //
-                                    VisitSummaryClass.summarizePeriod(core, env, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
-                                } else {
-                                    DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
-                                    if (datePtr < workingDate) {
-                                        //
-                                        // There are missing dates, update them
-                                        //
-                                        VisitSummaryClass.summarizePeriod(core, env, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
-                                    }
-                                }
-                                if (csData.ok()) {
-                                    //
-                                    // if there is more data, go to the next record
-                                    //
-                                    csData.goNext();
-                                }
-                                datePtr = datePtr.AddDays(1).Date;
-                            }
-                            csData.close();
-                        }
+                        ////
+                        //// Find missing daily summaries, summarize that date
+                        ////
+                        //SQL = core.db.getSQLSelect("ccVisitSummary", "DateNumber", "TimeDuration=24 and DateNumber>=" + env.oldestVisitSummaryWeCareAbout.Date.ToOADate(), "DateNumber,TimeNumber");
+                        //using (var csData = new CsModel(core)) {
+                        //    csData.openSql(SQL);
+                        //    DateTime datePtr = env.oldestVisitSummaryWeCareAbout;
+                        //    while (datePtr <= env.yesterday) {
+                        //        if (!csData.ok()) {
+                        //            //
+                        //            // Out of data, start with this DatePtr
+                        //            //
+                        //            VisitSummaryClass.summarizePeriod(core, env, datePtr, datePtr, 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                        //        } else {
+                        //            DateTime workingDate = DateTime.MinValue.AddDays(csData.getInteger("DateNumber"));
+                        //            if (datePtr < workingDate) {
+                        //                //
+                        //                // There are missing dates, update them
+                        //                //
+                        //                VisitSummaryClass.summarizePeriod(core, env, datePtr, workingDate.AddDays(-1), 24, core.siteProperties.dataBuildVersion, env.oldestVisitSummaryWeCareAbout);
+                        //            }
+                        //        }
+                        //        if (csData.ok()) {
+                        //            //
+                        //            // if there is more data, go to the next record
+                        //            //
+                        //            csData.goNext();
+                        //        }
+                        //        datePtr = datePtr.AddDays(1).Date;
+                        //    }
+                        //    csData.close();
+                        //}
                     }
                 }
                 //

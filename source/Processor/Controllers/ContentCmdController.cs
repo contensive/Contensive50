@@ -304,14 +304,13 @@ namespace Contensive.Processor.Controllers {
         /// convert a single command in the command formats to call the execute
         /// </summary>
         private static string executeSingleCommand(CoreController core, string cmdSrc, CPUtilsBaseClass.addonContext Context) {
-#if NETFRAMEWORK
             try {
                 //
                 // accumulator gets the result of each cmd, then is passed to the next command to filter
                 List<object> cmdCollection = null;
                 Dictionary<string, object> cmdDef = null;
                 Dictionary<string, object> cmdArgDef = new Dictionary<string, object>();
-                var json = new System.Web.Script.Serialization.JavaScriptSerializer();
+                //var json = new System.Web.Script.Serialization.JavaScriptSerializer();
                 //
                 cmdSrc = cmdSrc.Trim(' ');
                 string whiteChrs = Environment.NewLine + "\t ";
@@ -346,7 +345,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         Dictionary<string, object> cmdDictionary;
                         try {
-                            cmdDictionary = json.Deserialize<Dictionary<string, object>>(cmdSrc);
+                            cmdDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(cmdSrc);
                         } catch (Exception ex) {
                             LogController.logError(core, ex);
                             throw;
@@ -370,7 +369,7 @@ namespace Contensive.Processor.Controllers {
                         //
                         // JSON is a command list in the form of an array, like: [ "clear" , { "import": "test.html" },{ "open" : "myfile.txt" }]
                         //
-                        cmdCollection = json.Deserialize<List<object>>(cmdSrc);
+                        cmdCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<List<object>>(cmdSrc);
                     } else {
                         //
                         // a single text command without JSON wrapper, like
@@ -437,7 +436,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // argument is in the form of an object, like: ( "text name": "my text" )
                             //
-                            object cmdDictionaryOrCollection = json.Deserialize<object>(cmdArg);
+                            object cmdDictionaryOrCollection = Newtonsoft.Json.JsonConvert.DeserializeObject<object>(cmdArg);
                             string cmdDictionaryOrCollectionTypeName = cmdDictionaryOrCollection.GetType().FullName.ToLowerInvariant();
                             if (cmdDictionaryOrCollectionTypeName.left(37) != "system.collections.generic.dictionary") {
                                 throw new GenericException("Error parsing JSON command argument list, expected a single command, command list [" + cmdSrc + "]");
@@ -742,17 +741,11 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                 }
-                //
                 return CmdAccumulator;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-#else
-            return string.Empty;
-#endif
         }
-
-
     }
 }
