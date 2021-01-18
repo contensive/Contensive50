@@ -1,15 +1,9 @@
 ﻿
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Tests.TestConstants;
 using Contensive.Processor;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     //
     //====================================================================================================
     //

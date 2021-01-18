@@ -1,12 +1,11 @@
 ﻿
-using Contensive.Processor;
 using Contensive.BaseClasses;
-using System;
-using System.Collections.Generic;
+using Contensive.Processor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ViewTests {
+namespace Tests {
 
     [TestClass()]
     public class CpCSTests {

@@ -11,26 +11,14 @@
                 HttpContext.Current.Response.End()
                 Exit Sub
             End If
-            If (ConfigurationManager.AppSettings("ContensiveUseWebConfig").ToLower = "true") Then
-                '
-                ' -- initialize with web.config settings
-                Dim serverConfig As Contensive.Processor.Models.Domain.ServerConfigModel = DefaultSite.ConfigurationClass.getServerConfig()
-                Using cp As New Contensive.Processor.CPClass(serverConfig.apps(0).name, serverConfig, HttpContext.Current)
-                    Response.Write(cp.executeRoute())
-                    If (DefaultSite.ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
-                        HttpRuntime.UnloadAppDomain()
-                    End If
-                End Using
-            Else
-                '
-                ' -- initialize with contensive c:\programdata\contensive\serverConfig.json (use same settings as cli and services)
-                Using cp As New Contensive.Processor.CPClass(DefaultSite.ConfigurationClass.getAppName(), HttpContext.Current)
-                    Response.Write(cp.executeRoute())
-                    If (DefaultSite.ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
-                        HttpRuntime.UnloadAppDomain()
-                    End If
-                End Using
-            End If
+            '
+            ' -- initialize with contensive d:\contensive\serverConfig.json (use same settings as cli and services)
+            Using cp As New Contensive.Processor.CPClass(DefaultSite.ConfigurationClass.getAppName(), HttpContext.Current)
+                Response.Write(cp.executeRoute())
+                If (DefaultSite.ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
+                    HttpRuntime.UnloadAppDomain()
+                End If
+            End Using
         Catch ex As Exception
         Finally
         End Try

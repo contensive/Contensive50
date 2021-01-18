@@ -1,20 +1,19 @@
 ﻿
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Controllers;
 using static Tests.TestConstants;
-using Contensive.Processor;
-using Contensive.Processor.Models.Domain;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     //
     //====================================================================================================
     /// <summary>
     /// cache controller unit tests
     /// </summary>
     [TestClass()]
-    public class cacheControllerTests {
+    public class CacheControllerTests {
         //
         //====================================================================================================
         //

@@ -186,8 +186,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="core"></param>
         /// <param name="src"></param>
         /// <param name="Context"></param>
-        /// <param name="deprecated_personalizationPeopleId"></param>
-        /// <param name="deprecated_personalizationIsAuthenticated"></param>
         /// <returns></returns>
         public static string executeContentCommands(CoreController core, string src, CPUtilsBaseClass.addonContext Context) {
             try {
@@ -467,7 +465,8 @@ namespace Contensive.Processor.Controllers {
                     //
                     // execute the commands in the JSON cmdCollection
                     //
-                    foreach (object cmd in cmdCollection) {
+                    foreach (object srcCmd in cmdCollection) {
+
                         //
                         // repeat for all commands in the collection:
                         // convert each command in the command array to a cmd string, and a cmdArgDef dictionary
@@ -477,6 +476,17 @@ namespace Contensive.Processor.Controllers {
                         //   C - { "command" : "single-default-argument" }
                         //   D - { "command" : { "name" : "The Name"} }
                         //   E - { "command" : { "name" : "The Name" , "secondArgument" : "secondValue" } }
+                        //
+                        //
+                        // -- these inner objects are newtonsoft jobject. serialize and deserialize
+                        string tmp = Newtonsoft.Json.JsonConvert.SerializeObject(srcCmd);
+                        object cmd;
+                        if(tmp.left(1).Equals("{") && tmp.right(1).Equals("}")) {
+                            cmd = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(tmp);
+                        } else {
+                            cmd = Newtonsoft.Json.JsonConvert.DeserializeObject<string>(tmp);
+                        }
+                        //Dictionary<string, object> cmd = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(tmp);
                         //
                         string cmdTypeName = cmd.GetType().FullName.ToLowerInvariant();
                         string cmdText = "";
@@ -510,7 +520,11 @@ namespace Contensive.Processor.Controllers {
                                         { "default", cmdDef[cmdDefKey] }
                                     };
                                 } else if ((cmdDefValueTypeName == "dictionary") || (cmdDefValueTypeName == "dictionary(of string,object)") || (cmdTypeName.left(37) == "system.collections.generic.dictionary")) {
-                                    cmdArgDef = (Dictionary<string, object>)cmdDef[cmdDefKey];
+                                    //
+                                    // -- json jobject that mimiks dictionary. serialize it and re-deserialize 
+                                    string asdfasdf = Newtonsoft.Json.JsonConvert.SerializeObject(cmdDef[cmdDefKey]);
+                                    cmdArgDef = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, object>>(asdfasdf);
+                                    //cmdArgDef = (Dictionary<string, object>)cmdDef[cmdDefKey];
                                 } else {
                                     //
                                     // syntax error, bad command

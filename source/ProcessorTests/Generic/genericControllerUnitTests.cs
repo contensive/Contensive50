@@ -1,13 +1,13 @@
 ﻿
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Contensive.Processor;
 using Contensive.Processor.Controllers;
-using static Tests.TestConstants;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using static Newtonsoft.Json.JsonConvert;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     [TestClass]
     public class GenericControllerUnitTests {
         //

@@ -1,34 +1,27 @@
 ﻿
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using Contensive.Processor.Controllers;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Exceptions;
 
 namespace Contensive.Processor.Addons.AdminSite {
+    /// <summary>
+    /// Create tabs in edit view
+    /// </summary>
     public static class EditViewTabList {
         //
         // ====================================================================================================
         /// <summary>
-        /// Generate the content of a tab in the Edit Screen
+        /// Get tabs saved
         /// </summary>
         /// <param name="core"></param>
         /// <param name="adminData"></param>
+        /// <param name="editorEnv"></param>
         /// <param name="RecordID"></param>
         /// <param name="ContentID"></param>
-        /// <param name="record_readOnly"></param>
-        /// <param name="IsLandingPage"></param>
-        /// <param name="IsRootPage"></param>
         /// <param name="EditTab"></param>
-        /// <param name="EditorContext"></param>
-        /// <param name="return_NewFieldList"></param>
-        /// <param name="HelpCnt"></param>
-        /// <param name="HelpIDCache"></param>
-        /// <param name="helpDefaultCache"></param>
-        /// <param name="HelpCustomCache"></param>
-        /// <param name="AllowHelpMsgCustom"></param>
-        /// <param name="helpIdIndex"></param>
         /// <returns></returns>
         public static string getTab(CoreController core, AdminDataModel adminData, EditorEnvironmentModel editorEnv, int RecordID, int ContentID, string EditTab) {
             string returnHtml = "";
@@ -88,18 +81,8 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// </summary>
         /// <param name="core"></param>
         /// <param name="adminData"></param>
-        /// <param name="readOnlyField"></param>
-        /// <param name="IsLandingPage"></param>
-        /// <param name="IsRootPage"></param>
-        /// <param name="EditorContext"></param>
-        /// <param name="TemplateIDForStyles"></param>
-        /// <param name="fieldEditorList"></param>
-        /// <param name="styleList"></param>
-        /// <param name="styleOptionList"></param>
-        /// <param name="emailIdForStyles"></param>
-        /// <param name="IsTemplateTable"></param>
-        /// <param name="editorAddonListJSON"></param>
-        /// <returns></returns>
+        /// <param name="editTabs"></param>
+        /// <param name="editorEnv"></param>
         public static void addContentTabs(CoreController core, AdminDataModel adminData, EditTabModel editTabs, EditorEnvironmentModel editorEnv) {
             try {
                 // todo
@@ -164,19 +147,17 @@ namespace Contensive.Processor.Addons.AdminSite {
         /// add a tab to the list of tabs
         /// </summary>
         /// <param name="core"></param>
+        /// <param name="editTabs"></param>
         /// <param name="Caption"></param>
         /// <param name="Content"></param>
         /// <returns></returns>
         public static void addCustomTab(CoreController core, EditTabModel editTabs, string Caption, string Content) {
             try {
-                if (string.IsNullOrEmpty(Content)) { return ; }
+                if (string.IsNullOrEmpty(Content)) { return; }
                 editTabs.addEntry(Caption.Replace(" ", "&nbsp;"), "", "", Content, false, "ccAdminTab");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
             }
         }
-        //
-        //
-
     }
 }

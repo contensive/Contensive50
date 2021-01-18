@@ -2,7 +2,7 @@
 using Contensive.Models.Db;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
-using Enyim.Caching;
+using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -81,7 +81,10 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// AWS client. Dispose on close
         /// </summary>
-        private Enyim.Caching.MemcachedClient cacheClient = null;
+        //private Enyim.Caching.MemcachedClient cacheClientMemCacheD = null;
+        private readonly ConnectionMultiplexer redisConnectionGroup;
+        //
+        private readonly IDatabase redisDb;
         //
         // ====================================================================================================
         // ----- private instance storage
@@ -89,6 +92,21 @@ namespace Contensive.Processor.Controllers {
         /// true if cacheClient initialized correctly
         /// </summary>
         private readonly bool remoteCacheInitialized;
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //private static Lazy<ConnectionMultiplexer> lazyConnection = new Lazy<ConnectionMultiplexer>(() => {
+        //    return ConnectionMultiplexer.Connect("whatever-redis.bd1zu2.0009.usw2.cache.amazonaws.com:6379");
+        //});
+        ////
+        ////====================================================================================================
+        ////
+        //public static ConnectionMultiplexer connection {
+        //    get {
+        //        ConnectionMultiplexer lazyConnection = ConnectionMultiplexer.Connect("whatever-redis.bd1zu2.0009.usw2.cache.amazonaws.com:6379");
+        //        return lazyConnection;
+        //    }
+        //}
         //
         //====================================================================================================
         /// <summary>
@@ -101,44 +119,30 @@ namespace Contensive.Processor.Controllers {
                 //
                 _globalInvalidationDate = null;
                 remoteCacheInitialized = false;
-//#if NETFRAMEWORK
                 if (core.serverConfig.enableRemoteCache) {
                     //
-                    // -- leave off, it causes a performance hit
-                    if (core.serverConfig.enableEnyimNLog) { Enyim.Caching.LogManager.AssignFactory(new NLogFactory()); }
-                    //
-                    // -- test core version
-                     services.AddEnyimMemcached(memcachedClientOptions => {
-                        memcachedClientOptions.Servers.Add(new Server {
-                            Address = "127.0.0.1",
-                            Port = 11211
-                        });
-                    });
-                    //
-                    // -- initialize memcached drive (Enyim)
+                    // -- Redis implementation
                     string cacheEndpoint = core.serverConfig.awsElastiCacheConfigurationEndpoint;
                     if (!string.IsNullOrEmpty(cacheEndpoint)) {
-                        string[] cacheEndpointSplit = cacheEndpoint.Split(':');
-                        int cacheEndpointPort = 11211;
-                        if (cacheEndpointSplit.GetUpperBound(0) > 1) {
-                            cacheEndpointPort = GenericController.encodeInteger(cacheEndpointSplit[1]);
-                        }
-                        Amazon.ElastiCacheCluster.ElastiCacheClusterConfig cacheConfig = new Amazon.ElastiCacheCluster.ElastiCacheClusterConfig(cacheEndpointSplit[0], cacheEndpointPort) {
-                            Protocol = Enyim.Caching.Memcached.MemcachedProtocol.Binary
-                        };
-                        cacheClient = new Enyim.Caching.MemcachedClient(cacheConfig);
-                        if (cacheClient != null) {
+                        redisConnectionGroup = ConnectionMultiplexer.Connect(cacheEndpoint);
+                        if (redisConnectionGroup != null) {
+                            redisDb = redisConnectionGroup.GetDatabase();
                             remoteCacheInitialized = true;
                         }
                     }
                 }
-//#endif
+            } catch (RedisConnectionException ex) {
+                //
+                // -- could not connect
+                LogController.logError(core, ex, "Exception initializing Redis connection, will continue with cache disabled.");
             } catch (Exception ex) {
                 //
-                // -- client does not throw its own errors, so try to differentiate by message
-                throw (new GenericException("Exception initializing remote cache, will continue with cache disabled.", ex));
+                // -- mystery except, buyt cannot let a connection error take down the application
+                LogController.logError(core, ex, "Exception initializing remote cache, will continue with cache disabled.");
             }
         }
+
+
         //
         //========================================================================
         /// <summary>
@@ -292,22 +296,29 @@ namespace Contensive.Processor.Controllers {
                     // -- use remote cache
                     typeMessage = "remote";
                     try {
-                        result = cacheClient.Get<CacheDocumentClass>(keyHash.hash);
-                    } catch (Exception ex) {
-                        //
-                        // --client does not throw its own errors, so try to differentiate by message
-                        if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
-                            //
-                            // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
-                            LogController.logWarn(core, ex);
-                            cacheClient.Remove(keyHash.hash);
-                            result = null;
-                        } else {
-                            //
-                            // -- some other error
-                            LogController.logError(core, ex);
-                            throw;
+                        RedisKey redisKey = new RedisKey(keyHash.hash);
+                        RedisValue redisValue = redisDb.StringGet(redisKey);
+                        if(!redisValue.IsNull) {
+                            result = Newtonsoft.Json.JsonConvert.DeserializeObject<CacheDocumentClass>(redisValue);
                         }
+                        //result = cacheClientMemCacheD.Get<CacheDocumentClass>(keyHash.hash);
+                    } catch (Exception ex) {
+                        LogController.logError(core, ex);
+                        throw;
+                        ////
+                        //// --memcachd -- client does not throw its own errors, so try to differentiate by message
+                        //if (ex.Message.ToLowerInvariant().IndexOf("unable to load type") >= 0) {
+                        //    //
+                        //    // -- trying to deserialize an object and this code does not have a matching class, clear cache and return empty
+                        //    LogController.logWarn(core, ex);
+                        //    cacheClientMemCacheD.Remove(keyHash.hash);
+                        //    result = null;
+                        //} else {
+                        //    //
+                        //    // -- some other error
+                        //    LogController.logError(core, ex);
+                        //    throw;
+                        //}
                     }
                 }
                 if ((result == null) && core.serverConfig.enableLocalMemoryCache) {
@@ -366,7 +377,6 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// save an object to cache, with invalidation date and dependentKeyList
-        /// 
         /// </summary>
         /// <param name="key"></param>
         /// <param name="content"></param>
@@ -867,11 +877,17 @@ namespace Contensive.Processor.Controllers {
                     if (remoteCacheInitialized) {
                         //
                         // -- save remote cache
-                        if (!cacheClient.Store(Enyim.Caching.Memcached.StoreMode.Set, keyHash.hash, cacheDocument, cacheDocument.invalidationDate)) {
-                            //
-                            // -- store failed
-                            LogController.logError(core, "Enyim cacheClient.Store failed, no details available.");
-                        }
+                        var redisKey = new RedisKey(keyHash.hash);
+                        string jsonCacheDocument = Newtonsoft.Json.JsonConvert.SerializeObject(cacheDocument);
+                        var redisValue = new RedisValue( jsonCacheDocument);
+                        TimeSpan? redisTimeSpan = cacheDocument.invalidationDate.Subtract(DateTime.Now);
+                        redisDb.StringSet(redisKey, redisValue, redisTimeSpan);
+
+                        //if (!cacheClientMemCacheD.Store(Enyim.Caching.Memcached.StoreMode.Set, keyHash.hash, cacheDocument, cacheDocument.invalidationDate)) {
+                        //    //
+                        //    // -- store failed
+                        //    LogController.logError(core, "Enyim cacheClient.Store failed, no details available.");
+                        //}
                     }
                 }
                 //
@@ -989,9 +1005,13 @@ namespace Contensive.Processor.Controllers {
             if (!this.disposed) {
                 this.disposed = true;
                 if (disposing) {
-                    if (cacheClient != null) {
-                        cacheClient.Dispose();
+                    if (redisConnectionGroup != null) {
+                        redisConnectionGroup.Close();
+                        redisConnectionGroup.Dispose();
                     }
+                    //if (cacheClientMemCacheD != null) {
+                    //    cacheClientMemCacheD.Dispose();
+                    //}
                     //
                     // cleanup managed objects
                 }

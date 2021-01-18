@@ -1,11 +1,6 @@
 ﻿
-Option Explicit On
-Option Strict On
-
-Imports System.Web.SessionState
-Imports System.Web.Routing
-Imports Contensive.Processor.Controllers
 Imports Contensive
+Imports Contensive.Processor.Controllers
 
 Public Class Global_asax
     Inherits System.Web.HttpApplication

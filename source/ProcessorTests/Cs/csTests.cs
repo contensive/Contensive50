@@ -1,16 +1,13 @@
-﻿
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive;
-using Contensive.Processor;
-using Contensive.Processor.Models;
-using Contensive.BaseClasses;
-using Contensive.Processor.Controllers;
-using static Tests.TestConstants;
+﻿using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Data;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     //
     //====================================================================================================
     // file types to test...
@@ -210,7 +207,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         //
         //
-        public void createAndReadFileField_Util(CPContentClass.FieldTypeIdEnum fieldType, string expectedExtensionLower, string failMessage) {
+        public static void createAndReadFileField_Util(CPContentClass.FieldTypeIdEnum fieldType, string expectedExtensionLower) {
             using (CPClass cp = new CPClass(testAppName)) {
                 string testContent = "testContent" + cp.Utils.GetRandomInteger().ToString();
                 string testField = "testField" + cp.Utils.GetRandomInteger().ToString();
@@ -252,35 +249,35 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
         //
         [TestMethod()]
         public void createSaveReadHtmlFile_Test() {
-            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileHTML, ".html", "Testing Field Type fileHtml");
+            createAndReadFileField_Util(CPContentBaseClass.FieldTypeIdEnum.FileHTML, ".html");
         }
         //
         //
         //
         [TestMethod()]
         public void createFieldCSSFileTest() {
-            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileCSS, ".css", "Testing Field Type FileCSS");
+            createAndReadFileField_Util(CPContentBaseClass.FieldTypeIdEnum.FileCSS, ".css");
         }
         //
         //
         //
         [TestMethod()]
         public void createFieldJSFileTest() {
-            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileJavascript, ".js", "Testing Field Type FileJS");
+            createAndReadFileField_Util(CPContentBaseClass.FieldTypeIdEnum.FileJavascript, ".js");
         }
         //
         //
         //
         [TestMethod()]
         public void createFieldTextFileTest() {
-            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileText, ".txt", "Testing Field Type FileText");
+            createAndReadFileField_Util(CPContentBaseClass.FieldTypeIdEnum.FileText, ".txt");
         }
         //
         //
         //
         [TestMethod()]
         public void createFieldXmlFileTest() {
-            createAndReadFileField_Util(BaseClasses.CPContentBaseClass.FieldTypeIdEnum.FileXML, ".xml", "Testing Field Type FileText");
+            createAndReadFileField_Util(CPContentBaseClass.FieldTypeIdEnum.FileXML, ".xml");
         }
 
     }

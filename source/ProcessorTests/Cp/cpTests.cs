@@ -1,13 +1,11 @@
 ﻿
-using Contensive.Processor;
 using Contensive.BaseClasses;
-using System;
-using System.Collections.Generic;
+using Contensive.Models.Db;
+using Contensive.Processor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Tests.TestConstants;
-using Contensive.Models.Db;
 
-namespace Contensive.ProcessorTests.UnitTests.ViewTests {
+namespace Tests {
     [TestClass()]
     public class CpTests {
         //====================================================================================================
@@ -110,7 +108,7 @@ namespace Contensive.ProcessorTests.UnitTests.ViewTests {
                     }
                 }
                 // -- invalidate route map cache
-                Processor.Models.Domain.RouteMapModel.invalidateCache(cp.core);
+                Contensive.Processor.Models.Domain.RouteMapModel.invalidateCache(cp.core);
                 // - clear local route map cache 
                 cp.core.routeMapCacheClear();
                 //

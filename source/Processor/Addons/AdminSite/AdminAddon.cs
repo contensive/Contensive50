@@ -298,8 +298,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                     } else if (adminData.adminForm != 0) {
                         //
                         // -- formindex requires valid content
-                        if ((adminData.adminContent.tableName == null) && (adminData.adminForm == AdminFormIndex)) { 
-                            adminData.adminForm = AdminFormRoot; 
+                        if ((adminData.adminContent.tableName == null) && (adminData.adminForm == AdminFormIndex)) {
+                            adminData.adminForm = AdminFormRoot;
                         }
                         //
                         // No content so far, try the forms
@@ -584,8 +584,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                 DateTime CollectionLastUpdated = default(DateTime);
                 var includeHelp = new StringBuilder();
                 //
-                if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) { 
-                    return ""; 
+                if (GenericController.strInstr(1, "," + usedIDString + ",", "," + helpCollectionID + ",") == 0) {
+                    return "";
                 }
                 using (var csData = new CsModel(cp.core)) {
                     csData.openRecord("Add-on Collections", helpCollectionID);

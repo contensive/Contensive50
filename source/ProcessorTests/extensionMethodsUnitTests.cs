@@ -1,16 +1,17 @@
 ﻿
-using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor.Controllers;
+using System;
 
-namespace Contensive.ProcessorTests.UnitTests {
+namespace Tests {
     [TestClass]
-    public class extensionMethodsUnitTests {
+    public class ExtensionMethodsUnitTests {
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// test
+        /// </summary>
         [TestMethod]
-        public void Extensions_String_Left_test1() {
+        public void string_Left_test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -32,9 +33,11 @@ namespace Contensive.ProcessorTests.UnitTests {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// test
+        /// </summary>
         [TestMethod]
-        public void Extensions_String_Right_Test1() {
+        public void string_Right_Test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -58,7 +61,7 @@ namespace Contensive.ProcessorTests.UnitTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Extensions_String_IsNumeric_Test1() {
+        public void string_IsNumeric_Test1() {
             // arrange
             string arg1 = "1234567890";
             string arg2 = "";
@@ -87,7 +90,7 @@ namespace Contensive.ProcessorTests.UnitTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Extensions_DateTime_IsOld_Test1() {
+        public void dateTime_IsOld_Test1() {
             // arrange
             var arg1 = new DateTime(1, 1, 1);
             var arg2 = new DateTime(2017, 1, 1);
@@ -104,7 +107,7 @@ namespace Contensive.ProcessorTests.UnitTests {
         //====================================================================================================
         //
         [TestMethod]
-        public void Extensions_DateTime_MinDateIfOld_Test1() {
+        public void dateTime_MinDateIfOld_Test1() {
             // arrange
             var arg1 = new DateTime(1, 1, 1);
             var arg2 = new DateTime(2017, 1, 1);

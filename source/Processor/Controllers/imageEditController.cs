@@ -50,7 +50,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //
-        //
+        /// <summary>
+        /// save the image to a file
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="fileSystem"></param>
+        /// <returns></returns>
         public bool save(string pathFilename, FileController fileSystem) {
             bool returnOk = false;
             try {

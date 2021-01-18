@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Tests {
+﻿namespace Tests {
     public static class TestConstants {
         //
         // code version for this build. This is saved in a site property and checked in the housekeeping event - checkDataVersion

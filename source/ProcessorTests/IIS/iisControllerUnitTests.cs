@@ -1,16 +1,12 @@
-﻿
-using System;
+﻿using Contensive.Processor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor;
-using Contensive.Processor.Controllers;
-using static Tests.TestConstants;
 using Microsoft.Web.Administration;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     [TestClass]
-    public class iisControllerUnitTests {
+    public class IisControllerUnitTests {
         [TestMethod]
-        public void Controllers_iis_verifyAppPool_test1() {
+        public void verifyAppPool_test1() {
             // arrange
             string appPoolName = "testAppPool";
             using (ServerManager serverManager = new ServerManager()) {

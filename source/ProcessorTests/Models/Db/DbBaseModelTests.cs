@@ -1,11 +1,13 @@
-﻿using Contensive.Processor;
+﻿
+using Contensive.Models.Db;
+using Contensive.Processor;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
 using static Tests.TestConstants;
 
-namespace Contensive.Models.Db.Tests {
+namespace Tests {
     [TestClass()]
     public class DbBaseModelTests {
         [TestMethod()]
@@ -104,7 +106,7 @@ namespace Contensive.Models.Db.Tests {
         public void addDefaultTest_CreatedBy() {
             using (CPClass cp = new CPClass(testAppName)) {
                 string defaultRootUserGuid = "{4445cd14-904f-480f-a7b7-29d70d0c22ca}";
-                var root = PersonModel.create<PersonModel>(cp, defaultRootUserGuid);
+                var root = Contensive.Models.Db.DbBaseModel.create<Contensive.Models.Db.PersonModel>(cp, defaultRootUserGuid);
                 if(root == null ) {
                     root = DbBaseModel.addDefault<PersonModel>(cp);
                     root.ccguid = defaultRootUserGuid;

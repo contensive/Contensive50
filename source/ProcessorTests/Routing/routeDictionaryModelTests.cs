@@ -1,11 +1,10 @@
 ﻿
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Tests.TestConstants;
 using Contensive.Processor;
 using Contensive.Processor.Models.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ModelTests {
+namespace Tests {
     [TestClass()]
     public class RouteMapModelTests {
         [TestMethod]

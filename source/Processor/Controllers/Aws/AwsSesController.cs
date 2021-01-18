@@ -8,7 +8,7 @@ using Contensive.Processor.Extensions;
 using Contensive.Processor.Models.Domain;
 //
 namespace Contensive.Processor.Controllers {
-    public class AwsSesController {
+    public static class AwsSesController {
         //
         //====================================================================================================
         /// <summary>

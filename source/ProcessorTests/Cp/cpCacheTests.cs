@@ -1,13 +1,12 @@
 ﻿
+using Contensive.Models.Db;
 using Contensive.Processor;
-using Contensive.BaseClasses;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using static Tests.TestConstants;
-using Contensive.Models.Db;
 
-namespace Contensive.ProcessorTests.UnitTests.ViewTests {
+namespace Tests {
 
     [TestClass()]
     public class CpCacheTests {

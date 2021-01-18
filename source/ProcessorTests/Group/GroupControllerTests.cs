@@ -1,17 +1,14 @@
 ﻿
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Contensive.Models.Db;
+using Contensive.Processor;
 using Contensive.Processor.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Tests.TestConstants;
-using Contensive.Processor;
 using System.Data;
-using Contensive.Models.Db;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     //
     //====================================================================================================
     //

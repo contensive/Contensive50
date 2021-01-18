@@ -12,7 +12,7 @@ using Contensive.Processor.Extensions;
 
 //
 namespace Contensive.Processor.Controllers {
-    public class AwsSqsController {
+    public static class AwsSqsController {
         //
         //====================================================================================================
         /// <summary>

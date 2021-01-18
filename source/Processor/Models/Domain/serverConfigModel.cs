@@ -134,7 +134,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Save the object
         /// </summary>
-        /// <param name="cp"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
         public int save(CoreController core) {
             try {

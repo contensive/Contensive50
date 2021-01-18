@@ -1,26 +1,22 @@
 ﻿
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor.Controllers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Tests.TestConstants;
-using Contensive.Processor;
 using Contensive.BaseClasses;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     //
     //====================================================================================================
     //
     [TestClass()]
-    public class activeContentControllerTests {
+    public class ActiveContentControllerTests {
         //
         //====================================================================================================
         //
         [TestMethod]
-        public void Controllers_ActiveContent_Content()  {
+        public void controllers_ActiveContent_Content()  {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 string source = "<ac Type=\"content\">";

@@ -325,11 +325,12 @@ namespace Contensive.Models.Db {
                 Type stackClass = stackMethod.ReflectedType;
                 string stackNamespace = stackClass.Namespace.ToLowerInvariant();
                 //
-                // -- return false if calling method is outside of dbmodels and processor
+                // -- return false if calling method is outside of dbmodels and processor or tests
+                bool namespaceWithinTests = (stackNamespace.Length >= 5) && stackNamespace.Substring(0, 5).Equals("tests");
                 bool namespaceWithinDbModels = (stackNamespace.Length >= 20) && stackNamespace.Substring(0, 20).Equals("contensive.models.db");
                 bool namespaceWithinProcessor = (stackNamespace.Length >= 20) && stackNamespace.Substring(0, 20).Equals("contensive.processor");
-                if (!namespaceWithinProcessor && !namespaceWithinDbModels) { return false; }
-                if (namespaceWithinProcessor) { return true; }
+                if (namespaceWithinProcessor || namespaceWithinTests) { return true; }
+                if (!namespaceWithinTests && !namespaceWithinProcessor && !namespaceWithinDbModels) { return false; }
             }
             return true;
             //

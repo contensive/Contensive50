@@ -102,87 +102,175 @@ namespace Contensive.Processor {
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Delete a file if it exists.
+        /// </summary>
+        /// <param name="filename"></param>
         public override void DeleteFile(string filename) {
             fileSystemController.deleteFile(filename);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Read a text file. If the file does not exist, returns empty.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public override string Read(string filename) {
             return fileSystemController.readFileText(filename);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Read binary file to binary array. If the file does not exist, returns empty.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns></returns>
         public override byte[] ReadBinary(string filename) {
             return fileSystemController.readFileBinary(filename);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Save text file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="fileContent"></param>
         public override void Save(string filename, string fileContent) {
             fileSystemController.saveFile(filename, fileContent);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Save response from an http get
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
         public override void SaveHttpGet(string pathFilename, string url) {
             fileSystemController.saveHttpRequestToFile(pathFilename, url);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// save response from an http post
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
+        /// <param name="requestArguments"></param>
         public override void SaveHttpPost(string pathFilename, string url, List<KeyValuePair<string, string>> requestArguments) {
             throw new NotImplementedException();
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// save response from an http post
+        /// </summary>
+        /// <param name="pathFilename"></param>
+        /// <param name="url"></param>
+        /// <param name="entity"></param>
         public override void SaveHttpPost(string pathFilename, string url, string entity) {
             throw new NotImplementedException();
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// Save binary file
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <param name="fileContent"></param>
         public override void SaveBinary(string filename, byte[] fileContent) {
             fileSystemController.saveFile(filename, fileContent);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// return if file exists
+        /// </summary>
+        /// <param name="pathFileName"></param>
+        /// <returns></returns>
         public override bool FileExists(string pathFileName) {
             return fileSystemController.fileExists(pathFileName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// return if a folder exists
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
         public override bool FolderExists(string folderName) {
             return fileSystemController.pathExists(folderName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// get file details
+        /// </summary>
+        /// <param name="PathFilename"></param>
+        /// <returns></returns>
         public override FileDetail FileDetails(string PathFilename) {
             return fileSystemController.getFileDetails(PathFilename);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// get file list
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageNumber"></param>
+        /// <returns></returns>
         public override List<FileDetail> FileList(string folderName, int pageSize, int pageNumber) {
             return fileSystemController.getFileList(folderName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// get file list
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public override List<FileDetail> FileList(string folderName, int pageSize) {
             return fileSystemController.getFileList(folderName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// get file list
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
         public override List<FileDetail> FileList(string folderName) {
             return fileSystemController.getFileList(folderName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// get folder list
+        /// </summary>
+        /// <param name="folderName"></param>
+        /// <returns></returns>
         public override List<FolderDetail> FolderList(string folderName) {
             return fileSystemController.getFolderList(folderName);
         }
         //
         //==========================================================================================
+        /// <summary>
+        /// delete folder
+        /// </summary>
+        /// <param name="folderPath"></param>
         public override void DeleteFolder(string folderPath) {
             fileSystemController.deleteFolder(folderPath);
         }
         //
         //==========================================================================================
-        //
+        /// <summary>
+        /// save an upload to a file
+        /// </summary>
+        /// <param name="htmlformName"></param>
+        /// <param name="returnFilename"></param>
+        /// <returns></returns>
         public override bool SaveUpload(string htmlformName, ref string returnFilename) {
             return fileSystemController.upload(htmlformName, "\\upload", ref returnFilename);
         }

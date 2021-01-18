@@ -273,7 +273,7 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated, please use cp.CdnFiles, cp.PrivateFiles, cp.WwwFiles, or cp.TempFiles instead.", false)]
         public override void DeleteFolder(string pathFolderName) {
             if (core.wwwFiles.isinLocalAbsDosPath(pathFolderName)) {
-                core.wwwFiles.deleteFolder(core.wwwFiles.convertLocalAbsToRelativePath((pathFolderName)));
+                core.wwwFiles.deleteFolder(core.wwwFiles.convertLocalAbsToRelativePath(pathFolderName));
             } else if (core.privateFiles.isinLocalAbsDosPath(pathFolderName)) {
                 core.privateFiles.deleteFolder( core.privateFiles.convertLocalAbsToRelativePath( pathFolderName));
             } else if (core.cdnFiles.isinLocalAbsDosPath(pathFolderName)) {

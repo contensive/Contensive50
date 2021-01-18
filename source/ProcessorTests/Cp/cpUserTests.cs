@@ -1,15 +1,13 @@
 ﻿
 using Contensive.Processor;
-using Contensive.BaseClasses;
-using System;
-using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using static Tests.TestConstants;
 using Contensive.Processor.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ViewTests {
+namespace Tests {
     [TestClass()]
-    public class cpUserTests {
+    public class CpUserTests {
         //====================================================================================================
         /// <summary>
         ///  Test 1 - cp ok without application (cluster mode).

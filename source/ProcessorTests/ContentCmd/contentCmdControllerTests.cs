@@ -1,18 +1,12 @@
 ﻿
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Contensive.Processor.Controllers;
-
-using static Tests.TestConstants;
 using Contensive.BaseClasses;
-using Contensive.Processor;
 using Contensive.Models.Db;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     [TestClass()]
     public class contentCmdControllerTests {
         //

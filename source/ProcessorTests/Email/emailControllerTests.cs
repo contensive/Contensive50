@@ -1,14 +1,14 @@
 ﻿
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Contensive.Processor.Controllers;
-using static Tests.TestConstants;
-using System.Linq;
-using Contensive.Processor;
-using Contensive.Processor.Models.Domain;
 using Contensive.Models.Db;
+using Contensive.Processor;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Models.Domain;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using System.Linq;
+using static Tests.TestConstants;
 
-namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
+namespace Tests {
     [TestClass]
     public class EmailControllerTests {
         //
@@ -97,7 +97,7 @@ namespace Contensive.ProcessorTests.UnitTests.ControllerTests {
                 string test2 = GenericController.getRandomInteger(cp.core).ToString() + "@kma.net";
                 // act
                 EmailController.addToBlockList(cp.core, test1);
-                string blockList = Processor.Controllers.EmailController.getBlockList(cp.core);
+                string blockList = Contensive.Processor.Controllers.EmailController.getBlockList(cp.core);
                 // assert
                 Assert.IsTrue(EmailController.isOnBlockedList(cp.core, test1));
                 Assert.IsFalse(EmailController.isOnBlockedList(cp.core, test2));
