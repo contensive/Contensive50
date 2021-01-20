@@ -1298,23 +1298,23 @@ namespace Contensive.Processor.Controllers {
         /// execute an assembly in a path
         /// </summary>
         /// <param name="addon"></param>
-        /// <param name="fullPath"></param>
-        /// <param name="IsDevAssembliesFolder"></param>
+        /// <param name="dosAbsPath"></param>
+        /// <param name="assemblyFileDictKey"></param>
         /// <param name="addonFound"></param>
         /// <returns></returns>
-        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string fullPath, ref bool addonFound) {
+        private string execute_dotNetClass_byPath(AddonModel addon, string assemblyFileDictKey, string dosAbsPath, ref bool addonFound) {
             try {
                 addonFound = false;
-                if (!Directory.Exists(fullPath)) { return string.Empty; }
-                foreach (var testPathFilename in Directory.GetFileSystemEntries(fullPath, "*.dll")) {
+                if (!Directory.Exists(dosAbsPath)) { return string.Empty; }
+                foreach (var testDosAbsPathFilename in Directory.GetFileSystemEntries(dosAbsPath, "*.dll")) {
                     //
                     // -- tmp test skipping the non-addon list, depend on found-addon list instead
-                    if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testPathFilename.ToLower(CultureInfo.InvariantCulture).right(x.Length) == x))) {
+                    if (!string.IsNullOrEmpty(core.assemblyList_NonAddonsInstalled.Find(x => testDosAbsPathFilename.ToLower(CultureInfo.InvariantCulture).right(x.Length) == x))) {
                         //
                         // -- this assembly is a non-addon installed file, block full path
                         continue;
                     };
-                    string returnValue = execute_dotNetClass_assembly(addon, testPathFilename, ref addonFound);
+                    string returnValue = execute_dotNetClass_assembly(addon, testDosAbsPathFilename, ref addonFound);
                     if (addonFound) {
                         //
                         // -- addon found, save addonsFound list and return the addon result
@@ -1323,7 +1323,7 @@ namespace Contensive.Processor.Controllers {
                         lock (lockObj) {
                             if (!core.assemblyList_AddonsFound.ContainsKey(assemblyFileDictKey)) {
                                 core.assemblyList_AddonsFound.Add(assemblyFileDictKey, new AssemblyFileDetails {
-                                    pathFilename = testPathFilename,
+                                    pathFilename = testDosAbsPathFilename,
                                     path = ""
                                 });
                                 core.assemblyList_AddonsFound_save();
@@ -1346,37 +1346,36 @@ namespace Contensive.Processor.Controllers {
         /// Execute an addon assembly
         /// </summary>
         /// <param name="addon"></param>
-        /// <param name="assemblyPhysicalPrivatePathname"></param>
-        /// <param name="fileIsValidAddonAssembly">The file was a valid assembly, just not the right onw</param>
+        /// <param name="assemblyPrivateAbsPathFilename"></param>
         /// <param name="addonFound">If found, the search for the assembly can be abandoned</param>
         /// <returns></returns>
-        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPhysicalPrivatePathname, ref bool addonFound) {
+        private string execute_dotNetClass_assembly(AddonModel addon, string assemblyPrivateAbsPathFilename, ref bool addonFound) {
             try {
                 //
-                LogController.logTrace(core, "execute_dotNetClass_assembly, enter, [" + assemblyPhysicalPrivatePathname + "]");
+                LogController.logTrace(core, "execute_dotNetClass_assembly, enter, [" + assemblyPrivateAbsPathFilename + "]");
                 //
                 Assembly testAssembly = null;
                 addonFound = false;
                 try {
                     //
                     // -- "once an assembly is loaded into an appdomain, it's there for the life of the appdomain."
-                    testAssembly = Assembly.LoadFrom(assemblyPhysicalPrivatePathname);
+                    testAssembly = Assembly.LoadFrom(assemblyPrivateAbsPathFilename);
                 } catch (System.BadImageFormatException) {
                     //
                     // -- file is not an assembly, return addonFound false
                     //
-                    LogController.logTrace(core, "execute_dotNetClass_assembly, 1, [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 1, [" + assemblyPrivateAbsPathFilename + "]");
                     addonFound = false;
                     //
                     // -- MS says BadImageFormatException is how you detect non-assembly DLLs
-                    string filename = Path.GetFileName(assemblyPhysicalPrivatePathname);
+                    string filename = Path.GetFileName(assemblyPrivateAbsPathFilename);
                     if (!string.IsNullOrWhiteSpace(filename)) { core.assemblyList_NonAddonsInstalled.Add(filename); }
                     return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- file is not an assembly, return addonFound false
                     //
-                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 2, [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 2, [" + assemblyPrivateAbsPathFilename + "]");
                     addonFound = false;
                     return string.Empty;
                 }
@@ -1424,26 +1423,26 @@ namespace Contensive.Processor.Controllers {
                 } catch (ArgumentException ex) {
                     //
                     // -- argument exception
-                    LogController.logWarn(core, ex, "Argument Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "], assembly [" + assemblyPhysicalPrivatePathname + "]. Typically these are when the assembly has two classes that differ only by the case of the class name or namespace.");
+                    LogController.logWarn(core, ex, "Argument Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "], assembly [" + assemblyPrivateAbsPathFilename + "]. Typically these are when the assembly has two classes that differ only by the case of the class name or namespace.");
                     addonFound = false;
                     return string.Empty;
                 } catch (ReflectionTypeLoadException ex) {
                     //
                     // -- loader error, one of the types listed could not be loaded. Could be bad or missing dependency
                     foreach (var loaderException in ex.LoaderExceptions) {
-                        LogController.logError(core, ex, "Loader Exception [" + loaderException.Message + "] while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPhysicalPrivatePathname + "]");
+                        LogController.logError(core, ex, "Loader Exception [" + loaderException.Message + "] while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPrivateAbsPathFilename + "]");
                     }
                     addonFound = false;
                     return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- unknown error. Better to log and continue
-                    LogController.logError(core, ex, "Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logError(core, ex, "Exception while enumerating classes for addon [" + addon.id + "," + addon.name + "],  assembly [" + assemblyPrivateAbsPathFilename + "]");
                     addonFound = false;
                     return string.Empty;
                 }
                 //
-                LogController.logTrace(core, "execute_dotNetClass_assembly, 4, [" + assemblyPhysicalPrivatePathname + "]");
+                LogController.logTrace(core, "execute_dotNetClass_assembly, 4, [" + assemblyPrivateAbsPathFilename + "]");
                 //
                 // -- if not addon found, exit now
                 if (!addonFound) { return string.Empty; }
@@ -1452,7 +1451,7 @@ namespace Contensive.Processor.Controllers {
                 AddonBaseClass AddonObj = null;
                 try {
                     //
-                    LogController.logTrace(core, "execute_dotNetClass_assembly, 5, [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 5, [" + assemblyPrivateAbsPathFilename + "]");
                     //
                     // -- Create an object from the Assembly
                     AddonObj = (AddonBaseClass)testAssembly.CreateInstance(addonType.FullName);
@@ -1460,18 +1459,18 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- exception thrown out of application bin folder when xunit library included -- ignore
                     //
-                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a ReflectionTypeLoadException. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex + "]");
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a ReflectionTypeLoadException. Return blank. addon [" + addon.name + "], [" + assemblyPrivateAbsPathFilename + "], exception [" + ex + "]");
                     return string.Empty;
                 } catch (Exception ex) {
                     //
                     // -- problem loading types
                     //
-                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a load exception. Return blank. addon [" + addon.name + "], [" + assemblyPhysicalPrivatePathname + "], exception [" + ex + "]");
+                    LogController.logWarn(core, "execute_dotNetClass_assembly, 6, Assembly matches addon pattern but caused a load exception. Return blank. addon [" + addon.name + "], [" + assemblyPrivateAbsPathFilename + "], exception [" + ex + "]");
                     return string.Empty;
                 }
                 try {
                     //
-                    LogController.logTrace(core, "execute_dotNetClass_assembly, 8, [" + assemblyPhysicalPrivatePathname + "]");
+                    LogController.logTrace(core, "execute_dotNetClass_assembly, 8, [" + assemblyPrivateAbsPathFilename + "]");
                     //
                     // -- Call Execute
                     object AddonObjResult = AddonObj.Execute(core.cpParent);
@@ -1482,7 +1481,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- error in the addon
                     //
-                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 9, [" + assemblyPhysicalPrivatePathname + "]. There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPhysicalPrivatePathname + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex + "]");
+                    LogController.logError(core, ex, "execute_dotNetClass_assembly, 9, [" + assemblyPrivateAbsPathFilename + "]. There was an error in the addon [" + addon.name + "]. It could not be executed because there was an error in the addon assembly [" + assemblyPrivateAbsPathFilename + "], in class [" + addonType.FullName.Trim().ToLowerInvariant() + "]. The error was [" + ex + "]");
                     return string.Empty;
                 }
             } catch (Exception ex) {

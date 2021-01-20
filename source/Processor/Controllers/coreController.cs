@@ -1,16 +1,15 @@
 ﻿
-using System;
-using System.Reflection;
-using Contensive.Processor.Models.Domain;
-using System.Collections.Generic;
-using static Contensive.Processor.Constants;
-using NLog;
-using Contensive.Models.Db;
 using Contensive.BaseModels;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
+using NLog;
+using System;
+using System.Collections.Generic;
 using System.Data.Entity.Design.PluralizationServices;
 using System.Globalization;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using static Contensive.Processor.Constants;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -26,6 +25,24 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         internal CPClass cpParent { get; set; }
         //
+        //====================================================================================================
+        /// <summary>
+        /// The route map is a dictionary of route names plus route details that tell how to execute the route.
+        /// local instance is used to speed up multiple local requests.
+        /// If during a page hit the route table entries are updated, cache is cleared and the instance object is cleared. When the next reference is 
+        /// made the data is refreshed. At the end of every pageload, if the routemap updates it reloads the iis route table so if a new route
+        /// is added and the next hit is to that method, it will be loaded.
+        /// </summary>
+        public RouteMapModel routeMap {
+            get {
+                if (_routeMap == null) {
+                    _routeMap = RouteMapModel.create(this);
+                }
+                return _routeMap;
+            }
+        }
+        private RouteMapModel _routeMap;
+        //
         //===================================================================================================
         /// <summary>
         /// server configuration - this is the node's configuration, including everything needed to attach to resources required (db,cache,filesystem,etc)
@@ -34,7 +51,9 @@ namespace Contensive.Processor.Controllers {
         public ServerConfigModel serverConfig { get; set; }
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// Common property holding all AWS credentials. These data include hooks for legacy credential strategies.
+        /// </summary>
         public AwsCredentialsModel awsCredentials {
             get {
                 if (_awsCredentials == null) {
@@ -98,7 +117,9 @@ namespace Contensive.Processor.Controllers {
         static extern void GetSystemTimePreciseAsFileTime(out long filetime);
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// todo - remove this simple wrapper
+        /// </summary>
         public string sqlDateTimeMockable {
             get {
                 return DbController.encodeSQLDate(dateTimeNowMockable);
@@ -111,23 +132,25 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool mockEmail { get; set; }
         //
+        //===================================================================================================
+        /// <summary>
+        /// In email mock mode, this list includes all emails sent
+        /// </summary>
         public List<MockEmailClass> mockEmailList { get; set; } = new List<MockEmailClass>();
         //
-        /// <summary>
-        /// when enable, use MS trace logging. An attempt to stop file append permission issues
-        /// </summary>
-        public bool useNlog { get; set; } = true;
-        //
+        //===================================================================================================
         /// <summary>
         /// Dictionary of cdef, index by name
         /// </summary>
         internal Dictionary<string, Models.Domain.ContentMetadataModel> metaDataDictionary { get; set; }
         //
+        //===================================================================================================
         /// <summary>
         /// Dictionary of tableschema, index by name
         /// </summary>
         internal Dictionary<string, Models.Domain.TableSchemaModel> tableSchemaDictionary { get; set; }
         //
+        //===================================================================================================
         /// <summary>
         /// lookup contentId by contentName
         /// </summary>
@@ -141,7 +164,10 @@ namespace Contensive.Processor.Controllers {
         }
         internal Dictionary<string, int> _contentNameIdDictionary;
         //
-        // -- assembly files to skip
+        //===================================================================================================
+        /// <summary>
+        /// assembly files to skip
+        /// </summary>
         internal List<string> assemblyList_NonAddonsInstalled { get; set; } = new List<string> {
             "\\cpbase.dll",
             "\\awssdk.core.dll",
@@ -189,6 +215,11 @@ namespace Contensive.Processor.Controllers {
                 return _assemblyFileDict;
             }
         }
+        //
+        //===================================================================================================
+        /// <summary>
+        /// list of assemblies found to be addons. used to speed up execution
+        /// </summary>
         public void assemblyList_AddonsFound_save() {
             var dependentKeyList = new List<CacheKeyHashClass> {
                 cpParent.core.cache.createTableDependencyKeyHash(AddonModel.tableMetadata.tableNameLower),
@@ -200,7 +231,9 @@ namespace Contensive.Processor.Controllers {
         private const string AssemblyFileDictCacheName = "assemblyFileDict";
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// List of datasources. The default datasourse is the first entry, and is populated from the initialization configuration. Additional datasources come from the datasources content in the primary datasourse.
+        /// </summary>
         public Dictionary<string, DataSourceModel> dataSourceDictionary {
             get {
                 if (_dataSources == null) {
@@ -212,7 +245,9 @@ namespace Contensive.Processor.Controllers {
         private Dictionary<string, DataSourceModel> _dataSources;
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// cp.doc - the primary document being constructed
+        /// </summary>
         public DocController doc {
             get {
                 if (_doc == null) {
@@ -224,11 +259,13 @@ namespace Contensive.Processor.Controllers {
         private DocController _doc;
         //
         //===================================================================================================
-        //
-        public Controllers.HtmlController html {
+        /// <summary>
+        /// 
+        /// </summary>
+        public HtmlController html {
             get {
                 if (_html == null) {
-                    _html = new Controllers.HtmlController(this);
+                    _html = new HtmlController(this);
                 }
                 return _html;
             }
@@ -576,7 +613,8 @@ namespace Contensive.Processor.Controllers {
             cpParent = cp;
             _mockNow = null;
             deleteSessionOnExit = true;
-            LogController.log(this, "CoreController constructor-0, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+
+            LogController.log(this, "CoreController constructor(cp), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -586,9 +624,6 @@ namespace Contensive.Processor.Controllers {
             //
             serverConfig = ServerConfigModel.getObject(this);
             this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-#if NETFRAMEWORK
-            webServer.iisContext = null;
-#endif
             constructorInitialize(false);
             LogController.log(this, "CoreController constructor-0, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
         }
@@ -600,13 +635,15 @@ namespace Contensive.Processor.Controllers {
         /// To create a session.user, call session.verifyUser()
         /// </summary>
         /// <param name="cp"></param>
+        /// <param name="applicationName"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName) {
             this.cpParent = cp;
             this.cpParent.core = this;
             _mockNow = null;
             deleteSessionOnExit = true;
-            LogController.log(this, "CoreController constructor-1, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            //
+            LogController.log(this, "CoreController constructor(appName), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
             //
             metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
             tableSchemaDictionary = null;
@@ -618,53 +655,56 @@ namespace Contensive.Processor.Controllers {
             serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
             appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
             if (appConfig != null) {
-#if NETFRAMEWORK
-                webServer.iisContext = null;
-#endif
                 constructorInitialize(false);
             }
-            LogController.log(this, "CoreController constructor-1, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            LogController.log(this, "CoreController constructor(appName), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// The route map is a dictionary of route names plus route details that tell how to execute the route.
-        /// local instance is used to speed up multiple local requests.
-        /// If during a page hit the route table entries are updated, cache is cleared and the instance object is cleared. When the next reference is 
-        /// made the data is refreshed. At the end of every pageload, if the routemap updates it reloads the iis route table so if a new route
-        /// is added and the next hit is to that method, it will be loaded.
-        /// </summary>
-        public RouteMapModel routeMap {
-            get {
-                if (_routeMap == null) {
-                    _routeMap = RouteMapModel.create(this);
-                }
-                return _routeMap;
-            }
-        }
-        private RouteMapModel _routeMap;
-        /// <summary>
-        /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
-        /// </summary>
-        public void routeMapCacheClear() {
-            // 
-            addonCacheClear();
-            Models.Domain.RouteMapModel.invalidateCache(this);
-            _routeMap = null;
-        }
+        ////
+        ////====================================================================================================
+        ///// <summary>
+        ///// Constructor for the use case
+        ///// </summary>
+        ///// <param name="cp"></param>
+        ///// <param name="httpContext"></param>
+        ///// <param name="applicationName"></param>
+        //public CoreController(CPClass cp, string applicationName, HttpContextModel httpContext) {
+        //    this.cpParent = cp;
+        //    this.cpParent.core = this;
+        //    _mockNow = null;
+        //    deleteSessionOnExit = true;
+        //    //
+        //    LogController.log(this, "CoreController constructor(appName, serverRequest), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+        //    //
+        //    metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+        //    tableSchemaDictionary = null;
+        //    //
+        //    // -- create default auth objects for non-user methods, or until auth is available
+        //    session = new SessionController(this);
+        //    //
+        //    serverConfig = ServerConfigModel.getObject(this);
+        //    serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
+        //    appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
+        //    if (appConfig != null) {
+        //        constructorInitialize(false);
+        //    }
+        //    LogController.log(this, "CoreController constructor(appName, serverRequest), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+        //}
         //
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
         /// </summary>
         /// <param name="cp"></param>
+        /// <param name="applicationName"></param>
+        /// <param name="serverConfig"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) {
             try {
                 cpParent = cp;
                 deleteSessionOnExit = true;
                 _mockNow = null;
-                LogController.log(this, "CoreController constructor-2, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
+                LogController.log(this, "CoreController constructor(appName, serverConfig), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 //
                 metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
                 tableSchemaDictionary = null;
@@ -676,55 +716,21 @@ namespace Contensive.Processor.Controllers {
                 this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
                 appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
                 appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
-#if NETFRAMEWORK
-                webServer.iisContext = null;
-#endif
                 constructorInitialize(false);
-                LogController.log(this, "CoreController constructor-2, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
+                LogController.log(this, "CoreController constructor(appName, serverConfig), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
             } catch (Exception ex) {
                 LogController.logLocalOnly("CoreController constructor-2, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
                 throw;
             }
         }
-
-#if NETFRAMEWORK
-        //
-        //====================================================================================================
-        /// <summary>
-        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
-            try {
-            this.cpParent = cp;
-            this.cpParent.core = this;
-            _mockNow = null;
-            deleteSessionOnExit = false;
-            LogController.log(this, "CoreController constructor-3, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            session = new SessionController(this);
-            //
-            this.serverConfig = serverConfig;
-            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            this.appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
-            webServer.initWebContext(httpContext);
-            constructorInitialize(true);
-            LogController.log(this, "CoreController constructor-3, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            } catch (Exception ex) {
-                LogController.logLocalOnly("CoreController constructor-3, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
-                throw;
-            }
-        }
-
         //
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
-        public CoreController(CPClass cp, string applicationName, System.Web.HttpContext httpContext) {
+        public CoreController(CPClass cp, string applicationName, HttpContextModel httpContext) {
             try {
                 this.cpParent = cp;
                 this.cpParent.core = this;
@@ -750,7 +756,7 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-#endif
+//#endif
         //
         /// <summary>
         /// coreClass constructor common tasks.
@@ -789,6 +795,16 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        //===================================================================================================
+        /// <summary>
+        /// clear the addon cache, the persistent routeMap, and the non-persistent RouteMap
+        /// </summary>
+        public void routeMapCacheClear() {
+            // 
+            addonCacheClear();
+            Models.Domain.RouteMapModel.invalidateCache(this);
+            _routeMap = null;
+        }
         //
         //====================================================================================================
         /// <summary>

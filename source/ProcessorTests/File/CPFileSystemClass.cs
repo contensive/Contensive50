@@ -89,8 +89,11 @@ namespace Tests {
                 string tmpContent = GenericController.getRandomInteger(cp.core).ToString();
                 // act
                 cp.CdnFiles.Save(srcFilename, tmpContent);
+                Assert.IsTrue(cp.CdnFiles.FileExists(srcFilename));
+                //
                 cp.CdnFiles.DeleteFile(srcFilename);
                 // assert
+                Assert.IsFalse(cp.CdnFiles.FileExists(srcFilename));
                 Assert.AreEqual("", cp.CdnFiles.Read(srcFilename));
             }
         }

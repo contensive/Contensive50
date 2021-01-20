@@ -26,7 +26,7 @@ namespace Contensive.CLI {
 
                     //
                     // -- create an instance of cp to execute commands
-                    using (Processor.CPClass cpServer = new Processor.CPClass()) {
+                    using (CPClass cpServer = new CPClass()) {
                         if (!cpServer.serverOk) {
                             Console.WriteLine("Server Configuration not loaded correctly. Please run --configure");
                             return;

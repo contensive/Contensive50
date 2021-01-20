@@ -9,8 +9,13 @@ using System;
 using System.Collections.Generic;
 
 namespace Contensive.Processor {
+    /// <summary>
+    /// The main class created to run an application
+    /// </summary>
     public class CPClass : CPBaseClass, IDisposable {
-        //
+        /// <summary>
+        /// The processor class is an api wrapper around the CoreController
+        /// </summary>
         public CoreController core { get; set; }
         //
         //=========================================================================================================
@@ -33,22 +38,11 @@ namespace Contensive.Processor {
         //
         //=========================================================================================================
         /// <summary>
-        /// constructor for non-Internet app use. Configuration provided manually
+        /// constructor for non-Internet app use. Configuration provided manually. Used internally to create application instances for email rendering.
         /// </summary>
         /// <remarks></remarks>
-        public CPClass(string appName,  ServerConfigModel serverConfig ) {
+        public CPClass(string appName, ServerConfigModel serverConfig) {
             core = new CoreController(this, appName, serverConfig);
-        }
-#if NETFRAMEWORK
-        //
-        //=========================================================================================================
-        /// <summary>
-        /// constructor for iis site use. Configuration provided manually (maybe from webconfig)
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <remarks></remarks>
-        public CPClass(string appName, ServerConfigModel serverConfig, System.Web.HttpContext httpContext) {
-            core = new CoreController(this, appName, serverConfig, httpContext);
         }
         //
         //=========================================================================================================
@@ -56,11 +50,11 @@ namespace Contensive.Processor {
         /// constructor for iis site use. Configuration read from programdata json
         /// </summary>
         /// <param name="httpContext"></param>
+        /// <param name="appName"></param>
         /// <remarks></remarks>
-        public CPClass(string appName, System.Web.HttpContext httpContext) {
+        public CPClass(string appName, HttpContextModel httpContext) {
             core = new CoreController(this, appName, httpContext);
         }
-#endif
         //
         //=========================================================================================================
         /// <summary>

@@ -1,19 +1,18 @@
 ﻿
+using Contensive.BaseClasses;
+using Contensive.CPBase.BaseModels;
+using Contensive.Models.Db;
+using Contensive.Processor.Models.Domain;
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
-using System.Data;
-using System.Collections.Generic;
-using Contensive.BaseClasses;
-using Contensive.Processor.Models.Domain;
-using static Contensive.Processor.Controllers.GenericController;
 using static Contensive.Processor.Constants;
-using Contensive.Models.Db;
-using System.Globalization;
-using Contensive.BaseModels;
-using System.Linq;
-using Contensive.CPBase.BaseModels;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
