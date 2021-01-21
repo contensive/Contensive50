@@ -747,7 +747,7 @@ namespace Contensive.Processor.Controllers {
                 serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
                 appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
                 if (appConfig != null) {
-                    webServer.initWebContext(httpContext);
+                    webServer.httpContext = httpContext;
                     constructorInitialize(true);
                 }
                 LogController.log(this, "CoreController constructor-4, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
@@ -756,12 +756,11 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-//#endif
         //
         /// <summary>
         /// coreClass constructor common tasks.
         /// </summary>
-        /// <param name="cp"></param>
+        /// <param name="allowVisit"></param>
         /// <remarks></remarks>
         private void constructorInitialize(bool allowVisit) {
             try {
@@ -781,12 +780,28 @@ namespace Contensive.Processor.Controllers {
                     // -- application is not ready, might be error, or in maintainence mode
                     session = SessionController.create(this, false);
                 } else {
+                    //
+                    // -- initialize session
                     session = SessionController.create(this, allowVisit && siteProperties.allowVisitTracking);
                     //
                     // -- debug defaults on, so if not on, set it off and clear what was collected
                     doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging");
                     if (!doc.visitPropertyAllowDebugging) {
                         doc.testPointMessage = "";
+                    }
+                    //
+                    // -- initialize doc properties from httpContext
+                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.ServerVariables) {
+                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.serverVariable);
+                    }
+                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.Headers) {
+                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.header);
+                    }
+                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.QueryString) {
+                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.queryString);
+                    }
+                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.Form) {
+                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.form);
                     }
                 }
             } catch (Exception ex) {

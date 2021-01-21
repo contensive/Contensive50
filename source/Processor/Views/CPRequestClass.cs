@@ -107,28 +107,28 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override string HTTPAccept {
             get {
-                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT")) ? cp.core.webServer.serverEnvironment["HTTP_ACCEPT"] : ""; 
+                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT"] : ""; 
             }
         }
         //
         //====================================================================================================
         public override string HTTPAcceptCharset {
             get {
-                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_CHARSET")) ? cp.core.webServer.serverEnvironment["HTTP_ACCEPT_CHARSET"] : "";
+                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT_CHARSET")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"] : "";
             }
         }
         //
         //====================================================================================================
         public override string HTTPProfile {
             get {
-                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_PROFILE")) ? cp.core.webServer.serverEnvironment["HTTP_PROFILE"] : "";
+                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_PROFILE")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_PROFILE"] : "";
             }
         }
         //
         //====================================================================================================
         public override string HTTPXWapProfile {
             get {
-                return (cp.core.webServer.serverEnvironment.ContainsKey("HTTP_X_WAP_PROFILE")) ? cp.core.webServer.serverEnvironment["HTTP_X_WAP_PROFILE"] : "";
+                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_X_WAP_PROFILE")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_X_WAP_PROFILE"] : "";
             }
         }
         //
@@ -226,14 +226,14 @@ namespace Contensive.Processor {
         //====================================================================================================
         public override string Body {
             get {
-                return cp.core.webServer.requestBody;
+                return cp.core.webServer.httpContext.Request.requestBody;
             }
         }
         //
         //====================================================================================================
         public override string ContentType {
             get {
-                return cp.core.webServer.requestContentType;
+                return cp.core.webServer.httpContext.Request.ContentType;
             }
         }
         //

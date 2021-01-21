@@ -45,35 +45,39 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// Request Url
         /// </summary>
-        public HttpContentRequestUrl Url;
+        public HttpContentRequestUrl Url { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public Uri UrlReferrer;
+        public Uri UrlReferrer { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, HttpContextRequestCookie> Cookies;
+        public Dictionary<string, HttpContextRequestCookie> Cookies { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, string> Form;
+        public Dictionary<string, string> Form { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, string> QueryString;
+        public Dictionary<string, string> QueryString { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public System.Collections.Specialized.NameValueCollection Headers;
+        public Dictionary<string,string> Headers { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public System.Collections.Specialized.NameValueCollection ServerVariables;
+        public Dictionary<string,string> ServerVariables { get; set; }
         /// <summary>
         /// 
         /// </summary>
-        public string ContentType;
+        public string ContentType { get; set; }
+        /// <summary>
+        /// The content body created before the call
+        /// </summary>
+        public string requestBody { get; set; }
     }
     //
     //====================================================================================================
@@ -94,6 +98,10 @@ namespace Contensive.Processor.Models.Domain {
     /// 
     /// </summary>
     public class HttpContextRequestCookie {
+        /// <summary>
+        /// 
+        /// </summary>
+        public string Name;
         /// <summary>
         /// 
         /// </summary>

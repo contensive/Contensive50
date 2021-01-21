@@ -59,7 +59,7 @@ namespace Contensive.Processor.Controllers {
         public string requestPathPage {
             get {
                 if (string.IsNullOrEmpty(_requestPathPage)) {
-                    _requestPathPage = (core.webServer.serverEnvironment.ContainsKey("SCRIPT_NAME")) ? core.webServer.serverEnvironment["SCRIPT_NAME"] : "";
+                    _requestPathPage = core.webServer.httpContext.Request.ServerVariables.ContainsKey("SCRIPT_NAME") ? core.webServer.httpContext.Request.ServerVariables["SCRIPT_NAME"] : "";
                 }
                 return _requestPathPage;
             }
@@ -73,7 +73,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestReferrer {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("HTTP_REFERER")) ? core.webServer.serverEnvironment["HTTP_REFERER"] : "";
+                return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_REFERER")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_REFERER"] : "";
             }
         }
         //
@@ -83,7 +83,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestDomain {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("SERVER_NAME")) ? core.webServer.serverEnvironment["SERVER_NAME"] : "";
+                return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("SERVER_NAME")) ? core.webServer.httpContext.Request.ServerVariables["SERVER_NAME"] : "";
             }
         }
         //
@@ -94,7 +94,7 @@ namespace Contensive.Processor.Controllers {
         public bool requestSecure {
             get {
                 if (_requestSecure == null) {
-                    _requestSecure = (core.webServer.serverEnvironment.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.serverEnvironment["SERVER_PORT_SECURE"]) : false;
+                    _requestSecure = (core.webServer.httpContext.Request.ServerVariables.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.httpContext.Request.ServerVariables["SERVER_PORT_SECURE"]) : false;
                 }
                 return (bool)_requestSecure;
             }
@@ -107,7 +107,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestRemoteIP {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("REMOTE_ADDR")) ? core.webServer.serverEnvironment["REMOTE_ADDR"] : "";
+                return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("REMOTE_ADDR")) ? core.webServer.httpContext.Request.ServerVariables["REMOTE_ADDR"] : "";
             }
         }
         //
@@ -117,7 +117,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestBrowser {
             get {
-                return (core.webServer.serverEnvironment.ContainsKey("HTTP_USER_AGENT")) ? core.webServer.serverEnvironment["HTTP_USER_AGENT"] : "";
+                return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_USER_AGENT")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_USER_AGENT"] : "";
             }
         }
         //
@@ -268,18 +268,18 @@ namespace Contensive.Processor.Controllers {
         /// 
         /// </summary>
         public Dictionary<string, CookieClass> requestCookies { get; set; }
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// The body of the request
-        /// </summary>
-        public string requestBody { get; set; }
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// The content type of the request
-        /// </summary>
-        public string requestContentType { get; set; }
+        ////
+        //// ====================================================================================================
+        ///// <summary>
+        ///// The body of the request
+        ///// </summary>
+        //public string requestBody { get; set; }
+        ////
+        //// ====================================================================================================
+        ///// <summary>
+        ///// The content type of the request
+        ///// </summary>
+        //public string requestContentType { get; set; }
         //
         // ====================================================================================================
         /// <summary>
@@ -298,12 +298,12 @@ namespace Contensive.Processor.Controllers {
         /// 
         /// </summary>
         public Dictionary<string, string> requestQuery { get; set; } = new Dictionary<string, string>();
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// 
-        /// </summary>
-        public Dictionary<string, string> serverEnvironment { get; set; } = new Dictionary<string, string>();
+        ////
+        //// ====================================================================================================
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        //public Dictionary<string, string> serverEnvironment { get; set; } = new Dictionary<string, string>();
         //
         // ====================================================================================================
         /// <summary>
@@ -403,117 +403,6 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public bool initWebContext(HttpContextModel httpContext) {
             try {
-                //
-                // -- argument validation
-                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Response == null)) {
-                    Controllers.LogController.logWarn(core, new GenericException("Attempt to initialize webContext but iisContext or one of its objects is null."));
-                    return false;
-                }
-                //
-                // -- setup IIS default Response
-                this.httpContext = httpContext;
-                this.httpContext.Response.CacheControl = "no-cache";
-                this.httpContext.Response.Expires = -1;
-                this.httpContext.Response.Buffer = true;
-                //
-                // todo convert this to lazy read from stored iisContext
-                // -- read the request body into requestbody
-                httpContext.Request.InputStream.Position = 0;
-                System.IO.StreamReader str = new System.IO.StreamReader(httpContext.Request.InputStream);
-                requestBody = str.ReadToEnd();
-                //
-                requestContentType = httpContext.Request.ContentType;
-                //
-                //
-                // todo consider dprecating custom and use docProperties
-                // custom server variables
-                //
-                // -- server variables
-                {
-                    System.Collections.Specialized.NameValueCollection nameValues = this.httpContext.Request.ServerVariables;
-                    for (int i = 0; i < nameValues.Count; i++) {
-                        string key = nameValues.GetKey(i);
-                        if (serverEnvironment.ContainsKey(key)) { serverEnvironment.Remove(key); }
-                        serverEnvironment.Add(nameValues.GetKey(i), nameValues.Get(i));
-                        core.docProperties.setProperty(nameValues.GetKey(i), nameValues.Get(i), DocPropertyModel.DocPropertyTypesEnum.serverVariable);
-                    }
-                }
-                //
-                // -- headers
-                {
-                    System.Collections.Specialized.NameValueCollection nameValues = this.httpContext.Request.Headers;
-                    for (int i = 0; i < nameValues.Count; i++) {
-                        string key = nameValues.GetKey(i);
-                        if (string.IsNullOrWhiteSpace(key)) { continue; }
-                        if (requestHeaders.ContainsKey(key)) { requestForm.Remove(key); }
-                        requestHeaders.Add(key, nameValues.Get(i));
-                        core.docProperties.setProperty(key, nameValues.Get(i), DocPropertyModel.DocPropertyTypesEnum.header);
-                    }
-                }
-                //
-                // -- queryString
-                {
-                    if (this.httpContext.Request.QueryString.Count > 0) {
-                        requestQueryString = "";
-                        foreach (string key in this.httpContext.Request.QueryString.Keys) {
-                            if (string.IsNullOrWhiteSpace(key)) { continue; }
-                            string keyValue = this.httpContext.Request.QueryString[key];
-                            if (requestQuery.ContainsKey(key)) { requestQuery.Remove(key); }
-                            requestQuery.Add(key, keyValue);
-                            core.docProperties.setProperty(key, keyValue, DocPropertyModel.DocPropertyTypesEnum.queryString);
-                            requestQueryString = GenericController.modifyQueryString(requestQueryString, key, keyValue);
-                        }
-                    }
-                }
-                //
-                // -- form
-                {
-                    foreach (string key in this.httpContext.Request.Form.Keys) {
-                        if (string.IsNullOrWhiteSpace(key)) { continue; }
-                        string keyValue = this.httpContext.Request.Form[key];
-                        if (requestForm.ContainsKey(key)) { requestForm.Remove(key); }
-                        requestForm.Add(key, keyValue);
-                        core.docProperties.setProperty(key, keyValue, DocPropertyModel.DocPropertyTypesEnum.form);
-                    }
-                }
-                //
-                // -- files
-                {
-                    int filePtr = 0;
-                    string instanceId = GenericController.getGUIDNaked();
-                    foreach (string key in this.httpContext.Request.Files.AllKeys) {
-                        if (string.IsNullOrWhiteSpace(key)) { continue; }
-                        System.Web.HttpPostedFile file = this.httpContext.Request.Files[key];
-                        if (file != null) {
-                            string normalizedFilename = FileController.normalizeDosFilename(file.FileName);
-                            if ((file.ContentLength > 0) && (!string.IsNullOrWhiteSpace(normalizedFilename))) {
-                                DocPropertyModel docProperty = new DocPropertyModel {
-                                    name = key,
-                                    value = normalizedFilename,
-                                    nameValue = encodeRequestVariable(key) + "=" + encodeRequestVariable(normalizedFilename),
-                                    tempfilename = instanceId + "-" + filePtr.ToString() + ".bin",
-                                    propertyType = DocPropertyModel.DocPropertyTypesEnum.file
-                                };
-                                core.tempFiles.verifyPath(core.tempFiles.localAbsRootPath);
-                                file.SaveAs(core.tempFiles.joinPath(core.tempFiles.localAbsRootPath, docProperty.tempfilename));
-                                core.tempFiles.deleteOnDisposeFileList.Add(docProperty.tempfilename);
-                                docProperty.fileSize = encodeInteger(file.ContentLength);
-                                core.docProperties.setProperty(key, docProperty);
-                                filePtr += 1;
-                            }
-                        }
-                    }
-                }
-                //
-                // -- cookies
-                {
-                    foreach (string key in this.httpContext.Request.Cookies.Keys) {
-                        if (string.IsNullOrWhiteSpace(key)) { continue; }
-                        string keyValue = this.httpContext.Request.Cookies[key].Value;
-                        keyValue = decodeResponseVariable(keyValue);
-                        addRequestCookie(key, keyValue);
-                    }
-                }
                 //
                 //--------------------------------------------------------------------------
                 //
@@ -1107,7 +996,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public string getBrowserAcceptLanguage() {
             try {
-                string AcceptLanguageString = (core.webServer.serverEnvironment.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.serverEnvironment["HTTP_ACCEPT_LANGUAGE"] : "";
+                string AcceptLanguageString = (core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT_LANGUAGE")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT_LANGUAGE"] : "";
                 int CommaPosition = GenericController.strInstr(1, AcceptLanguageString, ",");
                 while (CommaPosition != 0) {
                     string AcceptLanguage = (AcceptLanguageString.left(CommaPosition - 1)).Trim(' ');
