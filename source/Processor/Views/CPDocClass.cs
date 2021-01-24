@@ -5,6 +5,9 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor {
+    /// <summary>
+    /// persistent document class
+    /// </summary>
     public class CPDocClass : BaseClasses.CPDocBaseClass, IDisposable {
         /// <summary>
         /// dependencies
@@ -19,10 +22,12 @@ namespace Contensive.Processor {
         public CPDocClass(CPClass cpParent) {
             cp = cpParent;
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public override List<HtmlAssetClass> HtmlAssetList {
 
-            get{
+            get {
                 return cp.core.doc.htmlAssetList;
             }
         }
@@ -34,10 +39,11 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override bool NoFollow {
             get {
-                return cp.core.webServer.response_NoFollow;
+                if (cp.core.webServer == null) { return false; }
+                return cp.core.webServer.responseNoFollow;
             }
             set {
-                cp.core.webServer.response_NoFollow = value;
+                cp.core.webServer.responseNoFollow = value;
             }
         }
         //
@@ -48,9 +54,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override int PageId {
             get {
-                if (cp.core.doc == null) { return 0; }
-                if (cp.core.doc.pageController == null) { return 0; }
-                if (cp.core.doc.pageController.page == null) { return 0; }
+                if ((cp.core.doc == null) || (cp.core.doc.pageController == null) || (cp.core.doc.pageController.page == null)) { return 0; }
                 return cp.core.doc.pageController.page.id;
             }
         }
@@ -62,9 +66,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string PageName {
             get {
-                if (cp.core.doc == null) { return string.Empty; }
-                if (cp.core.doc.pageController == null) { return string.Empty; }
-                if (cp.core.doc.pageController.page == null) {return string.Empty; }
+                if ((cp.core.doc == null) || (cp.core.doc.pageController == null) || (cp.core.doc.pageController.page == null)) { return ""; }
                 return cp.core.doc.pageController.page.name;
             }
         }
@@ -76,7 +78,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override string RefreshQueryString {
             get {
-                if (cp.core.doc == null) { return String.Empty; }
+                if (cp.core.doc == null) { return ""; }
                 return cp.core.doc.refreshQueryString;
             }
         }
@@ -88,7 +90,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override DateTime StartTime {
             get {
-                if (cp.core.doc == null) { return default( DateTime ); }
+                if (cp.core.doc == null) { return default; }
                 return cp.core.doc.profileStartTime;
             }
         }
@@ -100,9 +102,7 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public override int TemplateId {
             get {
-                if (cp.core.doc == null) { return 0; }
-                if (cp.core.doc.pageController == null) { return 0; }
-                if (cp.core.doc.pageController.template == null) { return 0; }
+                if ((cp.core.doc == null) || (cp.core.doc.pageController == null) || (cp.core.doc.pageController.template == null)) { return 0; }
                 return cp.core.doc.pageController.template.id;
             }
         }
@@ -132,9 +132,9 @@ namespace Contensive.Processor {
         /// <summary>
         /// adds a link to javascript code to the head of the document
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="codeLink"></param>
         public override void AddHeadJavascriptLink(string codeLink) {
-            cp.core.html.addScriptLinkSrc( codeLink, "api", true);
+            cp.core.html.addScriptLinkSrc(codeLink, "api", true);
         }
         //
         //====================================================================================================
@@ -150,7 +150,7 @@ namespace Contensive.Processor {
         /// <summary>
         /// adds a link to javascript code to the head of the document
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="codeLink"></param>
         public override void AddBodyJavascriptLink(string codeLink) {
             cp.core.html.addScriptLinkSrc(codeLink, "api", false);
         }
@@ -165,57 +165,104 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="metaDescription"></param>
         public override void AddMetaDescription(string metaDescription) {
             cp.core.html.addMetaDescription(metaDescription);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="metaKeywordList"></param>
         public override void AddMetaKeywordList(string metaKeywordList) {
             cp.core.html.addMetaKeywordList(metaKeywordList);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="code"></param>
         public override void AddOnLoadJavascript(string code) {
             cp.core.html.addScriptCode_onLoad(code, "");
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pageTitle"></param>
         public override void AddTitle(string pageTitle) {
             cp.core.html.addTitle(pageTitle);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
         public override void AddRefreshQueryString(string key, string Value) => cp.core.doc.addRefreshQueryString(key, Value);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
         public override void AddRefreshQueryString(string key, int Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
         public override void AddRefreshQueryString(string key, double Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
         public override void AddRefreshQueryString(string key, bool Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="Value"></param>
         public override void AddRefreshQueryString(string key, DateTime Value) => cp.core.doc.addRefreshQueryString(key, GenericController.encodeText(Value));
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="styleSheet"></param>
         public override void AddHeadStyle(string styleSheet) {
             cp.core.html.addHeadTag(HtmlController.style(styleSheet));
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="styleSheetLink"></param>
         public override void AddHeadStyleLink(string styleSheetLink) {
             cp.core.html.addStyleLink(styleSheetLink, "");
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="html"></param>
         public override void AddBodyEnd(string html) {
             cp.core.doc.htmlForEndOfBody += html;
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public override string Body {
             get {
                 return cp.core.doc.body;
@@ -225,100 +272,175 @@ namespace Contensive.Processor {
             }
         }
         //
-        //====================================================================================================
-        /// <summary>
-        /// Decodes an argument parsed from an AddonOptionString for all non-allowed characters
-        /// </summary>
-        /// <param name="encodedArgument"></param>
-        /// <returns></returns>
-        public string decodeLegacyOptionStringArgument(string encodedArgument) {
-            return GenericController.decodeNvaArgument(encodedArgument);
-        }
-        //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override string GetProperty(string key, string defaultValue) {
             if (cp.core.docProperties.containsKey(key)) { return cp.core.docProperties.getText(key); }
             return defaultValue;
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override string GetProperty(string key) => GetProperty(key, string.Empty);
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override bool GetBoolean(string key, bool defaultValue) {
-            return GenericController.encodeBoolean(GetProperty(key, GenericController.encodeText( defaultValue)));
+            return GenericController.encodeBoolean(GetProperty(key, GenericController.encodeText(defaultValue)));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override bool GetBoolean(string key) => GetBoolean(key, false);
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override DateTime GetDate(string key, DateTime defaultValue) {
-            return GenericController.encodeDate(GetProperty(key, GenericController.encodeText( defaultValue)));
+            return GenericController.encodeDate(GetProperty(key, GenericController.encodeText(defaultValue)));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override DateTime GetDate(string key) => GetDate(key, DateTime.MinValue);
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override int GetInteger(string key, int defaultValue) {
-            return cp.Utils.EncodeInteger(GetProperty(key, GenericController.encodeText( defaultValue )));
+            return cp.Utils.EncodeInteger(GetProperty(key, GenericController.encodeText(defaultValue)));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override int GetInteger(string key) => GetInteger(key, 0);
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override double GetNumber(string key, double defaultValue) {
-            return cp.Utils.EncodeNumber(GetProperty(key, GenericController.encodeText( defaultValue )));
+            return cp.Utils.EncodeNumber(GetProperty(key, GenericController.encodeText(defaultValue)));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override double GetNumber(string key) => GetNumber(key, 0);
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         public override string GetText(string key, string defaultValue) {
             return GetProperty(key, defaultValue);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override string GetText(string key) {
             return GetProperty(key, string.Empty);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public override bool IsProperty(string key) {
             return cp.core.docProperties.containsKey(key);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public override void SetProperty(string key, string value) {
             cp.core.docProperties.setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public override void SetProperty(string key, bool value) {
             cp.core.docProperties.setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public override void SetProperty(string key, int value) {
             cp.core.docProperties.setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public override void SetProperty(string key, DateTime value) {
             cp.core.docProperties.setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public override void SetProperty(string key, double value) {
             cp.core.docProperties.setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //=======================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         public override bool IsAdminSite {
             get {
                 return !cp.Request.PathPage.IndexOf(cp.Site.GetText("adminUrl"), System.StringComparison.OrdinalIgnoreCase).Equals(-1);
@@ -328,6 +450,9 @@ namespace Contensive.Processor {
         //=======================================================================================================
         // Deprecated
         //
+        /// <summary>
+        /// Deprecated
+        /// </summary>
         [Obsolete("Filter addons are deprecated", false)]
         public override string Content {
             get {
@@ -337,67 +462,117 @@ namespace Contensive.Processor {
                 cp.core.doc.bodyContent = value;
             }
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Use addon navigation.", false)]
         public override string NavigationStructure {
             get {
                 return string.Empty;
             }
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Section is no longer supported", false)]
         public override int SectionId {
             get {
                 return 0;
             }
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
         [Obsolete("Site styles are no longer supported. Include styles and javascript in addons.", false)]
         public override string SiteStylesheet {
             get {
                 return "";
             }
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <returns></returns>
         [Obsolete("var is deprecated.", false)]
         public override string get_GlobalVar(string Index) {
             return get_Var(Index);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <returns></returns>
         [Obsolete("var is deprecated.", false)]
         public override bool get_IsGlobalVar(string Index) {
             return get_IsVar(Index);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <returns></returns>
         [Obsolete("var is deprecated.", false)]
         public override bool get_IsVar(string Index) {
             return cp.core.docProperties.containsKey(Index);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <returns></returns>
         [Obsolete("var is deprecated.", false)]
         public override string get_Var(string Index) {
             return cp.core.docProperties.getText(Index);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <param name="Value"></param>
         [Obsolete("var is deprecated.", false)]
         public override void set_Var(string Index, string Value) {
             cp.core.docProperties.setProperty(Index, Value);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="Index"></param>
+        /// <param name="Value"></param>
         [Obsolete("var is deprecated.", false)]
         public override void set_GlobalVar(string Index, string Value) {
             cp.core.docProperties.setProperty(Index, Value);
         }
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use GetBoolean(string,bool).", false)]
         public override bool GetBoolean(string key, string defaultValue) => GetBoolean(key, GenericController.encodeBoolean(defaultValue));
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use GetDate(string,DateTime).", false)]
         public override DateTime GetDate(string key, string defaultValue) => GetDate(key, GenericController.encodeDate(defaultValue));
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use GetInteger(string,int).", false)]
         public override int GetInteger(string key, string defaultValue) => GetInteger(key, GenericController.encodeInteger(defaultValue));
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use GetNumber(string,double).", false)]
         public override double GetNumber(string key, string defaultValue) => GetNumber(key, GenericController.encodeNumber(defaultValue));
         //
@@ -407,13 +582,22 @@ namespace Contensive.Processor {
         #region  IDisposable Support 
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPDocClass()  {
+        /// <summary>
+        /// 
+        /// </summary>
+        ~CPDocClass() {
             Dispose(false);
         }
+        /// <summary>
+        /// 
+        /// </summary>
         protected bool disposed_doc;
         //
         //====================================================================================================

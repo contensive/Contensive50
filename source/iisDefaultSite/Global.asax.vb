@@ -19,7 +19,7 @@ Public Class Global_asax
             LogController.logLocalOnly("Global.asax, Application_Start [" & ConfigurationClass.getAppName() & "]", BaseClasses.CPLogBaseClass.LogLevel.Info)
             '
             Using cp As New Contensive.Processor.CPClass(ConfigurationClass.getAppName())
-                DefaultSite.ConfigurationClass.loadRouteMap(cp)
+                ConfigurationClass.loadRouteMap(cp)
             End Using
         Catch ex As Exception
             LogController.logLocalOnly("Global.asax, Application_Start exception [" & ConfigurationClass.getAppName() & "]" & getAppDescription("Application_Start ERROR exit") + ", ex [" & ex.ToString() & "]", Contensive.BaseClasses.CPLogBaseClass.LogLevel.Fatal)
@@ -128,7 +128,7 @@ Public Class Global_asax
     '
     Private Function getShutdownDetail() As String
         Dim shutdownReason As System.Web.ApplicationShutdownReason = System.Web.Hosting.HostingEnvironment.ShutdownReason
-        Dim shutdownDetail As String = ""
+        Dim shutdownDetail As String
 
         Select Case shutdownReason
             Case ApplicationShutdownReason.BinDirChangeOrDirectoryRename

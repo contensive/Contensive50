@@ -1522,18 +1522,18 @@ namespace Contensive.Processor.Controllers {
                 if (core.docProperties.containsKey(key)) {
                     var docProperty = core.docProperties.getProperty(key);
                     if ((docProperty.propertyType == DocPropertyModel.DocPropertyTypesEnum.file) && (docProperty.name.ToLowerInvariant() == key)) {
-                        string dosPathFilename = FileController.normalizeDosPath(path);
+                        string dstDosPath = FileController.normalizeDosPath(path);
                         returnFilename = encodeDosFilename(docProperty.value);
-                        dosPathFilename += returnFilename;
-                        deleteFile(dosPathFilename, isLocal);
+                        string dstDosPathFilename = dstDosPath + returnFilename;
+                        deleteFile(dstDosPathFilename, isLocal);
                         if (docProperty.tempfilename != "") {
                             //
                             // copy tmp private files to the appropriate folder in the destination file system
                             //
-                            core.tempFiles.copyFile(docProperty.tempfilename, dosPathFilename, this);
+                            core.tempFiles.copyFile(docProperty.tempfilename, dstDosPathFilename, this);
                             //
                             if (!isLocal) {
-                                copyFileLocalToRemote(dosPathFilename);
+                                copyFileLocalToRemote(dstDosPathFilename);
                             }
                             return true;
                         }

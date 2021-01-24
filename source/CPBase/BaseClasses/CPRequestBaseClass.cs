@@ -2,6 +2,9 @@
 using System;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// Properties of optional http request
+    /// </summary>
     public abstract class CPRequestBaseClass {
         /// <summary>
         /// The browser string of the request
@@ -18,7 +21,7 @@ namespace Contensive.BaseClasses {
         /// <returns></returns>
         public abstract string Cookie(string cookieName);
         /// <summary>
-        /// Full cookie list from the browser
+        /// Full cookie list from the browser. empty line seperates cookies. name=value pairs
         /// </summary>
         public abstract string CookieString { get; }
         /// <summary>
@@ -96,7 +99,7 @@ namespace Contensive.BaseClasses {
         /// </summary>
         public abstract string LinkSource { get; }
         /// <summary>
-        /// the left-most segment of the url. The page for website urls
+        /// the right-most segment of the url. The page for website urls
         /// </summary>
         public abstract string Page { get; }
         /// <summary>

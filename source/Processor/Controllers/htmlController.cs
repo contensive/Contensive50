@@ -3023,7 +3023,7 @@ namespace Contensive.Processor.Controllers {
                 headList.Add(Environment.NewLine + "<meta name=\"generator\" content=\"Contensive\">");
                 //
                 // -- no-follow
-                if (core.webServer.response_NoFollow) {
+                if (core.webServer.responseNoFollow) {
                     headList.Add(Environment.NewLine + "<meta name=\"robots\" content=\"nofollow\" >");
                     headList.Add(Environment.NewLine + "<meta name=\"mssmarttagspreventparsing\" content=\"true\" >");
                 }

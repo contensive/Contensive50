@@ -9,19 +9,34 @@ namespace Contensive.Processor.Models.Domain {
     /// Parameter object for CPClass to provide website request context
     /// </summary>
     public class HttpContextModel : HttpContextBaseModel {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// construct
+        /// </summary>
+        public HttpContextModel() {
+            Request = new HttpContextRequest();
+            Response = new HttpContextResponse();
+            ApplicationInstance = new HttpContextApplicationInstance();
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// Request
         /// </summary>
         public HttpContextRequest Request;
+        //
+        //====================================================================================================
         /// <summary>
         /// Response
         /// </summary>
         public HttpContextResponse Response;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public HttpContextApplicationInstance ApplicationInstance;
-
     }
     //
     //====================================================================================================
@@ -42,38 +57,76 @@ namespace Contensive.Processor.Models.Domain {
     /// Request Object
     /// </summary>
     public class HttpContextRequest {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// construct
+        /// </summary>
+        public HttpContextRequest() {
+            Url = new HttpContentRequestUrl();
+            Cookies = new Dictionary<string, HttpContextRequestCookie>();
+            Form = new Dictionary<string, string>();
+            QueryString = new Dictionary<string, string>();
+            Headers = new Dictionary<string, string>();
+            ServerVariables = new Dictionary<string, string>();
+            Files = new List<DocPropertyModel>();
+        }
+        //
+        //====================================================================================================
         /// <summary>
         /// Request Url
         /// </summary>
         public HttpContentRequestUrl Url { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Uri UrlReferrer { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Dictionary<string, HttpContextRequestCookie> Cookies { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Dictionary<string, string> Form { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Dictionary<string, string> QueryString { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string,string> Headers { get; set; }
+        public Dictionary<string, string> Headers { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string,string> ServerVariables { get; set; }
+        public Dictionary<string, string> ServerVariables { get; set; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// List of uploaded file details, physical files saved to windowsTempFiles
+        /// </summary>
+        public List<DocPropertyModel> Files { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string ContentType { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// The content body created before the call
         /// </summary>
@@ -85,23 +138,33 @@ namespace Contensive.Processor.Models.Domain {
     /// Request Url
     /// </summary>
     public class HttpContentRequestUrl {
+        //
+        //====================================================================================================
         /// <summary>
         /// port
         /// </summary>
         public int Port;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string AbsoluteUri;
     }
+    //
+    //====================================================================================================
     /// <summary>
     /// 
     /// </summary>
     public class HttpContextRequestCookie {
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string Name;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
@@ -110,101 +173,150 @@ namespace Contensive.Processor.Models.Domain {
     //
     //====================================================================================================
     /// <summary>
-    /// 
+    /// Response object. System adds to it, parent client
     /// </summary>
     public class HttpContextResponse {
+        //
+        //====================================================================================================
         /// <summary>
-        /// 
+        /// construct
         /// </summary>
-        public void ClearHeaders() {
-
+        public HttpContextResponse() {
+            cookies = new Dictionary<string, HttpContextResponseCookie>();
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public void Flush() {
-
+            // clear the response
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Redirect Url. if not blank, redirect on output
+        /// </summary>
+        public string redirectUrl { get; set; }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// List of headers to pass back to the http client
+        /// </summary>
+        public List<HttpContextResponseHeader> headers { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        public void Redirect( string a, bool b) {
-
-        }
+        public string contentType { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="HeaderName"></param>
-        /// <param name="HeaderValue"></param>
-        public void AddHeader(string HeaderName, string HeaderValue) {
-
-        }
+        public string status { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string ContentType { get; set; }
+        public Dictionary<string, HttpContextResponseCookie> cookies;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string Status { get; set;  }
+        public string cacheControl { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, HttpContextResponseCookie> Cookies;
+        public int expires { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string CacheControl;
-        /// <summary>
-        /// 
-        /// </summary>
-        public int Expires;
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool Buffer;
+        public bool buffer;
     }
+    //
+    //====================================================================================================
+    /// <summary>
+    /// Response Headers
+    /// </summary>
+    public class HttpContextResponseHeader {
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Header name
+        /// </summary>
+        public string name;
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Header Value
+        /// </summary>
+        public string value;
+    }
+    //
+    //====================================================================================================
     /// <summary>
     /// 
     /// </summary>
     public class HttpContextResponseCookie {
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public bool HttpOnly;
+        public bool httpOnly;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public HttpContextResponseCookieSameSiteMode SameSite;
+        public HttpContextResponseCookieSameSiteMode sameSite;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string Value;
+        public string value;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public DateTime Expires;
+        public DateTime expires;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string Domain;
+        public string domain;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public string Path;
+        public string path;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public bool Secure;
+        public bool secure;
     }
+    //
+    //====================================================================================================
     /// <summary>
     /// 
     /// </summary>
     public enum HttpContextResponseCookieSameSiteMode {
         /// <summary>
-        /// 
+        /// same site mode is the only mode supported
         /// </summary>
         Lax = 1
     }

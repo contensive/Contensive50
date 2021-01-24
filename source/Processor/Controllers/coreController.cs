@@ -350,7 +350,9 @@ namespace Contensive.Processor.Controllers {
         private SitePropertiesController _siteProperties;
         //
         //===================================================================================================
-        //
+        /// <summary>
+        /// persistent object with methods to control the web server features
+        /// </summary>
         public WebServerController webServer {
             get {
                 if (_webServer == null) {
@@ -610,22 +612,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cp"></param>
         /// <remarks></remarks>
         public CoreController(CPClass cp) {
-            cpParent = cp;
-            _mockNow = null;
-            deleteSessionOnExit = true;
-
-            LogController.log(this, "CoreController constructor(cp), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            //
-            metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
-            tableSchemaDictionary = null;
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            session = new SessionController(this);
-            //
-            serverConfig = ServerConfigModel.getObject(this);
-            this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-            constructorInitialize(false);
-            LogController.log(this, "CoreController constructor-0, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            coreController_Initialize(cp, null, null, false);
         }
         //
         //====================================================================================================
@@ -635,107 +622,45 @@ namespace Contensive.Processor.Controllers {
         /// To create a session.user, call session.verifyUser()
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="applicationName"></param>
+        /// <param name="appName"></param>
         /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName) {
-            this.cpParent = cp;
-            this.cpParent.core = this;
-            _mockNow = null;
-            deleteSessionOnExit = true;
-            //
-            LogController.log(this, "CoreController constructor(appName), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            //
-            metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
-            tableSchemaDictionary = null;
-            //
-            // -- create default auth objects for non-user methods, or until auth is available
-            session = new SessionController(this);
-            //
-            serverConfig = ServerConfigModel.getObject(this);
-            serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-            appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-            if (appConfig != null) {
-                constructorInitialize(false);
-            }
-            LogController.log(this, "CoreController constructor(appName), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-        }
-        ////
-        ////====================================================================================================
-        ///// <summary>
-        ///// Constructor for the use case
-        ///// </summary>
-        ///// <param name="cp"></param>
-        ///// <param name="httpContext"></param>
-        ///// <param name="applicationName"></param>
-        //public CoreController(CPClass cp, string applicationName, HttpContextModel httpContext) {
-        //    this.cpParent = cp;
-        //    this.cpParent.core = this;
-        //    _mockNow = null;
-        //    deleteSessionOnExit = true;
-        //    //
-        //    LogController.log(this, "CoreController constructor(appName, serverRequest), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-        //    //
-        //    metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
-        //    tableSchemaDictionary = null;
-        //    //
-        //    // -- create default auth objects for non-user methods, or until auth is available
-        //    session = new SessionController(this);
-        //    //
-        //    serverConfig = ServerConfigModel.getObject(this);
-        //    serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-        //    appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-        //    if (appConfig != null) {
-        //        constructorInitialize(false);
-        //    }
-        //    LogController.log(this, "CoreController constructor(appName, serverRequest), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-        //}
-        //
-        //====================================================================================================
-        /// <summary>
-        /// coreClass constructor for app, non-Internet use. coreClass is the primary object internally, created by cp.
-        /// </summary>
-        /// <param name="cp"></param>
-        /// <param name="applicationName"></param>
-        /// <param name="serverConfig"></param>
-        /// <remarks></remarks>
-        public CoreController(CPClass cp, string applicationName, ServerConfigModel serverConfig) {
-            try {
-                cpParent = cp;
-                deleteSessionOnExit = true;
-                _mockNow = null;
-                //
-                LogController.log(this, "CoreController constructor(appName, serverConfig), enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-                //
-                metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
-                tableSchemaDictionary = null;
-                //
-                // -- create default auth objects for non-user methods, or until auth is available
-                session = new SessionController(this);
-                //
-                this.serverConfig = serverConfig;
-                this.serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-                appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-                appConfig.appStatus = AppConfigModel.AppStatusEnum.ok;
-                constructorInitialize(false);
-                //
-                LogController.log(this, "CoreController constructor(appName, serverConfig), exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-                //
-            } catch (Exception ex) {
-                LogController.logLocalOnly("CoreController constructor-2, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
-                throw;
-            }
+        public CoreController(CPClass cp, string appName) : this(cp) {
+            coreController_Initialize(cp, appName, null, false);
         }
         //
         //====================================================================================================
         /// <summary>
         /// coreClass constructor for a web request/response environment. coreClass is the primary object internally, created by cp.
         /// </summary>
-        public CoreController(CPClass cp, string applicationName, HttpContextModel httpContext) {
+        public CoreController(CPClass cp, string appName, HttpContextModel httpContext) {
             try {
+                coreController_Initialize(cp, appName, httpContext, true);
+            } catch (Exception ex) {
+                LogController.logLocalOnly("CoreController constructor-4, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// coreClass constructor common tasks.
+        /// </summary>
+        /// <param name="appName"></param>
+        /// <param name="allowVisit"></param>
+        /// <param name="httpContext"></param>
+        /// <param name="cp"></param>
+        /// <remarks></remarks>
+        private void coreController_Initialize(CPClass cp, string appName, HttpContextModel httpContext, bool allowVisit) {
+            try {
+
                 this.cpParent = cp;
                 this.cpParent.core = this;
+                //
+                // -- clear mock datetime
                 _mockNow = null;
-                LogController.log(this, "CoreController constructor-4, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                deleteSessionOnExit = true;
+                //
+                LogController.log(this, "coreController_Initialize, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 //
                 metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
                 tableSchemaDictionary = null;
@@ -745,26 +670,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 serverConfig = ServerConfigModel.getObject(this);
                 serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
-                appConfig = AppConfigModel.getObject(this, serverConfig, applicationName);
-                if (appConfig != null) {
+                appConfig = null;
+                if (!string.IsNullOrEmpty(appName)) {
+                    appConfig = AppConfigModel.getObject(this, serverConfig, appName);
                     webServer.httpContext = httpContext;
-                    constructorInitialize(true);
+                    webServer.initWebContext();
                 }
-                LogController.log(this, "CoreController constructor-4, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
-            } catch (Exception ex) {
-                LogController.logLocalOnly("CoreController constructor-4, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
-                throw;
-            }
-        }
-        //
-        /// <summary>
-        /// coreClass constructor common tasks.
-        /// </summary>
-        /// <param name="allowVisit"></param>
-        /// <remarks></remarks>
-        private void constructorInitialize(bool allowVisit) {
-            try {
                 //
+                // -- initialize app environment
                 doc.docGuid = GenericController.getGUID();
                 doc.allowDebugLog = true;
                 doc.profileStartTime = dateTimeNowMockable;
@@ -803,9 +716,15 @@ namespace Contensive.Processor.Controllers {
                     foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.Form) {
                         docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.form);
                     }
+                    //
+                    // -- add uploaded files to docproperties. windowsTempFiles should be disposed by parent object who created them and provided the context
+                    foreach (DocPropertyModel fileProperty in httpContext.Request.Files) {
+                        docProperties.setProperty(fileProperty.name, fileProperty);
+                    }
+
                 }
             } catch (Exception ex) {
-                LogController.logLocalOnly("CoreController constructorInitialize, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
+                LogController.logLocalOnly("CoreController coreController_Initialize, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);
                 throw;
             }
         }

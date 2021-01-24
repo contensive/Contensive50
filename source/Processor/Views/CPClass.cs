@@ -35,15 +35,15 @@ namespace Contensive.Processor {
         public CPClass(string appName) {
             core = new CoreController(this, appName);
         }
-        //
-        //=========================================================================================================
-        /// <summary>
-        /// constructor for non-Internet app use. Configuration provided manually. Used internally to create application instances for email rendering.
-        /// </summary>
-        /// <remarks></remarks>
-        public CPClass(string appName, ServerConfigModel serverConfig) {
-            core = new CoreController(this, appName, serverConfig);
-        }
+        ////
+        ////=========================================================================================================
+        ///// <summary>
+        ///// constructor for non-Internet app use. Configuration provided manually. Used internally to create application instances for email rendering.
+        ///// </summary>
+        ///// <remarks></remarks>
+        //public CPClass(string appName, ServerConfigModel serverConfig) {
+        //    core = new CoreController(this, appName, serverConfig);
+        //}
         //
         //=========================================================================================================
         /// <summary>

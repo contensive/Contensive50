@@ -508,7 +508,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns></returns>
         public string getVisitCookie() {
-            return core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisit);
+            return core.webServer.requestCookie(appNameCookiePrefix + cookieNameVisit);
         }
         //
         //========================================================================
@@ -517,7 +517,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <returns></returns>
         public string getVisitorCookie() {
-            return core.webServer.getRequestCookie(appNameCookiePrefix + cookieNameVisitor);
+            return core.webServer.requestCookie(appNameCookiePrefix + cookieNameVisitor);
         }
         //
         //========================================================================

@@ -5,29 +5,43 @@ using Contensive.Processor.Models.Domain;
 using Microsoft.Web.Administration;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 //
 namespace Contensive.Processor.Controllers {
     /// <summary>
-    /// Code dedicated to processing iis input and output. lazy Constructed. (see coreHtmlClass for html processing)
+    /// Code dedicated to processing webserver (iis for windows) input and output. lazy Constructed. (see coreHtmlClass for html processing)
     /// What belongs here is everything that would have to change if we converted to apache
     /// </summary>
     public class WebServerController {
         //
         //====================================================================================================
         // enum this, not consts --  https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
+        /// <summary>
+        /// 200
+        /// </summary>
         public static readonly string httpResponseStatus200_Success = "200 OK";
+        /// <summary>
+        /// 401 unauthorized
+        /// </summary>
         public static readonly string httpResponseStatus401_Unauthorized = "401 Unauthorized";
+        /// <summary>
+        /// 403 forbidden
+        /// </summary>
         public static readonly string httpResponseStatus403_Forbidden = "403 Forbidden";
+        /// <summary>
+        /// 404 not found
+        /// </summary>
         public static readonly string httpResponseStatus404_NotFound = "404 Not Found";
+        /// <summary>
+        /// 500 server error
+        /// </summary>
         public static readonly string httpResponseStatus500_ServerError = "500 Internal Server Error";
         //
         //====================================================================================================
         //
-        private readonly CoreController core;
+        private CoreController core { get; }
         //
         //====================================================================================================
         /// <summary>
@@ -44,8 +58,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public int requestPort {
             get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return 0;
                 if (_requestPort == null) {
-                    _requestPort = ((httpContext != null) && (httpContext.Request != null) && (httpContext.Request.Url != null)) ? httpContext.Request.Url.Port : 0;
+                    _requestPort = httpContext.Request.Url.Port;
                 }
                 return (int)_requestPort;
             }
@@ -59,7 +74,8 @@ namespace Contensive.Processor.Controllers {
         public string requestPathPage {
             get {
                 if (string.IsNullOrEmpty(_requestPathPage)) {
-                    _requestPathPage = core.webServer.httpContext.Request.ServerVariables.ContainsKey("SCRIPT_NAME") ? core.webServer.httpContext.Request.ServerVariables["SCRIPT_NAME"] : "";
+                    if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return string.Empty;
+                    _requestPathPage = httpContext.Request.ServerVariables.ContainsKey("SCRIPT_NAME") ? core.webServer.httpContext.Request.ServerVariables["SCRIPT_NAME"] : "";
                 }
                 return _requestPathPage;
             }
@@ -73,7 +89,8 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestReferrer {
             get {
-                return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_REFERER")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_REFERER"] : "";
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return string.Empty;
+                return (httpContext.Request.ServerVariables.ContainsKey("HTTP_REFERER")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_REFERER"] : "";
             }
         }
         //
@@ -83,6 +100,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestDomain {
             get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return string.Empty;
                 return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("SERVER_NAME")) ? core.webServer.httpContext.Request.ServerVariables["SERVER_NAME"] : "";
             }
         }
@@ -93,9 +111,9 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public bool requestSecure {
             get {
-                if (_requestSecure == null) {
-                    _requestSecure = (core.webServer.httpContext.Request.ServerVariables.ContainsKey("SERVER_PORT_SECURE")) ? encodeBoolean(core.webServer.httpContext.Request.ServerVariables["SERVER_PORT_SECURE"]) : false;
-                }
+                if (_requestSecure != null) { return (bool)_requestSecure; }
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return false;
+                _requestSecure = core.webServer.httpContext.Request.ServerVariables.ContainsKey("SERVER_PORT_SECURE") && encodeBoolean(core.webServer.httpContext.Request.ServerVariables["SERVER_PORT_SECURE"]);
                 return (bool)_requestSecure;
             }
         }
@@ -107,6 +125,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestRemoteIP {
             get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return string.Empty;
                 return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("REMOTE_ADDR")) ? core.webServer.httpContext.Request.ServerVariables["REMOTE_ADDR"] : "";
             }
         }
@@ -117,6 +136,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestBrowser {
             get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.ServerVariables == null)) return string.Empty;
                 return (core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_USER_AGENT")) ? core.webServer.httpContext.Request.ServerVariables["HTTP_USER_AGENT"] : "";
             }
         }
@@ -125,7 +145,20 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// The QueryString of the current URI
         /// </summary>
-        public string requestQueryString { get; set; } = "";
+        public string requestQueryString {
+            get {
+                if (_requestQueryString != null) { return _requestQueryString; }
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.QueryString == null)) return string.Empty;
+                _requestQueryString = "";
+                string delimiter = "";
+                foreach (var qsPair in httpContext.Request.QueryString) {
+                    _requestQueryString += delimiter + qsPair.Key + "=" + qsPair.Value;
+                    delimiter = "&";
+                }
+                return _requestQueryString;
+            }
+        }
+        private string _requestQueryString { get; set; } = null;
         //
         // ====================================================================================================
         /// <summary>
@@ -133,51 +166,75 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         public string requestUrlSource {
             get {
-                if (_requestUrlSource == null) {
-                    _requestUrlSource = httpContext.Request.Url.AbsoluteUri;
-                }
+                if (_requestUrlSource != null) { return _requestUrlSource; }
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return string.Empty;
+                _requestUrlSource = httpContext.Request.Url.AbsoluteUri;
                 return _requestUrlSource;
             }
         }
         private string _requestUrlSource = null;
         //
         // ====================================================================================================
-        //
-        public string linkForwardSource { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public string linkForwardError { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public bool pageExcludeFromAnalytics { get; set; }
-        //
-        // ====================================================================================================
-        //
-        //public int memberAction { get; set; }
+        /// <summary>
+        /// source Url
+        /// </summary>
+        public string requestLinkForwardSource {
+            get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return string.Empty;
+                _requestUrlSource = httpContext.Request.Url.AbsoluteUri;
+                return _requestUrlSource;
+            }
+        }
         //
         // ====================================================================================================
+        /// <summary>
+        /// if true, viewing saved with this property
+        /// </summary>
+        public bool pageExcludeFromAnalytics {
+            get {
+                return _pageExcludeFromAnalytics;
+            }
+            set {
+                _pageExcludeFromAnalytics = value;
+            }
+        }
+        private bool _pageExcludeFromAnalytics = false;
         //
+        // ====================================================================================================
+        /// <summary>
+        /// for more information message
+        /// </summary>
         public string adminMessage { get; set; } = "";
         //
         // ====================================================================================================
-        //
-        public string requestPageReferer { get; set; } = "";
+        /// <summary>
+        /// Request Referer
+        /// </summary>
+        public string requestPageReferer {
+            get {
+                return requestReferer;
+            }
+        }
         //
         // ====================================================================================================
-        //
-        public string requestReferer { get; set; } = "";
+        /// <summary>
+        /// Request Referer
+        /// </summary>
+        public string requestReferer {
+            get {
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.UrlReferrer == null)) return string.Empty;
+                return httpContext.Request.UrlReferrer.AbsoluteUri;
+            }
+        }
         //
         // ====================================================================================================
         /// <summary>
         /// The Action for all internal forms, if not set, default
         /// </summary>
-        public string serverFormActionURL {
+        public string requestFormActionURL {
             get {
-                if (string.IsNullOrEmpty(_serverFormActionURL)) {
-                    _serverFormActionURL = requestUrl;
-                }
+                if (!string.IsNullOrEmpty(_serverFormActionURL)) { return _serverFormActionURL; }
+                requestFormActionURL = requestProtocol + requestDomain + requestPath + requestPage;
                 return _serverFormActionURL;
             }
             set {
@@ -187,8 +244,14 @@ namespace Contensive.Processor.Controllers {
         private string _serverFormActionURL;
         //
         // ====================================================================================================
-        //
-        public string requestContentWatchPrefix { get; set; } = "";
+        /// <summary>
+        /// string to prefix a content watch link. protocol + domain + "/"
+        /// </summary>
+        public string requestContentWatchPrefix {
+            get {
+                return requestProtocol + requestDomain + "/";
+            }
+        }
         //
         // ====================================================================================================
         /// <summary>
@@ -217,69 +280,105 @@ namespace Contensive.Processor.Controllers {
                 return _requestUrl;
             }
         }
-        private string _requestUrl;
+        private string _requestUrl = null;
         //
         // ====================================================================================================
         /// <summary>
         /// The path between the requestDomain and the requestPage. NOTE - breaking change: this used to follow appRootPath and never started with /
         /// </summary>
-        public string requestPath { get; set; } = "";
+        public string requestPath {
+            get {
+                if (_requestPath != null) { return _requestPath; }
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return string.Empty;
+                var segments = splitUrl(httpContext.Request.Url.AbsoluteUri);
+                _requestPath = segments.unixPath();
+                return _requestPath;
+            }
+        }
+        private string _requestPath = null;
         //
         // ====================================================================================================
         /// <summary>
         /// The page or script name, typicall index.html or default.aspx or myPage.aspx
         /// </summary>
-        public string requestPage { get; set; } = "";
+        public string requestPage {
+            get {
+                if (_requestPage != null) { return _requestPage; }
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return string.Empty;
+                var segments = splitUrl(httpContext.Request.Url.AbsoluteUri);
+                _requestPage = segments.filename;
+                return _requestPage;
+            }
+        }
+        private string _requestPage = null;
         //
         // ====================================================================================================
         /// <summary>
         /// The URL to the root of the secure area for this site
         /// </summary>
-        public string requestSecureURLRoot { get; set; } = "";
+        public string requestSecureURLRoot {
+            get {
+                return "https://" + requestDomain + "/";
+            }
+        }
         //
         // ====================================================================================================
         /// <summary>
         /// when set, Meta no follow is added
         /// </summary>
-        public bool response_NoFollow { get; set; }
-        //
-        // ====================================================================================================
-        //
-        public string bufferRedirect { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public string bufferContentType { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public string bufferCookies { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public string bufferResponseHeader { get; set; } = "";
-        //
-        // ====================================================================================================
-        //
-        public string bufferResponseStatus { get; set; } = "";
+        public bool responseNoFollow {
+            get {
+                return _responseNoFollow;
+            }
+            set {
+                _responseNoFollow = value;
+            }
+        }
+        private bool _responseNoFollow = false;
         //
         // ====================================================================================================
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, CookieClass> requestCookies { get; set; }
-        ////
-        //// ====================================================================================================
-        ///// <summary>
-        ///// The body of the request
-        ///// </summary>
-        //public string requestBody { get; set; }
-        ////
-        //// ====================================================================================================
-        ///// <summary>
-        ///// The content type of the request
-        ///// </summary>
-        //public string requestContentType { get; set; }
+        public Dictionary<string, CookieClass> requestCookies {
+            get {
+                if (_requestCookies != null) { return _requestCookies; }
+                _requestCookies = new Dictionary<string, CookieClass>();
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Cookies == null)) return _requestCookies;
+                foreach (KeyValuePair<string, HttpContextRequestCookie> kvp in httpContext.Request.Cookies) {
+                    _requestCookies = new Dictionary<string, CookieClass> {
+                        { kvp.Key, new CookieClass() { name = kvp.Key, value = kvp.Value.Value } }
+                    };
+                }
+                return _requestCookies;
+            }
+        }
+        private Dictionary<string, CookieClass> _requestCookies = null;
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// return a cookie value. return empty if cookie is not present.
+        /// </summary>
+        /// <param name="cookieName"></param>
+        /// <returns></returns>
+        public string requestCookie(string cookieName) {
+            if (!requestCookies.ContainsKey(cookieName)) { return ""; }
+            return requestCookies[cookieName].value;
+        }
+        //
+        // ====================================================================================================
+        /// <summary>
+        /// The content type of the request
+        /// </summary>
+        public string requestContentType {
+            get {
+                if (_requestContentType != null) { return _requestContentType; };
+                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Cookies == null)) return "";
+                _requestContentType = httpContext.Request.ContentType;
+                return _requestContentType;
+            }
+        }
+        private string _requestContentType = null;
         //
         // ====================================================================================================
         /// <summary>
@@ -297,22 +396,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// 
         /// </summary>
-        public Dictionary<string, string> requestQuery { get; set; } = new Dictionary<string, string>();
-        ////
-        //// ====================================================================================================
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        //public Dictionary<string, string> serverEnvironment { get; set; } = new Dictionary<string, string>();
-        //
-        // ====================================================================================================
-        /// <summary>
-        /// 
-        /// </summary>
         /// <param name="core"></param>
         public WebServerController(CoreController core) {
             this.core = core;
-            requestCookies = new Dictionary<string, CookieClass>();
         }
         //
         //=======================================================================================
@@ -325,48 +411,6 @@ namespace Contensive.Processor.Controllers {
                 string cmd = "IISReset.exe";
                 string arg = "";
                 string stdOut = runProcess(core, cmd, arg, true);
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //
-        //=======================================================================================
-        /// <summary>
-        /// Stop IIS, Must be called from a process running as admin, This can be done using the command queue, which kicks off the ccCmd process from the Server
-        /// </summary>
-        public void stop() {
-            try {
-                string logFilename = core.tempFiles.localAbsRootPath + "iis-stop-" + getRandomInteger(core).ToString() + ".Log";
-                string cmd = "%comspec% /c IISReset /stop >> \"" + logFilename + "\"";
-                runProcess(core, cmd, "", true);
-                string logMessage = core.tempFiles.readFileText(logFilename);
-                core.tempFiles.deleteFile(logFilename);
-                logMessage = strReplace(logMessage, Environment.NewLine, " ");
-                logMessage = strReplace(logMessage, "\r", " ");
-                logMessage = strReplace(logMessage, "\n", " ");
-                LogController.logInfo(core, "iis stop, stdout [" + logMessage + "]");
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
-        //   
-        //=======================================================================================
-        /// <summary>
-        /// Start IIS, Must be called from a process running as admin, This can be done using the command queue, which kicks off the ccCmd process from the Server
-        /// </summary>
-        public void start() {
-            try {
-                string logFilename = core.tempFiles.localAbsRootPath + "iis-start-" + getRandomInteger(core).ToString() + ".Log";
-                string cmd = "%comspec% /c IISReset /start >> \"" + logFilename + "\"";
-                runProcess(core, cmd, "", true);
-                string logMessage = core.tempFiles.readFileText(logFilename);
-                core.tempFiles.deleteFile(logFilename);
-                logMessage = GenericController.strReplace(logMessage, Environment.NewLine, " ");
-                logMessage = GenericController.strReplace(logMessage, "\r", " ");
-                logMessage = GenericController.strReplace(logMessage, "\n", " ");
-                LogController.logInfo(core, "iis start, stdout [" + logMessage + "]");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
@@ -399,9 +443,8 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Initialize the application, returns responseOpen
         /// </summary>
-        /// <param name="httpContext"></param>
         /// <returns></returns>
-        public bool initWebContext(HttpContextModel httpContext) {
+        public bool initWebContext() {
             try {
                 //
                 //--------------------------------------------------------------------------
@@ -411,15 +454,6 @@ namespace Contensive.Processor.Controllers {
                     core.html.enableOutputBuffer(true);
                     core.doc.continueProcessing = true;
                     setResponseContentType("text/html");
-                    //
-                    // -- Process QueryString to core.doc.main_InStreamArray
-                    // -- Do this first to set core.main_ReadStreamJSForm, core.main_ReadStreamJSProcess, core.main_ReadStreamBinaryRead (must be in QS)
-                    linkForwardSource = "";
-                    linkForwardError = "";
-                    //
-                    // Other Server variables
-                    requestReferer = requestReferrer;
-                    requestPageReferer = requestReferrer;
                     //
                     core.doc.blockExceptionReporting = false;
                     //
@@ -431,8 +465,7 @@ namespace Contensive.Processor.Controllers {
                         if (visitToken.id != 0) {
                             string sql = "update ccvisits set CookieSupport=1 where id=" + visitToken.id;
                             core.db.executeNonQuery(sql);
-                            //Task.Run(() => core.db.executeNonQueryAsync(sql));
-                            core.doc.continueProcessing = false; //--- should be disposed by caller --- Call dispose
+                            core.doc.continueProcessing = false;
                             return core.doc.continueProcessing;
                         }
                     }
@@ -569,41 +602,19 @@ namespace Contensive.Processor.Controllers {
                     if (originUri != null) {
                         if (core.domainDictionary.ContainsKey(originUri.Host.ToLowerInvariant())) {
                             if (core.domainDictionary[originUri.Host.ToLowerInvariant()].allowCORS) {
-                                httpContext.Response.AddHeader("Access-Control-Allow-Credentials", "true");
-                                httpContext.Response.AddHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
-                                httpContext.Response.AddHeader("Access-Control-Headers", "Content-Type,soapaction,X-Requested-With");
-                                httpContext.Response.AddHeader("Access-Control-Allow-Origin", originUri.GetLeftPart(UriPartial.Authority));
+                                addResponseHeader("Access-Control-Allow-Credentials", "true");
+                                addResponseHeader("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+                                addResponseHeader("Access-Control-Headers", "Content-Type,soapaction,X-Requested-With");
+                                addResponseHeader("Access-Control-Allow-Origin", originUri.GetLeftPart(UriPartial.Authority));
                             }
                         }
                     }
                     if (core.domain.noFollow) {
-                        response_NoFollow = true;
+                        responseNoFollow = true;
                     }
-                    //
-                    requestContentWatchPrefix = requestProtocol + requestDomain + "/";
-                    requestContentWatchPrefix = requestContentWatchPrefix.left(requestContentWatchPrefix.Length - 1);
-                    //
-                    requestPath = "/";
-                    if (string.IsNullOrWhiteSpace(requestPathPage)) {
-                        requestPage = core.siteProperties.serverPageDefault;
-                    } else {
-                        requestPage = requestPathPage;
-                        int slashPtr = requestPathPage.LastIndexOf("/", StringComparison.InvariantCulture);
-                        if (slashPtr >= 0) {
-                            requestPage = "";
-                            requestPath = requestPathPage.left(slashPtr + 1);
-                            if (requestPathPage.Length > 1) { requestPage = requestPathPage.Substring(slashPtr + 1); }
-                        }
-                    }
-                    requestSecureURLRoot = "https://" + requestDomain + "/";
                     //
                     // ----- Style tag
                     adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
-                    //
-                    // ----- Create core.main_ServerFormActionURL if it has not been overridden manually
-                    if (string.IsNullOrEmpty(serverFormActionURL)) {
-                        serverFormActionURL = requestProtocol + requestDomain + requestPath + requestPage;
-                    }
                 }
                 //
                 // -- done at last
@@ -614,34 +625,6 @@ namespace Contensive.Processor.Controllers {
             return core.doc.continueProcessing;
         }
         //
-        //========================================================================
-        /// <summary>
-        /// get the cookie value if the cookie name is in the request
-        /// </summary>
-        /// <param name="CookieName"></param>
-        /// <returns></returns>
-        public string getRequestCookie(string CookieName) {
-            if (requestCookies.ContainsKey(CookieName)) {
-                return requestCookies[CookieName].value;
-            }
-            return string.Empty;
-        }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// Add a cookie to the request cookies - used to setup the collection
-        /// </summary>
-        /// <param name="cookieKey"></param>
-        /// <param name="cookieValue"></param>
-        public void addRequestCookie(string cookieKey, string cookieValue) {
-            if (requestCookies.ContainsKey(cookieKey)) {
-                requestCookies.Remove(cookieKey);
-            }
-            requestCookies.Add(cookieKey, new CookieClass {
-                name = cookieKey,
-                value = cookieValue
-            });
-        }
         //====================================================================================================
         /// <summary>
         /// set cookie in iis response
@@ -652,39 +635,28 @@ namespace Contensive.Processor.Controllers {
         /// <param name="domain">The domain for this cookie. Typically the requestDomain.</param>
         /// <param name="path">the path for the cookie. typically "/"</param>
         /// <param name="secure">If true, this cookie will only be served over https.</param>
-
         public void addResponseCookie(string name, string value, DateTime dateExpires, string domain, string path, bool secure) {
             try {
-                if (httpContext != null) {
-                    //
-                    // -- add cookie by accessing the array (auto adds if missing, seems messy but recommended)
-                    httpContext.Response.Cookies[name].HttpOnly = true;
-                    httpContext.Response.Cookies[name].SameSite = HttpContextResponseCookieSameSiteMode.Lax; // System.Web.SameSiteMode.Lax;
-                    httpContext.Response.Cookies[name].Value = value;
-                    if (!isMinDate(dateExpires)) {
-                        httpContext.Response.Cookies[name].Expires = dateExpires;
-                    }
-                    if (!string.IsNullOrEmpty(domain)) {
-                        httpContext.Response.Cookies[name].Domain = domain;
-                    }
-                    if (!string.IsNullOrEmpty(path)) {
-                        httpContext.Response.Cookies[name].Path = path;
-                    }
-                    if (secure) {
-                        httpContext.Response.Cookies[name].Secure = secure;
-                    }
-                } else {
-                    //
-                    // Pass Cookie to non-asp parent crlf delimited list of name,value,expires,domain,path,secure
-                    if (!string.IsNullOrEmpty(bufferCookies)) {
-                        bufferCookies += Environment.NewLine;
-                    }
-                    bufferCookies += name;
-                    bufferCookies += Environment.NewLine + value;
-                    bufferCookies += Environment.NewLine + (isMinDate(dateExpires) ? "" : dateExpires.ToString(CultureInfo.InvariantCulture));
-                    bufferCookies += Environment.NewLine + (string.IsNullOrEmpty(domain) ? "" : domain);
-                    bufferCookies += Environment.NewLine + (string.IsNullOrEmpty(path) ? "" : path);
-                    bufferCookies += Environment.NewLine + (secure ? "true" : "false");
+                if ((httpContext == null) || (httpContext.Response == null) || (httpContext.Response.cookies == null)) { return; }
+                //
+                // -- add cookie to httpContext response
+                if (!httpContext.Response.cookies.ContainsKey(name)) {
+                    httpContext.Response.cookies.Add(name, new HttpContextResponseCookie());
+                }
+                httpContext.Response.cookies[name].httpOnly = true;
+                httpContext.Response.cookies[name].sameSite = HttpContextResponseCookieSameSiteMode.Lax;
+                httpContext.Response.cookies[name].value = value;
+                if (!isMinDate(dateExpires)) {
+                    httpContext.Response.cookies[name].expires = dateExpires;
+                }
+                if (!string.IsNullOrEmpty(domain)) {
+                    httpContext.Response.cookies[name].domain = domain;
+                }
+                if (!string.IsNullOrEmpty(path)) {
+                    httpContext.Response.cookies[name].path = path;
+                }
+                if (secure) {
+                    httpContext.Response.cookies[name].secure = secure;
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -719,14 +691,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="status">A string starting with the response number (like 200 or 404) followed by the response message</param>
         public void setResponseStatus(string status) {
-            if (core.doc.continueProcessing) {
-                LogController.logTrace(core, "setResponseStatus [" + status + "]");
-                if (httpContext != null) {
-                    // add header to response
-                    httpContext.Response.Status = status;
-                }
-                bufferResponseStatus = status;
-            }
+            if (!core.doc.continueProcessing) { return; }
+            if ((httpContext == null) || (httpContext.Response == null)) { return; }
+            //
+            httpContext.Response.status = status;
         }
         //
         //===========================================================================================
@@ -735,12 +703,57 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="ContentType"></param>
         public void setResponseContentType(string ContentType) {
-            if (core.doc.continueProcessing) {
-                if (httpContext != null) {
-                    // add header to response
-                    httpContext.Response.ContentType = ContentType;
+            if (!core.doc.continueProcessing) { return; }
+            if ((httpContext == null) || (httpContext.Response == null)) { return; }
+            //
+            httpContext.Response.contentType = ContentType;
+            //bufferContentType = ContentType;
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return response cookie name=value in a querystring format
+        /// </summary>
+        public string responseCookies {
+            get {
+                string result = "";
+                string delimiter = "";
+                foreach (KeyValuePair<string, HttpContextResponseCookie> kvp in httpContext.Response.cookies) {
+                    result += delimiter + kvp.Key + "=" + kvp.Value.value;
+                    delimiter = "&";
                 }
-                bufferContentType = ContentType;
+                return result;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// return response headers name=value in a querystring format
+        /// </summary>
+        public string responseHeaders {
+            get {
+                string result = "";
+                string delimiter = "";
+                foreach (HttpContextResponseHeader header in httpContext.Response.headers) {
+                    result += delimiter + header.name + "=" + header.value;
+                    delimiter = "&";
+                }
+                return result;
+            }
+        }
+        //
+        //===========================================================================================
+        /// <summary>
+        /// 
+        /// </summary>
+        public string responseContentType {
+            get {
+                if ((httpContext == null) || (httpContext.Response == null)) { return ""; }
+                return httpContext.Response.contentType;
+            }
+            set {
+                if ((httpContext == null) || (httpContext.Response == null)) { return; }
+                httpContext.Response.contentType = value;
             }
         }
         //
@@ -752,18 +765,16 @@ namespace Contensive.Processor.Controllers {
         /// <param name="HeaderValue"></param>
         public void addResponseHeader(string HeaderName, string HeaderValue) {
             try {
-                if (core.doc.continueProcessing) {
-                    if (httpContext != null) {
-                        // add header to response
-                        httpContext.Response.AddHeader(HeaderName, HeaderValue);
-                    }
-                    if (!string.IsNullOrEmpty(bufferResponseHeader)) {
-                        bufferResponseHeader += Environment.NewLine;
-                    }
-                    bufferResponseHeader = bufferResponseHeader + GenericController.strReplace(HeaderName, Environment.NewLine, "") + Environment.NewLine + GenericController.strReplace(GenericController.encodeText(HeaderValue), Environment.NewLine, "");
-                }
+                if (!core.doc.continueProcessing) { return; }
+                if ((httpContext == null) || (httpContext.Response == null)) { return; }
+                //
+                httpContext.Response.headers.Add(new HttpContextResponseHeader() {
+                    name = HeaderName,
+                    value = HeaderValue
+                });
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                throw;
             }
         }
         //
@@ -778,6 +789,9 @@ namespace Contensive.Processor.Controllers {
         public string redirect(string NonEncodedLink, string RedirectReason, bool IsPageNotFound, bool allowDebugMessage) {
             string result = HtmlController.div("Redirecting to [" + NonEncodedLink + "], reason [" + RedirectReason + "]", "ccWarningBox");
             try {
+                if (!core.doc.continueProcessing) { return result; }
+                if ((httpContext == null) || (httpContext.Response == null)) { return result; }
+                //
                 if (core.doc.continueProcessing) {
                     string FullLink = NonEncodedLink;
                     string ShortLink = "";
@@ -801,14 +815,14 @@ namespace Contensive.Processor.Controllers {
                         ShortLink = GenericController.encodeVirtualPath(ShortLink, core.appConfig.cdnFileUrl, appRootPath, requestDomain);
                         FullLink = requestProtocol + requestDomain + ShortLink;
                     }
-
+                    //
                     string EncodedLink = null;
                     if (string.IsNullOrEmpty(NonEncodedLink)) {
                         //
                         // Link is not valid
                         //
                         LogController.logError(core, new GenericException("Redirect was called with a blank Link. Redirect Reason [" + RedirectReason + "]"));
-                        return string.Empty;
+                        return result;
                         //
                         // changed to main_ServerLinksource because if a redirect is caused by a link forward, and the host page for the iis 404 is
                         // the same as the destination of the link forward, this throws an error and does not forward. the only case where main_ServerLinksource is different
@@ -819,7 +833,7 @@ namespace Contensive.Processor.Controllers {
                         // Loop redirect error, throw trap and block redirect to prevent loop
                         //
                         LogController.logError(core, new GenericException("Redirect was called to the same URL, main_ServerLink is [" + requestUrl + "], main_ServerLinkSource is [" + requestUrlSource + "]. This redirect is only allowed if either the form or querystring has change to prevent cyclic redirects. Redirect Reason [" + RedirectReason + "]"));
-                        return string.Empty;
+                        return result;
                     } else if (IsPageNotFound) {
                         //
                         // Do a PageNotFound then redirect
@@ -828,7 +842,6 @@ namespace Contensive.Processor.Controllers {
                         if (!string.IsNullOrEmpty(ShortLink)) {
                             string sql = "Update ccContentWatch set link=null where link=" + DbController.encodeSQLText(ShortLink);
                             core.db.executeNonQuery(sql);
-                            //Task.Run(() => core.db.executeNonQueryAsync(sql));
                         }
                         //
                         if (allowDebugMessage && core.doc.visitPropertyAllowDebugging) {
@@ -857,10 +870,8 @@ namespace Contensive.Processor.Controllers {
                             if (httpContext != null) {
                                 //
                                 // -- redirect and release application. HOWEVER -- the thread will continue so use responseOpen=false to abort as much activity as possible
-                                httpContext.Response.Redirect(NonEncodedLink, false);
+                                httpContext.Response.redirectUrl = NonEncodedLink;
                                 httpContext.ApplicationInstance.CompleteRequest();
-                            } else {
-                                bufferRedirect = NonEncodedLink;
                             }
                         }
                     }
@@ -868,10 +879,11 @@ namespace Contensive.Processor.Controllers {
                     // -- close the output stream
                     core.doc.continueProcessing = false;
                 }
+                return result;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                throw;
             }
-            return result;
         }
         //
         //====================================================================================================
@@ -949,15 +961,14 @@ namespace Contensive.Processor.Controllers {
                                         BlockRedirect = true;
                                         csData.set("active", 0);
                                     } else {
-                                        using (var CSHost = new CsModel(core)) {
-                                            CSHost.open(contentMeta.name, "ID=" + HostRecordId);
-                                            if (!CSHost.ok()) {
-                                                //
-                                                // ----- Content Watch host record not found, mark inactive
-                                                //
-                                                BlockRedirect = true;
-                                                csData.set("active", 0);
-                                            }
+                                        using var CSHost = new CsModel(core);
+                                        CSHost.open(contentMeta.name, "ID=" + HostRecordId);
+                                        if (!CSHost.ok()) {
+                                            //
+                                            // ----- Content Watch host record not found, mark inactive
+                                            //
+                                            BlockRedirect = true;
+                                            csData.set("active", 0);
                                         }
                                     }
                                 }
@@ -1025,9 +1036,8 @@ namespace Contensive.Processor.Controllers {
         /// 
         /// </summary>
         public void flushStream() {
-            if (httpContext != null) {
-                httpContext.Response.Flush();
-            }
+            if ((httpContext == null) || (httpContext.Response == null)) { return; }
+            httpContext.Response.Flush();
         }
         //
         //====================================================================================================
@@ -1245,9 +1255,7 @@ namespace Contensive.Processor.Controllers {
         /// 
         /// </summary>
         public void clearResponseBuffer() {
-            httpContext.Response.ClearHeaders();
-            bufferRedirect = "";
-            bufferResponseHeader = "";
+            httpContext.Response.headers.Clear();
         }
     }
     //

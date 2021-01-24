@@ -18,59 +18,109 @@ namespace Contensive.Processor.Models.Domain {
         //
         private readonly Dictionary<string, DocPropertyModel> docPropertiesDict;
         //
+        //====================================================================================================
+        /// <summary>
+        /// constuct
+        /// </summary>
+        /// <param name="core"></param>
         public DocPropertiesModel(CoreController core) {
             this.core = core;
             docPropertiesDict = new Dictionary<string, DocPropertyModel>();
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set integer property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyType"></param>
         public void setProperty(string key, int value, DocPropertyModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
-        //
+        /// <summary>
+        /// set integer property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void setProperty(string key, int value) {
             setProperty(key, value.ToString(), DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set number (double) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyType"></param>
         public void setProperty(string key, double value, DocPropertyModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
-        //
+        /// <summary>
+        /// set number (double) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void setProperty(string key, double value) {
             setProperty(key, value.ToString(), DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set date (DateTime) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyType"></param>
         public void setProperty(string key, DateTime value, DocPropertyModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
-        //
+        /// <summary>
+        /// set date (DateTime) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void setProperty(string key, DateTime value) {
             setProperty(key, value.ToString(CultureInfo.InvariantCulture), DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set boolean (bool) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyType"></param>
         public void setProperty(string key, bool value, DocPropertyModel.DocPropertyTypesEnum propertyType) {
             setProperty(key, value.ToString(), propertyType);
         }
-        //
+        /// <summary>
+        /// set boolean (bool) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void setProperty(string key, bool value) {
             setProperty(key, value.ToString(), DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set text (string) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public void setProperty(string key, string value) {
             setProperty(key, value, DocPropertyModel.DocPropertyTypesEnum.userDefined);
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set text (string) property
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="propertyType"></param>
         public void setProperty(string key, string value, DocPropertyModel.DocPropertyTypesEnum propertyType) {
             try {
                 DocPropertyModel prop = new DocPropertyModel {
@@ -84,13 +134,17 @@ namespace Contensive.Processor.Models.Domain {
                 prop.value = value;
                 setProperty(key, prop);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Set complete doc property object
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value">See DocPropertyModel for details.</param>
         public void setProperty(string key, DocPropertyModel value) {
             string propKey = encodeDocPropertyKey(key);
             if (!string.IsNullOrEmpty(propKey)) {
@@ -102,14 +156,21 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        //
-        public bool containsKey(string RequestName) {
-            return docPropertiesDict.ContainsKey(encodeDocPropertyKey(RequestName));
+        /// <summary>
+        /// true if the doc property key exists
+        /// </summary>
+        /// <param name="Key"></param>
+        /// <returns></returns>
+        public bool containsKey(string Key) {
+            return docPropertiesDict.ContainsKey(encodeDocPropertyKey(Key));
         }
         //
         //====================================================================================================
-        //
-        public List<string> getKeyList()  {
+        /// <summary>
+        /// Get list of doc property keys
+        /// </summary>
+        /// <returns></returns>
+        public List<string> getKeyList() {
             List<string> keyList = new List<string>();
             foreach (KeyValuePair<string, DocPropertyModel> kvp in docPropertiesDict) {
                 keyList.Add(kvp.Key);
@@ -118,56 +179,76 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //=============================================================================================
-        //
+        /// <summary>
+        /// get a doc property converted as Number (type double)
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public double getNumber(string RequestName) {
             try {
                 return GenericController.encodeNumber(getProperty(RequestName).value);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
         //
         //=============================================================================================
-        //
+        /// <summary>
+        /// get a doc property converted as integer
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public int getInteger(string RequestName) {
             try {
                 return GenericController.encodeInteger(getProperty(RequestName).value);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
         //
         //=============================================================================================
-        //
+        /// <summary>
+        /// get a doc property converted as Text (type string)
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public string getText(string RequestName) {
             try {
                 return GenericController.encodeText(getProperty(RequestName).value);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
         //
         //=============================================================================================
-        //
-        public string getRenderedActiveContent(string RequestName) {
+        /// <summary>
+        /// get a doc property from they key, and decode the wysiwyg editor response into content to be saved.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public string getTextFromWysiwygEditor(string key) {
             try {
-                return ActiveContentController.processWysiwygResponseForSave(core, GenericController.encodeText(getProperty(RequestName).value));
+                return ActiveContentController.processWysiwygResponseForSave(core, GenericController.encodeText(getProperty(key).value));
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
         //
         //=============================================================================================
-        //
+        /// <summary>
+        /// get a doc property converted as Boolean (type bool)
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public bool getBoolean(string RequestName) {
             try {
                 return GenericController.encodeBoolean(getProperty(RequestName).value);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -178,7 +259,7 @@ namespace Contensive.Processor.Models.Domain {
             try {
                 return GenericController.encodeDate(getProperty(RequestName).value);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -194,7 +275,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return new DocPropertyModel();
@@ -209,7 +290,7 @@ namespace Contensive.Processor.Models.Domain {
                     returnResult = sourceKey.ToLowerInvariant();
                 }
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
             return returnResult;
@@ -243,7 +324,7 @@ namespace Contensive.Processor.Models.Domain {
                     }
                 }
             } catch (Exception ex) {
-                LogController.logError(core,ex);
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -253,7 +334,7 @@ namespace Contensive.Processor.Models.Domain {
         /// return the docProperties collection as the legacy optionString
         /// </summary>
         /// <returns></returns>
-        public string getLegacyOptionStringFromVar()  {
+        public string getLegacyOptionStringFromVar() {
             var returnString = new StringBuilder();
             foreach (string key in getKeyList()) {
                 returnString.Append("&" + GenericController.encodeLegacyOptionStringArgument(key) + "=" + encodeLegacyOptionStringArgument(getProperty(key).value));

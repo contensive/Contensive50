@@ -1,12 +1,11 @@
 ﻿
-using System;
-using System.Diagnostics;
-using System.Collections.Generic;
-using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor.Models.Domain;
-using Microsoft.ClearScript;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -27,205 +26,307 @@ namespace Contensive.Processor.Controllers {
             domain = new DomainModel();
             wysiwygAddonList = new Dictionary<CPHtml5BaseClass.EditorContentType, string>();
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// parent object
         /// </summary>
         private readonly CoreController core;
+        //
+        //====================================================================================================
         /// <summary>
         /// this documents unique guid (created on the fly)
         /// </summary>
         public string docGuid { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// boolean that tracks if the current document is html. set true if any addon executed is set htmlDocument=true. When true, the initial addon executed is returned in the html wrapper (html with head)
         /// If no addon executed is an html addon, the result is returned as-is.
         /// </summary>
         public bool isHtml { get; set; } = false;
+        //
+        //====================================================================================================
         /// <summary>
         /// head tags, script tags, style tags, etc
         /// </summary>
         public List<CPDocBaseClass.HtmlAssetClass> htmlAssetList { get; set; } = new List<CPDocBaseClass.HtmlAssetClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// head meta tag list (convert to list object)
         /// </summary>
         public List<HtmlMetaClass> htmlMetaContent_OtherTags { get; set; } = new List<HtmlMetaClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// html title elements
         /// </summary>
         public List<HtmlMetaClass> htmlMetaContent_TitleList { get; set; } = new List<HtmlMetaClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// html meta description
         /// </summary>
         public List<HtmlMetaClass> htmlMetaContent_Description { get; set; } = new List<HtmlMetaClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// html meta keywords
         /// </summary>
         public List<HtmlMetaClass> htmlMetaContent_KeyWordList { get; set; } = new List<HtmlMetaClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// current domain for website documents. For all others this is the primary domain for the application.
         /// </summary>
         public DomainModel domain { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// if this document is composed of page content records and templates, this object provides supporting properties and methods
         /// </summary>
         public PageContentController pageController { get; }
+        //
+        //====================================================================================================
         /// <summary>
         /// Anything that needs to be written to the Page during main_GetClosePage
         /// </summary>
         public string htmlForEndOfBody { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Dictionary<CPHtml5BaseClass.EditorContentType, string> wysiwygAddonList;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int editWrapperCnt { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// The accumulated body built as each component adds elements. Available to addons at onBodyEnd. Can be used to create addon filters
         /// </summary>
         public string body { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// querystring required to return to the current state (perform a refresh)
         /// </summary>
         public string refreshQueryString { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int redirectContentID { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int redirectRecordID { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// when true (default), stream is buffered until page is done
         /// </summary>
         public bool outputBufferEnabled { get; set; } = true;
+        //
+        //====================================================================================================
         /// <summary>
         /// Message - when set displays in an admin hint box in the page
         /// </summary>
         public string adminWarning { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// PageID that goes with the warning
         /// </summary>
         public int adminWarningPageID { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int checkListCnt { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int inputDateCnt { get; set; } = 0;
         //
+        //====================================================================================================
+        //
         internal List<CacheInputSelectClass> inputSelectCache = new List<CacheInputSelectClass>();
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int formInputTextCnt { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string quickEditCopy { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string bodyContent { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int landingPageID { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string redirectLink { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public string redirectReason { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public bool redirectBecausePageNotFound { get; set; } = false;
+        //
+        //====================================================================================================
         /// <summary>
         /// exceptions collected during document construction
         /// </summary>
         internal List<string> errorList { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// user errors collected during this document
         /// </summary>
         internal List<string> userErrorList = new List<string>();
+        //
+        //====================================================================================================
         /// <summary>
         /// List of test points displayed on debug footer
         /// </summary>
         public string testPointMessage { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public bool visitPropertyAllowDebugging { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// if true, send main_TestPoint messages to the stream
         /// </summary>
         internal Stopwatch appStopWatch { get; set; } = Stopwatch.StartNew();
+        //
+        //====================================================================================================
         /// <summary>
         /// set in constructor
         /// </summary>
         public DateTime profileStartTime { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// turn on in script -- use to write /debug.log in content files for whatever is needed
         /// </summary>
         public bool allowDebugLog { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// used so error reporting can not call itself
         /// </summary>
         public bool blockExceptionReporting { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// when false, routines should not add to the output and immediately exit
         /// </summary>
         public bool continueProcessing { get; set; }
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         internal List<int> addonIdListRunInThisDoc { get; set; } = new List<int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// If ContentId in this list, they are not a content manager
         /// </summary>
         internal List<int> contentAccessRights_NotList { get; set; } = new List<int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// If ContentId in this list, they are a content manager
         /// </summary>
         internal List<int> contentAccessRights_List { get; set; } = new List<int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// If in _List, test this for allowAdd
         /// </summary>
         internal List<int> contentAccessRights_AllowAddList { get; set; } = new List<int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// If in _List, test this for allowDelete
         /// </summary>
         internal List<int> contentAccessRights_AllowDeleteList { get; set; } = new List<int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// list of content names that have been verified editable by this user
         /// </summary>
         internal List<string> contentIsEditingList { get; set; } = new List<string>();
+        //
+        //====================================================================================================
         /// <summary>
         /// list of content names verified that this user CAN NOT edit
         /// </summary>
         internal List<string> contentNotEditingList { get; set; } = new List<string>();
+        //
+        //====================================================================================================
         /// <summary>
         /// Dictionary of addons running to track recursion, addonId and count of recursive entries. When executing an addon, check if it is in the list, if so, check if the recursion count is under the limit (addonRecursionDepthLimit). If not add it or increment the count. On exit, decrement the count and remove if 0.
         /// </summary>
         internal Dictionary<int, int> addonRecursionDepth { get; set; } = new Dictionary<int, int>();
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public Stack<AddonModel> addonModelStack { get; set; } = new Stack<AddonModel>();
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>
         public int addonInstanceCnt { get; set; } = 0;
+        //
+        //====================================================================================================
         /// <summary>
         /// Email Block List - these are people who have asked to not have email sent to them from this site, Loaded ondemand by csv_GetEmailBlockList
         /// </summary>
         public string emailBlockListStore { get; set; } = "";
+        //
+        //====================================================================================================
         /// <summary>
         /// 
         /// </summary>

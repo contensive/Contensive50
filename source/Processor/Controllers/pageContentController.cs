@@ -2139,7 +2139,7 @@ namespace Contensive.Processor.Controllers {
                             //
                             // ----- print the feedback submit form
                             //
-                            Panel = "<form Action=\"" + core.webServer.serverFormActionURL + "?" + core.doc.refreshQueryString + "\" Method=\"post\">";
+                            Panel = "<form Action=\"" + core.webServer.requestFormActionURL + "?" + core.doc.refreshQueryString + "\" Method=\"post\">";
                             Panel +=  "<table border=\"0\" cellpadding=\"4\" cellspacing=\"0\" width=\"100%\">";
                             Panel +=  "<tr>";
                             Panel +=  "<td colspan=\"2\"><p>Your feedback is welcome</p></td>";

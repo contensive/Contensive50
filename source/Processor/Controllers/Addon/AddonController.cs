@@ -813,7 +813,7 @@ namespace Contensive.Processor.Controllers {
                                                                     //
                                                                     // treat html as active content for now.
                                                                     //
-                                                                    fieldValue = core.docProperties.getRenderedActiveContent(fieldName);
+                                                                    fieldValue = core.docProperties.getTextFromWysiwygEditor(fieldName);
                                                                 } else {
                                                                     fieldValue = core.docProperties.getText(fieldName);
                                                                 }

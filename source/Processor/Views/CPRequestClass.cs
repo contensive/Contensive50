@@ -6,9 +6,9 @@ using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 
 namespace Contensive.Processor {
-    //
-    // comVisible to be activeScript compatible
-    //
+    /// <summary>
+    /// request
+    /// </summary>
     public class CPRequestClass : BaseClasses.CPRequestBaseClass, IDisposable {
         /// <summary>
         /// dependencies
@@ -16,12 +16,18 @@ namespace Contensive.Processor {
         private readonly CPClass cp;
         //
         //====================================================================================================
-        // Constructor
+        /// <summary>
+        /// construct
+        /// </summary>
+        /// <param name="cp"></param>
         public CPRequestClass(CPClass cp) {
             this.cp = cp;
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// request browser string
+        /// </summary>
         public override string Browser {
             get {
                 return cp.core.webServer.requestBrowser;
@@ -29,6 +35,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// true if the browser is recognized mobile
+        /// </summary>
         public override bool BrowserIsMobile {
             get {
                 return cp.core.session.visit.mobile;
@@ -36,8 +45,14 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get the request cookie value
+        /// </summary>
+        /// <param name="CookieName"></param>
+        /// <returns></returns>
         public override string Cookie(string CookieName) {
-            return cp.core.webServer.getRequestCookie(CookieName);
+            if (!cp.core.webServer.requestCookies.ContainsKey(CookieName)) { return ""; }
+            return cp.core.webServer.requestCookies[CookieName].value;
         }
         //
         //====================================================================================================
@@ -48,8 +63,8 @@ namespace Contensive.Processor {
         public override string CookieString {
             get {
                 string returnCookies = "";
-                foreach (KeyValuePair<string, CookieClass> kvp in cp.core.webServer.requestCookies) {
-                    returnCookies += "&" + GenericController.encodeRequestVariable( kvp.Key ) + "=" + GenericController.encodeRequestVariable( kvp.Value.value);
+                foreach (KeyValuePair<string,HttpContextRequestCookie> kvp in cp.core.webServer.httpContext.Request.Cookies) {
+                    returnCookies += "&" + GenericController.encodeRequestVariable(kvp.Key) + "=" + GenericController.encodeRequestVariable(kvp.Value.Value);
                 }
                 if (returnCookies.Length > 0) {
                     returnCookies = returnCookies.Substring(1);
@@ -59,6 +74,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// request form in a querystring form
+        /// </summary>
         public override string Form {
             get {
                 return Controllers.GenericController.convertNameValueDictToREquestString(cp.core.webServer.requestForm);
@@ -66,38 +84,69 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// The request querystring, to be used for actions
+        /// </summary>
         public override string FormAction {
             get {
-                return cp.core.webServer.serverFormActionURL;
+                return cp.core.webServer.requestFormActionURL;
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override bool GetBoolean(string RequestName) {
             return cp.core.docProperties.getBoolean(RequestName);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override DateTime GetDate(string RequestName) {
             return cp.core.docProperties.getDate(RequestName);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override int GetInteger(string RequestName) {
             return cp.core.docProperties.getInteger(RequestName);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override double GetNumber(string RequestName) {
             return cp.core.docProperties.getNumber(RequestName);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// get property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override string GetText(string RequestName) {
             return cp.core.docProperties.getText(RequestName);
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// The domain used on the request
+        /// </summary>
         public override string Host {
             get {
                 return cp.core.webServer.requestDomain;
@@ -105,48 +154,70 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy server variable with no internal use
+        /// </summary>
         public override string HTTPAccept {
             get {
-                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT"] : ""; 
+                if ((cp.core.webServer.httpContext == null) || (cp.core.webServer.httpContext.Request == null) || (cp.core.webServer.httpContext.Request.ServerVariables == null)) { return ""; }
+                if (!cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT")) { return ""; }
+                return cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT"];
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy server variable with no internal use
+        /// </summary>
         public override string HTTPAcceptCharset {
             get {
-                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT_CHARSET")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"] : "";
+                if ((cp.core.webServer.httpContext == null) || (cp.core.webServer.httpContext.Request == null) || (cp.core.webServer.httpContext.Request.ServerVariables == null)) { return ""; }
+                if (!cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_ACCEPT_CHARSET")) { return ""; }
+                return cp.core.webServer.httpContext.Request.ServerVariables["HTTP_ACCEPT_CHARSET"];
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy server variable with no internal use
+        /// </summary>
         public override string HTTPProfile {
             get {
-                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_PROFILE")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_PROFILE"] : "";
+                if ((cp.core.webServer.httpContext == null) || (cp.core.webServer.httpContext.Request == null) || (cp.core.webServer.httpContext.Request.ServerVariables == null)) { return ""; }
+                if (!cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_PROFILE")) { return ""; }
+                return cp.core.webServer.httpContext.Request.ServerVariables["HTTP_PROFILE"];
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy server variable with no internal use
+        /// </summary>
         public override string HTTPXWapProfile {
             get {
-                return (cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_X_WAP_PROFILE")) ? cp.core.webServer.httpContext.Request.ServerVariables["HTTP_X_WAP_PROFILE"] : "";
+                if ((cp.core.webServer.httpContext == null) || (cp.core.webServer.httpContext.Request == null) || (cp.core.webServer.httpContext.Request.ServerVariables == null)) { return ""; }
+                if (!cp.core.webServer.httpContext.Request.ServerVariables.ContainsKey("HTTP_X_WAP_PROFILE")) { return ""; }
+                return cp.core.webServer.httpContext.Request.ServerVariables["HTTP_X_WAP_PROFILE"];
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy server variable with no internal use
+        /// </summary>
         public override string Language {
             get {
-                if (cp.core.session.userLanguage == null) {
-                    return "";
-                }
+                if (cp.core.session.userLanguage == null) { return ""; }
                 LanguageModel userLanguage = DbBaseModel.create<LanguageModel>(cp, cp.core.session.user.languageId);
-                if (userLanguage != null) {
-                    return userLanguage.name;
-                }
+                if (userLanguage != null) { return userLanguage.name; }
                 return "English";
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string Link {
             get {
                 return cp.core.webServer.requestUrl;
@@ -154,13 +225,19 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string LinkForwardSource {
             get {
-                return cp.core.webServer.linkForwardSource;
+                return cp.core.webServer.requestLinkForwardSource;
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string LinkSource {
             get {
                 return cp.core.webServer.requestUrlSource;
@@ -168,6 +245,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string Page {
             get {
                 return cp.core.webServer.requestPage;
@@ -175,6 +255,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string Path {
             get {
                 return cp.core.webServer.requestPath;
@@ -182,6 +265,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string PathPage {
             get {
                 return cp.core.webServer.requestPathPage;
@@ -189,6 +275,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string Protocol {
             get {
                 return cp.core.webServer.requestProtocol;
@@ -196,6 +285,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string QueryString {
             get {
                 return cp.core.webServer.requestQueryString;
@@ -203,6 +295,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string Referer {
             get {
                 return cp.core.webServer.requestReferer;
@@ -210,6 +305,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string RemoteIP {
             get {
                 return cp.core.webServer.requestRemoteIP;
@@ -217,6 +315,9 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override bool Secure {
             get {
                 return cp.core.webServer.requestSecure;
@@ -224,46 +325,60 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy property not supported in the webserver
+        /// </summary>
         public override string Body {
             get {
+                if ((cp.core.webServer.httpContext == null) || (cp.core.webServer.httpContext.Request == null)) return "";
                 return cp.core.webServer.httpContext.Request.requestBody;
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// wrapper around protected webServer property
+        /// </summary>
         public override string ContentType {
             get {
-                return cp.core.webServer.httpContext.Request.ContentType;
+                return cp.core.webServer.requestContentType;
             }
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// legacy property. true if form or querystring includes this property
+        /// </summary>
+        /// <param name="RequestName"></param>
+        /// <returns></returns>
         public override bool OK(string RequestName) {
-            return cp.core.docProperties.containsKey(RequestName);
+            if (cp.core.webServer.httpContext.Request.QueryString.ContainsKey(RequestName)) { return true; }
+            if (cp.core.webServer.httpContext.Request.Form.ContainsKey(RequestName)) { return true; }
+            return false;
         }
         //
         // deprecated
         //====================================================================================================
-        //
+        /// <summary>
+        /// deprecated, return false
+        /// </summary>
         [Obsolete]
         public override bool BrowserIsIE { get { return false; } }
-        //
+        /// <summary>
+        /// deprecated, return false
+        /// </summary>
         [Obsolete]
         public override bool BrowserIsMac { get { return false; } }
-        //
+        /// <summary>
+        /// deprecated, return false
+        /// </summary>
         [Obsolete]
-        public override bool BrowserIsWindows {
-            get {
-                return false;
-            }
-        }
-        //
+        public override bool BrowserIsWindows { get { return false; } }
+        /// <summary>
+        /// deprecated, return false
+        /// </summary>
         [Obsolete]
-        public override string BrowserVersion {
-            get {
-                return "";
-            }
-        }
+        public override string BrowserVersion { get { return ""; } }
         //
         #region  IDisposable Support 
         //
@@ -285,14 +400,14 @@ namespace Contensive.Processor {
         protected bool disposed_req;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-        ~CPRequestClass()  {
+        ~CPRequestClass() {
             Dispose(false);
-            
-            
+
+
         }
         #endregion
     }

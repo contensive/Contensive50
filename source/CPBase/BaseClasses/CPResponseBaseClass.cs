@@ -2,6 +2,9 @@
 using System;
 
 namespace Contensive.BaseClasses {
+    /// <summary>
+    /// Control over the optional http response
+    /// </summary>
     public abstract class CPResponseBaseClass {
         //
         //====================================================================================================
@@ -18,7 +21,7 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// 
+        /// response headers
         /// </summary>
         public abstract string Header { get; }
         //
@@ -70,31 +73,60 @@ namespace Contensive.BaseClasses {
         public abstract void SetStatus(string status);
         //
         //====================================================================================================
-        //
-        public abstract void SetTimeout(string timeoutSeconds);
-        //
-        //====================================================================================================
-        //
+        /// <summary>
+        /// set response content type
+        /// </summary>
+        /// <param name="contentType"></param>
         public abstract void SetType(string contentType);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set a simple response cookie value
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         public abstract void SetCookie(string key, string value);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set a response cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="dateExpires"></param>
         public abstract void SetCookie(string key, string value, DateTime dateExpires);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set a response cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="dateExpires"></param>
+        /// <param name="domain"></param>
         public abstract void SetCookie(string key, string value, DateTime dateExpires, string domain);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set a response cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="dateExpires"></param>
+        /// <param name="domain"></param>
+        /// <param name="path"></param>
         public abstract void SetCookie(string key, string value, DateTime dateExpires, string domain, string path);
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// set a response cookie
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <param name="dateExpires"></param>
+        /// <param name="domain"></param>
+        /// <param name="path"></param>
+        /// <param name="secure"></param>
         public abstract void SetCookie(string key, string value, DateTime dateExpires, string domain, string path, bool secure);
         //
         //====================================================================================================
@@ -107,9 +139,19 @@ namespace Contensive.BaseClasses {
         public abstract bool isOpen { get; }
         //
         //====================================================================================================
-        // deprecated
+        /// <summary>
+        /// deprecated. content generation no longer includes a buffer
+        /// </summary>
+        /// <param name="content"></param>
         [Obsolete("The write buffer is deprecated")]
         public abstract void Write(string content);
+        //
+        /// <summary>
+        /// Deprecated. Set http response timeout directly in response client.
+        /// </summary>
+        /// <param name="timeoutSeconds"></param>
+        [Obsolete("Deprecated. Set http response timeout directly in response client.", true)]
+        public abstract void SetTimeout(string timeoutSeconds);
     }
 }
 
