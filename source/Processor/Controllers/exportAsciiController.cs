@@ -37,8 +37,8 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Check for special case iContentNames
                 //
-                core.webServer.setResponseContentType("text/plain");
-                core.html.enableOutputBuffer(false);
+                core.webServer.responseContentType = "text/plain";
+                //core.html.enableOutputBuffer(false);
                 TableName = DbController.getDbObjectTableName(MetadataController.getContentTablename(core, iContentName));
                 switch (GenericController.toUCase(TableName)) {
                     case "CCMEMBERS":

@@ -752,27 +752,27 @@ namespace Contensive.Processor.Controllers {
             }
             return result;
         }
-        //
-        //====================================================================================================
-        //
-        public void enableOutputBuffer(bool BufferOn) {
-            try {
-                if (core.doc.outputBufferEnabled) {
-                    //
-                    // ----- once on, can not be turned off Response Object
-                    //
-                    core.doc.outputBufferEnabled = BufferOn;
-                } else {
-                    //
-                    // ----- StreamBuffer off, allow on and off
-                    //
-                    core.doc.outputBufferEnabled = BufferOn;
-                }
-            } catch (Exception ex) {
-                LogController.logError(core, ex);
-                throw;
-            }
-        }
+        ////
+        ////====================================================================================================
+        ////
+        //public void enableOutputBuffer(bool BufferOn) {
+        //    try {
+        //        if (core.doc.outputBufferEnabled) {
+        //            //
+        //            // ----- once on, can not be turned off Response Object
+        //            //
+        //            core.doc.outputBufferEnabled = BufferOn;
+        //        } else {
+        //            //
+        //            // ----- StreamBuffer off, allow on and off
+        //            //
+        //            core.doc.outputBufferEnabled = BufferOn;
+        //        }
+        //    } catch (Exception ex) {
+        //        LogController.logError(core, ex);
+        //        throw;
+        //    }
+        //}
         //
         //====================================================================================================
         /// <summary>

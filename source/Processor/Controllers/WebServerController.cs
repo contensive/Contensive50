@@ -373,7 +373,7 @@ namespace Contensive.Processor.Controllers {
         public string requestContentType {
             get {
                 if (_requestContentType != null) { return _requestContentType; };
-                if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Cookies == null)) return "";
+                if ((httpContext == null) || (httpContext.Request == null)) return "";
                 _requestContentType = httpContext.Request.ContentType;
                 return _requestContentType;
             }
@@ -441,79 +441,75 @@ namespace Contensive.Processor.Controllers {
         //   
         //==================================================================================
         /// <summary>
-        /// Initialize the application, returns responseOpen
+        /// Initialize httpcontext.
         /// </summary>
         /// <returns></returns>
-        public bool initWebContext() {
+        public bool initHttpContext() {
             try {
                 //
-                //--------------------------------------------------------------------------
+                // -- must have valid context, else non http 
+                if (httpContext == null) { return false; }
+                if (!core.appConfig.appStatus.Equals(BaseModels.AppConfigBaseModel.AppStatusEnum.ok)) { return false; }
                 //
-                if (core.appConfig.appStatus.Equals(BaseModels.AppConfigBaseModel.AppStatusEnum.ok)) {
+                // -- initialize doc properties from httpContext
+                foreach (KeyValuePair<string, string> kvp in httpContext.Request.ServerVariables) {
+                    core.docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.serverVariable);
+                }
+                foreach (KeyValuePair<string, string> kvp in httpContext.Request.Headers) {
+                    core.docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.header);
+                }
+                foreach (KeyValuePair<string, string> kvp in httpContext.Request.QueryString) {
+                    core.docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.queryString);
+                }
+                foreach (KeyValuePair<string, string> kvp in httpContext.Request.Form) {
+                    core.docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.form);
+                }
+                //
+                // -- add uploaded files to docproperties. windowsTempFiles should be disposed by parent object who created them and provided the context
+                foreach (DocPropertyModel fileProperty in httpContext.Request.Files) {
+                    core.docProperties.setProperty(fileProperty.name, fileProperty);
+                }
+                //
+                // -- setup response 
+                core.webServer.responseContentType = "text/html";
+                //
+                //   javascript cookie detect on page1 of all visits
+                string CookieDetectKey = core.docProperties.getText(rnCookieDetect);
+                if (!string.IsNullOrEmpty(CookieDetectKey)) {
                     //
-                    core.html.enableOutputBuffer(true);
-                    core.doc.continueProcessing = true;
-                    setResponseContentType("text/html");
-                    //
-                    core.doc.blockExceptionReporting = false;
-                    //
-                    //   javascript cookie detect on page1 of all visits
-                    string CookieDetectKey = core.docProperties.getText(rnCookieDetect);
-                    if (!string.IsNullOrEmpty(CookieDetectKey)) {
-                        //
-                        SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
-                        if (visitToken.id != 0) {
-                            string sql = "update ccvisits set CookieSupport=1 where id=" + visitToken.id;
-                            core.db.executeNonQuery(sql);
-                            core.doc.continueProcessing = false;
-                            return core.doc.continueProcessing;
-                        }
+                    SecurityController.TokenData visitToken = SecurityController.decodeToken(core, CookieDetectKey);
+                    if (visitToken.id != 0) {
+                        string sql = "update ccvisits set CookieSupport=1 where id=" + visitToken.id;
+                        core.db.executeNonQuery(sql);
+                        core.doc.continueProcessing = false;
+                        return core.doc.continueProcessing;
                     }
+                }
+                //
+                //   verify Domain table entry
+                bool updateDomainCache = false;
+                //
+                core.domain.name = requestDomain;
+                core.domain.rootPageId = 0;
+                core.domain.noFollow = false;
+                core.domain.typeId = 1;
+                core.domain.visited = false;
+                core.domain.id = 0;
+                core.domain.forwardUrl = "";
+                core.domainDictionary = core.cache.getObject<Dictionary<string, DomainModel>>("domainContentList");
+                if (core.domainDictionary == null) {
                     //
-                    //   verify Domain table entry
-                    bool updateDomainCache = false;
-                    //
-                    core.domain.name = requestDomain;
-                    core.domain.rootPageId = 0;
-                    core.domain.noFollow = false;
-                    core.domain.typeId = 1;
-                    core.domain.visited = false;
-                    core.domain.id = 0;
-                    core.domain.forwardUrl = "";
-                    core.domainDictionary = core.cache.getObject<Dictionary<string, DomainModel>>("domainContentList");
-                    if (core.domainDictionary == null) {
-                        //
-                        //  no cache found, build domainContentList from database
-                        core.domainDictionary = DomainModel.createDictionary(core.cpParent, "(active<>0)and(name is not null)");
-                        updateDomainCache = true;
-                    }
-                    //
-                    // verify app config domainlist is in the domainlist cache
-                    foreach (string domain in core.appConfig.domainList) {
-                        if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
-                            LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
-                            var newDomain = DbBaseModel.addEmpty<DomainModel>(core.cpParent, 0);
-                            newDomain.name = domain;
-                            newDomain.rootPageId = 0;
-                            newDomain.noFollow = false;
-                            newDomain.typeId = 1;
-                            newDomain.visited = false;
-                            newDomain.forwardUrl = "";
-                            newDomain.defaultTemplateId = 0;
-                            newDomain.pageNotFoundPageId = 0;
-                            newDomain.forwardDomainId = 0;
-                            newDomain.defaultRouteId = core.siteProperties.getInteger("");
-                            newDomain.save(core.cpParent, 0);
-                            core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
-                            updateDomainCache = true;
-                        }
-                    }
-                    //
-                    // -- verify request domain
-                    if (!core.domainDictionary.ContainsKey(requestDomain.ToLowerInvariant())) {
-                        LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLowerInvariant() + "] not found");
-                        var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent, 0);
-                        newDomain.name = requestDomain;
+                    //  no cache found, build domainContentList from database
+                    core.domainDictionary = DomainModel.createDictionary(core.cpParent, "(active<>0)and(name is not null)");
+                    updateDomainCache = true;
+                }
+                //
+                // verify app config domainlist is in the domainlist cache
+                foreach (string domain in core.appConfig.domainList) {
+                    if (!core.domainDictionary.ContainsKey(domain.ToLowerInvariant())) {
+                        LogController.logTrace(core, "adding domain record because configList domain not found [" + domain.ToLowerInvariant() + "]");
+                        var newDomain = DbBaseModel.addEmpty<DomainModel>(core.cpParent, 0);
+                        newDomain.name = domain;
                         newDomain.rootPageId = 0;
                         newDomain.noFollow = false;
                         newDomain.typeId = 1;
@@ -522,82 +518,103 @@ namespace Contensive.Processor.Controllers {
                         newDomain.defaultTemplateId = 0;
                         newDomain.pageNotFoundPageId = 0;
                         newDomain.forwardDomainId = 0;
+                        newDomain.defaultRouteId = core.siteProperties.getInteger("");
                         newDomain.save(core.cpParent, 0);
-                        core.domainDictionary.Add(requestDomain.ToLowerInvariant(), newDomain);
+                        core.domainDictionary.Add(domain.ToLowerInvariant(), newDomain);
                         updateDomainCache = true;
                     }
-                    if (updateDomainCache) {
-                        //
-                        // if there was a change, update the cache
-                        //
-                        string dependencyKey = DbBaseModel.createDependencyKeyInvalidateOnChange<DomainModel>(core.cpParent);
-                        CacheKeyHashClass dependencyKeyHash = core.cache.createKeyHash(dependencyKey);
-                        List<CacheKeyHashClass> keyHashList = new List<CacheKeyHashClass> { dependencyKeyHash };
-                        core.cache.storeObject("domainContentList", core.domainDictionary, keyHashList);
-                    }
+                }
+                //
+                // -- verify request domain
+                if (!core.domainDictionary.ContainsKey(requestDomain.ToLowerInvariant())) {
+                    LogController.logTrace(core, "adding domain record because requestDomain [" + requestDomain.ToLowerInvariant() + "] not found");
+                    var newDomain = DomainModel.addEmpty<DomainModel>(core.cpParent, 0);
+                    newDomain.name = requestDomain;
+                    newDomain.rootPageId = 0;
+                    newDomain.noFollow = false;
+                    newDomain.typeId = 1;
+                    newDomain.visited = false;
+                    newDomain.forwardUrl = "";
+                    newDomain.defaultTemplateId = 0;
+                    newDomain.pageNotFoundPageId = 0;
+                    newDomain.forwardDomainId = 0;
+                    newDomain.save(core.cpParent, 0);
+                    core.domainDictionary.Add(requestDomain.ToLowerInvariant(), newDomain);
+                    updateDomainCache = true;
+                }
+                if (updateDomainCache) {
                     //
-                    // domain found
+                    // if there was a change, update the cache
                     //
-                    core.domain = core.domainDictionary[requestDomain.ToLowerInvariant()];
-                    if (core.domain.id == 0) {
-                        //
-                        // this is a default domain or a new domain -- add to the domain table
-                        var domain = new DomainModel {
-                            name = requestDomain,
-                            typeId = 1,
-                            rootPageId = core.domain.rootPageId,
-                            forwardUrl = core.domain.forwardUrl,
-                            noFollow = core.domain.noFollow,
-                            visited = core.domain.visited,
-                            defaultTemplateId = core.domain.defaultTemplateId,
-                            pageNotFoundPageId = core.domain.pageNotFoundPageId
-                        };
-                        //
-                        // todo - would prefer not save new template
-                        // -- fix, must save or template selection fails.
-                        domain.save(core.cpParent, 0);
-                        core.domain.id = domain.id;
+                    string dependencyKey = DbBaseModel.createDependencyKeyInvalidateOnChange<DomainModel>(core.cpParent);
+                    CacheKeyHashClass dependencyKeyHash = core.cache.createKeyHash(dependencyKey);
+                    List<CacheKeyHashClass> keyHashList = new List<CacheKeyHashClass> { dependencyKeyHash };
+                    core.cache.storeObject("domainContentList", core.domainDictionary, keyHashList);
+                }
+                //
+                // domain found
+                //
+                core.domain = core.domainDictionary[requestDomain.ToLowerInvariant()];
+                if (core.domain.id == 0) {
+                    //
+                    // this is a default domain or a new domain -- add to the domain table
+                    var domain = new DomainModel {
+                        name = requestDomain,
+                        typeId = 1,
+                        rootPageId = core.domain.rootPageId,
+                        forwardUrl = core.domain.forwardUrl,
+                        noFollow = core.domain.noFollow,
+                        visited = core.domain.visited,
+                        defaultTemplateId = core.domain.defaultTemplateId,
+                        pageNotFoundPageId = core.domain.pageNotFoundPageId
+                    };
+                    //
+                    // todo - would prefer not save new template
+                    // -- fix, must save or template selection fails.
+                    domain.save(core.cpParent, 0);
+                    core.domain.id = domain.id;
+                }
+                if (!core.domain.visited) {
+                    //
+                    // set visited true
+                    //
+                    core.db.executeNonQuery("update ccdomains set visited=1 where name=" + DbController.encodeSQLText(requestDomain));
+                    core.cache.invalidate("domainContentList");
+                }
+                if (core.domain.typeId == 1) {
+                    //
+                    // normal domain, leave it
+                    //
+                } else if (GenericController.strInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
+                    //
+                    // forwarding does not work in the admin site
+                    //
+                } else if (core.domain.typeId.Equals(2) && !string.IsNullOrEmpty(core.domain.forwardUrl)) {
+                    //
+                    // forward to a URL
+                    if (GenericController.strInstr(1, core.domain.forwardUrl, "://") == 0) {
+                        core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
                     }
-                    if (!core.domain.visited) {
-                        //
-                        // set visited true
-                        //
-                        core.db.executeNonQuery("update ccdomains set visited=1 where name=" + DbController.encodeSQLText(requestDomain));
-                        core.cache.invalidate("domainContentList");
-                    }
-                    if (core.domain.typeId == 1) {
-                        //
-                        // normal domain, leave it
-                        //
-                    } else if (GenericController.strInstr(1, requestPathPage, "/" + core.appConfig.adminRoute, 1) != 0) {
-                        //
-                        // forwarding does not work in the admin site
-                        //
-                    } else if (core.domain.typeId.Equals(2) && !string.IsNullOrEmpty(core.domain.forwardUrl)) {
-                        //
-                        // forward to a URL
-                        if (GenericController.strInstr(1, core.domain.forwardUrl, "://") == 0) {
-                            core.domain.forwardUrl = "http://" + core.domain.forwardUrl;
+                    redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
+                    return core.doc.continueProcessing;
+                } else if ((core.domain.typeId == 3) && (core.domain.forwardDomainId != 0) && (core.domain.forwardDomainId != core.domain.id)) {
+                    //
+                    // forward to a replacement domain
+                    //
+                    string forwardDomain = MetadataController.getRecordName(core, "domains", core.domain.forwardDomainId);
+                    if (!string.IsNullOrEmpty(forwardDomain)) {
+                        int pos = requestUrlSource.IndexOf(requestDomain, StringComparison.InvariantCultureIgnoreCase);
+                        if (pos > 0) {
+                            core.domain.forwardUrl = requestUrlSource.left(pos) + forwardDomain + requestUrlSource.Substring((pos + requestDomain.Length));
+                            redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
+                            return core.doc.continueProcessing;
                         }
-                        redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this URL", false, false);
-                        return core.doc.continueProcessing;
-                    } else if ((core.domain.typeId == 3) && (core.domain.forwardDomainId != 0) && (core.domain.forwardDomainId != core.domain.id)) {
-                        //
-                        // forward to a replacement domain
-                        //
-                        string forwardDomain = MetadataController.getRecordName(core, "domains", core.domain.forwardDomainId);
-                        if (!string.IsNullOrEmpty(forwardDomain)) {
-                            int pos = requestUrlSource.IndexOf(requestDomain, StringComparison.InvariantCultureIgnoreCase);
-                            if (pos > 0) {
-                                core.domain.forwardUrl = requestUrlSource.left(pos) + forwardDomain + requestUrlSource.Substring((pos + requestDomain.Length));
-                                redirect(core.domain.forwardUrl, "Forwarding to [" + core.domain.forwardUrl + "] because the current domain [" + requestDomain + "] is in the domain content set to forward to this replacement domain", false, false);
-                                return core.doc.continueProcessing;
-                            }
-                        }
                     }
-                    //
-                    // todo - CORS cannot be generated dynamically because info http method does not execute code
-                    // -- add default CORS headers to approved domains
+                }
+                //
+                // todo - CORS cannot be generated dynamically because info http method does not execute code
+                // -- add default CORS headers to approved domains
+                if ((httpContext != null) && (httpContext.Request != null) && (httpContext.Request.UrlReferrer != null)) {
                     Uri originUri = httpContext.Request.UrlReferrer;
                     if (originUri != null) {
                         if (core.domainDictionary.ContainsKey(originUri.Host.ToLowerInvariant())) {
@@ -609,14 +626,13 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    if (core.domain.noFollow) {
-                        responseNoFollow = true;
-                    }
-                    //
-                    // ----- Style tag
-                    adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";
+                }
+                if (core.domain.noFollow) {
+                    responseNoFollow = true;
                 }
                 //
+                // ----- Style tag
+                adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";                //
                 // -- done at last
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -696,19 +712,18 @@ namespace Contensive.Processor.Controllers {
             //
             httpContext.Response.status = status;
         }
-        //
-        //===========================================================================================
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="ContentType"></param>
-        public void setResponseContentType(string ContentType) {
-            if (!core.doc.continueProcessing) { return; }
-            if ((httpContext == null) || (httpContext.Response == null)) { return; }
-            //
-            httpContext.Response.contentType = ContentType;
-            //bufferContentType = ContentType;
-        }
+        ////
+        ////===========================================================================================
+        ///// <summary>
+        ///// 
+        ///// </summary>
+        ///// <param name="ContentType"></param>
+        //public void setResponseContentType(string ContentType) {
+        //    if (!core.doc.continueProcessing) { return; }
+        //    if ((httpContext == null) || (httpContext.Response == null)) { return; }
+        //    //
+        //    httpContext.Response.contentType = ContentType;
+        //}
         //
         //====================================================================================================
         /// <summary>

@@ -183,6 +183,11 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         public HttpContextResponse() {
             cookies = new Dictionary<string, HttpContextResponseCookie>();
+            headers = new List<HttpContextResponseHeader>();
+            cacheControl = "no-cache";
+            expires = -1;
+            buffer = true;
+            contentType = "";
         }
         //
         //====================================================================================================
@@ -239,7 +244,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// 
         /// </summary>
-        public bool buffer;
+        public bool buffer { get; set; }
     }
     //
     //====================================================================================================

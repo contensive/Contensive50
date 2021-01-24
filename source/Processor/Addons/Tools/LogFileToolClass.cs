@@ -107,7 +107,7 @@ namespace Contensive.Processor.Addons.Tools {
                     //
                     // Return the content of the file
                     //
-                    core.webServer.setResponseContentType("text/text");
+                    core.webServer.responseContentType = "text/text";
                     result = core.wwwFiles.readFileText(core.docProperties.getText("SourceFile"));
                     core.doc.continueProcessing = false;
                 } else {

@@ -19,14 +19,30 @@
                     Response.Redirect(context.Response.redirectUrl)
                     Exit Sub
                 End If
+                '
                 For Each header As Contensive.Processor.Models.Domain.HttpContextResponseHeader In context.Response.headers
-                    Dim responseHeader As New NameValueCollection( ,)
-                    responseHeader
-
-                    Response.Headers.Add(New NameValueCollection() {{""}, {}})
-
+                    Response.Headers.Add(header.name, header.value)
                 Next
-                Response.Write(cp.executeRoute())
+                '
+                For Each cookie As KeyValuePair(Of String, Contensive.Processor.Models.Domain.HttpContextResponseCookie) In context.Response.cookies
+                    Dim ck As New HttpCookie(cookie.Key, cookie.Value.value)
+                    ck.Domain = cookie.Value.domain
+                    ck.Expires = cookie.Value.expires
+                    ck.HttpOnly = cookie.Value.httpOnly
+                    ck.Name = cookie.Key
+                    ck.Path = cookie.Value.path
+                    ck.SameSite = cookie.Value.sameSite
+                    ck.Secure = cookie.Value.secure
+                    Response.AppendCookie(ck)
+                Next
+                '
+                Response.ContentType = context.Response.contentType
+                Response.CacheControl = context.Response.cacheControl
+                Response.Status = context.Response.status
+                Response.Expires = context.Response.expires
+                Response.Buffer = context.Response.buffer
+                '
+                Response.Write(content)
                 If (ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
                     HttpRuntime.UnloadAppDomain()
                 End If

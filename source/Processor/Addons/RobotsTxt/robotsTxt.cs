@@ -30,7 +30,7 @@ namespace Contensive.Processor.Addons.RobotsTxt {
                     core.wwwFiles.saveFile(Filename, result);
                 }
                 result += core.addonCache.robotsTxt;
-                core.webServer.setResponseContentType("text/plain");
+                core.webServer.responseContentType = "text/plain";
                 core.doc.continueProcessing = false;
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);

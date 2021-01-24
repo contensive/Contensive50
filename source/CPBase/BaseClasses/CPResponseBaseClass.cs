@@ -63,6 +63,7 @@ namespace Contensive.BaseClasses {
         /// 
         /// </summary>
         /// <param name="bufferOn"></param>
+        [Obsolete("Deprecated. Output buffer is deprecated",false)]
         public abstract void SetBuffer(bool bufferOn);
         //
         //====================================================================================================

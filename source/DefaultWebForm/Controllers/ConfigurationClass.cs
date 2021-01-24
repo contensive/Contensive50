@@ -97,11 +97,6 @@ namespace DefaultSite {
                     throw new ApplicationException("ConfigurationClass.buildContext - Attempt to initialize webContext but iisContext or one of its objects is null., [" + appName + "]");
                 }
                 // 
-                // -- setup http cache
-                context.Response.CacheControl = "no-cache";
-                context.Response.Expires = -1;
-                context.Response.Buffer = true;
-                // 
                 // -- xfer body to context
                 iisContext.Request.InputStream.Position = 0;
                 System.IO.StreamReader str = new System.IO.StreamReader(iisContext.Request.InputStream);

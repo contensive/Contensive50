@@ -102,15 +102,6 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// deprecate
-        /// </summary>
-        /// <param name="bufferOn"></param>
-        public override void SetBuffer(bool bufferOn) {
-            cp.core.html.enableOutputBuffer(bufferOn);
-        }
-        //
-        //====================================================================================================
-        /// <summary>
         /// set response status
         /// </summary>
         /// <param name="status"></param>
@@ -214,6 +205,16 @@ namespace Contensive.Processor {
         [Obsolete("Deprecated. Set http response timeout directly in response client.", true)]
         public override void SetTimeout(string timeoutSeconds) {
             // 
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// deprecate
+        /// </summary>
+        /// <param name="bufferOn"></param>
+        [Obsolete("Deprecated. Output buffer is deprecated", false)]
+        public override void SetBuffer(bool bufferOn) {
+            //cp.core.html.enableOutputBuffer(bufferOn);
         }
 
         #region  IDisposable Support 

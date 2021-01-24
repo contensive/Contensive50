@@ -662,7 +662,7 @@ namespace Contensive.Processor.Controllers {
                 //
                 LogController.log(this, "coreController_Initialize, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 //
-                metaDataDictionary = new Dictionary<string, Models.Domain.ContentMetadataModel>();
+                metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
                 tableSchemaDictionary = null;
                 //
                 // -- create default auth objects for non-user methods, or until auth is available
@@ -670,18 +670,28 @@ namespace Contensive.Processor.Controllers {
                 //
                 serverConfig = ServerConfigModel.getObject(this);
                 serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
+                doc.continueProcessing = true;
                 appConfig = null;
                 if (!string.IsNullOrEmpty(appName)) {
+                    //
+                    // -- initialize application
                     appConfig = AppConfigModel.getObject(this, serverConfig, appName);
+                }
+                if (httpContext!=null) {
+                    //
+                    // -- initialize http context
                     webServer.httpContext = httpContext;
-                    webServer.initWebContext();
+                    webServer.initHttpContext();
                 }
                 //
-                // -- initialize app environment
+                // -- initialize document
                 doc.docGuid = GenericController.getGUID();
                 doc.allowDebugLog = true;
                 doc.profileStartTime = dateTimeNowMockable;
                 doc.visitPropertyAllowDebugging = true;
+                //
+                // -- allow exception reporing
+                doc.blockExceptionReporting = false;
                 //
                 // -- attempt auth load
                 if (appConfig == null) {
@@ -701,25 +711,6 @@ namespace Contensive.Processor.Controllers {
                     doc.visitPropertyAllowDebugging = visitProperty.getBoolean("AllowDebugging");
                     if (!doc.visitPropertyAllowDebugging) {
                         doc.testPointMessage = "";
-                    }
-                    //
-                    // -- initialize doc properties from httpContext
-                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.ServerVariables) {
-                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.serverVariable);
-                    }
-                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.Headers) {
-                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.header);
-                    }
-                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.QueryString) {
-                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.queryString);
-                    }
-                    foreach (KeyValuePair<string, string> kvp in webServer.httpContext.Request.Form) {
-                        docProperties.setProperty(kvp.Key, kvp.Value, DocPropertyModel.DocPropertyTypesEnum.form);
-                    }
-                    //
-                    // -- add uploaded files to docproperties. windowsTempFiles should be disposed by parent object who created them and provided the context
-                    foreach (DocPropertyModel fileProperty in httpContext.Request.Files) {
-                        docProperties.setProperty(fileProperty.name, fileProperty);
                     }
 
                 }

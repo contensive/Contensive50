@@ -197,7 +197,7 @@ Public Class ConfigurationClass
                         Continue For
                     End If
                     Dim cookieValue As String = iisContext.Request.Cookies(cookieKey).Value
-                    cookieValue = System.Uri.EscapeDataString(cookieValue)
+                    'cookieValue = System.Uri.EscapeDataString(cookieValue)
                     If (context.Request.Cookies.ContainsKey(cookieKey)) Then
                         context.Request.Cookies.Remove(cookieKey)
                     End If
