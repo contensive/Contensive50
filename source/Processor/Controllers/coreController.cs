@@ -658,15 +658,11 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- clear mock datetime
                 _mockNow = null;
-                deleteSessionOnExit = true;
                 //
                 LogController.log(this, "coreController_Initialize, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 //
                 metaDataDictionary = new Dictionary<string, ContentMetadataModel>();
                 tableSchemaDictionary = null;
-                //
-                // -- create default auth objects for non-user methods, or until auth is available
-                session = new SessionController(this);
                 //
                 serverConfig = ServerConfigModel.getObject(this);
                 serverConfig.defaultDataSourceType = ServerConfigBaseModel.DataSourceTypeEnum.sqlServer;
@@ -693,7 +689,9 @@ namespace Contensive.Processor.Controllers {
                 // -- allow exception reporing
                 doc.blockExceptionReporting = false;
                 //
-                // -- attempt auth load
+                // -- session
+                //session = new SessionController(this);
+                deleteSessionOnExit = (httpContext == null);
                 if (appConfig == null) {
                     //
                     // -- server mode, there is no application
@@ -712,7 +710,6 @@ namespace Contensive.Processor.Controllers {
                     if (!doc.visitPropertyAllowDebugging) {
                         doc.testPointMessage = "";
                     }
-
                 }
             } catch (Exception ex) {
                 LogController.logLocalOnly("CoreController coreController_Initialize, exception [" + ex.ToString() + "]", BaseClasses.CPLogBaseClass.LogLevel.Fatal);

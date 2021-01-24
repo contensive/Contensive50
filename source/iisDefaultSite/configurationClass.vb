@@ -94,19 +94,26 @@ Public Class ConfigurationClass
                 Throw New ApplicationException("ConfigurationClass.buildContext - Attempt to initialize webContext but iisContext or one of its objects is null., [" + appName + "]")
             End If
             '
-            ' -- setup http cache
+            ' -- set default response
             context.Response.CacheControl = "no-cache"
             context.Response.Expires = -1
             context.Response.Buffer = True
             '
-            ' -- xfer body to context
+            ' -- setup request
             iisContext.Request.InputStream.Position = 0
-            Dim str As System.IO.StreamReader = New System.IO.StreamReader(iisContext.Request.InputStream)
-            context.Request.requestBody = str.ReadToEnd()
+            context.Request.requestBody = (New System.IO.StreamReader(iisContext.Request.InputStream)).ReadToEnd()
+            'Dim str As System.IO.StreamReader = New System.IO.StreamReader(iisContext.Request.InputStream)
+            'context.Request.requestBody = str.ReadToEnd()
             context.Request.ContentType = iisContext.Request.ContentType
+            context.Request.Url = New HttpContentRequestUrl() With {
+                .AbsoluteUri = iisContext.Request.Url.AbsoluteUri,
+                .Port = iisContext.Request.Url.Port
+            }
+            context.Request.UrlReferrer = iisContext.Request.UrlReferrer
             '
-            ' -- server variables
             If True Then
+                '
+                ' -- server variables
                 Dim nameValues As NameValueCollection = iisContext.Request.ServerVariables
                 For i As Integer = 0 To nameValues.Count - 1
                     Dim key As String = nameValues.GetKey(i)
@@ -120,8 +127,9 @@ Public Class ConfigurationClass
                 Next
             End If
             '
-            ' -- request headers
             If True Then
+                '
+                ' -- request headers
                 Dim nameValues As NameValueCollection = iisContext.Request.Headers
                 For i As Integer = 0 To nameValues.Count - 1
                     Dim key As String = nameValues.GetKey(i)
@@ -135,8 +143,9 @@ Public Class ConfigurationClass
                 Next
             End If
             '
-            ' -- request querystring
             If True Then
+                '
+                ' -- request querystring
                 Dim nameValues As NameValueCollection = iisContext.Request.QueryString
                 For i As Integer = 0 To nameValues.Count - 1
                     Dim key As String = nameValues.GetKey(i)
@@ -150,8 +159,9 @@ Public Class ConfigurationClass
                 Next
             End If
             '
-            ' -- request form
             If True Then
+                '
+                ' -- request form
                 Dim nameValues As NameValueCollection = iisContext.Request.Form
                 For i As Integer = 0 To nameValues.Count - 1
                     Dim key As String = nameValues.GetKey(i)
@@ -166,6 +176,8 @@ Public Class ConfigurationClass
             End If
 
             If True Then
+                '
+                ' -- transfer upload files
                 Dim filePtr As Integer = 0
                 Dim instanceId As String = GenericController.getGUIDNaked()
                 For Each key As String In iisContext.Request.Files.AllKeys
@@ -192,19 +204,17 @@ Public Class ConfigurationClass
             End If
 
             If True Then
+                '
+                ' -- transfer cookies
                 For Each cookieKey As String In iisContext.Request.Cookies.Keys
-                    If String.IsNullOrWhiteSpace(cookieKey) Then
-                        Continue For
-                    End If
-                    Dim cookieValue As String = iisContext.Request.Cookies(cookieKey).Value
-                    'cookieValue = System.Uri.EscapeDataString(cookieValue)
+                    If String.IsNullOrWhiteSpace(cookieKey) Then Continue For
                     If (context.Request.Cookies.ContainsKey(cookieKey)) Then
                         context.Request.Cookies.Remove(cookieKey)
                     End If
                     context.Request.Cookies.Add(cookieKey, New HttpContextRequestCookie() With {
-                    .Name = cookieKey,
-                    .Value = cookieValue
-                })
+                        .Name = cookieKey,
+                        .Value = iisContext.Request.Cookies(cookieKey).Value
+                    })
                 Next
             End If
             Return context

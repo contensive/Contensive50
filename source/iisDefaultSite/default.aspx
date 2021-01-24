@@ -13,10 +13,13 @@
             Dim appName As String = ConfigurationClass.getAppName()
             Dim context = ConfigurationClass.buildContext(appName, HttpContext.Current)
             Using cp As New Contensive.Processor.CPClass(appName, context)
+                '
+                ' -- execute route
                 Dim content As String = cp.executeRoute()
-
+                '
+                ' -- transfer response to webserver
                 If (Not String.IsNullOrEmpty(context.Response.redirectUrl)) Then
-                    Response.Redirect(context.Response.redirectUrl)
+                    Response.Redirect(context.Response.redirectUrl, False)
                     Exit Sub
                 End If
                 '
@@ -42,7 +45,10 @@
                 Response.Expires = context.Response.expires
                 Response.Buffer = context.Response.buffer
                 '
+                ' -- write content body to webserver
                 Response.Write(content)
+                '
+                ' -- if routeMap changed, unload app domain
                 If (ConfigurationClass.routeMapDateInvalid() OrElse (cp.routeMap.dateCreated <> CDate(HttpContext.Current.Application("RouteMapDateCreated")))) Then
                     HttpRuntime.UnloadAppDomain()
                 End If
