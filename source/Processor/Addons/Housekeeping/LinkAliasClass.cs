@@ -37,6 +37,14 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 // -- delete dups
                 string sql = "delete from ccLinkAliases where id in ( select b.id from cclinkaliases a,cclinkaliases b where a.id<b.id and a.name=b.name )";
                 core.db.executeNonQuery(sql);
+                //
+                // -- delete blank name
+                sql = "delete from ccLinkAliases where (name is null)or(name='')";
+                core.db.executeNonQuery(sql);
+                //
+                // -- delete missing or invalid page
+                sql = "delete from ccLinkAliases from ccLinkAliases l left join ccpagecontent p on p.id=l.pageId where p.id is null";
+                core.db.executeNonQuery(sql);
 
             } catch (Exception ex) {
                 LogController.logError(core, ex);
