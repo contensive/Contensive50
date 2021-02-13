@@ -625,17 +625,11 @@ namespace Contensive.Processor.Addons.AdminSite {
                                                     fieldChanged = true;
                                                     csData.set(fieldName, "");
                                                 }
-                                                string filename = GenericController.encodeText(fieldValueObject);
-                                                if (!string.IsNullOrWhiteSpace(filename)) {
-                                                    filename = FileController.encodeDosFilename(filename);
-                                                    string unixPathFilename = csData.getFilename(fieldName, filename);
-                                                    string dosPathFilename = FileController.convertToDosSlash(unixPathFilename);
-                                                    string dosPath = FileController.getPath(dosPathFilename);
-                                                    cp.core.cdnFiles.upload(fieldName, dosPath, ref filename);
-                                                    csData.set(fieldName, unixPathFilename);
-                                                    recordChanged = true;
-                                                    fieldChanged = true;
-                                                }
+                                                //
+                                                // -- find the uploaded file in the request.files 
+                                                csData.setFormInput(cp.core, fieldName, fieldName);
+                                                recordChanged = true;
+                                                fieldChanged = true;
                                                 break;
                                             }
                                         case CPContentBaseClass.FieldTypeIdEnum.Boolean: {

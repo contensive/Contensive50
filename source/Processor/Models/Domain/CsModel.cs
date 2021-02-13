@@ -1,16 +1,15 @@
 ﻿
+using Contensive.BaseClasses;
+using Contensive.Processor.Controllers;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Controllers;
-using Contensive.BaseClasses;
-using System.Data;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Exceptions;
-using static Contensive.Processor.Controllers.GenericController;
 using System.Collections.Specialized;
+using System.Data;
 using System.Globalization;
-using System.Threading.Tasks;
 using System.Text;
+using static Contensive.Processor.Controllers.GenericController;
 //
 namespace Contensive.Processor {
     //
@@ -430,7 +429,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// initialize a cs
         /// </summary>
-        /// <param name="MemberID"></param>
         /// <returns></returns>
         private void init() {
             isOpen = true;
@@ -466,7 +464,9 @@ namespace Contensive.Processor {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Move to the next row in the dataset
+        /// </summary>
         public void goNext() => goNext(false);
         //
         //========================================================================
@@ -484,7 +484,9 @@ namespace Contensive.Processor {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Move to the first row in the dataset
+        /// </summary>
         public void goFirst() => goFirst(false);
         //
         //========================================================================
@@ -493,7 +495,6 @@ namespace Contensive.Processor {
         /// For textFilenames, this is the filename of the content.
         /// For lookups, this is the id
         /// </summary>
-        /// <param name="ignore"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public string getRawData(string fieldName) {
@@ -548,7 +549,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the first fieldname in the CS, Returns null if there are no more
         /// </summary>
-        /// <param name="ignore"></param>
         /// <returns></returns>
         public string getFirstFieldName() {
             try {
@@ -565,7 +565,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the next fieldname in the CS, Returns null if there are no more
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <returns></returns>
         public string getNextFieldName() {
             try {
@@ -585,7 +584,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the type of a field within a csv_ContentSet
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public CPContentBaseClass.FieldTypeIdEnum getFieldTypeId(string fieldName) {
@@ -602,7 +600,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the caption of a field within a csv_ContentSet
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public string getFieldCaption(string fieldName) {
@@ -625,7 +622,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get a list of captions of fields within a data set
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <returns></returns>
         public string getSelectFieldList() {
             try {
@@ -641,7 +637,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// get the caption of a field within a csv_ContentSet
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
         public bool isFieldSupported(string fieldName) {
@@ -657,12 +652,12 @@ namespace Contensive.Processor {
         //
         //========================================================================
         /// <summary>
-        /// get the filename that backs the field specified. only valid for fields of TextFile and File type.
+        /// get the unix filename that backs the field specified. only valid for fields of TextFile and File type.
         /// Attempt to read the filename from the field
         /// if no filename, attempt to create it from the tablename-recordid
         /// if no recordid, create filename from a random
         /// </summary>
-        /// <param name="FieldName"></param>
+        /// <param name="fieldName"></param>
         /// <param name="originalFilename"></param>
         /// <param name="contentName"></param>
         /// <returns></returns>
@@ -786,14 +781,14 @@ namespace Contensive.Processor {
         /// <returns></returns>
         public string getFilename(string fieldName, string originalFilename, string contentName) => getFilename(fieldName, originalFilename, contentName, 0);
         /// <summary>
-        /// get the filename that backs the field specified.
+        /// get the unix filename that backs the field specified.
         /// </summary>
         /// <param name="fieldName"></param>
         /// <param name="originalFilename"></param>
         /// <returns></returns>
         public string getFilename(string fieldName, string originalFilename) => getFilename(fieldName, originalFilename, "", 0);
         /// <summary>
-        /// get the filename that backs the field specified.
+        /// get the unix filename that backs the field specified.
         /// </summary>
         /// <param name="fieldName"></param>
         /// <returns></returns>
@@ -1049,9 +1044,8 @@ namespace Contensive.Processor {
         /// <summary>
         /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
         /// </summary>
-        /// <param name="ignore"></param>
         /// <param name="fieldName"></param>
-        /// <param name="FieldValue"></param>
+        /// <param name="fieldValue"></param>
         //
         public void set(string fieldName, string fieldValue) {
             try {
@@ -1222,20 +1216,35 @@ namespace Contensive.Processor {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
         public void set(string fieldName, int fieldValue) => set(fieldName, fieldValue.ToString(CultureInfo.InvariantCulture));
-        //
+        /// <summary>
+        /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
         public void set(string fieldName, double fieldValue) => set(fieldName, fieldValue.ToString(CultureInfo.InvariantCulture));
-        //
+        /// <summary>
+        /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
         public void set(string fieldName, DateTime fieldValue) => set(fieldName, fieldValue.ToString(CultureInfo.InvariantCulture));
-        //
+        /// <summary>
+        /// Saves the value for the field. If the field uses a file, the content is saved to the file using the fields filename. To set a file-based field's filename, use setFieldFilename
+        /// </summary>
+        /// <param name="fieldName"></param>
+        /// <param name="fieldValue"></param>
         public void set(string fieldName, bool fieldValue) => set(fieldName, fieldValue.ToString(CultureInfo.InvariantCulture));
         //
         //========================================================================
         /// <summary>
         /// rollback, or undo the changes to the current row
         /// </summary>
-        /// <param name="CSPointer"></param>
         public void rollBack() {
             try {
                 if (!ok()) { throw new ArgumentException("dataset is not valid"); }
@@ -1250,7 +1259,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// Save the current CS Cache back to the database
         /// </summary>
-        /// <param name="csPtr"></param>
         /// <param name="asyncSave"></param>
         /// <param name="blockClearCache"></param>
         public void save(bool asyncSave, bool blockClearCache) {
@@ -1504,7 +1512,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// Initialize the csv_ContentSet Result Cache when it is first opened
         /// </summary>
-        /// <param name="ignore"></param>
         private void initAfterOpen() {
             try {
                 this.resultColumnCount = 0;
@@ -1591,19 +1598,49 @@ namespace Contensive.Processor {
             }
             return false;
         }
-        //
+        /// <summary>
+        /// Opens a csv_ContentSet with the Members of a group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly, int pageSize)
             => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, pageSize, 1);
-        //
+        /// <summary>
+        /// Opens a csv_ContentSet with the Members of a group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <param name="activeOnly"></param>
+        /// <returns></returns>
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList, bool activeOnly)
             => openGroupUsers(groupList, sqlCriteria, sortFieldList, activeOnly, DbController.sqlPageSizeDefault, 1);
-        //
+        /// <summary>
+        /// Opens a csv_ContentSet with the Members of a group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <param name="sortFieldList"></param>
+        /// <returns></returns>
         public bool openGroupUsers(List<string> groupList, string sqlCriteria, string sortFieldList)
             => openGroupUsers(groupList, sqlCriteria, sortFieldList, true, DbController.sqlPageSizeDefault, 1);
-        //
+        /// <summary>
+        /// Opens a csv_ContentSet with the Members of a group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <param name="sqlCriteria"></param>
+        /// <returns></returns>
         public bool openGroupUsers(List<string> groupList, string sqlCriteria)
             => openGroupUsers(groupList, sqlCriteria, "", true, DbController.sqlPageSizeDefault, 1);
-        //
+        /// <summary>
+        /// Opens a csv_ContentSet with the Members of a group
+        /// </summary>
+        /// <param name="groupList"></param>
+        /// <returns></returns>
         public bool openGroupUsers(List<string> groupList)
             => openGroupUsers(groupList, "", "", true, DbController.sqlPageSizeDefault, 1);
         //
@@ -1611,7 +1648,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// Return an array with all the data
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <returns></returns>
         public string[,] getRows() {
             return this.readCache;
@@ -1631,7 +1667,6 @@ namespace Contensive.Processor {
         /// <summary>
         /// return the content name of a csv_ContentSet
         /// </summary>
-        /// <param name="CSPointer"></param>
         /// <returns></returns>
         //
         public string getContentName() {
@@ -1660,11 +1695,19 @@ namespace Contensive.Processor {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Return an edit link for the current record
+        /// </summary>
+        /// <returns></returns>
         public string getRecordEditLink() => getRecordEditLink(false);
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// Save a field value from a form request. The field is processed as the type from the cs content definition opened.
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="fieldName"></param>
+        /// <param name="requestName"></param>
         public void setFormInput(CoreController core, string fieldName, string requestName) {
             if (!ok()) {
                 throw new GenericException("Data is invalid, empty, or end-of-file");
@@ -1702,13 +1745,25 @@ namespace Contensive.Processor {
                     case CPContentBaseClass.FieldTypeIdEnum.FileImage: {
                             //
                             // -- upload file
-                            string Filename = core.docProperties.getText(LocalRequestName);
-                            if (!string.IsNullOrEmpty(Filename)) {
-                                string Path = getFilename(fieldName, Filename, "", getFieldTypeId(fieldName));
-                                set(fieldName, Path);
-                                Path = GenericController.strReplace(Path, "\\", "/");
-                                Path = GenericController.strReplace(Path, "/" + Filename, "");
-                                core.cdnFiles.upload(LocalRequestName, Path, ref Filename);
+                            if (core.docProperties.containsKey(LocalRequestName)) {
+                                var docProperty = core.docProperties.getProperty(LocalRequestName);
+                                string filename = docProperty.value;
+                                //
+                                // -- make filename compatible with dos and unix
+                                filename = FileController.encodeDosFilename(filename);
+                                filename = FileController.encodeUnixFilename(filename);
+                                //
+                                string unixPathFilename = getFilename(fieldName, filename);
+                                string dosPathFilename = FileController.convertToDosSlash(unixPathFilename);
+                                string dosPath = FileController.getPath(dosPathFilename);
+                                //
+                                // -- copy windowsTemp file to cdnFiles and force upload
+                                var WindowsTempFiles = new FileController(core, System.IO.Path.GetTempPath());
+                                WindowsTempFiles.copyFile(docProperty.windowsTempfilename, dosPathFilename, core.cdnFiles);
+                                core.cdnFiles.upload(fieldName, dosPath, ref filename);
+                                //
+                                // -- update record with unix pathFilename to saved uploaded file
+                                set(fieldName, unixPathFilename);
                             }
                             break;
                         }

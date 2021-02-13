@@ -2,7 +2,7 @@
 
 Namespace DefaultSite
     Public Class WindowsTempFileController
-        Public Shared Function CreateTmpFile() As String
+        Public Shared Function createTmpFile() As String
             Dim fileName As String = String.Empty
 
             Try

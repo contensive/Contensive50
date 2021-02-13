@@ -95,9 +95,9 @@ Public Class ConfigurationClass
             End If
             '
             ' -- set default response
-            context.Response.CacheControl = "no-cache"
-            context.Response.Expires = -1
-            context.Response.Buffer = True
+            context.Response.cacheControl = "no-cache"
+            context.Response.expires = -1
+            context.Response.buffer = True
             '
             ' -- setup request
             iisContext.Request.InputStream.Position = 0
@@ -188,15 +188,15 @@ Public Class ConfigurationClass
                     If file IsNot Nothing Then
                         Dim normalizedFilename As String = FileController.normalizeDosFilename(file.FileName)
                         If (file.ContentLength > 0) AndAlso (Not String.IsNullOrWhiteSpace(normalizedFilename)) Then
-                            Dim windowsTempFile As String = DefaultSite.WindowsTempFileController.CreateTmpFile()
+                            Dim windowsTempFile As String = DefaultSite.WindowsTempFileController.createTmpFile()
                             file.SaveAs(windowsTempFile)
-                            Dim docProperty As DocPropertyModel = New DocPropertyModel With {
+                            context.Request.Files.Add(New DocPropertyModel With {
                                 .name = key,
                                 .value = normalizedFilename,
                                 .nameValue = System.Uri.EscapeDataString(key) & "=" + System.Uri.EscapeDataString(normalizedFilename),
-                                .tempfilename = windowsTempFile,
+                                .windowsTempfilename = windowsTempFile,
                                 .propertyType = DocPropertyModel.DocPropertyTypesEnum.file
-                            }
+                            })
                             filePtr += 1
                         End If
                     End If

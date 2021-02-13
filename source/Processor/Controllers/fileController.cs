@@ -1526,11 +1526,14 @@ namespace Contensive.Processor.Controllers {
                         returnFilename = encodeDosFilename(docProperty.value);
                         string dstDosPathFilename = dstDosPath + returnFilename;
                         deleteFile(dstDosPathFilename, isLocal);
-                        if (docProperty.tempfilename != "") {
+                        if (docProperty.windowsTempfilename != "") {
                             //
                             // copy tmp private files to the appropriate folder in the destination file system
                             //
-                            core.tempFiles.copyFile(docProperty.tempfilename, dstDosPathFilename, this);
+                            var WindowsTempFiles = new FileController(core, System.IO.Path.GetTempPath());
+                            WindowsTempFiles.copyFile(docProperty.windowsTempfilename, dstDosPathFilename, this);
+
+                            //core.tempFiles.copyFile(docProperty.tempfilename, dstDosPathFilename, this);
                             //
                             if (!isLocal) {
                                 copyFileLocalToRemote(dstDosPathFilename);

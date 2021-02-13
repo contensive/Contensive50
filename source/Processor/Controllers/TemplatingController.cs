@@ -1,4 +1,5 @@
 ﻿//
+using HandlebarsDotNet;
 using System.Text;
 //
 namespace Contensive.Processor.Controllers {
@@ -13,8 +14,10 @@ namespace Contensive.Processor.Controllers {
         /// <param name="dataSet"></param>
         /// <returns></returns>
         public static string renderStringToString(string template, object dataSet) {
-            var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
-            return stubble.Render(template, dataSet);
+            var templateCompiled = Handlebars.Compile(template);
+            return templateCompiled(dataSet);
+            //var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
+            //return stubble.Render(template, dataSet);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// for file types, the dosAbsPathfilename
         /// </summary>
-        public string tempfilename { get; set; }
+        public string windowsTempfilename { get; set; }
         /// <summary>
         /// for file types, the size
         /// </summary>

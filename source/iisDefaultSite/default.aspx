@@ -17,6 +17,11 @@
                 ' -- execute route
                 Dim content As String = cp.executeRoute()
                 '
+                ' -- delete uploaded temp files in request
+                For Each file In context.Request.Files
+                    DefaultSite.WindowsTempFileController.deleteTmpFile(file.windowsTempfilename)
+                Next
+                '
                 ' -- transfer response to webserver
                 If (Not String.IsNullOrEmpty(context.Response.redirectUrl)) Then
                     Response.Redirect(context.Response.redirectUrl, False)

@@ -1307,8 +1307,8 @@ namespace Contensive.Processor.Addons.AdminSite {
                         } else if (allowAdminFieldCheck(core) && (!InResponse) && (!InEmptyFieldList)) {
                             //
                             // Was sent out non-blank, and no response back, flag error and leave the current value to a retry
-                            string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please Try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
-                            Processor.Controllers.ErrorController.addUserError(core, errorMessage);
+                            string errorMessage = "There has been an error reading the response from your browser. The field[" + field.caption + "]" + TabCopy + " was missing. Please try your change again. If this error happens repeatedly, please report this problem to your site administrator.";
+                            ErrorController.addUserError(core, errorMessage);
                             LogController.logError(core, new GenericException(errorMessage));
                             ResponseFieldValueIsOKToSave = false;
                         } else {
