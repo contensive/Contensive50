@@ -1,10 +1,9 @@
-﻿//
+﻿
 using HandlebarsDotNet;
-using System.Text;
-//
+
 namespace Contensive.Processor.Controllers {
     /// <summary>
-    /// Templating methods (Mustache, Stubble)
+    /// Templating methods (Mustache, Stubble, Handlebars - need signed, and framework+core or standard)
     /// </summary>
     public static class TemplatingController {
         /// <summary>
@@ -16,8 +15,6 @@ namespace Contensive.Processor.Controllers {
         public static string renderStringToString(string template, object dataSet) {
             var templateCompiled = Handlebars.Compile(template);
             return templateCompiled(dataSet);
-            //var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
-            //return stubble.Render(template, dataSet);
         }
     }
 }

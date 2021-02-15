@@ -708,7 +708,6 @@ namespace Contensive.Processor.Controllers {
                 doc.blockExceptionReporting = false;
                 //
                 // -- session
-                //session = new SessionController(this);
                 deleteSessionOnExit = (httpContext == null);
                 if (appConfig == null) {
                     //

@@ -189,8 +189,6 @@ namespace Contensive.Processor {
         }
         //
         //====================================================================================================
-        // deprecated
-        //
         /// <summary>
         /// deprecated. response no longer supports buffer
         /// </summary>
@@ -209,14 +207,14 @@ namespace Contensive.Processor {
         //
         //====================================================================================================
         /// <summary>
-        /// deprecate
+        /// deprecated
         /// </summary>
         /// <param name="bufferOn"></param>
         [Obsolete("Deprecated. Output buffer is deprecated", false)]
-        public override void SetBuffer(bool bufferOn) {
-            //cp.core.html.enableOutputBuffer(bufferOn);
+        public override void SetBuffer(bool bufferOn) { 
+            //
         }
-
+        //
         #region  IDisposable Support 
         //
         // dispose

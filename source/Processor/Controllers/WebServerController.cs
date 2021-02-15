@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
-//
+
 namespace Contensive.Processor.Controllers {
     /// <summary>
     /// Code dedicated to processing webserver (iis for windows) input and output. lazy Constructed. (see coreHtmlClass for html processing)
@@ -45,14 +45,11 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// if this instance is a webRole, retain pointer for callbacks
+        /// The context of the optional http client that may have created this object.
         /// </summary>
-        //public Object iisContext { get; set; }
         public HttpContextModel httpContext { get; set; } = null;
         //
-        // todo - create request domain model with constructor for both web-driven and non-web-driven environments
-        //
-        // ====================================================================================================
+        //====================================================================================================
         /// <summary>
         /// request port
         /// </summary>
@@ -712,18 +709,6 @@ namespace Contensive.Processor.Controllers {
             //
             httpContext.Response.status = status;
         }
-        ////
-        ////===========================================================================================
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <param name="ContentType"></param>
-        //public void setResponseContentType(string ContentType) {
-        //    if (!core.doc.continueProcessing) { return; }
-        //    if ((httpContext == null) || (httpContext.Response == null)) { return; }
-        //    //
-        //    httpContext.Response.contentType = ContentType;
-        //}
         //
         //====================================================================================================
         /// <summary>
