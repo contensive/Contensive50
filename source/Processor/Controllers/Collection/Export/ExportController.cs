@@ -7,6 +7,9 @@ using Contensive.BaseClasses;
 using Contensive.Models.Db;
 
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// Export Controller
+    /// </summary>
     public static class ExportController {
         // 
         // ====================================================================================================
@@ -14,7 +17,7 @@ namespace Contensive.Processor.Controllers {
         /// create the colleciton zip file and return the pathFilename in the Cdn
         /// </summary>
         /// <param name="cp"></param>
-        /// <param name="collectionId"></param>
+        /// <param name="collection"></param>
         /// <returns></returns>
         public static string createCollectionZip_returnCdnPathFilename(CPBaseClass cp, AddonCollectionModel collection) {
             string cdnExportZip_Filename = "";
@@ -150,7 +153,7 @@ namespace Contensive.Processor.Controllers {
                                     CS2.Open("Scripting Modules", "ccguid=" + cp.Db.EncodeSQLText(ModuleGuid));
                                     if (CS2.OK()) {
                                         string Code = CS2.GetText("code").Trim();
-                                        Code = EncodeCData(Code);
+                                        Code = encodeCData(Code);
                                         collectionXml += System.Environment.NewLine + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>";
                                     }
                                     CS2.Close();
@@ -178,7 +181,7 @@ namespace Contensive.Processor.Controllers {
                                             + " suffix=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("suffix")) + "\""
                                             + " sortOrder=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("sortOrder")) + "\""
                                             + ">"
-                                            + EncodeCData(CS2.GetText("styleFilename").Trim())
+                                            + encodeCData(CS2.GetText("styleFilename").Trim())
                                             + "</SharedStyle>";
                                     CS2.Close();
                                 }
@@ -333,7 +336,7 @@ namespace Contensive.Processor.Controllers {
         // ====================================================================================================
         //
         public static string getNode(string NodeName, string NodeContent, bool deprecated) {
-            string xmlContent = (string.IsNullOrWhiteSpace(NodeContent)) ? "" : EncodeCData(NodeContent);
+            string xmlContent = (string.IsNullOrWhiteSpace(NodeContent)) ? "" : encodeCData(NodeContent);
             return Environment.NewLine + "\t" + (deprecated ? "<!-- deprecated -->" : "") + "<" + NodeName + ">" + xmlContent + "</" + NodeName + ">";
         }
         //
@@ -473,32 +476,23 @@ namespace Contensive.Processor.Controllers {
         }
         // 
         // ====================================================================================================
-        // 
-        public static string EncodeCData(string source) {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="source"></param>
+        /// <returns></returns>
+        public static string encodeCData(string source) {
             if (string.IsNullOrWhiteSpace(source)) return "";
             return "<![CDATA[" + Strings.Replace(source, "]]>", "]]]]><![CDATA[>") + "]]>";
-        }
-        // 
-        // =======================================================================================
-        public static void UnzipFile(CPBaseClass cp, string PathFilename) {
-            try {
-                // 
-                ICSharpCode.SharpZipLib.Zip.FastZip fastZip = new ICSharpCode.SharpZipLib.Zip.FastZip();
-                string fileFilter = null;
-
-                fastZip.ExtractZip(PathFilename, getPath(cp, PathFilename), fileFilter);                // 
-            } catch (Exception ex) {
-                cp.Site.ErrorReport(ex, "UnzipFile");
-            }
-        }        // 
+        } 
         // 
         // =======================================================================================
         /// <summary>
-        ///         ''' unzip
-        ///         ''' </summary>
-        ///         ''' <param name="zipTempPathFilename"></param>
-        ///         ''' <param name="addTempPathFilename"></param>
-        ///         ''' <remarks></remarks>
+        /// 
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="zipTempPathFilename"></param>
+        /// <param name="addTempPathFilename"></param>
         public static void zipTempCdnFile(CPBaseClass cp, string zipTempPathFilename, List<string> addTempPathFilename) {
             try {
                 ICSharpCode.SharpZipLib.Zip.ZipFile z;
@@ -521,27 +515,12 @@ namespace Contensive.Processor.Controllers {
         }
         // 
         // =======================================================================================
-        // 
-        public static string getPath(CPBaseClass cp, string pathFilename) {
-            int Position = Strings.InStrRev(pathFilename, @"\");
-            if (Position != 0)
-                return Strings.Mid(pathFilename, 1, Position);
-            return string.Empty;
-        }
-        // 
-        // =======================================================================================
-        // 
-        public static string getFilename(CPBaseClass cp, string PathFilename) {
-            int pos = Strings.InStrRev(PathFilename, "/");
-            if (pos != 0)
-                return Strings.Mid(PathFilename, pos + 1);
-            return PathFilename;
-        }
-        // 
-        // =======================================================================================
-        // 
-        // Indent every line by 1 tab
-        // 
+        /// <summary>
+        /// Indent every line by 1 tab
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="Source"></param>
+        /// <returns></returns>
         public static string tabIndent(CPBaseClass cp, string Source) {
             int posStart = Strings.InStr(1, Source, "<![CDATA[", CompareMethod.Text);
             if (posStart == 0) {
@@ -587,6 +566,13 @@ namespace Contensive.Processor.Controllers {
             }
         }
         //
+        // =======================================================================================
+        /// <summary>
+        /// createListFromCollection
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="collectionId"></param>
+        /// <returns></returns>
         public static List<ContentModel> createListFromCollection(CPBaseClass cp, int collectionId) {
             return DbBaseModel.createList<ContentModel>(cp, "id in (select distinct contentId from ccAddonCollectionCDefRules where collectionid=" + collectionId + ")", "name");
         }

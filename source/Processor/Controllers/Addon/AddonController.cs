@@ -1369,7 +1369,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- MS says BadImageFormatException is how you detect non-assembly DLLs
                     string filename = Path.GetFileName(assemblyPrivateAbsPathFilename);
-                    if (!string.IsNullOrWhiteSpace(filename)) { core.assemblyList_NonAddonsInstalled.Add(filename); }
+                    if (!string.IsNullOrWhiteSpace(filename)) { core.assemblyList_NonAddonsInstalled.Add("//" + filename); }
                     return string.Empty;
                 } catch (Exception ex) {
                     //

@@ -124,7 +124,7 @@ namespace Contensive.Processor.Controllers {
                         // 
                         string NodeInnerText = CS.GetText("ScriptingCode").Trim();
                         if (NodeInnerText != "")
-                            NodeInnerText = System.Environment.NewLine + "\t" + "\t" + "<Code>" + ExportController.EncodeCData(NodeInnerText) + "</Code>";
+                            NodeInnerText = System.Environment.NewLine + "\t" + "\t" + "<Code>" + ExportController.encodeCData(NodeInnerText) + "</Code>";
                         using (CPCSBaseClass CS2 = cp.CSNew()) {
                             CS2.Open("Add-on Scripting Module Rules", "addonid=" + addonid);
                             while (CS2.OK()) {

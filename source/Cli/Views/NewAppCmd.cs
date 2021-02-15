@@ -15,7 +15,7 @@ namespace Contensive.CLI {
         /// <summary>
         /// help text for this command
         /// </summary>
-        internal static readonly string  helpText = ""
+        internal static readonly string helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--newapp (-n)"
             + Environment.NewLine + "    new application wizard";
@@ -84,7 +84,7 @@ namespace Contensive.CLI {
                                 continue;
                             }
                             string allowableLetters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                            if(!appName.All(x => allowableLetters.Contains(x))) {
+                            if (!appName.All(x => allowableLetters.Contains(x))) {
                                 Console.Write("\nThis application name is not valid because it must contain only letters and numbers.");
                                 continue;
                             }
@@ -94,6 +94,12 @@ namespace Contensive.CLI {
                             }
                             break;
                         }
+                    }
+                    //
+                    // -- verify current app not already in server group
+                    if (!string.IsNullOrEmpty(appName) && cp.core.serverConfig.apps.ContainsKey(appName)) {
+                        Console.WriteLine("The application [" + appName + "] aleady exists. To upgrade this app, use --upgrade. To remove this site and create a new site, use --delete first.");
+                        return;
                     }
                     appConfig.name = appName;
                     //
@@ -219,17 +225,24 @@ namespace Contensive.CLI {
                     cp.core.webServer.verifySite(appName, domainName, cp.core.appConfig.localWwwPath);
                     //
                     Processor.Controllers.LogController.logInfo(cp.core, "Install iisDefaultSite.");
-                    var tempFiles = new Processor.Controllers.FileController(cp.core,cp.TempFiles.PhysicalFilePath);
-                    cp.core.programFiles.copyFile( @"\defaultaspxsite.zip", @"\defaultaspxsite.zip", tempFiles);
-                    cp.TempFiles.UnzipFile(@"\defaultaspxsite.zip");
-                    string srcPath = getZipSrcTempPath(cp,"Content", "Web.config");
-                    if (string.IsNullOrWhiteSpace(srcPath)) {
-                        Console.WriteLine("The installation on this server does not include a valid DefaultAspxSite.zip file.");
-                        return;
+                    if (!cp.core.programFiles.fileExists(@"\defaultaspxsite.zip")) {
+                        //
+                        // -- message to install defaultsite manually
+                        Console.WriteLine("File [defaultaspxsite.zip] was not found in the folder [\\Program Files (x86)\\Contensive]. To setup an IIS website, import this file using IIS Manager from the deployment folder. To automatically install during this process, copy the file into the program files folder.");
+                    } else {
+                        //
+                        // -- install defaultaspxsite
+                        cp.core.programFiles.copyFile(@"\defaultaspxsite.zip", @"\defaultaspxsite.zip", cp.core.tempFiles);
+                        cp.TempFiles.UnzipFile(@"\defaultaspxsite.zip");
+                        string srcPath = getZipSrcTempPath(cp, "Content", "Web.config");
+                        if (string.IsNullOrWhiteSpace(srcPath)) {
+                            Console.WriteLine("The installation on this server does not include a valid DefaultAspxSite.zip file.");
+                            return;
+                        }
+                        cp.TempFiles.CopyPath(srcPath, @"", cp.WwwFiles);
+                        cp.TempFiles.DeleteFile(@"\defaultaspxsite.zip");
+                        cp.TempFiles.DeleteFolder(@"content");
                     }
-                    cp.TempFiles.CopyPath(srcPath, @"", cp.WwwFiles);
-                    cp.TempFiles.DeleteFile(@"\defaultaspxsite.zip");
-                    cp.TempFiles.DeleteFolder(@"content");
                     //
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Run db upgrade.");
                     Processor.Controllers.BuildController.upgrade(cp.core, true, true);
@@ -269,17 +282,17 @@ namespace Contensive.CLI {
         /// <param name="targetFilename"></param>
         /// <returns></returns>
         public static string getZipSrcTempPath(CPClass cp, string startPath, string targetFilename) {
-            if(!string.IsNullOrWhiteSpace(startPath)) {
+            if (!string.IsNullOrWhiteSpace(startPath)) {
                 startPath += (startPath.right(1).Equals(@"/")) ? "" : "/";
             }
-            foreach( var file in cp.TempFiles.FileList(startPath)) {
-                if(file.Name.Equals(targetFilename,StringComparison.InvariantCultureIgnoreCase)) { 
+            foreach (var file in cp.TempFiles.FileList(startPath)) {
+                if (file.Name.Equals(targetFilename, StringComparison.InvariantCultureIgnoreCase)) {
                     //
                     // -- target file found, return this path
-                    return startPath; 
+                    return startPath;
                 }
             }
-            foreach( var folder in cp.TempFiles.FolderList(startPath)) {
+            foreach (var folder in cp.TempFiles.FolderList(startPath)) {
                 string targetPath = getZipSrcTempPath(cp, startPath + folder.Name + @"/", targetFilename);
                 if (!string.IsNullOrEmpty(targetPath)) {
                     //

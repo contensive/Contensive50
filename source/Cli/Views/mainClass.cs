@@ -268,7 +268,7 @@ namespace Contensive.CLI {
                             // -- run task in ccTasks table in application appName 
                             default:
                                 Console.WriteLine("Command not recognized [" + cmd + "]. Run cc.exe with no arguments for help.");
-                                break;
+                                return;
                         }
                     };
                 }

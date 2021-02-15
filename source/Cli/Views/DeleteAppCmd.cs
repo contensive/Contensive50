@@ -44,20 +44,27 @@ namespace Contensive.CLI {
                 }
                 Console.WriteLine("Deleting application [" + appName + "] from server group [" + cpServer.core.serverConfig.name + "].");
                 //
-                // delete the local file folders
+                // -- delete the local file folders
+                string appPath = cpServer.ServerConfig.localDataDriveLetter + ":\\inetpub\\" + appName;
+                if ( System.IO.Directory.Exists(appPath)){
+                    System.IO.Directory.Delete(appPath, true);
+                }
                 //
+                // -- drop the database on the server
+                try {
+                    cpServer.core.dbServer.deleteCatalog(appName);
+                } catch (Exception) {
+                    //
+                    // -- drop db failed
+                    Console.WriteLine("Could not delete database [" + appName + "], open Sql Management Studio and delete the database.");
+                }
                 //
-                // drop the database on the server
-                //
-                //Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Create database.");
-                //cp.core.dbServer.createCatalog(appConfig.name);
-                //
-                //
-                //remove the configuraion
+                // -- remove the configuraion
                 cpServer.core.serverConfig.apps.Remove( appName );
                 cpServer.core.serverConfig.save(cpServer.core);
             } catch (Exception ex) {
                 Console.WriteLine("Error: [" + ex + "]");
+                throw;
             }
         }
     }

@@ -1,17 +1,17 @@
-﻿    
-using System;
-using System.Xml;
-using System.Collections.Generic;
-using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Domain;
-using System.Linq;
-using static Contensive.BaseClasses.CPFileSystemBaseClass;
-using Contensive.Processor.Exceptions;
+﻿
 using Contensive.BaseClasses;
-using System.Reflection;
-using NLog;
 using Contensive.Models.Db;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
+using NLog;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Xml;
+using static Contensive.BaseClasses.CPFileSystemBaseClass;
+using static Contensive.Processor.Constants;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -121,6 +121,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="collectionsInstalledList"></param>
         /// <param name="includeBaseMetaDataInstall"></param>
         /// <param name="collectionsDownloaded">Collections downloaded but not installed yet. Do not need to download them again.</param>
+        /// <param name="isDependency"></param>
         /// <returns></returns>
         public static bool installCollectionFromCollectionFolder(CoreController core, bool isDependency, Stack<string> contextLog, string collectionGuid, ref string return_ErrorMessage, bool IsNewBuild, bool reinstallDependencies, ref List<string> nonCriticalErrorList, string logPrefix, ref List<string> collectionsInstalledList, bool includeBaseMetaDataInstall, ref List<string> collectionsDownloaded) {
             bool result = false;
@@ -846,7 +847,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //======================================================================================================
-        //
+        /// <summary>
+        /// install data node from install file
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="dataNode"></param>
+        /// <param name="return_ErrorMessage"></param>
         public static void installDataNode(CoreController core, XmlNode dataNode, ref string return_ErrorMessage) {
             foreach (XmlNode ContentNode in dataNode.ChildNodes) {
                 if (ContentNode.Name.ToLowerInvariant() == "record") {
@@ -950,11 +956,11 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================================
         /// <summary>
-        /// Installs all collections found in a source folder.
-        /// Builds the Collection Folder. 
-        /// Calls installCollectionFromCollectionFolder.
+        /// Installs all collections found in a source folder. Builds the Collection Folder. Calls installCollectionFromCollectionFolder.
         /// </summary>
         /// <param name="core"></param>
+        /// <param name="isDependency"></param>
+        /// <param name="contextLog"></param>
         /// <param name="installTempPath"></param>
         /// <param name="return_ErrorMessage"></param>
         /// <param name="collectionsInstalledList">a list of the collections installed to the database during this installation (dependencies etc.). The collections installed are added to this list</param>

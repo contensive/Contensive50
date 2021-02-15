@@ -1,7 +1,7 @@
 ﻿
-using System;
-using Contensive.Processor.Exceptions;
 using Contensive.Models.Db;
+using Contensive.Processor.Exceptions;
+using System;
 using System.Collections;
 
 namespace Contensive.Processor.Controllers {
@@ -19,11 +19,8 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// execute vb script
         /// </summary>
+        /// <param name="core"></param>
         /// <param name="addon"></param>
-        /// <param name="Code"></param>
-        /// <param name="EntryPoint"></param>
-        /// <param name="ScriptingTimeout"></param>
-        /// <param name="ScriptName"></param>
         /// <returns></returns>
         public static string execute_Script_VBScript( CoreController core, ref AddonModel addon) {
             string returnText = "";
@@ -116,10 +113,7 @@ namespace Contensive.Processor.Controllers {
         /// execute jscript script
         /// </summary>
         /// <param name="addon"></param>
-        /// <param name="Code"></param>
-        /// <param name="EntryPoint"></param>
-        /// <param name="ScriptingTimeout"></param>
-        /// <param name="ScriptName"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
         public static string execute_Script_JScript(CoreController core, ref AddonModel addon) {
             string returnText = "";
@@ -206,10 +200,13 @@ namespace Contensive.Processor.Controllers {
             }
             return returnText;
         }
+        //
+        //====================================================================================================
         /// <summary>
         /// translate script engine exception to message for log
         /// </summary>
         /// <param name="ex"></param>
+        /// <param name="scopeDescription"></param>
         /// <returns></returns>
         private static string getScriptEngineExceptionMessage(Microsoft.ClearScript.ScriptEngineException ex,string scopeDescription) {
             string errorMsg = "Clearscript exception, " + scopeDescription;

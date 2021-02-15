@@ -1,19 +1,12 @@
 ﻿
-using System;
-using System.Xml;
-using System.Collections.Generic;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using Contensive.Processor.Models.Domain;
-using System.Linq;
-using static Contensive.BaseClasses.CPFileSystemBaseClass;
-using Contensive.Processor.Exceptions;
-using Contensive.BaseClasses;
-using System.Reflection;
-using NLog;
 using Contensive.Models.Db;
-using System.Globalization;
+using Contensive.Processor.Models.Domain;
+using System;
+using System.Reflection;
 using System.Text;
+using System.Xml;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     //

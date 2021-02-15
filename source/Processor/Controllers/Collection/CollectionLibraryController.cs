@@ -217,9 +217,10 @@ namespace Contensive.Processor.Controllers {
         /// Calls installCollectionFromCollectionFolder.
         /// </summary>
         /// <param name="core"></param>
+        /// <param name="isDependency"></param>
+        /// <param name="contextLog"></param>
         /// <param name="collectionGuid"></param>
         /// <param name="return_ErrorMessage"></param>
-        /// <param name="ImportFromCollectionsGuidList"></param>
         /// <param name="IsNewBuild"></param>
         /// <param name="repair"></param>
         /// <param name="nonCriticalErrorList"></param>

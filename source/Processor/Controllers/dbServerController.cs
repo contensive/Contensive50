@@ -20,7 +20,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cp"></param>
+        /// <param name="core"></param>
         /// <remarks></remarks>
         public DbServerController(CoreController core) {
             try {
@@ -80,7 +80,21 @@ namespace Contensive.Processor.Controllers {
             try {
                 executeQuery("create database " + catalogName);
             } catch (Exception ex) {
-                LogController.logError( core,ex);
+                LogController.logError(core, ex);
+                throw;
+            }
+        }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Delete a catalog in the database
+        /// </summary>
+        /// <param name="catalogName"></param>
+        public void deleteCatalog(string catalogName) {
+            try {
+                executeQuery("DROP DATABASE IF EXISTS " + catalogName);
+            } catch (Exception ex) {
+                LogController.logError(core, ex);
                 throw;
             }
         }
@@ -113,24 +127,19 @@ namespace Contensive.Processor.Controllers {
         /// Execute a command or sql statemwent and return a dataTable
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
-        /// <param name="startRecord"></param>
-        /// <param name="maxRecords"></param>
         /// <returns></returns>
         private DataTable executeQuery(string sql) {
             DataTable returnData = new DataTable();
             try {
-                using (SqlConnection connSQL = new SqlConnection(getConnectionStringADONET())) {
-                    connSQL.Open();
-                    using (SqlCommand cmdSQL = new SqlCommand()) {
-                        cmdSQL.CommandType = CommandType.Text;
-                        cmdSQL.CommandText = sql;
-                        cmdSQL.Connection = connSQL;
-                        using (dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL)) {
-                            adptSQL.Fill(returnData);
-                        }
-                    }
-                }
+                using SqlConnection connSQL = new SqlConnection(getConnectionStringADONET());
+                connSQL.Open();
+                using SqlCommand cmdSQL = new SqlCommand {
+                    CommandType = CommandType.Text,
+                    CommandText = sql,
+                    Connection = connSQL
+                };
+                using dynamic adptSQL = new System.Data.SqlClient.SqlDataAdapter(cmdSQL);
+                adptSQL.Fill(returnData);
             } catch (Exception ex) {
                 var newEx = new GenericException("Exception [" + ex.Message + "] executing master sql [" + sql + "]", ex);
                 LogController.logError( core,newEx);

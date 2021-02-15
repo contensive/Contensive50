@@ -27,7 +27,7 @@ namespace Contensive.Processor.Controllers {
                         + " issecure=\"" + GenericController.getYesNo(template.isSecure) + "\""
                         + " >"
                         + addonList
-                        + System.Environment.NewLine + "\t\t" + "<BodyHtml>" + ExportController.tabIndent(cp, ExportController.EncodeCData(template.bodyHTML)) + "</BodyHtml>"
+                        + System.Environment.NewLine + "\t\t" + "<BodyHtml>" + ExportController.tabIndent(cp, ExportController.encodeCData(template.bodyHTML)) + "</BodyHtml>"
                         + System.Environment.NewLine + "\t" + "</Template>";
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex, "GetAddonNode");

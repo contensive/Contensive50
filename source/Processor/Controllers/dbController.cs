@@ -154,7 +154,6 @@ namespace Contensive.Processor.Controllers {
         /// Execute a query (returns data)
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="startRecord">0 based start record</param>
         /// <param name="maxRecords"></param>
         /// <returns></returns>
@@ -168,7 +167,6 @@ namespace Contensive.Processor.Controllers {
         /// Execute a query (returns data). max records 10M
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="startRecord">0 based start record</param>
         /// <returns></returns>
         public DataTable executeQuery(string sql, int startRecord) {
@@ -192,7 +190,6 @@ namespace Contensive.Processor.Controllers {
         /// Execute a query (returns data)
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="startRecord">0 based start record</param>
         /// <param name="maxRecords">required. max number of records the client will support.</param>
         /// <param name="recordsReturned"></param>
@@ -265,7 +262,6 @@ namespace Contensive.Processor.Controllers {
         /// execute a nonQuery command (non-record returning) and return records affected
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         /// <param name="recordsAffected"></param>
         public void executeNonQuery(string sql, ref int recordsAffected) {
             try {
@@ -299,7 +295,6 @@ namespace Contensive.Processor.Controllers {
         /// execute sql on a specific datasource asynchonously. No data is returned.
         /// </summary>
         /// <param name="sql"></param>
-        /// <param name="dataSourceName"></param>
         public async Task<int> executeNonQueryAsync(string sql) {
             try {
                 int result = 0;
@@ -333,7 +328,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Update a record in a table
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         /// <param name="sqlList"></param>
@@ -351,7 +345,12 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Update a record in a table
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="criteria"></param>
+        /// <param name="sqlList"></param>
         public void update(string tableName, string criteria, NameValueCollection sqlList)
             => update(tableName, criteria, sqlList, false);
         //
@@ -359,7 +358,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// iInserts a record into a table and returns the ID
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
@@ -374,7 +372,11 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// iInserts a record into a table and returns the ID
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public int insertGetId(string tableName)
             => insertGetId(tableName, 0);
         //
@@ -382,7 +384,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Insert a record in a table, select it and return a datatable. You must dispose the datatable.
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="memberId"></param>
         /// <returns></returns>
@@ -408,7 +409,11 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// Insert a record in a table, select it and return a datatable. You must dispose the datatable.
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public DataTable insert(string tableName)
             => insert(tableName, 0);
         //
@@ -416,33 +421,23 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Insert a record in a table. There is no check for core fields
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="sqlList"></param>
-        public void insert(string tableName, NameValueCollection sqlList, bool asyncSave) {
+        public void insert(string tableName, NameValueCollection sqlList) {
             try {
                 if (sqlList.Count == 0) { return; }
                 string sql = "INSERT INTO " + tableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
-                if (!asyncSave) {
-                    executeNonQuery(sql);
-                    return;
-                }
                 core.db.executeNonQuery(sql);
-                //Task.Run(() => executeNonQueryAsync(sql));
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
         }
         //
-        public void insert(string tableName, NameValueCollection sqlList)
-            => insert(tableName, sqlList, false);
-        //
         //========================================================================
         /// <summary>
         /// Opens the table specified and returns the data in a datatable. Returns all the active records in the table. Find the content record first, just for the dataSource.
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="criteria"></param>
         /// <param name="sortFieldList"></param>
@@ -451,35 +446,31 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pageNumber"></param>
         /// <returns></returns>
         public DataTable openTable(string tableName, string criteria, string sortFieldList, string selectFieldList, int pageSize, int pageNumber) {
-            DataTable returnDataTable = null;
             try {
-                string SQL = "SELECT";
+                string sql = "SELECT";
                 if (string.IsNullOrEmpty(selectFieldList)) {
-                    SQL += " *";
+                    sql += " *";
                 } else {
-                    SQL += " " + selectFieldList;
+                    sql += " " + selectFieldList;
                 }
-                SQL += " FROM " + tableName;
+                sql += " FROM " + tableName;
                 if (!string.IsNullOrEmpty(criteria)) {
-                    SQL += " WHERE (" + criteria + ")";
+                    sql += " WHERE (" + criteria + ")";
                 }
                 if (!string.IsNullOrEmpty(sortFieldList)) {
-                    SQL += " ORDER BY " + sortFieldList;
+                    sql += " ORDER BY " + sortFieldList;
                 }
-                //SQL &= ";"
-                returnDataTable = executeQuery(SQL, getStartRecord( pageSize, pageNumber) , pageSize);
+                return executeQuery(sql, getStartRecord(pageSize, pageNumber), pageSize);
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], opening table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));
                 throw;
             }
-            return returnDataTable;
         }
         //
         //========================================================================
         /// <summary>
         /// Returns true if the field exists in the table
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="fieldName"></param>
         /// <returns></returns>
@@ -589,7 +580,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Check for a field in a table in the database, if missing, create the field
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="fieldName"></param>
         /// <param name="fieldType"></param>
@@ -623,11 +613,10 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Delete (drop) a table
         /// </summary>
-        /// <param name="DataSourceName"></param>
-        /// <param name="TableName"></param>
-        public void deleteTable(string TableName) {
+        /// <param name="tableName"></param>
+        public void deleteTable(string tableName) {
             try {
-                executeNonQuery("DROP TABLE " + TableName);
+                executeNonQuery("DROP TABLE " + tableName);
                 core.cache.invalidateAll();
                 core.clearMetaData();
             } catch (Exception ex) {
@@ -640,9 +629,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Delete a table field from a table
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="fieldName"></param>
+        /// <param name="deleteIndexesContainingField"></param>
         public void deleteTableField(string tableName, string fieldName, bool deleteIndexesContainingField) {
             try {
                 if (isSQLTableField(tableName, fieldName)) {
@@ -656,7 +645,7 @@ namespace Contensive.Processor.Controllers {
                             foreach (Models.Domain.TableSchemaModel.ColumnSchemaModel column in tableSchema.columns) {
                                 if ((column.COLUMN_NAME.ToLowerInvariant() == fieldName.ToLowerInvariant())) {
                                     //
-                                    LogController.logInfo(core, "dropWorkflowField, dropping conversion required, field [" + column.COLUMN_NAME + "], table [" + tableName + "]");
+                                    LogController.logInfo(core, "deleteTableField, dropping conversion required, field [" + column.COLUMN_NAME + "], table [" + tableName + "]");
                                     //
                                     // these can be very long queries for big tables 
                                     int sqlTimeout = core.cpParent.Db.SQLTimeout;
@@ -666,22 +655,22 @@ namespace Contensive.Processor.Controllers {
                                     foreach (Models.Domain.TableSchemaModel.IndexSchemaModel index in tableSchema.indexes) {
                                         if (index.indexKeyList.Contains(column.COLUMN_NAME)) {
                                             //
-                                            LogController.logInfo(core, "dropWorkflowField, dropping index [" + index.index_name + "], because it contains this field");
+                                            LogController.logInfo(core, "deleteTableField, dropping index [" + index.index_name + "], because it contains this field");
                                             //
                                             try {
                                                 core.db.deleteIndex(tableName, index.index_name);
                                             } catch (Exception ex) {
-                                                LogController.logWarn(core, "dropWorkflowField, error dropping index, [" + ex + "]");
+                                                LogController.logWarn(core, "deleteTableField, error dropping index, [" + ex + "]");
                                             }
                                         }
                                     }
                                     //
-                                    LogController.logInfo(core, "dropWorkflowField, dropping field");
+                                    LogController.logInfo(core, "deleteTableField, dropping field");
                                     //
                                     try {
                                         executeNonQuery("ALTER TABLE " + tableName + " DROP COLUMN " + fieldName + ";");
                                     } catch (Exception exDrop) {
-                                        LogController.logWarn(core, exDrop, "dropWorkflowField, error dropping field");
+                                        LogController.logWarn(core, exDrop, "deleteTableField, error dropping field");
                                     }
                                     //
                                     core.cpParent.Db.SQLTimeout = sqlTimeout;
@@ -700,7 +689,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Create an index on a table, Fieldnames is  a comma delimited list of fields
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="IndexName"></param>
         /// <param name="FieldNames"></param>
@@ -746,7 +734,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Get FieldDescritor from FieldType
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="fieldType"></param>
         /// <returns></returns>
         public string getSQLAlterColumnType(CPContentBaseClass.FieldTypeIdEnum fieldType) {
@@ -754,7 +741,7 @@ namespace Contensive.Processor.Controllers {
             try {
                 switch (fieldType) {
                     case CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                    case CPContentBaseClass.FieldTypeIdEnum.Integer: 
+                    case CPContentBaseClass.FieldTypeIdEnum.Integer:
                     case CPContentBaseClass.FieldTypeIdEnum.Lookup:
                     case CPContentBaseClass.FieldTypeIdEnum.MemberSelect: {
                             returnType = "int null";
@@ -826,7 +813,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Delete an Index for a table
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="IndexName"></param>
         public void deleteIndex(string TableName, string IndexName) {
@@ -861,7 +847,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Get a DataSource type (SQL Server, etc) from its Name
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <returns></returns>
         //
         public int getDataSourceType() {
@@ -1076,7 +1061,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// encode a string for a like operation
         /// </summary>
-        /// <param name="core"></param>
         /// <param name="source"></param>
         /// <returns></returns>
         public static string encodeSqlTextLike(string source) {
@@ -1098,7 +1082,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// encodeSQLNumber
+        /// encode a number in a sql statement
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
@@ -1109,7 +1093,11 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        //
+        /// <summary>
+        /// encode integer in a sql statement
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public static string encodeSQLNumber(int? expression) {
             if (expression == null) return "null";
             return expression.ToString();
@@ -1117,7 +1105,7 @@ namespace Contensive.Processor.Controllers {
         //
         //========================================================================
         /// <summary>
-        /// encodeSQLBoolean
+        /// encode a boolean in a sql statement
         /// </summary>
         /// <param name="expression"></param>
         /// <returns></returns>
@@ -1131,7 +1119,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// delete a record
         /// </summary>
-        /// <param name="dataSourceName"></param>
         /// <param name="tableName"></param>
         /// <param name="recordId"></param>
         //
@@ -1150,10 +1137,10 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="guid"></param>
         /// <param name="tableName"></param>
-        public void delete(string tableName, string guid ) {
+        public void delete(string tableName, string guid) {
             try {
-                if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(guid)) { 
-                    throw new GenericException("tablename and guid cannot be blank"); 
+                if (string.IsNullOrWhiteSpace(tableName) || string.IsNullOrWhiteSpace(guid)) {
+                    throw new GenericException("tablename and guid cannot be blank");
                 }
                 if (isGuid(tableName) && !isGuid(guid)) {
                     //
@@ -1283,23 +1270,20 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         //
         public DataTable getTableSchemaData(string tableName) {
-            DataTable returnDt = new DataTable();
             try {
                 string connString = getConnectionStringADONET(core.appConfig.name);
-                using (SqlConnection connSQL = new SqlConnection(connString)) {
-                    connSQL.Open();
-                    returnDt = connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
-                }
+                using SqlConnection connSQL = new SqlConnection(connString);
+                connSQL.Open();
+                return connSQL.GetSchema("Tables", new[] { core.appConfig.name, null, tableName, null });
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return returnDt;
         }
         //
         //========================================================================
         /// <summary>
-        /// 
+        /// Get a recordset with the table schema
         /// </summary>
         /// <param name="tableName"></param>
         /// <returns></returns>
@@ -1311,10 +1295,9 @@ namespace Contensive.Processor.Controllers {
                     throw new ArgumentException("tablename cannot be blank");
                 } else {
                     string connString = getConnectionStringADONET(core.appConfig.name);
-                    using (SqlConnection connSQL = new SqlConnection(connString)) {
-                        connSQL.Open();
-                        returnDt = connSQL.GetSchema("Columns", new[] { core.appConfig.name, null, tableName, null });
-                    }
+                    using SqlConnection connSQL = new SqlConnection(connString);
+                    connSQL.Open();
+                    returnDt = connSQL.GetSchema("Columns", new[] { core.appConfig.name, null, tableName, null });
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
@@ -1324,7 +1307,11 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //========================================================================
-        //
+        /// <summary>
+        /// Get a recordset with the table schema
+        /// </summary>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public DataTable getIndexSchemaData(string tableName) {
             try {
                 if (string.IsNullOrWhiteSpace(tableName)) {
@@ -1344,8 +1331,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="nameIdOrGuid"></param>
         /// <returns></returns>
         public string getNameIdOrGuidSqlCriteria(string nameIdOrGuid) {
-            string sqlCriteria = "";
             try {
+                string sqlCriteria = "";
                 if (nameIdOrGuid.isNumeric()) {
                     sqlCriteria = "id=" + encodeSQLNumber(double.Parse(nameIdOrGuid));
                 } else if (GenericController.common_isGuid(nameIdOrGuid)) {
@@ -1353,11 +1340,11 @@ namespace Contensive.Processor.Controllers {
                 } else {
                     sqlCriteria = "name=" + encodeSQLText(nameIdOrGuid);
                 }
+                return sqlCriteria;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;
             }
-            return sqlCriteria;
         }
         //
         //====================================================================================================
@@ -1402,7 +1389,6 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// DeleteTableRecordChunks
         /// </summary>
-        /// <param name="DataSourceName"></param>
         /// <param name="TableName"></param>
         /// <param name="Criteria"></param>
         /// <param name="ChunkSize"></param>
@@ -1475,7 +1461,11 @@ namespace Contensive.Processor.Controllers {
         }
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// verify a name is a valid tablename
+        /// </summary>
+        /// <param name="sourceName"></param>
+        /// <returns></returns>
         public static string encodeSqlTableName(string sourceName) {
             string returnName = "";
             const string FirstCharSafeString = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -1514,7 +1504,11 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=================================================================================
-        //
+        /// <summary>
+        /// verify a datatable is valid
+        /// </summary>
+        /// <param name="dt"></param>
+        /// <returns></returns>
         public static bool isDataTableOk(DataTable dt) {
             if (dt == null) { return false; }
             if (dt.Rows == null) { return false; }
@@ -1522,13 +1516,20 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //=================================================================================
-        //
+        /// <summary>
+        /// dispose datatable
+        /// </summary>
+        /// <param name="dt"></param>
         public static void closeDataTable(DataTable dt) {
             dt.Dispose();
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// execute a query from the remoteQueryKey stored in the remoteQueryTable
+        /// </summary>
+        /// <param name="remoteQueryKey"></param>
+        /// <returns></returns>
         public DataTable executeRemoteQuery(string remoteQueryKey) {
             DataTable result = null;
             try {
@@ -1578,6 +1579,7 @@ namespace Contensive.Processor.Controllers {
         /// </summary>
         /// <param name="contentId"></param>
         /// <param name="fieldName"></param>
+        /// <param name="core"></param>
         /// <returns></returns>
         public static int getContentFieldId(CoreController core, int contentId, string fieldName) {
             if ((contentId <= 0) || (string.IsNullOrWhiteSpace(fieldName))) { return 0; }
@@ -1591,7 +1593,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Get a Content Field Id (id of the ccFields table record) using just the database
         /// </summary>
+        /// <param name="core"></param>
         /// <param name="contentName"></param>
+        /// <param name="fieldName"></param>
         /// <returns></returns>
         public static int getContentFieldId(CoreController core, string contentName, string fieldName) {
             if ((string.IsNullOrWhiteSpace(contentName)) || (string.IsNullOrWhiteSpace(fieldName))) { return 0; }
@@ -1602,14 +1606,14 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get the id of the table in the cctable table
         /// </summary>
+        /// <param name="core"></param>
         /// <param name="TableName"></param>
         /// <returns></returns>
         public static int getTableID(CoreController core, string TableName) {
             if ((string.IsNullOrWhiteSpace(TableName))) { return 0; }
-            using (DataTable dt = core.db.executeQuery("select top 1 id from cctables where name=" + encodeSQLText(TableName) + " order by id")) {
-                if (dt.Rows.Count == 0) { return 0; }
-                return getDataRowFieldInteger(dt.Rows[0], "id");
-            }
+            using DataTable dt = core.db.executeQuery("select top 1 id from cctables where name=" + encodeSQLText(TableName) + " order by id");
+            if (dt.Rows.Count == 0) { return 0; }
+            return getDataRowFieldInteger(dt.Rows[0], "id");
         }
         //
         // ====================================================================================================
@@ -1619,7 +1623,7 @@ namespace Contensive.Processor.Controllers {
         /// <param name="pageSize">records per page</param>
         /// <param name="pageNumber">1-based page number</param>
         /// <returns></returns>
-        public static int getStartRecord( int pageSize, int pageNumber ) {
+        public static int getStartRecord(int pageSize, int pageNumber) {
             return pageSize * (pageNumber - 1);
         }
         /// <summary>
