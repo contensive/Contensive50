@@ -18,6 +18,8 @@ namespace Contensive.Processor.Addons.Housekeeping {
         public static void executeHourlyTasks(CoreController core) {
             try {
                 //
+                LogController.logInfo(core, "Housekeep, executeHourlyTasks, MetaData");
+                //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");

@@ -1912,7 +1912,20 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// getFormInputHTML
+        /// </summary>
+        /// <param name="htmlName"></param>
+        /// <param name="DefaultValue"></param>
+        /// <param name="styleHeight"></param>
+        /// <param name="styleWidth"></param>
+        /// <param name="readOnlyfield"></param>
+        /// <param name="allowActiveContent"></param>
+        /// <param name="addonListJSON"></param>
+        /// <param name="styleList"></param>
+        /// <param name="styleOptionList"></param>
+        /// <param name="allowResourceLibrary"></param>
+        /// <returns></returns>
         public string getFormInputHTML(string htmlName, string DefaultValue = "", string styleHeight = "", string styleWidth = "", bool readOnlyfield = false, bool allowActiveContent = false, string addonListJSON = "", string styleList = "", string styleOptionList = "", bool allowResourceLibrary = false) {
             string returnHtml = "";
             try {
@@ -1959,7 +1972,8 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// process requests from the legacy tool panel at the bottom of the page
+        /// process requests from the legacy tool panel at the bottom of the page, and the replacement tool-bar at the top.
+        /// Removed login processing and legacy tool panel
         /// </summary>
         public void processFormToolsPanel() {
             try {
@@ -1991,10 +2005,10 @@ namespace Contensive.Processor.Controllers {
                             case ButtonApply: {
                                     //
                                     // Apply
-                                    string requestUsername = core.cpParent.Doc.GetText(legacyFormSn + "username");
-                                    string requestPassword = core.cpParent.Doc.GetText(legacyFormSn + "password");
-                                    bool passwordRequestValid = core.cpParent.Doc.IsProperty(legacyFormSn + "password");
-                                    LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
+                                    //string requestUsername = core.cpParent.Doc.GetText(legacyFormSn + "username");
+                                    //string requestPassword = core.cpParent.Doc.GetText(legacyFormSn + "password");
+                                    //bool passwordRequestValid = core.cpParent.Doc.IsProperty(legacyFormSn + "password");
+                                    //LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
                                     //
                                     // ----- AllowAdminLinks
                                     //
