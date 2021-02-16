@@ -1,18 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string ondrag;
-        public string ondragend;
-        public string ondragenter;
-        public string ondragleave;
-        public string ondragover;
-        public string ondragstart;
-        public string ondrop;
-        public string onscroll;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondrag { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondragend { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondragenter { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondragleave { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondragover { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondragstart { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondrop { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onscroll { get; set; }
     }
 }

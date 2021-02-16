@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string oncopy;
-        public string oncut;
-        public string onpaste;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncopy { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncut { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onpaste { get; set; }
     }
 }

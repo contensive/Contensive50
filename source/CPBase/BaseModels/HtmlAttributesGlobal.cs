@@ -9,62 +9,62 @@ namespace Contensive.CPBase.BaseModels {
         /// <summary>
         /// Specifies a shortcut key to activate/focus an element
         /// </summary>
-        public string accesskey;
+        public string accesskey { get; set; }
         /// <summary>
         /// Specifies one or more classnames for an element (refers to a class in a style sheet)
         /// </summary>
-        public string @class;
+        public string @class { get; set; }
         /// <summary>
         /// Specifies whether the content of an element is editable or not
         /// </summary>
-        public bool contenteditable;
+        public bool contenteditable { get; set; }
         /// <summary>
         /// Used to store custom data private to the page or application
         /// </summary>
-        public List<KeyValuePair<string, string>> data;
+        public List<KeyValuePair<string, string>> data { get; set; }
         /// <summary>
         /// Specifies the text direction for the content in an element
         /// </summary>
-        public string dir;
+        public string dir { get; set; }
         /// <summary>
         /// Specifies whether an element is draggable or not
         /// </summary>
-        public bool draggable;
+        public bool draggable { get; set; }
         /// <summary>
         /// Specifies whether the dragged data is copied, moved, or linked, when dropped
         /// </summary>
-        public string dropzone;
+        public string dropzone { get; set; }
         /// <summary>
         /// Specifies that an element is not yet, or is no longer, relevant
         /// </summary>
-        public bool hidden;
+        public bool hidden { get; set; }
         /// <summary>
         /// Specifies a unique id for an element
         /// </summary>
-        public string id;
+        public string id { get; set; }
         /// <summary>
         /// Specifies the language of the element's content
         /// </summary>
-        public string lang;
+        public string lang { get; set; }
         /// <summary>
         /// Specifies whether the element is to have its spelling and grammar checked or not
         /// </summary>
-        public bool spellcheck;
+        public bool spellcheck { get; set; }
         /// <summary>
         /// Specifies an inline CSS style for an element
         /// </summary>
-        public string style;
+        public string style { get; set; }
         /// <summary>
         /// Specifies the tabbing order of an element
         /// </summary>
-        public string tabindex;
+        public string tabindex { get; set; }
         /// <summary>
         /// Specifies extra information about an element
         /// </summary>
-        public string title;
+        public string title { get; set; }
         /// <summary>
         /// Specifies whether the content of an element should be translated or not
         /// </summary>
-        public bool translate;
+        public bool translate { get; set; }
     }
 }

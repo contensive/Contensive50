@@ -1,15 +1,48 @@
 ﻿
 namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string onblur;
-        public string onchange;
-        public string oncontextmenu;
-        public string onfocus;
-        public string oninput;
-        public string oninvalid;
-        public string onreset;
-        public string onsearch;
-        public string onselect;
-        public string onsubmit;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onblur { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onchange { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncontextmenu { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onfocus { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oninput { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oninvalid { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onreset { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onsearch { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onselect { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onsubmit { get; set; }
     }
 }
