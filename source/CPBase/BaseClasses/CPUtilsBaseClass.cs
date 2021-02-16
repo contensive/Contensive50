@@ -91,15 +91,15 @@ namespace Contensive.BaseClasses {
             /// <summary>
             /// the content for the record (metadata that describes the table)
             /// </summary>
-            public string contentName;
+            public string contentName { get; set; }
             /// <summary>
             /// record's id
             /// </summary>
-            public int recordId;
+            public int recordId { get; set; }
             /// <summary>
             /// field name
             /// </summary>
-            public string fieldName;
+            public string fieldName { get; set; }
         }
         /// <summary>
         /// When an addon is execute, this object describes the environment in which the addon will be used.
@@ -134,7 +134,7 @@ namespace Contensive.BaseClasses {
             /// Optional. If included, this is the id value of a record in the Wrappers content and that wrapper will be added to the addon return result.
             /// </summary>
             /// <returns></returns>
-            public int wrapperID { get; set; } = 0;
+            public int wrapperID { get; set; }
             /// <summary>
             /// Optional. If included, the addon will be wrapped with a div and this will be the html Id value of the div. May be used to customize the resulting html styles.
             /// </summary>
@@ -149,34 +149,34 @@ namespace Contensive.BaseClasses {
             /// Optional. If true, this addon is called because it was a dependancy, and can only be called once within a document.
             /// </summary>
             /// <returns></returns>
-            public bool isIncludeAddon { get; set; } = false;
+            public bool isIncludeAddon { get; set; }
             /// <summary>
             /// Optional. If set true, the addon being called will be delivered as ah html document, with head, body and html tags. This forces the addon's htmlDocument setting.
             /// </summary>
             /// <returns></returns>
-            public bool forceHtmlDocument { get; set; } = false;
+            public bool forceHtmlDocument { get; set; }
             /// <summary>
             /// When true, the environment is run from the task subsystem, without a UI. Assemblies from base collection run from program files. Addon return is ignored.
             /// </summary>
-            public bool backgroundProcess { get; set; } = false;
+            public bool backgroundProcess { get; set; }
             /// <summary>
             /// When true, an addon's javascript will be put in the head. This also forces javascript for all dependant addons to the head.
             /// </summary>
-            public bool forceJavascriptToHead { get; set; } = false;
+            public bool forceJavascriptToHead { get; set; }
             //
             // todo - deprecate personalizationPeopleId - execute against the current session context
             /// <summary>
             /// Deprecated.  execute against the current session context
             /// </summary>
             /// <returns></returns>
-            public int personalizationPeopleId { get; set; } = 0;
+            public int personalizationPeopleId { get; set; }
             //
             // todo - deprecate personalizationPeopleId - execute against the current session context
             /// <summary>
             /// Deprecated.  execute against the current session context
             /// </summary>
             /// <returns></returns>
-            public bool personalizationAuthenticated { get; set; } = false;
+            public bool personalizationAuthenticated { get; set; }
         }
         //
         //====================================================================================================

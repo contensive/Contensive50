@@ -176,7 +176,7 @@ namespace Contensive.Processor.Controllers {
                 int ContentID = 0;
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 string iContentName;
-                string SQL;
+                string sql;
                 bool FoundMenuTable = false;
                 string appName;
                 CPCSBaseClass cs = cp.CSNew();
@@ -184,8 +184,8 @@ namespace Contensive.Processor.Controllers {
                 appName = cp.Site.Name;
                 iContentName = ContentName;
                 if (iContentName != "") {
-                    SQL = "select id from cccontent where name=" + cp.Db.EncodeSQLText(iContentName);
-                    if (cs.OpenSQL(SQL))
+                    sql = "select id from cccontent where name=" + cp.Db.EncodeSQLText(iContentName);
+                    if (cs.OpenSQL(sql))
                         ContentID = cs.GetInteger("id");
                     cs.Close();
                 }
@@ -196,8 +196,8 @@ namespace Contensive.Processor.Controllers {
                     // Build table lookup
                     // 
                     Dictionary<int, TableClass> tables = new Dictionary<int, TableClass>();
-                    SQL = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID";
-                    if (cs.OpenSQL(SQL)) {
+                    sql = "select T.ID,T.Name as TableName,D.Name as DataSourceName from ccTables T Left Join ccDataSources D on D.ID=T.DataSourceID";
+                    if (cs.OpenSQL(sql)) {
                         do {
                             TableClass table = new TableClass();
                             table.tableName = cs.GetText("TableName");
@@ -213,8 +213,8 @@ namespace Contensive.Processor.Controllers {
                     // Build SortMethod lookup
                     // 
                     Dictionary<int, string> sorts = new Dictionary<int, string>();
-                    SQL = "select ID,Name from ccSortMethods";
-                    if (cs.OpenSQL(SQL)) {
+                    sql = "select ID,Name from ccSortMethods";
+                    if (cs.OpenSQL(sql)) {
                         do {
                             sorts.Add(cs.GetInteger("id"), cs.GetText("name"));
                             cs.GoNext();
@@ -226,8 +226,8 @@ namespace Contensive.Processor.Controllers {
                     // Build groups lookup
                     // 
                     Dictionary<int, string> groups = new Dictionary<int, string>();
-                    SQL = "select ID,Name from ccGroups";
-                    if (cs.OpenSQL(SQL)) {
+                    sql = "select ID,Name from ccGroups";
+                    if (cs.OpenSQL(sql)) {
                         do {
                             groups.Add(cs.GetInteger("id"), cs.GetText("name"));
                             cs.GoNext();
@@ -238,9 +238,9 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // Build Content lookup
                     // 
-                    SQL = "select id,name from ccContent";
+                    sql = "select id,name from ccContent";
                     Dictionary<int, string> contents = new Dictionary<int, string>();
-                    if (cs.OpenSQL(SQL)) {
+                    if (cs.OpenSQL(sql)) {
                         do {
                             contents.Add(cs.GetInteger("id"), cs.GetText("name"));
                             cs.GoNext();
@@ -274,11 +274,11 @@ namespace Contensive.Processor.Controllers {
                     // select the content
                     // 
                     if (ContentID != 0)
-                        SQL = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                        sql = "select " + ContentSelectList + " from ccContent where (id=" + ContentID + ")and(contenttableid is not null)and(contentcontrolid is not null) order by id";
                     else
-                        SQL = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
+                        sql = "select " + ContentSelectList + " from ccContent where (name<>'')and(name is not null)and(contenttableid is not null)and(contentcontrolid is not null) order by id";
                     CPCSBaseClass csContent = cp.CSNew();
-                    if (csContent.OpenSQL(SQL)) {
+                    if (csContent.OpenSQL(sql)) {
                         // 
                         // ----- <cdef>
                         // 
@@ -357,12 +357,8 @@ namespace Contensive.Processor.Controllers {
                             sb.Append(" IconWidth=\"" + GetRSXMLAttribute(csContent, "IconWidth") + "\"");
                             sb.Append(" IconSprites=\"" + GetRSXMLAttribute(csContent, "IconSprites") + "\"");
                             // 
-                            // 
-                            if (true)
-                                // 
-                                // Add IsBaseContent
-                                // 
-                                sb.Append(" isbasecontent=\"" + GetRSXMLAttribute(csContent, "IsBaseContent") + "\"");
+                            // -- Add IsBaseContent
+                            sb.Append(" isbasecontent=\"" + GetRSXMLAttribute(csContent, "IsBaseContent") + "\"");
                         }
                         // 
                         if (true)
@@ -375,20 +371,20 @@ namespace Contensive.Processor.Controllers {
                         // create output
                         // 
                         if (ContentID != 0)
-                            SQL = "select " + FieldSelectList + ""
+                            sql = "select " + FieldSelectList + ""
                                 + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
                                 + " where (f.Type<>0)and(f.contentid=" + ContentID + ")"
                                 + "";
                         else
-                            SQL = "select " + FieldSelectList + ""
+                            sql = "select " + FieldSelectList + ""
                             + " from ccfields f left join ccfieldhelp h on h.fieldid=f.id"
                             + " where (f.Type<>0)"
                             + "";
                         if (!IncludeBaseFields)
-                            SQL = SQL + " and ((f.IsBaseField is null)or(f.IsBaseField=0))";
-                        SQL = SQL + " order by f.contentid,f.editTab,f.editSortPriority,f.id";
+                            sql += " and ((f.IsBaseField is null)or(f.IsBaseField=0))";
+                        sql += " order by f.contentid,f.editTab,f.editSortPriority,f.id";
                         CPCSBaseClass CFields = cp.CSNew();
-                        if ((CFields.OpenSQL(SQL))) {
+                        if ((CFields.OpenSQL(sql))) {
                             fieldId = 0;
                             do {
                                 LastFieldID = fieldId;
@@ -465,43 +461,39 @@ namespace Contensive.Processor.Controllers {
                                         // 
                                         HelpCnt = 0;
                                         HelpDefault = CFields.GetText("helpcustom");
-                                        if (HelpDefault == "")
+                                        if (string.IsNullOrEmpty(HelpDefault)) {
                                             HelpDefault = CFields.GetText("helpdefault");
-                                        if (HelpDefault != "") {
-                                            sb.Append(System.Environment.NewLine + "\t" + "\t" + "\t" + "<HelpDefault>" + EncodeCData(HelpDefault) + "</HelpDefault>");
-                                            HelpCnt = HelpCnt + 1;
                                         }
-                                        // HelpCustom = cfields.getText("helpcustom")
-                                        // If HelpCustom <> "" Then
-                                        // sb.Append( vbCrLf & vbTab & vbTab & vbTab & "<HelpCustom>" & HelpCustom & "</HelpCustom>")
-                                        // HelpCnt = HelpCnt + 1
-                                        // End If
-                                        if (HelpCnt > 0)
+                                        if (!string.IsNullOrEmpty(HelpDefault)) {
+                                            sb.Append(System.Environment.NewLine + "\t" + "\t" + "\t" + "<HelpDefault>" + EncodeCData(HelpDefault) + "</HelpDefault>");
+                                            HelpCnt += 1;
+                                        }
+                                        if (HelpCnt > 0) {
                                             sb.Append(System.Environment.NewLine + "\t" + "\t");
+                                        }
                                         sb.Append("</Field>");
                                     }
-
-                                    FieldCnt = FieldCnt + 1;
+                                    FieldCnt += 1;
                                 }
-
                                 CFields.GoNext();
                             }
                             while (CFields.OK());
                         }
                         CFields.Close();
-                        // 
-                        if (FieldCnt > 0)
-                            sb.Append(System.Environment.NewLine + "\t");
+                        if (FieldCnt > 0) {
+                            sb.Append(Environment.NewLine + "\t");
+                        }
                         sb.Append("</CDef>");
                     }
                     csContent.Close();
-                    if (ContentName == "") {
+                    if (string.IsNullOrEmpty(ContentName)) {
                         // 
                         // Add other areas of the CDef file
                         // 
                         sb.Append(GetXMLContentDefinition_SQLIndexes());
-                        if (FoundMenuTable)
+                        if (FoundMenuTable) {
                             sb.Append(GetXMLContentDefinition_AdminMenus());
+                        }
                     }
                     const string ApplicationCollectionGuid = "{C58A76E2-248B-4DE8-BF9C-849A960F79C6}";
                     const string CollectionFileRootNode = "collection";
@@ -1009,23 +1001,45 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// get attribute
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Found"></param>
+        /// <param name="Node"></param>
+        /// <param name="Name"></param>
+        /// <param name="DefaultIfNotFound"></param>
+        /// <returns></returns>
         public static double getXMLAttributeNumber(CoreController core, ref bool Found, XmlNode Node, string Name, string DefaultIfNotFound) {
             return encodeNumber(getXMLAttribute(core, ref Found, Node, Name, DefaultIfNotFound));
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// get attribute
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Found"></param>
+        /// <param name="Node"></param>
+        /// <param name="Name"></param>
+        /// <param name="DefaultIfNotFound"></param>
+        /// <returns></returns>
         public static bool getXMLAttributeBoolean(CoreController core, ref bool Found, XmlNode Node, string Name, bool DefaultIfNotFound) {
             return GenericController.encodeBoolean(getXMLAttribute(core, ref Found, Node, Name, encodeText(DefaultIfNotFound)));
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// get attribute
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="Found"></param>
+        /// <param name="Node"></param>
+        /// <param name="Name"></param>
+        /// <param name="DefaultIfNotFound"></param>
+        /// <returns></returns>
         public static int getXMLAttributeInteger(CoreController core, ref bool Found, XmlNode Node, string Name, int DefaultIfNotFound) {
             return GenericController.encodeInteger(getXMLAttribute(core, ref Found, Node, Name, DefaultIfNotFound.ToString()));
         }
-
-
     }
 }

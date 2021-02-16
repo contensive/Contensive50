@@ -37,7 +37,7 @@ namespace Contensive.Processor.Controllers {
                     return "";
                 // 
                 // -- argument testing, width and height must be >=0
-                if ((holeHeight < 0) | (holeWidth < 0)) {
+                if ((holeHeight < 0) || ( holeWidth < 0)) {
                     LogController.logError(core, new ArgumentException("Image resize/crop size must be >0, width [" + holeWidth + "], height [" + holeHeight + "]"));
                     return imagePathFilename.Replace(@"\", "/");
                 }
@@ -101,15 +101,16 @@ namespace Contensive.Processor.Controllers {
                 using (Image image = Image.Load(core.cdnFiles.localAbsRootPath + imagePathFilename.Replace("/", @"\"))) {
                     // 
                     // -- if image load issue, return un-resized
-                    if ((image.Width.Equals(0) | image.Height.Equals(0)))
+                    if (image.Width.Equals(0) || image.Height.Equals(0)) {
                         return imagePathFilename.Replace(@"\", "/");
+                    }
                     // 
                     // -- determine the scale ratio for each axis
                     double widthRatio = holeWidth / (double)image.Width;
                     double heightRatio = holeHeight / (double)image.Height;
                     // 
                     // -- determine scale-up (grow) or scale-down (shrink), if either ratio > 1, scale up
-                    bool scaleUp = (widthRatio > 1) | (heightRatio > 1);
+                    bool scaleUp = (widthRatio > 1) || (heightRatio > 1);
                     // 
                     // -- determine scale ratio based on scapeup, width and height ratio
                     bool resizeToWidth;
@@ -123,19 +124,19 @@ namespace Contensive.Processor.Controllers {
                         resizeToWidth = widthRatio > heightRatio;
                     // 
                     // -- determine the final size of the resized image (to be cropped next)
-                    SixLabors.ImageSharp.Size finalResizedImageSize;
+                    Size finalResizedImageSize;
                     if (resizeToWidth)
                         // 
                         // -- resize to width
                         finalResizedImageSize = new SixLabors.ImageSharp.Size() {
                             Width = holeWidth,
-                            Height = System.Convert.ToInt32(image.Height * widthRatio)
+                            Height = Convert.ToInt32(image.Height * widthRatio)
                         };
                     else
                         // 
                         // -- resize to height
                         finalResizedImageSize = new SixLabors.ImageSharp.Size() {
-                            Width = System.Convert.ToInt32(image.Width * heightRatio),
+                            Width = Convert.ToInt32(image.Width * heightRatio),
                             Height = holeHeight
                         };
                     if ((finalResizedImageSize.Height >= image.Height)) {
@@ -149,7 +150,7 @@ namespace Contensive.Processor.Controllers {
                             // 
                             // -- use image width, crop off overflow height
                             cropWidth = image.Width;
-                            cropHeight = System.Convert.ToInt32(image.Width * holeHeight / (double)holeWidth);
+                            cropHeight = Convert.ToInt32(image.Width * holeHeight / (double)holeWidth);
                             cropRectangle.X = 0;
                             cropRectangle.Y = System.Convert.ToInt32((image.Height - cropHeight) / (double)2);
                             cropRectangle.Width = cropWidth;
@@ -158,7 +159,7 @@ namespace Contensive.Processor.Controllers {
                             // 
                             // -- use image height, crop off overflow width
                             cropHeight = image.Height;
-                            cropWidth = System.Convert.ToInt32(image.Height * holeWidth / (double)holeHeight);
+                            cropWidth = Convert.ToInt32(image.Height * holeWidth / (double)holeHeight);
                             cropRectangle.X = System.Convert.ToInt32((image.Width - cropWidth) / (double)2);
                             cropRectangle.Y = 0;
                             cropRectangle.Width = cropWidth;

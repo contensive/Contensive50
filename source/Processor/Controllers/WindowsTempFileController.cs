@@ -65,6 +65,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// Read the temp file
         /// </summary>
+        /// <param name="cp"></param>
         /// <param name="dosAbspathFilename"></param>
         public static void readFile(CoreController cp, string dosAbspathFilename) {
             try {
