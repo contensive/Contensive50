@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using UAParser;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
 //
@@ -120,12 +121,6 @@ namespace Contensive.Processor.Controllers {
                 return visit.visitAuthenticated;
             }
         }
-        //
-        //====================================================================================================
-        /// <summary>
-        /// browser is identified as a bot, and is not on the friendly-bot list
-        /// </summary>
-        public bool visitBadBot { get; set; }
         //
         //====================================================================================================
         /// <summary>
@@ -324,7 +319,6 @@ namespace Contensive.Processor.Controllers {
                             resultSessionContext.visit.name = "User";
                         }
                         resultSessionContext.visit.startTime = core.doc.profileStartTime;
-                        resultSessionContext.visit.browser = core.webServer.requestBrowser.substringSafe(0, 254);
                         resultSessionContext.visit.remote_addr = core.webServer.requestRemoteIP;
                         //
                         // -- setup referrer
@@ -345,32 +339,25 @@ namespace Contensive.Processor.Controllers {
                             resultSessionContext.visit.refererPathPage = resultSessionContext.visit.refererPathPage.substringSafe(0, 255);
                         }
                         //
+                        // -- setup browser
                         if (string.IsNullOrEmpty(core.webServer.requestBrowser)) {
                             //
                             // blank browser, Blank-Browser-Bot
                             //
                             resultSessionContext.visit.name = "Blank-Browser-Bot";
                             resultSessionContext.visit.bot = true;
-                            resultSessionContext.visitBadBot = false;
                             resultSessionContext.visit.mobile = false;
                             resultSessionContext.visit.browser = string.Empty;
                         } else {
                             //
-                            // -- mobile detect
-                            switch (resultSessionContext.visitor.forceBrowserMobile) {
-                                case 1: {
-                                        resultSessionContext.visit.mobile = true;
-                                        break;
-                                    }
-                                case 2: {
-                                        resultSessionContext.visit.mobile = false;
-                                        break;
-                                    }
-                                default: {
-                                        resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
-                                        break;
-                                    }
-                            }
+                            // -- valid user-agent
+                            var uaParser = Parser.GetDefault();
+                            ClientInfo userAgent = uaParser.Parse(core.webServer.requestBrowser);
+                            //
+                            resultSessionContext.visit.browser = core.webServer.requestBrowser.substringSafe(0, 254);
+                            resultSessionContext.visit.name = userAgent.Device.IsSpider ? userAgent.Device.Family + " " + userAgent.UA.Family : "user";
+                            resultSessionContext.visit.bot = userAgent.Device.IsSpider;
+                            resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
                         }
                         //
                         // -- new visit, update the persistant visitor cookie

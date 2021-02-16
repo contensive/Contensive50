@@ -1,11 +1,12 @@
 ﻿
+using Contensive.BaseClasses;
 using System;
 using System.Linq;
-using System.Collections.Generic;
-using Contensive.BaseClasses;
 
 namespace Contensive.Models.Db {
-    //
+    /// <summary>
+    /// Auditing table to track each visit (=session)
+    /// </summary>
     public class VisitModel : DbBaseModel {
         //
         //====================================================================================================
@@ -15,16 +16,41 @@ namespace Contensive.Models.Db {
         public static DbBaseTableMetadataModel tableMetadata { get; } = new DbBaseTableMetadataModel("visits", "ccvisits", "default", false);
         //
         //====================================================================================================
+        /// <summary>
+        /// if true, this visit is from a bot
+        /// </summary>
         public bool bot { get; set; }
+        /// <summary>
+        /// the browser string prsented by the client browser during the visit
+        /// </summary>
         public string browser { get; set; }        
+        /// <summary>
+        /// true if cookie support verified (second hit)
+        /// </summary>
         public bool cookieSupport { get; set; }
+        /// <summary>
+        /// flag can be used to exclude this visit from analytics
+        /// </summary>
         public bool excludeFromAnalytics { get; set; }
-        //public string http_from { get; set; }
+        /// <summary>
+        /// the refering page on the first hit from the visit
+        /// </summary>
         public string http_referer { get; set; }
-        //public string http_via { get; set; }
+        /// <summary>
+        /// The datetime of the last hit during the visit
+        /// </summary>
         public DateTime? lastVisitTime { get; set; }
+        /// <summary>
+        /// count of login attempts during this visit
+        /// </summary>
         public int loginAttempts { get; set; }
+        /// <summary>
+        /// The people record associated with the visit. Can change during authentication
+        /// </summary>
         public int memberId { get; set; }
+        /// <summary>
+        /// true if this visit created a new people record
+        /// </summary>
         public bool memberNew { get; set; }
         public bool mobile { get; set; }
         public int pageVisits { get; set; }

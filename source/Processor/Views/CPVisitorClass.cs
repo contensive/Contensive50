@@ -29,18 +29,12 @@ namespace Contensive.Processor {
         /// <summary>
         /// set or get if the browser is forced mobile, once set true (mobile) is cannot be set back to browser
         /// </summary>
+        [Obsolete("Deprecated.")]
         public override bool ForceBrowserMobile {
             get {
-                // FBM==1, sets visit to mobile, FBM==2, sets visit to non-mobile, else mobile determined by browser string
-                return (cp.core.session.visitor.forceBrowserMobile == 1);
+                return false;
             }
-            set {
-                if (value) {
-                    cp.core.session.visitor.forceBrowserMobile = 1;
-                } else {
-                    cp.core.session.visitor.forceBrowserMobile = 2;
-                };
-            }
+            set { }
         }
         //
         //=======================================================================================================
@@ -311,12 +305,12 @@ namespace Contensive.Processor {
         protected bool disposed_visitor;
         // Do not change or add Overridable to these methods.
         // Put cleanup code in Dispose(ByVal disposing As Boolean).
-        public void Dispose()  {
+        public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~CPVisitorClass()  {
+        ~CPVisitorClass() {
             Dispose(false);
         }
         #endregion

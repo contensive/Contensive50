@@ -13,12 +13,6 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         /// <summary>
-        /// set the visit property to force the mobile state true
-        /// </summary>
-        public abstract bool ForceBrowserMobile { get; set; }
-        //
-        //====================================================================================================
-        /// <summary>
         /// return the visitor property from its key. If missing, set and return the defaultValue.
         /// </summary>
         /// <param name="key"></param>
@@ -205,27 +199,69 @@ namespace Contensive.BaseClasses {
         //
         //====================================================================================================
         // deprecated
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="targetVisitorId"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate type.")]
         public abstract string GetProperty(string key, string defaultValue, int targetVisitorId);
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate type.")]
         public abstract string GetProperty(string key, string defaultValue);
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate type.")]
         public abstract string GetProperty(string key);
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate defaultvalue type.")]
         public abstract bool GetBoolean(string key, string defaultValue);
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate defaultvalue type.")]
         public abstract DateTime GetDate(string key, string defaultValue);
-        //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate defaultvalue type.")]
         public abstract int GetInteger(string key, string defaultValue);
         //
+        /// <summary>
+        /// Use the Get that returns the appropriate defaultvalue type.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
         [Obsolete("Use the Get that returns the appropriate defaultvalue type.")]
         public abstract double GetNumber(string key, string defaultValue);
+        //
+        /// <summary>
+        /// set the visit property to force the mobile state true
+        /// </summary>
+        [Obsolete("Deprecated.", false)]
+        public abstract bool ForceBrowserMobile { get; set; }
     }
 }
 
