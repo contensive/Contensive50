@@ -30,7 +30,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     core.db.executeNonQuery(sql);
                 } catch (Exception ex) {
                     LogController.logError(core, ex);
-                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                     throw;
                 }
             }
@@ -59,11 +59,10 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     string sql = "delete from ccProperties where (TypeID=1)and(dateAdded<dateadd(hour, -24, getdate()))";
                     core.db.sqlCommandTimeout = 180;
                     core.db.executeNonQuery(sql);
-                    //Task.Run(() => core.db.executeNonQueryAsync(sql));
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                 throw;
             }
         }

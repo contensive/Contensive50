@@ -30,12 +30,7 @@ namespace Contensive.Processor {
         /// set or get if the browser is forced mobile, once set true (mobile) is cannot be set back to browser
         /// </summary>
         [Obsolete("Deprecated.")]
-        public override bool ForceBrowserMobile {
-            get {
-                return false;
-            }
-            set { }
-        }
+        public override bool ForceBrowserMobile { get; set; }
         //
         //=======================================================================================================
         /// <summary>

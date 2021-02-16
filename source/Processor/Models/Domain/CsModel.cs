@@ -1482,7 +1482,6 @@ namespace Contensive.Processor {
                             string sql = "update " + this.contentMeta.tableName + " set " + sqlUpdate + " where id=" + id + ";";
                             if (asyncSave) {
                                 db.executeNonQuery(sql);
-                                //Task.Run(() => db.executeNonQueryAsync(sql));
                             } else {
                                 db.executeNonQuery(sql);
                             }

@@ -338,7 +338,6 @@ namespace Contensive.Processor.Controllers {
                     executeNonQuery(sql);
                 } else {
                     core.db.executeNonQuery(sql);
-                    //Task.Run(() => executeNonQueryAsync(SQL));
                 }
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "] updating table [" + tableName + "], criteria [" + criteria + "], dataSourceName [" + dataSourceName + "]", ex));

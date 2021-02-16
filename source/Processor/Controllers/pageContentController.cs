@@ -290,7 +290,6 @@ namespace Contensive.Processor.Controllers {
                                 int Viewings = csData.getInteger("Viewings") + 1;
                                 sql = "update ccLinkForwards set Viewings=" + Viewings + " where ID=" + csData.getInteger("ID");
                                 core.db.executeNonQuery(sql);
-                                //Task.Run(() => core.db.executeNonQueryAsync(sql));
                                 tmpLink = csData.getText("DestinationLink");
                                 if (!string.IsNullOrEmpty(tmpLink)) {
                                     //

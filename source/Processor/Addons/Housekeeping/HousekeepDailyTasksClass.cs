@@ -62,7 +62,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 ActivityLogClass.executeDailyTasks(core, env);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                 throw;
             }
         }

@@ -25,7 +25,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                 throw;
 
             }
@@ -50,7 +50,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                     Doc.LoadXml(collectionFileContent);
                 } catch (Exception ex) {
                     LogController.logError(core, ex);
-                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                    LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                     throw;
                 }
                 if (loadOK) {
@@ -166,7 +166,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 LogController.logInfo(core, "Exiting RegisterAddonFolder");
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                 throw;
 
             }

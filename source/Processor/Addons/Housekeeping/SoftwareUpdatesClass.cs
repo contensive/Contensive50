@@ -50,7 +50,7 @@ namespace Contensive.Processor.Addons.Housekeeping {
                 return loadOK;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
-                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex.ToString() + "]");
+                LogController.logAlarm(core, "Housekeep, exception, ex [" + ex + "]");
                 throw;
             }
         }
