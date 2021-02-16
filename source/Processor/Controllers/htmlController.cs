@@ -23,7 +23,12 @@ namespace Contensive.Processor.Controllers {
         private readonly CoreController core;
         //
         // ====================================================================================================
-        //
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="attributes"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, HtmlAttributesA attributes) {
             StringBuilder result = new StringBuilder("<a");
             result.Append((string.IsNullOrWhiteSpace(attributes.download)) ? "" : "" + " download=\"" + encodeHtml(attributes.download) + "\"");
@@ -62,11 +67,50 @@ namespace Contensive.Processor.Controllers {
             result.Append(getHtmlAttributesGlobal(attributes));
             return result + ">" + innerHtml + "</a>";
         }
-        //
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="href"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, string href) => a(innerHtml, href, "", "", "", "");
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="href"></param>
+        /// <param name="htmlClass"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, string href, string htmlClass) => a(innerHtml, href, htmlClass, "", "", "");
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="href"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, string href, string htmlClass, string htmlId) => a(innerHtml, href, htmlClass, htmlId, "", "");
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="href"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="tabIndex"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex) => a(innerHtml, href, htmlClass, htmlId, tabIndex, "");
+        /// <summary>
+        /// tag
+        /// </summary>
+        /// <param name="innerHtml"></param>
+        /// <param name="href"></param>
+        /// <param name="htmlClass"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="tabIndex"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
         public static string a(string innerHtml, string href, string htmlClass, string htmlId, string tabIndex, string target) {
             var tag = new StringBuilder("<a");
             if (!String.IsNullOrWhiteSpace(href)) { tag.Append(" href=\"").Append(href).Append("\""); }
@@ -100,7 +144,12 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="AllowLogin"></param>
+        /// <param name="AllowTools"></param>
+        /// <returns></returns>
         public string getHtmlBodyEnd(bool AllowLogin, bool AllowTools) {
             List<string> result = new List<string>();
             try {
@@ -161,14 +210,34 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Select list from a content
+        /// </summary>
+        /// <param name="MenuName"></param>
+        /// <param name="CurrentValue"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="Criteria"></param>
+        /// <param name="NoneCaption"></param>
+        /// <param name="htmlId"></param>
+        /// <returns></returns>
         public string selectFromContent(string MenuName, int CurrentValue, string ContentName, string Criteria = "", string NoneCaption = "", string htmlId = "") {
             bool tempVar = false;
             return selectFromContent(MenuName, CurrentValue, ContentName, Criteria, NoneCaption, htmlId, ref tempVar, "");
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// Select list from a content
+        /// </summary>
+        /// <param name="MenuName"></param>
+        /// <param name="CurrentValue"></param>
+        /// <param name="ContentName"></param>
+        /// <param name="Criteria"></param>
+        /// <param name="NoneCaption"></param>
+        /// <param name="htmlId"></param>
+        /// <param name="return_IsEmptyList"></param>
+        /// <param name="HtmlClass"></param>
+        /// <returns></returns>
         public string selectFromContent(string MenuName, int CurrentValue, string ContentName, string Criteria, string NoneCaption, string htmlId, ref bool return_IsEmptyList, string HtmlClass = "") {
             string result = "";
             try {
@@ -2004,12 +2073,6 @@ namespace Contensive.Processor.Controllers {
                                 break;
                             case ButtonApply: {
                                     //
-                                    // Apply
-                                    //string requestUsername = core.cpParent.Doc.GetText(legacyFormSn + "username");
-                                    //string requestPassword = core.cpParent.Doc.GetText(legacyFormSn + "password");
-                                    //bool passwordRequestValid = core.cpParent.Doc.IsProperty(legacyFormSn + "password");
-                                    //LoginController.processLoginFormDefault(core, requestUsername, requestPassword, passwordRequestValid);
-                                    //
                                     // ----- AllowAdminLinks
                                     //
                                     core.visitProperty.setProperty("AllowEditing", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowEditing")));
@@ -2625,7 +2688,17 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="stylePanel"></param>
+        /// <param name="styleHilite"></param>
+        /// <param name="styleShadow"></param>
+        /// <param name="width"></param>
+        /// <param name="padding"></param>
+        /// <param name="heightMin"></param>
+        /// <returns></returns>
         public string getPanel(string content, string stylePanel, string styleHilite, string styleShadow, string width, int padding, int heightMin) {
             string ContentPanelWidth = "";
             string contentPanelWidthStyle = "";
