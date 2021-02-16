@@ -1,13 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string onkeydown;
-        public string onkeypress;
-        public string onkeyup;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onkeydown { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onkeypress { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onkeyup { get; set; }
     }
 }

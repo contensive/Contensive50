@@ -1,33 +1,95 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Contensive.CPBase.BaseModels {
+﻿namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string onabort;
-        public string oncanplay;
-        public string oncanplaythrough;
-        public string oncuechange;
-        public string ondurationchange;
-        public string onemptied;
-        public string onended;
-        //public string onerror;
-        public string onloadeddata;
-        public string onloadedmetadata;
-        public string onloadstart;
-        public string onpause;
-        public string onplay;
-        public string onplaying;
-        public string onprogress;
-        public string onratechange;
-        public string onseeked;
-        public string onseeking;
-        public string onstalled;
-        public string onsuspend;
-        public string ontimeupdate;
-        public string onvolumechange;
-        public string onwaiting;
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onabort { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncanplay { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncanplaythrough { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string oncuechange { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondurationchange { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onemptied { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onended { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onloadeddata { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onloadedmetadata { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onloadstart { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onpause { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onplay { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onplaying { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onprogress { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onratechange { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onseeked { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onseeking { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onstalled { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onsuspend { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ontimeupdate { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onvolumechange { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onwaiting { get; set; }
     }
 }

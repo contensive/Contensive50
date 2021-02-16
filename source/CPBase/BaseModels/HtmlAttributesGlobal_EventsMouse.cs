@@ -1,19 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Contensive.CPBase.BaseModels {
+    /// <summary>
+    /// 
+    /// </summary>
     public partial class HtmlAttributesGlobal {
-        public string onclick;
-        public string ondblclick;
-        public string onmousedown;
-        public string onmousemove;
-        public string onmouseout;
-        public string onmouseover;
-        public string onmouseup;
-        public string onmousewheel;
-        public string onwheel;
+        public string onclick { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string ondblclick { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmousedown { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmousemove { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmouseout { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmouseover { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmouseup { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onmousewheel { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+        public string onwheel { get; set; }
     }
 }
