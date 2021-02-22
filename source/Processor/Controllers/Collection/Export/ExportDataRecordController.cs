@@ -2,96 +2,80 @@
 using System.Collections.Generic;
 using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
+using Contensive.Processor.Models.Domain;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// Control export of data records
+    /// </summary>
     public static class ExportDataRecordController {
         // 
         // ====================================================================================================
-        // 
-        public static string getNodeList(CPBaseClass cp, string DataRecordList, List<string> tempPathFileList, string tempExportPath) {
+        /// <summary>
+        /// Create XML string for the Data node of the collection file from DataRecordList (list from collection record data-records).
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="dataRecordObjList">crlf delimited list of records to export. Each line is either the name of hte content, or content-record-guid</param>
+        /// <param name="tempPathFileList"></param>
+        /// <param name="tempExportPath"></param>
+        /// <returns></returns>
+        public static string getNodeList(CPBaseClass cp, List<CollectionDataRecordModel> dataRecordObjList, List<string> tempPathFileList, string tempExportPath) {
             try {
-                string result = "";
-                if (DataRecordList != "") {
-                    result += System.Environment.NewLine + "\t" + "<DataRecordList>" + ExportController.encodeCData( DataRecordList) + "</DataRecordList>";
-                    string[] DataRecords = Strings.Split(DataRecordList, System.Environment.NewLine);
-                    string RecordNodes = "";
-                    for (var Ptr = 0; Ptr <= Information.UBound(DataRecords); Ptr++) {
+                var result = new StringBuilder();
+                if (true) {
+                    var RecordNodes = new StringBuilder();
+                    foreach (CollectionDataRecordModel dataRecord in dataRecordObjList) {
+                        //
+                        // -- export one line from the data-record
                         string FieldNodes = "";
-                        string DataRecordName = "";
-                        string DataRecordGuid = "";
-                        string DataRecord = DataRecords[Ptr];
-                        if (DataRecord != "") {
-                            string[] DataSplit = Strings.Split(DataRecord, ",");
-                            if (Information.UBound(DataSplit) >= 0) {
-                                string DataContentName = Strings.Trim(DataSplit[0]);
-                                int DataContentId = cp.Content.GetID(DataContentName);
+                        if (true) {
+                            if (true) {
+                                int DataContentId = cp.Content.GetID(dataRecord.contentName);
                                 if (DataContentId <= 0)
-                                    RecordNodes = ""
-                                        + RecordNodes
-                                        + System.Environment.NewLine + "\t" + "<!-- data missing, content not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
+                                    RecordNodes.Append ( ""
+                                        + System.Environment.NewLine + "\t"
+                                                + "<!-- data missing, content not found during export, "
+                                                + "content=\"" + dataRecord.contentName + "\" "
+                                                + "guid=\"" + dataRecord.recordGuid + "\" "
+                                                + "name=\"" + dataRecord.recordName + "\" -->");
                                 else {
-                                    bool supportsGuid = cp.Content.IsField(DataContentName, "ccguid");
                                     string Criteria;
-                                    if (Information.UBound(DataSplit) == 0)
+                                    if (!string.IsNullOrEmpty(dataRecord.recordGuid)) {
+                                        // 
+                                        // guid {726ED098-5A9E-49A9-8840-767A74F41D01} format
+                                        Criteria = "ccguid=" + cp.Db.EncodeSQLText(dataRecord.recordGuid);
+                                    } else if (string.IsNullOrEmpty(dataRecord.recordName)) {
+                                        // 
+                                        // name and guid empty, export all records
                                         Criteria = "";
-                                    else {
-                                        string TestString = Strings.Trim(DataSplit[1]);
-                                        if (TestString == "") {
-                                            // 
-                                            // blank is a select all
-                                            // 
-                                            Criteria = "";
-                                            DataRecordName = "";
-                                            DataRecordGuid = "";
-                                        } else if (!supportsGuid) {
-                                            // 
-                                            // if no guid, this is name
-                                            // 
-                                            DataRecordName = TestString;
-                                            DataRecordGuid = "";
-                                            Criteria = "name=" + cp.Db.EncodeSQLText(DataRecordName);
-                                        } else if ((Strings.Len(TestString) == 38) & (Strings.Left(TestString, 1) == "{") & (Strings.Right(TestString, 1) == "}")) {
-                                            // 
-                                            // guid {726ED098-5A9E-49A9-8840-767A74F41D01} format
-                                            // 
-                                            DataRecordGuid = TestString;
-                                            DataRecordName = "";
-                                            Criteria = "ccguid=" + cp.Db.EncodeSQLText(DataRecordGuid);
-                                        } else if ((Strings.Len(TestString) == 36) & (Strings.Mid(TestString, 9, 1) == "-")) {
-                                            // 
-                                            // guid 726ED098-5A9E-49A9-8840-767A74F41D01 format
-                                            // 
-                                            DataRecordGuid = TestString;
-                                            DataRecordName = "";
-                                            Criteria = "ccguid=" + cp.Db.EncodeSQLText(DataRecordGuid);
-                                        } else if ((Strings.Len(TestString) == 32) & (Strings.InStr(1, TestString, " ") == 0)) {
-                                            // 
-                                            // guid 726ED0985A9E49A98840767A74F41D01 format
-                                            // 
-                                            DataRecordGuid = TestString;
-                                            DataRecordName = "";
-                                            Criteria = "ccguid=" + cp.Db.EncodeSQLText(DataRecordGuid);
-                                        } else {
-                                            // 
-                                            // use name
-                                            // 
-                                            DataRecordName = TestString;
-                                            DataRecordGuid = "";
-                                            Criteria = "name=" + cp.Db.EncodeSQLText(DataRecordName);
-                                        }
+                                    } else if ((Strings.Len(dataRecord.recordName) == 36) & (Strings.Mid(dataRecord.recordName, 9, 1) == "-")) {
+                                        // 
+                                        // use name as guid 726ED098-5A9E-49A9-8840-767A74F41D01 format
+                                        Criteria = "ccguid=" + cp.Db.EncodeSQLText(dataRecord.recordName);
+                                    } else if ((Strings.Len(dataRecord.recordName) == 32) & (Strings.InStr(1, dataRecord.recordName, " ") == 0)) {
+                                        // 
+                                        // use name as guid 726ED0985A9E49A98840767A74F41D01 format
+                                        Criteria = "ccguid=" + cp.Db.EncodeSQLText(dataRecord.recordName);
+                                    } else {
+                                        // 
+                                        // use name as-is
+                                        Criteria = "name=" + cp.Db.EncodeSQLText(dataRecord.recordName);
                                     }
                                     using (CPCSBaseClass CSData = cp.CSNew()) {
-                                        if (!CSData.Open(DataContentName, Criteria, "id"))
-                                            RecordNodes = ""
-+ RecordNodes
-+ System.Environment.NewLine + "\t" + "<!-- data missing, record not found during export, content=\"" + DataContentName + "\" guid=\"" + DataRecordGuid + "\" name=\"" + DataRecordName + "\" -->";
+                                        if (!CSData.Open(dataRecord.contentName, Criteria, "id"))
+                                            RecordNodes.Append( ""
+                                                + System.Environment.NewLine + "\t"
+                                                + "<!-- data missing, record not found during export, "
+                                                + "content=\"" + dataRecord.contentName + "\" "
+                                                + "guid=\"" + dataRecord.recordGuid + "\" "
+                                                + "name=\"" + dataRecord.recordName + "\" -->");
                                         else {
                                             // 
                                             // determine all valid fields
                                             // 
                                             int fieldCnt = 0;
-                                            string Sql = "select * from ccFields where contentid=" + DataContentId;
-
+                                            //string Sql = "select * from ccFields where contentid=" + DataContentId;
                                             string fieldLookupListValue = "";
                                             string[] fieldNames = Array.Empty<string>();
                                             int[] fieldTypes = Array.Empty<int>();
@@ -126,7 +110,7 @@ namespace Contensive.Processor.Controllers {
                                                                     }
 
                                                                 default: {
-                                                                        if (FieldTypeNumber == 7) {
+                                                                        if (FieldTypeNumber == (int)CPContentBaseClass.FieldTypeIdEnum.Lookup) {
                                                                             FieldLookupContentID = csFields.GetInteger("Lookupcontentid");
                                                                             fieldLookupListValue = csFields.GetText("LookupList");
                                                                             if (FieldLookupContentID != 0)
@@ -134,24 +118,26 @@ namespace Contensive.Processor.Controllers {
                                                                         }
                                                                         //CPContentBaseClass.FieldTypeIdEnum.File
                                                                         switch (FieldTypeNumber) {
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.File:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileImage:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Lookup:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Boolean:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileCSS:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileText:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileXML:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Currency:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Float:
                                                                             case (int)CPContentBaseClass.FieldTypeIdEnum.Integer:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Date:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Link:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.LongText:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                                                                             case (int)CPContentBaseClass.FieldTypeIdEnum.Text:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.LongText:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Boolean:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Date:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.File:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Lookup:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Currency:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileText:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileImage:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Float:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileCSS:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileXML:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileJavascript:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.Link:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.ResourceLink:
                                                                             case (int)CPContentBaseClass.FieldTypeIdEnum.HTML:
-                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileHTML: {
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileHTML:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.HTMLCode:
+                                                                            case (int)CPContentBaseClass.FieldTypeIdEnum.FileHTMLCode: {
                                                                                     var oldFieldNames = fieldNames;
                                                                                     fieldNames = new string[fieldCnt + 1];
                                                                                     // 
@@ -195,15 +181,15 @@ namespace Contensive.Processor.Controllers {
                                             // 
                                             // output records
                                             // 
-                                            DataRecordGuid = "";
+                                            dataRecord.recordGuid = "";
                                             while (CSData.OK()) {
                                                 FieldNodes = "";
-                                                DataRecordName = CSData.GetText("name");
-                                                if (supportsGuid) {
-                                                    DataRecordGuid = CSData.GetText("ccguid");
-                                                    if (DataRecordGuid == "") {
-                                                        DataRecordGuid = cp.Utils.CreateGuid();
-                                                        CSData.SetField("ccGuid", DataRecordGuid);
+                                                dataRecord.recordName = CSData.GetText("name");
+                                                if (true) {
+                                                    dataRecord.recordGuid = CSData.GetText("ccguid");
+                                                    if (dataRecord.recordGuid == "") {
+                                                        dataRecord.recordGuid = cp.Utils.CreateGuid();
+                                                        CSData.SetField("ccGuid", dataRecord.recordGuid);
                                                     }
                                                 }
                                                 int fieldPtr;
@@ -223,9 +209,9 @@ namespace Contensive.Processor.Controllers {
                                                                     cp.CdnFiles.Copy(pathFilename, tempExportPath + pathFilename, cp.TempFiles);
                                                                     if (!tempPathFileList.Contains(tempExportPath + pathFilename)) {
                                                                         tempPathFileList.Add(tempExportPath + pathFilename);
-                                                                        string path =  FileController.getPath(pathFilename);
+                                                                        string path = FileController.getPath(pathFilename);
                                                                         string filename = FileController.getFilename(pathFilename);
-                                                                        result += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                                                                        result.Append(  System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />");
                                                                     }
                                                                 }
 
@@ -248,7 +234,7 @@ namespace Contensive.Processor.Controllers {
                                                                 // text files
                                                                 // 
                                                                 FieldValue = CSData.GetText(FieldName);
-                                                                FieldValue = ExportController.encodeCData( FieldValue);
+                                                                FieldValue = ExportController.encodeCData(FieldValue);
                                                                 break;
                                                             }
 
@@ -318,17 +304,16 @@ namespace Contensive.Processor.Controllers {
                                                                 // text types
                                                                 // 
                                                                 FieldValue = CSData.GetText(FieldName);
-                                                                FieldValue = ExportController.encodeCData( FieldValue);
+                                                                FieldValue = ExportController.encodeCData(FieldValue);
                                                                 break;
                                                             }
                                                     }
                                                     FieldNodes = FieldNodes + System.Environment.NewLine + "\t" + "<field name=\"" + System.Net.WebUtility.HtmlEncode(FieldName) + "\">" + FieldValue + "</field>";
                                                 }
-                                                RecordNodes = ""
-                                                        + RecordNodes
-                                                        + System.Environment.NewLine + "\t" + "<record content=\"" + System.Net.WebUtility.HtmlEncode(DataContentName) + "\" guid=\"" + DataRecordGuid + "\" name=\"" + System.Net.WebUtility.HtmlEncode(DataRecordName) + "\">"
+                                                RecordNodes.Append( ""
+                                                        + System.Environment.NewLine + "\t" + "<record content=\"" + System.Net.WebUtility.HtmlEncode(dataRecord.contentName) + "\" guid=\"" + dataRecord.recordGuid + "\" name=\"" + System.Net.WebUtility.HtmlEncode(dataRecord.recordName) + "\">"
                                                         + ExportController.tabIndent(cp, FieldNodes)
-                                                        + System.Environment.NewLine + "\t" + "</record>";
+                                                        + System.Environment.NewLine + "\t" + "</record>");
                                                 CSData.GoNext();
                                             }
                                         }
@@ -338,14 +323,13 @@ namespace Contensive.Processor.Controllers {
                             }
                         }
                     }
-                    if (RecordNodes != "")
-                        result = ""
-+ result
-+ System.Environment.NewLine + "\t" + "<data>"
-+ ExportController.tabIndent(cp, RecordNodes)
-+ System.Environment.NewLine + "\t" + "</data>";
+                    if (RecordNodes.Length > 0 )
+                        result.Append( ""
+                            + System.Environment.NewLine + "\t" + "<data>"
+                            + ExportController.tabIndent(cp, RecordNodes.ToString())
+                            + System.Environment.NewLine + "\t" + "</data>");
                 }
-                return result;
+                return result.ToString();
             } catch (Exception ex) {
                 cp.Site.ErrorReport(ex);
                 return string.Empty;

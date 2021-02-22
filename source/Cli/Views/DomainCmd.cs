@@ -1,7 +1,6 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Contensive.Processor.Controllers;
 
 namespace Contensive.CLI {
     //
@@ -14,7 +13,7 @@ namespace Contensive.CLI {
         internal static readonly string  helpText = ""
             + Environment.NewLine
             + Environment.NewLine + "--domain domain-to-be-used-for-application"
-            + Environment.NewLine + "    The domain to be used as the primary domain for the application ( ex --domain mysite.sitefpo.com ). Requires you first set the application with -appname. Requires elevated permissions."
+            + Environment.NewLine + "    The domain to be used as the primary domain for the application ( ex --domain mysite.sitefpo.com ). Requires you first set the application with '-a appname'. Requires elevated permissions."
             + "";
         //
         // ====================================================================================================

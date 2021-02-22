@@ -15,64 +15,101 @@ namespace Contensive.Processor.Models.Domain {
     /// -- saveObject( cp ) - saves instance properties, returns the record id
     /// </summary>
     public class ServerConfigModel : ServerConfigBaseModel {
-        //
-        // -- public properties
-        //
-        // -- set during installation
         /// <summary>
         /// full dos path to the contensive program file installation. 
         /// </summary>
         public override string programFilesPath { get; set; }
-        //
-        // -- control the task runner and task scheduler for the server group
+        /// <summary>
+        /// if true, this instance can run tasks from the task queue
+        /// </summary>
         public override bool allowTaskRunnerService { get; set; }
+        /// <summary>
+        /// if true, instances on this server can schedule tasks (add them to the task queue)
+        /// </summary>
         public override bool allowTaskSchedulerService { get; set; }
+        /// <summary>
+        /// if running tasks, this is the number of concurrent tasks that the task runner
+        /// </summary>
         public override int maxConcurrentTasksPerServer { get; set; }
-        //
-        // -- name for this server group
+        /// <summary>
+        /// name for this server group
+        /// </summary>
         public override string name { get; set; }
-        //
-        // -- If true, use local dotnet memory cache backed by filesystem
+        /// <summary>
+        /// If true, use local dotnet memory cache backed by filesystem
+        /// </summary>
         public override bool enableLocalMemoryCache { get; set; }
-        //
-        // -- if true, used local files to cache, backing up local cache, then remote cache
+        /// <summary>
+        /// if true, used local files to cache, backing up local cache, then remote cache
+        /// </summary>
         public override bool enableLocalFileCache { get; set; }
-        //
-        // -- AWS dotnet elaticcache client wraps enyim, and provides node autodiscovery through the configuration object. this is the srver:port to the config file it uses.
+        /// <summary>
+        /// if true, elasticache is used
+        /// </summary>
         public override bool enableRemoteCache { get; set; }
+        /// <summary>
+        /// AWS elaticcache  server:port
+        /// </summary>
         public override string awsElastiCacheConfigurationEndpoint { get; set; }
-        //
-        // -- includes NLog logging into Enyim. Leave off as it causes performance issues
+        /// <summary>
+        /// includes NLog logging into Enyim. Leave off as it causes performance issues
+        /// </summary>
         public override bool enableEnyimNLog { get; set; }
-        //
-        // -- datasource for the cluster (only sql support for now)
+        /// <summary>
+        /// datasource for the cluster (only sql support for now)
+        /// </summary>
         public override DataSourceTypeEnum defaultDataSourceType { get; set; }
+        /// <summary>
+        /// default datasource endpoint (server:port)
+        /// </summary>
         public override string defaultDataSourceAddress { get; set; }
+        /// <summary>
+        /// default datasource endpoint username
+        /// </summary>
         public override string defaultDataSourceUsername { get; set; }
+        /// <summary>
+        /// default datasource endpoint password
+        /// </summary>
         public override string defaultDataSourcePassword { get; set; }
-        //
-        // -- aws programmatic user for all services
+        /// <summary>
+        /// aws programmatic user for all services. Within the application, this can be over-ridden
+        /// </summary>
         public override string awsAccessKey { get; set; }
+        /// <summary>
+        /// aws programmatic user for all services. Within the application, this can be over-ridden
+        /// </summary>
         public override string awsSecretAccessKey { get; set; }
-        //
-        // -- aws region for this server (default us-east-1)
+        /// <summary>
+        /// aws region for this server (default us-east-1) for all services. Within the application, this can be over-ridden
+        /// </summary>
         public override string awsRegionName { get; set; }
-        //
-        // -- endpoint for cluster files (not sure how it works, maybe this will be an object taht includes permissions, for now an fpo)
+        /// <summary>
+        /// if true, files are stored locally (d-drive, etc.). if false, cdnFiles and wwwFiles are stored on Aws S3 and mirrored locally
+        /// </summary>
         public override bool isLocalFileSystem { get; set; }
+        /// <summary>
+        /// Drive letter for local drive storage. Subfolder is /inetpub/ then the application names
+        /// </summary>
         public override string localDataDriveLetter { get; set; }
+        /// <summary>
+        /// If remote file storage, this is the bucket used for storage. Subfolders are the application names
+        /// </summary>
         public override string awsBucketName { get; set; }
-        //
-        // -- if provided, NLog data will be sent to this CloudWatch LogGroup 
+        /// <summary>
+        /// if provided, NLog data will be sent to this CloudWatch LogGroup 
+        /// </summary>
         public override string awsCloudWatchLogGroup { get; set; }
-        //
-        // -- used by applications to enable/disable features, like 
-        //      - ecommerce batch should only run in production
-        // todo figure out how to expose this, add it to configuration setup
+        /// <summary>
+        /// used by applications to enable/disable features, like  ecommerce batch should only run in production
+        /// </summary>
         public override bool productionEnvironment { get; set; }
-        //
-        // -- List of all apps on this server
+        /// <summary>
+        /// List of all apps on this server
+        /// </summary>
         public Dictionary <string, AppConfigModel> apps { get; set; }
+        /// <summary>
+        /// if true, the connection will be forced secure
+        /// </summary>
         public override bool defaultDataSourceSecure { get; set; }
 
         //

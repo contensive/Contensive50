@@ -198,7 +198,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static bool processLoginFormDefault(CoreController core, string requestUsername, string requestPassword, bool passwordRequestValid) {
             try {
-                if (!core.session.visit.cookieSupport) {
+                if ((!core.session.visit.cookieSupport) && (core.session.visit.pageVisits>1)) {
                     //
                     // -- no cookies
                     ErrorController.addUserError(core, "The login failed because cookies are disabled.");

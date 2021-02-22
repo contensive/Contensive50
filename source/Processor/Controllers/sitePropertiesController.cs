@@ -43,6 +43,20 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
+        /// The site property for the system bounce address
+        /// </summary>
+        public string  emailBounceAddress {
+            get {
+                if (_emailBounceAddress == null) {
+                    _emailBounceAddress = getText("EmailBounceAddress");
+                }
+                return Convert.ToString(_emailBounceAddress);
+            }
+        }
+        private string _emailBounceAddress = null;
+        //
+        //====================================================================================================
+        /// <summary>
         /// if true, add a login icon to the lower right corner
         /// </summary>
         public bool allowLoginIcon {

@@ -7,6 +7,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using Contensive.Processor.Models.Domain;
 using System.Reflection;
+using Amazon.S3;
+using Amazon.S3.Model;
+using System.Collections.Generic;
 
 namespace Contensive.CLI {
     static class NewAppCmd {
@@ -25,7 +28,7 @@ namespace Contensive.CLI {
         /// create a new app. If appname is provided, create the app with defaults. if not appname, prompt for defaults
         /// </summary>
         /// <param name="appName"></param>
-        public static void execute(string appName) {
+        public static async System.Threading.Tasks.Task executeAsync(string appName) {
             try {
                 const string iisDefaultDoc = "default.aspx";
                 string authTokenDefault = "909903";
@@ -179,11 +182,50 @@ namespace Contensive.CLI {
                             appConfig.cdnFileUrl = GenericController.promptForReply("files Url (typically a public folder in CDN website)", "https://s3.amazonaws.com/" + cp.core.serverConfig.awsBucketName + "/" + appConfig.name + "/files/");
                         }
                     }
+                    //
+                    // -- configure local folders
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Create local folders.");
                     setupDirectory(appConfig.localWwwPath);
                     setupDirectory(appConfig.localFilesPath);
                     setupDirectory(appConfig.localPrivatePath);
                     setupDirectory(appConfig.localTempPath);
+                    //
+                    // -- configure remote folders
+                    if (!cp.core.serverConfig.isLocalFileSystem) {
+                        //
+                        // -- update the server's bucket policy to make the remoteFilesPath public
+                        AmazonS3Client s3client = new AmazonS3Client(cp.core.serverConfig.awsAccessKey, cp.core.serverConfig.awsSecretAccessKey);
+                        //
+                        // -- get current policy for this bucket
+                        GetBucketPolicyRequest getRequest = new GetBucketPolicyRequest {
+                            BucketName = cp.core.serverConfig.awsBucketName
+                        };
+                        GetBucketPolicyResponse getResponse = await s3client.GetBucketPolicyAsync(getRequest);
+                        string policyString = getResponse.Policy;
+
+                        //var actionGet = new Amazon.Auth.AccessControlPolicy.ActionIdentifier("s3:Get*");
+                        //var policy = new Amazon.Auth.AccessControlPolicy.Policy {
+                        //    Id = "DemoEC2Permissions",
+                        //    Version = "2012-10-17",
+                        //    Statements = statements
+                        //};
+                        AwsBucketPolicy policy = cp.JSON.Deserialize<AwsBucketPolicy>(policyString);
+                        //Amazon.Auth.AccessControlPolicy.Policy policy = cp.JSON.Deserialize<Amazon.Auth.AccessControlPolicy.Policy>(policyString);
+                        //dynamic policy = cp.JSON.Deserialize<dynamic>(policyString);
+                        //AwsBucketPolicy policy = cp.JSON.Deserialize<AwsBucketPolicy>(policyString);
+                        policy.Statement.Add(new AwsBucketPolicyStatement {
+                            Action = "s3:GetObject",
+                            Effect = "Allow",
+                            Principal = "*",
+                            Resource = "arn:aws:s3:::" + cp.core.serverConfig.awsBucketName + appConfig.remoteFilePath + "*",
+                            Sid = "AllowPublicRead"
+                        });
+                        PutBucketPolicyRequest putRequest = new PutBucketPolicyRequest {
+                            BucketName = cp.core.serverConfig.awsBucketName,
+                            Policy = cp.JSON.Serialize( policy )
+                        };
+                        PutBucketPolicyResponse putResponse = await s3client.PutBucketPolicyAsync(putRequest);
+                    }
                     //
                     // -- save the app configuration and reload the server using this app
                     Contensive.Processor.Controllers.LogController.logInfo(cp.core, "Save app configuration.");
@@ -266,7 +308,7 @@ namespace Contensive.CLI {
         /// </summary>
         /// <param name="folderPathPage"></param>
         public static void setupDirectory(string folderPathPage) {
-            System.IO.Directory.CreateDirectory(folderPathPage);
+            Directory.CreateDirectory(folderPathPage);
             DirectoryInfo dInfo = new DirectoryInfo(folderPathPage);
             DirectorySecurity dSecurity = dInfo.GetAccessControl();
             dSecurity.AddAccessRule(new FileSystemAccessRule(new SecurityIdentifier(WellKnownSidType.WorldSid, null), FileSystemRights.FullControl, InheritanceFlags.ObjectInherit | InheritanceFlags.ContainerInherit, PropagationFlags.None, AccessControlType.Allow));
@@ -302,5 +344,34 @@ namespace Contensive.CLI {
             }
             return string.Empty;
         }
+        //
+        //====================================================================================================
+        /// <summary>
+        /// Policy used to assign public access to S3 bucket folder
+        /// </summary>
+        public class AwsBucketPolicy {
+            public string Version { get; set; }
+            public List<AwsBucketPolicyStatement> Statement { get; set; }
+        }
+        /// <summary>
+        /// Policy used to assign public access to S3 bucket folder
+        /// </summary>
+        public class AwsBucketPolicyStatement {
+            public string Sid { get; set; }
+            public string Effect { get; set; }
+            public object Principal { get; set; }
+            public string Action { get; set; }
+            public string Resource { get; set; }
+        }
+        /// <summary>
+        /// Principal, object with AWS property
+        /// </summary>
+        public class AwsBucketPolicyStatementPrincipalObjString {
+            public string AWS { get; set; }
+        }
+        public class AwsBucketPolicyStatementPrincipalObjListString {
+            public List<string> AWS { get; set; }
+        }
+
     }
 }

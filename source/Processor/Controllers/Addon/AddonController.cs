@@ -1,20 +1,20 @@
 ﻿
-using System;
-using System.Reflection;
-using System.Xml;
-using System.Collections.Generic;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
 using Contensive.BaseClasses;
-using System.IO;
-using System.Data;
-using System.Linq;
+using Contensive.Models.Db;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
-using static Newtonsoft.Json.JsonConvert;
-using Contensive.Models.Db;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
+using System.Reflection;
 using System.Text;
+using System.Xml;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -620,6 +620,13 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     //
+                    // -- log remote method payload size
+                    if (addon.remoteMethod) {
+                        StackFrame frame = new StackFrame(1);
+                        MethodBase method = frame.GetMethod();
+                        LogController.logTrace(core, "remote [" + method.ReflectedType.Name + "." + method.Name + "], visit [" + core.session.visit.id + "], payload [" + resultString.Length + "]");
+                    }
+                    //
                     // -- pop modelstack and test point message
                     core.doc.addonModelStack.Pop();
                 }
@@ -631,9 +638,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// execute the xml part of an addon, return html
         /// </summary>
-        /// <param name="nothingObject"></param>
         /// <param name="FormXML"></param>
         /// <param name="return_ExitAddonBlankWithResponse"></param>
+        /// <param name="contextErrorMessage"></param>
         /// <returns></returns>
         private string execute_formContent(string FormXML, ref bool return_ExitAddonBlankWithResponse, string contextErrorMessage) {
             string result = "";

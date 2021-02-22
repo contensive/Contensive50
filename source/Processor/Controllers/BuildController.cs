@@ -1,15 +1,15 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using static Contensive.Processor.Controllers.GenericController;
-using static Contensive.Processor.Constants;
-using System.Data;
-using System.Linq;
-using Contensive.Processor.Models.Domain;
-using Contensive.Processor.Exceptions;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using Contensive.Processor.Exceptions;
+using Contensive.Processor.Models.Domain;
+using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Data;
+using System.Linq;
+using static Contensive.Processor.Constants;
+using static Contensive.Processor.Controllers.GenericController;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -18,7 +18,7 @@ namespace Contensive.Processor.Controllers {
     /// code to built and upgrade apps
     /// not IDisposable - not contained classes that need to be disposed
     /// </summary>
-    public class BuildController {
+    public static class BuildController {
         //
         //====================================================================================================
         /// <summary>
@@ -154,7 +154,7 @@ namespace Contensive.Processor.Controllers {
                     verifyStates(core);
                     verifyLibraryFolders(core);
                     verifyLibraryFileTypes(core);
-                    verifyGroups(core);
+                    verifyDefaultGroups(core);
                     //
                     // -- verify many to many triggers for all many-to-many fields
                     verifyManyManyDeleteTriggers(core);
@@ -297,7 +297,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="name"></param>
         /// <param name="sqlName"></param>
         /// <param name="sqlValue"></param>
-        /// <param name="inActive"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName, string sqlValue) {
             try {
                 var metaData = ContentMetadataModel.createByUniqueName(core, contentName);
@@ -317,10 +316,21 @@ namespace Contensive.Processor.Controllers {
                 throw;
             }
         }
-        //
+        /// <summary>
+        /// verify a simple record exists
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentName"></param>
+        /// <param name="name"></param>
+        /// <param name="sqlName"></param>
         private static void verifyRecord(CoreController core, string contentName, string name, string sqlName)
             => verifyRecord(core, contentName, name, sqlName, "");
-        //
+        /// <summary>
+        /// verify a simple record exists
+        /// </summary>
+        /// <param name="core"></param>
+        /// <param name="contentName"></param>
+        /// <param name="name"></param>
         private static void verifyRecord(CoreController core, string contentName, string name)
             => verifyRecord(core, contentName, name, "", "");
         //
@@ -329,7 +339,7 @@ namespace Contensive.Processor.Controllers {
         /// gaurantee db fields meet minimum requirements. Like dateTime precision
         /// </summary>
         /// <param name="core"></param>
-        /// <param name="DataBuildVersion"></param>
+        /// <param name="logPrefix"></param>
         private static void verifySqlfieldCompatibility(CoreController core, string logPrefix) {
             string hint = "0";
             try {
@@ -684,13 +694,13 @@ namespace Contensive.Processor.Controllers {
         /// verify default groups
         /// </summary>
         /// <param name="core"></param>
-        public static void verifyGroups(CoreController core) {
+        public static void verifyDefaultGroups(CoreController core) {
             try {
                 appendUpgradeLogAddStep(core, core.appConfig.name, "VerifyDefaultGroups", "Verify Default Groups");
                 //
-                int GroupId = GroupController.add(core, "Site Managers");
-                string SQL = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(GroupId) + " where EditorGroupID is null;";
-                core.db.executeNonQuery(SQL);
+                int groupId = GroupController.add(core, "Site Managers");
+                string sql = "Update ccContent Set EditorGroupID=" + DbController.encodeSQLNumber(groupId) + " where EditorGroupID is null;";
+                core.db.executeNonQuery(sql);
             } catch (Exception ex) {
                 LogController.logError(core, ex);
                 throw;

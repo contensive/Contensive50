@@ -9,7 +9,7 @@ namespace Contensive.CLI {
     //
     static class MainClass {
         //
-        static void Main(string[] args) {
+        static async System.Threading.Tasks.Task Main(string[] args) {
             try {
                 //
                 // -- configure command executes without processor instance
@@ -141,7 +141,7 @@ namespace Contensive.CLI {
                                 //
                                 // -- start the new app wizard
                                 appName = getNextCmdArg(args, ref argPtr);
-                                NewAppCmd.execute(appName);
+                                await NewAppCmd.executeAsync(appName);
                                 break;
                             case "--status":
                             case "-s":

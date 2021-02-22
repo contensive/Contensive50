@@ -1,32 +1,36 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using System;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     public static class ExportTemplateController {
         // 
         // ====================================================================================================
+        /// <summary>
+        /// return the xml collection node for a template
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="template"></param>
+        /// <returns></returns>
 
         public static string get(CPBaseClass cp, PageTemplateModel template) {
             try {
-                string addonList = "";
+                var includeAddonNodeList = new StringBuilder();
                 foreach (var rule in DbBaseModel.createList<AddonTemplateRuleModel>(cp, "(templateId=" + template.id + ")")) {
                     AddonModel addon = DbBaseModel.create<AddonModel>(cp, rule.addonId);
                     if (addon != null) {
-                        addonList += System.Environment.NewLine + "\t\t" + "<IncludeAddon name=\"" + addon.name + "\" guid=\"" + addon.ccguid + "\" />";
+                        includeAddonNodeList.Append( System.Environment.NewLine + "\t\t" + "<IncludeAddon name=\"" + addon.name + "\" guid=\"" + addon.ccguid + "\" />");
                     }
                 }
                 return ""
-                    + System.Environment.NewLine + "\t" + "<Template"
+                    + Environment.NewLine + "\t" + "<Template"
                         + " name=\"" + System.Net.WebUtility.HtmlEncode(template.name) + "\""
                         + " guid=\"" + template.ccguid + "\""
                         + " issecure=\"" + GenericController.getYesNo(template.isSecure) + "\""
                         + " >"
-                        + addonList
+                        + includeAddonNodeList
                         + System.Environment.NewLine + "\t\t" + "<BodyHtml>" + ExportController.tabIndent(cp, ExportController.encodeCData(template.bodyHTML)) + "</BodyHtml>"
                         + System.Environment.NewLine + "\t" + "</Template>";
             } catch (Exception ex) {

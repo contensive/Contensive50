@@ -5,6 +5,9 @@ using System.Reflection;
 using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
+using System.Linq;
+using Contensive.Processor.Models.Domain;
+using System.Text;
 
 namespace Contensive.Processor.Controllers {
     /// <summary>
@@ -36,7 +39,7 @@ namespace Contensive.Processor.Controllers {
                         cp.UserError.Add("The collection you selected could not be found");
                         return string.Empty;
                     }
-                    string collectionXml = "<?xml version=\"1.0\" encoding=\"windows-1252\"?>";
+                    var collectionXml = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1252\"?>");
                     string CollectionGuid = CS.GetText("ccGuid");
                     if (CollectionGuid == "") {
                         CollectionGuid = cp.Utils.CreateGuid();
@@ -52,14 +55,14 @@ namespace Contensive.Processor.Controllers {
                         }
                     }
                     string CollectionName = CS.GetText("name");
-                    collectionXml += System.Environment.NewLine + "<Collection";
-                    collectionXml += " name=\"" + CollectionName + "\"";
-                    collectionXml += " guid=\"" + CollectionGuid + "\"";
-                    collectionXml += " system=\"" + GenericController.getYesNo(CS.GetBoolean("system")) + "\"";
-                    collectionXml += " updatable=\"" + GenericController.getYesNo(CS.GetBoolean("updatable")) + "\"";
-                    collectionXml += " blockNavigatorNode=\"" + GenericController.getYesNo(CS.GetBoolean("blockNavigatorNode")) + "\"";
-                    collectionXml += " onInstallAddonGuid=\"" + onInstallAddonGuid + "\"";
-                    collectionXml += ">";
+                    collectionXml.Append(System.Environment.NewLine + "<Collection");
+                    collectionXml.Append(" name=\"" + CollectionName + "\"");
+                    collectionXml.Append(" guid=\"" + CollectionGuid + "\"");
+                    collectionXml.Append(" system=\"" + GenericController.getYesNo(CS.GetBoolean("system")) + "\"");
+                    collectionXml.Append(" updatable=\"" + GenericController.getYesNo(CS.GetBoolean("updatable")) + "\"");
+                    collectionXml.Append(" blockNavigatorNode=\"" + GenericController.getYesNo(CS.GetBoolean("blockNavigatorNode")) + "\"");
+                    collectionXml.Append(" onInstallAddonGuid=\"" + onInstallAddonGuid + "\"");
+                    collectionXml.Append(">");
                     cdnExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
                     List<string> tempPathFileList = new List<string>();
                     string tempExportPath = "CollectionExport" + Guid.NewGuid().ToString() + @"\";
@@ -73,11 +76,11 @@ namespace Contensive.Processor.Controllers {
                     // helpLink
                     // 
                     if (CS.FieldOK("HelpLink"))
-                        collectionXml += System.Environment.NewLine + "\t" + "<HelpLink>" + System.Net.WebUtility.HtmlEncode(CS.GetText("HelpLink")) + "</HelpLink>";
+                        collectionXml.Append(System.Environment.NewLine + "\t" + "<HelpLink>" + System.Net.WebUtility.HtmlEncode(CS.GetText("HelpLink")) + "</HelpLink>");
                     // 
                     // Help
                     // 
-                    collectionXml += System.Environment.NewLine + "\t" + "<Help>" + System.Net.WebUtility.HtmlEncode(CS.GetText("Help")) + "</Help>";
+                    collectionXml.Append(System.Environment.NewLine + "\t" + "<Help>" + System.Net.WebUtility.HtmlEncode(CS.GetText("Help")) + "</Help>");
                     // 
                     // Addons
                     // 
@@ -104,22 +107,68 @@ namespace Contensive.Processor.Controllers {
                             }
                             wwwFileList += System.Environment.NewLine + addon.jsHeadScriptSrc;
                         }
-                        collectionXml += ExportAddonController.getAddonNode(cp, addon.id, ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList);
+                        collectionXml.Append(ExportAddonController.getAddonNode(cp, addon.id, ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList));
                     }
                     // 
                     // Layouts
                     foreach (var layout in DbBaseModel.createList<LayoutModel>(cp, "(installedByCollectionId=" + collection.id + ")")) {
-                        collectionXml += ExportLayoutController.get(cp, layout);
+                        collectionXml.Append(ExportLayoutController.get(cp, layout));
                     }
                     // 
                     // Templates
                     foreach (var template in DbBaseModel.createList<PageTemplateModel>(cp, "(collectionId=" + collection.id + ")")) {
-                        collectionXml += ExportTemplateController.get(cp, template);
+                        collectionXml.Append(ExportTemplateController.get(cp, template));
                     }
                     // 
-                    // Data Records
-                    string DataRecordList = CS.GetText("DataRecordList");
-                    collectionXml += ExportDataRecordController.getNodeList(cp, DataRecordList, tempPathFileList, tempExportPath);
+                    // -- Data Records
+                    List<CollectionDataRecordModel> dataRecordObjList = new List<CollectionDataRecordModel>();
+                    string dataRecordCrlfList = CS.GetText("DataRecordList");
+                    if (!string.IsNullOrEmpty(dataRecordCrlfList)) {
+                        //
+                        // -- save collection record datarecord list to collection xml
+                        collectionXml.Append(System.Environment.NewLine + "\t" + "<DataRecordList>" + encodeCData(dataRecordCrlfList) + "</DataRecordList>");
+                        //
+                        // -- first, create dataRecordList of records in the Collection's DataRecord tab
+                        foreach (var dataRecord in Strings.Split(dataRecordCrlfList, Environment.NewLine).ToList()) {
+                            if (string.IsNullOrEmpty(dataRecord)) {
+                                continue;
+                            }
+                            string[] dataSplit = Strings.Split(dataRecord, ",");
+                            CollectionDataRecordModel dataRecordObj = new CollectionDataRecordModel { contentName = dataSplit[0] };
+                            dataRecordObjList.Add(dataRecordObj);
+                            if (GenericController.isGuid(dataSplit[1])) {
+                                dataRecordObj.recordGuid = dataSplit[1];
+                                continue;
+                            }
+                            dataRecordObj.recordName = dataSplit[1];
+                        }
+                    }
+                    //
+                    // -- add records from any content that supports the field 'collectionid' or 'installedbycollectionid'
+
+                    foreach (var field in new List<string>() { "collectionId", "installedbycollectionid" }) {
+                        using (var csTable = cp.CSNew()) {
+                            if (csTable.OpenSQL("select c.name as contentName, c.id as contentId, t.name as tableName from cccontent c left join cctables t on t.id=c.ContentTableID left join ccfields f on f.ContentID=c.id  where (c.name<>'add-ons')and(f.name=" + cp.Db.EncodeSQLText(field) + ")")) {
+                                do {
+                                    using (var csRecord = cp.CSNew()) {
+                                        if (csRecord.OpenSQL("select ccguid from " + csTable.GetText("tableName") + " where (" + field + "=" + collection.id + ")and((contentcontrolid=" + csTable.GetInteger("contentid") + ")or(contentcontrolid=0))")) {
+                                            do {
+                                                dataRecordObjList.Add(new CollectionDataRecordModel {
+                                                    contentName = csTable.GetText("contentName"),
+                                                    recordGuid = csRecord.GetText("ccguid")
+                                                });
+                                                csRecord.GoNext();
+                                            } while (csRecord.OK());
+                                        }
+                                    }
+                                    csTable.GoNext();
+                                } while (csTable.OK());
+                            }
+                        }
+                    }
+                    //
+                    // -- add all datarecords to the xml export
+                    collectionXml.Append(ExportDataRecordController.getNodeList(cp, dataRecordObjList, tempPathFileList, tempExportPath));
                     // 
                     // CDef
                     foreach (Contensive.Models.Db.ContentModel content in createListFromCollection(cp, collection.id)) {
@@ -138,7 +187,7 @@ namespace Contensive.Processor.Controllers {
                             Pos = Strings.InStr(1, Node, "</cdef>", CompareMethod.Text);
                             if (Pos > 0) {
                                 Node = Strings.Mid(Node, 1, Pos + 6);
-                                collectionXml += System.Environment.NewLine + "\t" + Node;
+                                collectionXml.Append(System.Environment.NewLine + "\t" + Node);
                             }
                         }
                     }
@@ -154,7 +203,7 @@ namespace Contensive.Processor.Controllers {
                                     if (CS2.OK()) {
                                         string Code = CS2.GetText("code").Trim();
                                         Code = encodeCData(Code);
-                                        collectionXml += System.Environment.NewLine + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>";
+                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>");
                                     }
                                     CS2.Close();
                                 }
@@ -173,7 +222,7 @@ namespace Contensive.Processor.Controllers {
                                 using (CPCSBaseClass CS2 = cp.CSNew()) {
                                     CS2.Open("Shared Styles", "ccguid=" + cp.Db.EncodeSQLText(recordGuid));
                                     if (CS2.OK())
-                                        collectionXml += System.Environment.NewLine + "\t" + "<SharedStyle"
+                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<SharedStyle"
                                             + " Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\""
                                             + " guid=\"" + recordGuid + "\""
                                             + " alwaysInclude=\"" + CS2.GetBoolean("alwaysInclude") + "\""
@@ -182,7 +231,7 @@ namespace Contensive.Processor.Controllers {
                                             + " sortOrder=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("sortOrder")) + "\""
                                             + ">"
                                             + encodeCData(CS2.GetText("styleFilename").Trim())
-                                            + "</SharedStyle>";
+                                            + "</SharedStyle>");
                                     CS2.Close();
                                 }
                             }
@@ -215,7 +264,7 @@ namespace Contensive.Processor.Controllers {
                             }
                             CS3.Close();
                         }
-                        collectionXml += Node;
+                        collectionXml.Append(Node);
                     }
                     // 
                     // wwwFileList
@@ -253,7 +302,7 @@ namespace Contensive.Processor.Controllers {
                                         // -- copy file from here
                                         cp.PrivateFiles.Copy(addonPath + collectionPath + filename, tempExportPath + filename, cp.TempFiles);
                                         tempPathFileList.Add(tempExportPath + filename);
-                                        collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />");
                                     }
                                 } else if ((!cp.WwwFiles.FileExists(pathFilename))) {
                                     cp.UserError.Add("There was an error exporting this collection because the www file [" + pathFilename + "] was not found.");
@@ -261,7 +310,7 @@ namespace Contensive.Processor.Controllers {
                                 } else {
                                     cp.WwwFiles.Copy(pathFilename, tempExportPath + filename, cp.TempFiles);
                                     tempPathFileList.Add(tempExportPath + filename);
-                                    collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />";
+                                    collectionXml.Append(System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(filename) + "\" type=\"www\" path=\"" + System.Net.WebUtility.HtmlEncode(path) + "\" />");
                                 }
                             }
                         }
@@ -290,7 +339,7 @@ namespace Contensive.Processor.Controllers {
                                     else {
                                         cp.CdnFiles.Copy(PathFilename, tempExportPath + Filename, cp.TempFiles);
                                         tempPathFileList.Add(tempExportPath + Filename);
-                                        collectionXml += System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />";
+                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<Resource name=\"" + System.Net.WebUtility.HtmlEncode(Filename) + "\" type=\"content\" path=\"" + System.Net.WebUtility.HtmlEncode(Path) + "\" />");
                                     }
                                 }
                             }
@@ -299,21 +348,21 @@ namespace Contensive.Processor.Controllers {
                     // 
                     // ExecFileListNode
                     // 
-                    collectionXml += execResourceNodeList;
+                    collectionXml.Append(execResourceNodeList);
                     // 
                     // Other XML
                     // 
                     string OtherXML;
                     OtherXML = CS.GetText("otherxml");
                     if (Strings.Trim(OtherXML) != "")
-                        collectionXml += System.Environment.NewLine + OtherXML;
-                    collectionXml += System.Environment.NewLine + "</Collection>";
+                        collectionXml.Append(System.Environment.NewLine + OtherXML);
+                    collectionXml.Append(System.Environment.NewLine + "</Collection>");
                     CS.Close();
                     string tempExportXml_Filename = encodeFilename(cp, CollectionName + ".xml");
                     // 
                     // Save the installation file and add it to the archive
                     // 
-                    cp.TempFiles.Save(tempExportPath + tempExportXml_Filename, collectionXml);
+                    cp.TempFiles.Save(tempExportPath + tempExportXml_Filename, collectionXml.ToString());
                     if (!tempPathFileList.Contains(tempExportPath + tempExportXml_Filename))
                         tempPathFileList.Add(tempExportPath + tempExportXml_Filename);
                     string tempExportZip_Filename = encodeFilename(cp, CollectionName + ".zip");
@@ -484,7 +533,7 @@ namespace Contensive.Processor.Controllers {
         public static string encodeCData(string source) {
             if (string.IsNullOrWhiteSpace(source)) return "";
             return "<![CDATA[" + Strings.Replace(source, "]]>", "]]]]><![CDATA[>") + "]]>";
-        } 
+        }
         // 
         // =======================================================================================
         /// <summary>
@@ -522,6 +571,8 @@ namespace Contensive.Processor.Controllers {
         /// <param name="Source"></param>
         /// <returns></returns>
         public static string tabIndent(CPBaseClass cp, string Source) {
+            return Source;
+            //
             int posStart = Strings.InStr(1, Source, "<![CDATA[", CompareMethod.Text);
             if (posStart == 0) {
                 // 
@@ -535,34 +586,36 @@ namespace Contensive.Processor.Controllers {
                 else {
                     // 
                     // text area found, isolate it and indent before and after
-                    // 
                     int posEnd = Strings.InStr(posStart, Source, "</textarea>", CompareMethod.Text);
-                    string pre = Strings.Mid(Source, 1, posStart - 1);
-                    string post = "";
-                    string target;
-                    if (posEnd == 0)
-                        target = Strings.Mid(Source, posStart);
-                    else {
-                        target = Strings.Mid(Source, posStart, posEnd - posStart + Strings.Len("</textarea>"));
-                        post = Strings.Mid(Source, posEnd + Strings.Len("</textarea>"));
+                    if (posEnd == 0) {
+                        //
+                        // -- append target, no post
+                        return ""
+                            + tabIndent(cp, Strings.Mid(Source, 1, posStart - 1))
+                            + Strings.Mid(Source, posStart);
+                    } else {
+                        //
+                        // -- append target
+                        return ""
+                            + tabIndent(cp, Strings.Mid(Source, 1, posStart - 1))
+                            + Strings.Mid(Source, posStart, posEnd - posStart + Strings.Len("</textarea>"))
+                            + tabIndent(cp, Strings.Mid(Source, posEnd + Strings.Len("</textarea>")));
                     }
-                    return tabIndent(cp, pre) + target + tabIndent(cp, post);
                 }
             } else {
                 // 
                 // cdata found, isolate it and indent before and after
-                // 
                 int posEnd = Strings.InStr(posStart, Source, "]]>", CompareMethod.Text);
-                string pre = Strings.Mid(Source, 1, posStart - 1);
-                string post = "";
-                string target;
-                if (posEnd == 0)
-                    target = Strings.Mid(Source, posStart);
-                else {
-                    target = Strings.Mid(Source, posStart, posEnd - posStart + Strings.Len("]]>"));
-                    post = Strings.Mid(Source, posEnd + 3);
+                if (posEnd == 0) {
+                    return ""
+                        + tabIndent(cp, Strings.Mid(Source, 1, posStart - 1))
+                        + Strings.Mid(Source, posStart);
+                } else {
+                    return ""
+                        + tabIndent(cp, Strings.Mid(Source, 1, posStart - 1))
+                        + Strings.Mid(Source, posStart, posEnd - posStart + Strings.Len("]]>"))
+                        + tabIndent(cp, Strings.Mid(Source, posEnd + 3));
                 }
-                return tabIndent(cp, pre) + target + tabIndent(cp, post);
             }
         }
         //

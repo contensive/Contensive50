@@ -1,13 +1,13 @@
 ﻿
-using System;
 using Contensive.BaseClasses;
+using Contensive.Models.Db;
+using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using static Contensive.Processor.Constants;
 using static Contensive.Processor.Controllers.GenericController;
-using System.Diagnostics;
-using Contensive.Processor.Exceptions;
-using Contensive.Models.Db;
-using System.Collections.Generic;
 
 namespace Contensive.Processor.Controllers {
     //
@@ -15,7 +15,7 @@ namespace Contensive.Processor.Controllers {
     /// <summary>
     /// static class controller
     /// </summary>
-    public class RouteController {
+    public static class RouteController {
         //
         //=============================================================================
         /// <summary>

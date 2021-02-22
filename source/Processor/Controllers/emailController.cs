@@ -1,14 +1,14 @@
 ﻿
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using static Contensive.Processor.Constants;
+using Contensive.Models.Db;
 using Contensive.Processor.Exceptions;
 using Contensive.Processor.Models.Domain;
-using static Newtonsoft.Json.JsonConvert;
-using Contensive.Models.Db;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text.RegularExpressions;
+using static Contensive.Processor.Constants;
+using static Newtonsoft.Json.JsonConvert;
 //
 namespace Contensive.Processor.Controllers {
     //
@@ -19,12 +19,6 @@ namespace Contensive.Processor.Controllers {
     public class EmailController {
         //
         private const string emailBlockListFilename = "Config\\SMTPBlockList.txt";
-        //
-        //====================================================================================================
-        //
-        public static string getBounceAddress(CoreController core, string backupBounceAddress) {
-            return core.siteProperties.getText("EmailBounceAddress", backupBounceAddress);
-        }
         //
         //====================================================================================================
         //
@@ -429,7 +423,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns>Admin message if something went wrong (email addresses checked, etc.</returns>
         public static bool queueSystemEmail(CoreController core, SystemEmailModel email, string appendedCopy, int additionalMemberID, ref string userErrorMessage) {
             try {
-                string BounceAddress = getBounceAddress(core, email.fromAddress);
+                string BounceAddress = core.siteProperties.emailBounceAddress;
                 EmailTemplateModel emailTemplate = DbBaseModel.create<EmailTemplateModel>(core.cpParent, email.emailTemplateId);
                 string EmailTemplateSource = "";
                 if (emailTemplate != null) {
@@ -1119,7 +1113,7 @@ namespace Contensive.Processor.Controllers {
                         string SQLTablePeople = MetadataController.getContentTablename(core, "People");
                         string SQLTableMemberRules = MetadataController.getContentTablename(core, "Member Rules");
                         string SQLTableGroups = MetadataController.getContentTablename(core, "Groups");
-                        string BounceAddress = getBounceAddress(core, "");
+                        string BounceAddress = core.siteProperties.emailBounceAddress;
                         while (CSEmail.ok()) {
                             int emailId = CSEmail.getInteger("ID");
                             int EmailMemberId = CSEmail.getInteger("ModifiedBy");
@@ -1219,7 +1213,7 @@ namespace Contensive.Processor.Controllers {
             int emailsEffected = 0;
             using (var csEmailList = new CsModel(core)) {
                 string sql = Properties.Resources.sqlConditionalEmail_DaysAfterJoin;
-                string bounceAddress = getBounceAddress(core, "");
+                string bounceAddress = core.siteProperties.emailBounceAddress;
                 sql = sql.Replace("{{sqldatenow}}", core.sqlDateTimeMockable);
                 //
                 // -- almost impossible to debug without a log entry
@@ -1263,7 +1257,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static int processConditional_DaysBeforeExpiration(CoreController core) {
             int emailsEffected = 0;
-            string bounceAddress = getBounceAddress(core, "");
+            string bounceAddress = core.siteProperties.emailBounceAddress;
             using (var csList = new CsModel(core)) {
                 string sql = Properties.Resources.sqlConditionalEmail_DaysBeforeExpiration;
                 sql = sql.Replace("{{sqldatenow}}", core.sqlDateTimeMockable);
