@@ -340,12 +340,19 @@ namespace Contensive.Processor.Controllers {
         public Dictionary<string, CookieClass> requestCookies {
             get {
                 if (_requestCookies != null) { return _requestCookies; }
+                //
+                LogController.logLocalOnly("WebServerController.requestCookies, build 1", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
                 _requestCookies = new Dictionary<string, CookieClass>();
                 if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Cookies == null)) return _requestCookies;
+                //
+                LogController.logLocalOnly("WebServerController.requestCookies, build 2", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
                 foreach (KeyValuePair<string, HttpContextRequestCookie> kvp in httpContext.Request.Cookies) {
-                    _requestCookies = new Dictionary<string, CookieClass> {
-                        { kvp.Key, new CookieClass() { name = kvp.Key, value = kvp.Value.Value } }
-                    };
+                    //
+                    LogController.logLocalOnly("WebServerController.requestCookies, build 3", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                    //
+                    _requestCookies.Add(kvp.Key, new CookieClass() { name = kvp.Key, value = kvp.Value.Value });                    
                 }
                 return _requestCookies;
             }
@@ -359,7 +366,13 @@ namespace Contensive.Processor.Controllers {
         /// <param name="cookieName"></param>
         /// <returns></returns>
         public string requestCookie(string cookieName) {
+            //
+            LogController.log(core, "WebServerController.requestCookie, key [" + cookieName + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            //
             if (!requestCookies.ContainsKey(cookieName)) { return ""; }
+            //
+            LogController.log(core, "WebServerController.requestCookie, ContainsKey true, value [" + requestCookies[cookieName].value + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+            //
             return requestCookies[cookieName].value;
         }
         //
@@ -443,6 +456,9 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public bool initHttpContext() {
             try {
+                //
+                LogController.logLocalOnly("initHttpContext, enter", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                LogController.logLocalOnly("initHttpContext, httpContext.Request.Cookies.Count [" + httpContext.Request.Cookies.Count + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace);
                 //
                 // -- must have valid context, else non http 
                 if (httpContext == null) { return false; }
@@ -630,8 +646,13 @@ namespace Contensive.Processor.Controllers {
                 //
                 // ----- Style tag
                 adminMessage = "For more information, please contact the <a href=\"mailto:" + core.siteProperties.emailAdmin + "?subject=Re: " + requestDomain + "\">Site Administrator</A>.";                //
-                // -- done at last
+                //
+                LogController.logLocalOnly("initHttpContext, exit", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
             } catch (Exception ex) {
+                //
+                LogController.logLocalOnly("initHttpContext, exception", BaseClasses.CPLogBaseClass.LogLevel.Trace);
+                //
                 LogController.logError(core, ex);
                 throw;
             }

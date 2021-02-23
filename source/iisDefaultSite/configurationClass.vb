@@ -208,7 +208,7 @@ Public Class ConfigurationClass
                 ' -- transfer cookies
                 LogController.logLocalOnly("ConfigurationClass.buildContext transfer cookies", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                 For Each cookieKey As String In iisContext.Request.Cookies.Keys
-                    LogController.logLocalOnly("ConfigurationClass.buildContext transfer cookies, cookieKey [" + cookieKey + "], cookie value [" + iisContext.Request.Cookies(cookieKey).Value + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
+                    LogController.logLocalOnly("ConfigurationClass.buildContext transfer cookies, cookieKey [" & cookieKey & "], cookie value [" & iisContext.Request.Cookies(cookieKey).Value & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                     If String.IsNullOrWhiteSpace(cookieKey) Then Continue For
                     If (context.Request.Cookies.ContainsKey(cookieKey)) Then
                         context.Request.Cookies.Remove(cookieKey)
@@ -218,6 +218,7 @@ Public Class ConfigurationClass
                         .Value = iisContext.Request.Cookies(cookieKey).Value
                     })
                 Next
+                LogController.logLocalOnly("ConfigurationClass.buildContext exit, context.Request.Cookies.Count [" & context.Request.Cookies.Count & "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
             End If
             Return context
         Catch ex As Exception

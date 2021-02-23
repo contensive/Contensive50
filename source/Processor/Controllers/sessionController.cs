@@ -359,6 +359,7 @@ namespace Contensive.Processor.Controllers {
                             resultSessionContext.visit.name = userAgent.Device.IsSpider ? userAgent.Device.Family + " " + userAgent.UA.Family : "user";
                             resultSessionContext.visit.bot = userAgent.Device.IsSpider;
                             resultSessionContext.visit.mobile = isMobile(core.webServer.requestBrowser);
+                            //
                         }
                         //
                         // -- new visit, update the persistant visitor cookie
@@ -408,6 +409,17 @@ namespace Contensive.Processor.Controllers {
                     }
                     resultSessionContext.visit.memberId = resultSessionContext.user.id;
                     resultSessionContext.visit.visitorId = resultSessionContext.visitor.id;
+                    //
+                    // -- set visitor fields needed for tracking
+                    if (resultSessionContext.visitor.bot != resultSessionContext.visit.bot) {
+                        resultSessionContext.visitor.bot = resultSessionContext.visit.bot;
+                        visitor_changes = true;
+                    }
+                    if (resultSessionContext.visitor.cookieSupport != resultSessionContext.visit.cookieSupport) {
+                        resultSessionContext.visitor.cookieSupport = resultSessionContext.visit.cookieSupport;
+                        visitor_changes = true;
+                    }
+
                     //
                     // -- Save anything that changed
                     //
