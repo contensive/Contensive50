@@ -52,18 +52,45 @@ namespace Contensive.Models.Db {
         /// true if this visit created a new people record
         /// </summary>
         public bool memberNew { get; set; }
+        /// <summary>
+        /// browser indicates mobile
+        /// </summary>
         public bool mobile { get; set; }
+        /// <summary>
+        /// number of hits in this visit
+        /// </summary>
         public int pageVisits { get; set; }
+        /// <summary>
+        /// pathPage of referer
+        /// </summary>
         public string refererPathPage { get; set; }
+        /// <summary>
+        /// request ip address
+        /// </summary>
         public string remote_addr { get; set; }
-        //public string remoteName { get; set; }
+        /// <summary>
+        /// integer of start date
+        /// </summary>
         public int startDateValue { get; set; }
+        /// <summary>
+        /// time portion of startDate
+        /// </summary>
         public DateTime? startTime { get; set; }
-        //public DateTime? stopTime { get; set; }
+        /// <summary>
+        /// seconds between firsthit and lasthit
+        /// </summary>
         public int timeToLastHit { get; set; }
-        //public bool verboseReporting { get; set; }
+        /// <summary>
+        /// if true, this visit was authenticated to memberId
+        /// </summary>
         public bool visitAuthenticated { get; set; }
+        /// <summary>
+        /// visitor for this visit
+        /// </summary>
         public int visitorId { get; set; }
+        /// <summary>
+        /// if true, the visitor was created for this visit
+        /// </summary>
         public bool visitorNew { get; set; }
         //
         //====================================================================================================

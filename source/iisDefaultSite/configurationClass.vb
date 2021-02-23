@@ -206,7 +206,9 @@ Public Class ConfigurationClass
             If True Then
                 '
                 ' -- transfer cookies
+                LogController.logLocalOnly("ConfigurationClass.buildContext transfer cookies", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                 For Each cookieKey As String In iisContext.Request.Cookies.Keys
+                    LogController.logLocalOnly("ConfigurationClass.buildContext transfer cookies, cookieKey [" + cookieKey + "], cookie value [" + iisContext.Request.Cookies(cookieKey).Value + "]", BaseClasses.CPLogBaseClass.LogLevel.Trace)
                     If String.IsNullOrWhiteSpace(cookieKey) Then Continue For
                     If (context.Request.Cookies.ContainsKey(cookieKey)) Then
                         context.Request.Cookies.Remove(cookieKey)

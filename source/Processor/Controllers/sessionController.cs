@@ -179,8 +179,8 @@ namespace Contensive.Processor.Controllers {
                 // -- load visit cookie, token
                 //
                 string visitCookie = resultSessionContext.getVisitCookie();
-                bool cookieDetected = !string.IsNullOrEmpty(visitCookie);
                 var visitToken = (string.IsNullOrEmpty(visitCookie)) ? new SecurityController.TokenData() : SecurityController.decodeToken(core, visitCookie);
+                LogController.logTrace(core, "visitCookie [" + visitCookie + "], visitCookie.id [" + visitToken.id + "]");
                 if (!visitToken.id.Equals(0)) {
                     VisitModel visitTest = DbBaseModel.create<VisitModel>(core.cpParent, visitToken.id);
                     if (!(visitTest is null)) {
@@ -193,8 +193,8 @@ namespace Contensive.Processor.Controllers {
                 // -- load visitor cookie cookie/tokens
                 //
                 string visitorCookie = resultSessionContext.getVisitorCookie();
-                cookieDetected |= !string.IsNullOrEmpty(visitorCookie);
                 var visitorToken = (string.IsNullOrEmpty(visitorCookie)) ? new SecurityController.TokenData() : SecurityController.decodeToken(core, visitorCookie);
+                LogController.logTrace(core, "visitorCookie [" + visitorCookie + "], visitorCookie.id [" + visitorToken.id + "]");
                 if (!visitorToken.id.Equals(0)) {
                     VisitorModel visitorTest = DbBaseModel.create<VisitorModel>(core.cpParent, visitorToken.id);
                     if (!(visitorTest is null)) {
@@ -214,6 +214,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- attempt link authentication
                     var linkToken = SecurityController.decodeToken(core, linkEid);
+                    LogController.logTrace(core, "link authentication, linkEid [" + linkEid + "], linkToken.id [" + linkToken.id + "]");
                     if (!linkToken.id.Equals(0) && linkToken.expires.CompareTo(core.dateTimeNowMockable) < 0) {
                         //
                         // -- valid link token, attempt login/recognize
@@ -371,7 +372,7 @@ namespace Contensive.Processor.Controllers {
                     resultSessionContext.visit.timeToLastHit = encodeInteger((core.doc.profileStartTime - encodeDate(resultSessionContext.visit.startTime)).TotalSeconds);
                     resultSessionContext.visit.excludeFromAnalytics |= resultSessionContext.visit.bot || resultSessionContext.user.excludeFromAnalytics || resultSessionContext.user.admin || resultSessionContext.user.developer;
                     resultSessionContext.visit.pageVisits += 1;
-                    resultSessionContext.visit.cookieSupport |= cookieDetected;
+                    resultSessionContext.visit.cookieSupport |= !string.IsNullOrEmpty(visitCookie) || !string.IsNullOrEmpty(visitorCookie);
                     resultSessionContext.visit.lastVisitTime = core.doc.profileStartTime;
                     resultSessionContext.visit.visitorNew = visitorNew;
                     resultSessionContext.visit.visitorId = resultSessionContext.visitor.id;
@@ -388,15 +389,6 @@ namespace Contensive.Processor.Controllers {
                         // -- setup new user if nothing else
                         if ((resultSessionContext.user is null) || resultSessionContext.user.id.Equals(0)) {
                             resultSessionContext.user = createGuest(core, true);
-                            //resultSessionContext.user = DbBaseModel.addEmpty<PersonModel>(core.cpParent);
-                            //resultSessionContext.user.createdByVisit = true;
-                            //resultSessionContext.user.name = "Guest";
-                            //resultSessionContext.user.firstName = "Guest";
-                            //resultSessionContext.user.createdBy = resultSessionContext.user.id;
-                            //resultSessionContext.user.dateAdded = core.doc.profileStartTime;
-                            //resultSessionContext.user.modifiedBy = resultSessionContext.user.id;
-                            //resultSessionContext.user.modifiedDate = core.doc.profileStartTime;
-                            //resultSessionContext.user.visits = 1;
                             user_changes = true;
                             //
                             resultSessionContext.visit.visitAuthenticated = false;

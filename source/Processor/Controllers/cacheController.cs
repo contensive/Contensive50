@@ -334,7 +334,7 @@ namespace Contensive.Processor.Controllers {
                     string serializedDataObject = null;
                     using (System.Threading.Mutex mutex = new System.Threading.Mutex(false, keyHash.hash)) {
                         mutex.WaitOne();
-                        serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(keyHash + ".txt"));
+                        serializedDataObject = core.privateFiles.readFileText("appCache\\" + FileController.encodeDosFilename(keyHash.hash + ".txt"));
                         mutex.ReleaseMutex();
                     }
                     if (!string.IsNullOrEmpty(serializedDataObject)) {
@@ -347,14 +347,14 @@ namespace Contensive.Processor.Controllers {
                 //
                 // -- log result
                 if (result == null) {
-                    LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + keyHash + "]");
+                    LogController.logTrace(core, "miss, cacheType [" + typeMessage + "], key [" + keyHash.key + "]");
                 } else {
                     if (result.content == null) {
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash + "], saveDate [" + result.saveDate + "], content [null]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash.key + "], saveDate [" + result.saveDate + "], content [null]");
                     } else {
                         string content = result.content.ToString();
                         content = (content.Length > 50) ? (content.left(50) + "...") : content;
-                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash + "], saveDate [" + result.saveDate + "], content [" + content + "]");
+                        LogController.logTrace(core, "hit, cacheType [" + typeMessage + "], key [" + keyHash.key + "], saveDate [" + result.saveDate + "], content [" + content + "]");
                     }
                 }
                 //
@@ -789,16 +789,21 @@ namespace Contensive.Processor.Controllers {
         /// create a key to store unmanaged content with store(). Managed content like database model should use createRecordKey and createTableDependencyKey.
         /// </summary>
         /// <param name="objectUniqueName">The unique key that describes the object. Ex. catalogitemList, or metadata-134</param>
-        /// <param name="objectUniqueIdentifier"></param>
         /// <returns></returns>
         public CacheKeyHashClass createKeyHash(string objectUniqueName) {
             var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(createKey(objectUniqueName));
             return new CacheKeyHashClass() {
+                key = objectUniqueName,
                 hash = Convert.ToBase64String(plainTextBytes)
             };
         }
         //
         //====================================================================================================
+        /// <summary>
+        /// convert a unique name to a cache key (not hashed)
+        /// </summary>
+        /// <param name="objectUniqueName"></param>
+        /// <returns></returns>
         public string createKey(string objectUniqueName) {
             return core.appConfig.name + "-" + objectUniqueName;
         }
@@ -891,7 +896,7 @@ namespace Contensive.Processor.Controllers {
                     }
                 }
                 //
-                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + keyHash + "], expires [" + cacheDocument.invalidationDate + "], depends on [" + string.Join(",", cacheDocument.dependentKeyHashList) + "], points to [" + string.Join(",", cacheDocument.keyPtrHash) + "]");
+                LogController.logTrace(core, "cacheType [" + typeMessage + "], key [" + keyHash.key + "], expires [" + cacheDocument.invalidationDate + "], depends on [" + string.Join(",", cacheDocument.dependentKeyHashList) + "], points to [" + string.Join(",", cacheDocument.keyPtrHash) + "]");
                 //
             } catch (Exception ex) {
                 LogController.logError(core, ex);

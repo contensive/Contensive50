@@ -19,9 +19,12 @@ namespace Contensive.Models.Db {
         /// </summary>
         public int memberId { get; set; }
         /// <summary>
-        /// deprecate
+        /// if true, this visitor is from a bot. Used to housekeep unneeded visitors
         /// </summary>
-        [Obsolete("Deprecated.",false)]
-        public int forceBrowserMobile { get; set; }
+        public bool bot { get; set; }
+        /// <summary>
+        /// the browser string prsented by the client browser during the visit. Used to housekeep unneeded visitors
+        /// </summary>
+        public bool cookieSupport { get; set; }
     }
 }
