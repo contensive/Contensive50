@@ -288,7 +288,7 @@ namespace Contensive.Processor.Controllers {
                 if (_requestPath != null) { return _requestPath; }
                 if ((httpContext == null) || (httpContext.Request == null) || (httpContext.Request.Url == null)) return string.Empty;
                 var segments = splitUrl(httpContext.Request.Url.AbsoluteUri);
-                _requestPath = segments.unixPath();
+                _requestPath = segments.unixPath;
                 return _requestPath;
             }
         }

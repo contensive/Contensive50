@@ -43,9 +43,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// render addLinkAuthToAllLinks, ActiveFormatting, ActiveImages and ActiveEditIcons. 
         /// 1) addLinkAuthToAllLinks adds a link authentication querystring to all anchor tags pointed to this application's domains.
-        /// 2) ActiveFormatting converts <AC type=""></AC> tags into thier rendered equvalent.
+        /// 2) ActiveFormatting converts AC type="" /AC tags into thier rendered equvalent.
         /// 3) ActiveImages ?
-        /// 4) ActiveEditIcons: if true, it converts <AC type=""></AC> tags into <img> tags with instance properties encoded
+        /// 4) ActiveEditIcons: if true, it converts AC type="" /AC tags into img tags with instance properties encoded
         ///
         /// </summary>
         /// <param name="core"></param>
@@ -53,7 +53,6 @@ namespace Contensive.Processor.Controllers {
         /// <param name="deprecated_personalizationPeopleId">The user to whom this rendering will be targeted</param>
         /// <param name="ContextContentName">If this content is from a DbModel, this is the content name.</param>
         /// <param name="ContextRecordID">If this content is from a DbModel, this is the record id.</param>
-        /// <param name="moreInfoPeopleId">If the content includes either a more-information link, or a feedback form, this is the person to whom the feedback or more-information applies.</param>
         /// <param name="addLinkAuthenticationToAllLinks">If true, link authentication is added to all anchor tags</param>
         /// <param name="ignore"></param>
         /// <param name="encodeACResourceLibraryImages">To be deprecated: this was a way to store only a reference to library images in the content, then replace with img tag while rendering</param>
@@ -1252,7 +1251,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Convert an active content field (html data stored with <ac></ac> html tags) to a wysiwyg editor request (html with edit icon <img> for <ac></ac>)
+        /// Convert an active content field (html data stored with ac /ac html tags) to a wysiwyg editor request (html with edit icon img for ac /ac)
         /// </summary>
         public static string renderHtmlForWysiwygEditor(CoreController core, string editorValue) {
             return encode(core, editorValue, 0, "", 0, 0, false, false, false, true, true, false, "", "", false, Contensive.BaseClasses.CPUtilsBaseClass.addonContext.ContextSimple, false, false);

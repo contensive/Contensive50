@@ -1762,7 +1762,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Convert an HTML source to a text equivelent. converts CRLF to <br>, encodes reserved HTML characters to their equivalent
+        /// Convert an HTML source to a text equivelent. converts CRLF to br, encodes reserved HTML characters to their equivalent
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
@@ -2075,19 +2075,19 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     // ----- AllowAdminLinks
                                     //
-                                    core.visitProperty.setProperty("AllowEditing", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowEditing")));
+                                    core.visitProperty.setProperty("AllowEditing", encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowEditing")));
                                     //
                                     // ----- Quick Editor
                                     //
-                                    core.visitProperty.setProperty("AllowQuickEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowQuickEditor")));
+                                    core.visitProperty.setProperty("AllowQuickEditor", encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowQuickEditor")));
                                     //
                                     // ----- Advanced Editor
                                     //
-                                    core.visitProperty.setProperty("AllowAdvancedEditor", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowAdvancedEditor")));
+                                    core.visitProperty.setProperty("AllowAdvancedEditor", encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowAdvancedEditor")));
                                     //
                                     // ----- developer Only parts
                                     //
-                                    core.visitProperty.setProperty("AllowDebugging", GenericController.encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowDebugging")));
+                                    core.visitProperty.setProperty("AllowDebugging", encodeText(core.docProperties.getBoolean(legacyFormSn + "AllowDebugging")));
                                 }
                                 break;
                         }
@@ -2481,7 +2481,7 @@ namespace Contensive.Processor.Controllers {
         ///       PrimaryContentName = "People"
         ///       PrimaryRecordId = MemberID
         ///       SecondaryContentName = "Groups"
-        ///       SecondaryContentSelectCriteria = "ccGroups.PublicJoin<>0"
+        ///       SecondaryContentSelectCriteria = "ccGroups.PublicJoin not equal 0"
         ///       RulesContentName = "Member Rules"
         ///       RulesPrimaryFieldName = "MemberID"
         ///       RulesSecondaryFieldName = "GroupID"

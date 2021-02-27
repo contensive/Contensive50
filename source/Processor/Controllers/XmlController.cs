@@ -178,10 +178,10 @@ namespace Contensive.Processor.Controllers {
                 string iContentName;
                 string sql;
                 bool FoundMenuTable = false;
-                string appName;
+                //;
                 CPCSBaseClass cs = cp.CSNew();
                 // 
-                appName = cp.Site.Name;
+                string appName = cp.Site.Name;
                 iContentName = ContentName;
                 if (iContentName != "") {
                     sql = "select id from cccontent where name=" + cp.Db.EncodeSQLText(iContentName);

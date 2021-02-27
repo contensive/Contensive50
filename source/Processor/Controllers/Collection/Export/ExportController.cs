@@ -1,12 +1,11 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
-using System.Linq;
 using Contensive.Processor.Models.Domain;
+using Microsoft.VisualBasic;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Contensive.Processor.Controllers {
@@ -73,17 +72,14 @@ namespace Contensive.Processor.Controllers {
                     List<string> execFileList = ExportResourceListController.getResourceFileList(cp, CS.GetText("execFileList"), CollectionGuid);
                     string execResourceNodeList = ExportResourceListController.getResourceNodeList(cp, execFileList, CollectionGuid, tempPathFileList, tempExportPath);
                     // 
-                    // helpLink
-                    // 
+                    // -- helpLink
                     if (CS.FieldOK("HelpLink"))
                         collectionXml.Append(System.Environment.NewLine + "\t" + "<HelpLink>" + System.Net.WebUtility.HtmlEncode(CS.GetText("HelpLink")) + "</HelpLink>");
                     // 
-                    // Help
-                    // 
+                    // -- Help
                     collectionXml.Append(System.Environment.NewLine + "\t" + "<Help>" + System.Net.WebUtility.HtmlEncode(CS.GetText("Help")) + "</Help>");
                     // 
-                    // Addons
-                    // 
+                    // -- Addons
                     string IncludeSharedStyleGuidList = "";
                     string IncludeModuleGuidList = "";
                     foreach (var addon in DbBaseModel.createList<AddonModel>(cp, "collectionid=" + collection.id)) {
@@ -110,18 +106,8 @@ namespace Contensive.Processor.Controllers {
                         collectionXml.Append(ExportAddonController.getAddonNode(cp, addon.id, ref IncludeModuleGuidList, ref IncludeSharedStyleGuidList));
                     }
                     // 
-                    // Layouts
-                    foreach (var layout in DbBaseModel.createList<LayoutModel>(cp, "(installedByCollectionId=" + collection.id + ")")) {
-                        collectionXml.Append(ExportLayoutController.get(cp, layout));
-                    }
-                    // 
-                    // Templates
-                    foreach (var template in DbBaseModel.createList<PageTemplateModel>(cp, "(collectionId=" + collection.id + ")")) {
-                        collectionXml.Append(ExportTemplateController.get(cp, template));
-                    }
-                    // 
                     // -- Data Records
-                    List<CollectionDataRecordModel> dataRecordObjList = new List<CollectionDataRecordModel>();
+                    List<CollectionDataExportModel> dataRecordObjList = new List<CollectionDataExportModel>();
                     string dataRecordCrlfList = CS.GetText("DataRecordList");
                     if (!string.IsNullOrEmpty(dataRecordCrlfList)) {
                         //
@@ -134,7 +120,7 @@ namespace Contensive.Processor.Controllers {
                                 continue;
                             }
                             string[] dataSplit = Strings.Split(dataRecord, ",");
-                            CollectionDataRecordModel dataRecordObj = new CollectionDataRecordModel { contentName = dataSplit[0] };
+                            CollectionDataExportModel dataRecordObj = new CollectionDataExportModel { contentName = dataSplit[0] };
                             dataRecordObjList.Add(dataRecordObj);
                             if (GenericController.isGuid(dataSplit[1])) {
                                 dataRecordObj.recordGuid = dataSplit[1];
@@ -153,7 +139,7 @@ namespace Contensive.Processor.Controllers {
                                     using (var csRecord = cp.CSNew()) {
                                         if (csRecord.OpenSQL("select ccguid from " + csTable.GetText("tableName") + " where (" + field + "=" + collection.id + ")and((contentcontrolid=" + csTable.GetInteger("contentid") + ")or(contentcontrolid=0))")) {
                                             do {
-                                                dataRecordObjList.Add(new CollectionDataRecordModel {
+                                                dataRecordObjList.Add(new CollectionDataExportModel {
                                                     contentName = csTable.GetText("contentName"),
                                                     recordGuid = csRecord.GetText("ccguid")
                                                 });
@@ -188,52 +174,6 @@ namespace Contensive.Processor.Controllers {
                             if (Pos > 0) {
                                 Node = Strings.Mid(Node, 1, Pos + 6);
                                 collectionXml.Append(System.Environment.NewLine + "\t" + Node);
-                            }
-                        }
-                    }
-                    // 
-                    // Scripting Modules
-                    if (IncludeModuleGuidList != "") {
-                        string[] Modules = Strings.Split(IncludeModuleGuidList, System.Environment.NewLine);
-                        for (var Ptr = 0; Ptr <= Information.UBound(Modules); Ptr++) {
-                            string ModuleGuid = Modules[Ptr];
-                            if (ModuleGuid != "") {
-                                using (CPCSBaseClass CS2 = cp.CSNew()) {
-                                    CS2.Open("Scripting Modules", "ccguid=" + cp.Db.EncodeSQLText(ModuleGuid));
-                                    if (CS2.OK()) {
-                                        string Code = CS2.GetText("code").Trim();
-                                        Code = encodeCData(Code);
-                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<ScriptingModule Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\" guid=\"" + ModuleGuid + "\">" + Code + "</ScriptingModule>");
-                                    }
-                                    CS2.Close();
-                                }
-                            }
-                        }
-                    }
-                    // 
-                    // shared styles
-                    string[] recordGuids;
-                    string recordGuid;
-                    if ((IncludeSharedStyleGuidList != "")) {
-                        recordGuids = Strings.Split(IncludeSharedStyleGuidList, System.Environment.NewLine);
-                        for (var Ptr = 0; Ptr <= Information.UBound(recordGuids); Ptr++) {
-                            recordGuid = recordGuids[Ptr];
-                            if (recordGuid != "") {
-                                using (CPCSBaseClass CS2 = cp.CSNew()) {
-                                    CS2.Open("Shared Styles", "ccguid=" + cp.Db.EncodeSQLText(recordGuid));
-                                    if (CS2.OK())
-                                        collectionXml.Append(System.Environment.NewLine + "\t" + "<SharedStyle"
-                                            + " Name=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("name")) + "\""
-                                            + " guid=\"" + recordGuid + "\""
-                                            + " alwaysInclude=\"" + CS2.GetBoolean("alwaysInclude") + "\""
-                                            + " prefix=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("prefix")) + "\""
-                                            + " suffix=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("suffix")) + "\""
-                                            + " sortOrder=\"" + System.Net.WebUtility.HtmlEncode(CS2.GetText("sortOrder")) + "\""
-                                            + ">"
-                                            + encodeCData(CS2.GetText("styleFilename").Trim())
-                                            + "</SharedStyle>");
-                                    CS2.Close();
-                                }
                             }
                         }
                     }

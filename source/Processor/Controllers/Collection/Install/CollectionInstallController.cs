@@ -146,7 +146,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- ERROR, collection folder not found
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder not found.");
-                    return_ErrorMessage += "<P>The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.</P>";
+                    return_ErrorMessage += "The collection was not installed from the local collections because the folder containing the Add-on's resources could not be found. It may not be installed locally.";
                     return false;
                 }
                 //
@@ -158,7 +158,7 @@ namespace Contensive.Processor.Controllers {
                     //
                     // -- EXIT, ERROR, collection folder was empty
                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + collectionGuid + "], collection folder is empty.");
-                    return_ErrorMessage += "<P>The collection was not installed because the folder containing the Add-on's resources was empty.</P>";
+                    return_ErrorMessage += "The collection was not installed because the folder containing the Add-on's resources was empty.";
                     return false;
                 }
                 //
@@ -206,7 +206,7 @@ namespace Contensive.Processor.Controllers {
                                     // ----- Error condition -- it must have a collection name
                                     //
                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], collection has no name");
-                                    return_ErrorMessage += "<P>The collection was not installed because the collection name in the xml collection file is blank</P>";
+                                    return_ErrorMessage += "The collection was not installed because the collection name in the xml collection file is blank";
                                     return false;
                                 }
                                 bool attributeFound = false;
@@ -232,7 +232,7 @@ namespace Contensive.Processor.Controllers {
                                     //
                                     //
                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], Collection file contains incorrect GUID, correct GUID [" + collectionGuid.ToLowerInvariant() + "], incorrect GUID in file [" + GenericController.toLCase(FileGuid) + "]");
-                                    return_ErrorMessage += "<P>The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.</P>";
+                                    return_ErrorMessage += " The collection was not installed because the unique number identifying the collection, called the guid, does not match the collection requested.";
                                     return false;
                                 }
                                 if (string.IsNullOrEmpty(collectionGuid)) {
@@ -247,14 +247,14 @@ namespace Contensive.Processor.Controllers {
                                     // -- New collection Not Updateable and collection already exists
                                     string message = "The collection [" + CollectionName + "] was not installed because the new collection is marked not-updateable and the current collection is already installed";
                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], " + message);
-                                    return_ErrorMessage += "<P>" + message + "</P>";
+                                    return_ErrorMessage += message;
                                     return true;
                                 } else if ((collection != null) && !collection.updatable) {
                                     //
                                     // -- Current collection is not updateable
                                     string message = "The collection [" + CollectionName + "] was not installed because the current collection is marked not-updateable";
                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], " + message);
-                                    return_ErrorMessage += "<P>" + message + "</P>";
+                                    return_ErrorMessage += message;
                                     return true;
                                 }
                                 //
@@ -516,7 +516,7 @@ namespace Contensive.Processor.Controllers {
                                                 // error - Need a way to reach the user that submitted the file
                                                 //
                                                 LogController.logError(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], creating navigator entries, there was an error parsing the portion of the collection that contains metadata. Navigator entry creation was aborted. [There was an error reading the Meta data file.] " + ex);
-                                                return_ErrorMessage += "<P>The collection was not installed because the xml collection file has an error.</P>";
+                                                return_ErrorMessage += " The collection was not installed because the xml collection file has an error.";
                                                 return false;
                                             }
                                             if (loadOK) {
@@ -570,7 +570,7 @@ namespace Contensive.Processor.Controllers {
                                                                 if (string.IsNullOrEmpty(ContentName)) {
                                                                     LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data.record node with a blank content attribute.");
                                                                     result = false;
-                                                                    return_ErrorMessage += "<P>Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.</P>";
+                                                                    return_ErrorMessage += " Collection file [" + CollectionName + "] contains a data.record node with a blank content attribute.";
                                                                     return false;
                                                                 } else {
                                                                     string ContentRecordGuid = XmlController.getXMLAttribute(core, ref IsFound, ContentNode, "guid", "");
@@ -578,13 +578,13 @@ namespace Contensive.Processor.Controllers {
                                                                     if ((string.IsNullOrEmpty(ContentRecordGuid)) && (string.IsNullOrEmpty(ContentRecordName))) {
                                                                         LogController.logInfo(core, MethodInfo.GetCurrentMethod().Name + ", installCollectionFromAddonCollectionFolder [" + CollectionName + "], install collection file contains a data record node with neither guid nor name. It must have either a name or a guid attribute. The content is [" + ContentName + "]");
                                                                         result = false;
-                                                                        return_ErrorMessage += "<P>The collection [" + CollectionName + "] was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].</P>";
+                                                                        return_ErrorMessage += " The collection [" + CollectionName + "] was not installed because the Collection file contains a data record node with neither name nor guid. This is not allowed. The content is [" + ContentName + "].";
                                                                         return false;
                                                                     } else {
                                                                         //
                                                                         // create or update the record
                                                                         //
-                                                                        ContentMetadataModel metaData = Models.Domain.ContentMetadataModel.createByUniqueName(core, ContentName);
+                                                                        ContentMetadataModel metaData = ContentMetadataModel.createByUniqueName(core, ContentName);
                                                                         using (var csData = new CsModel(core)) {
                                                                             if (!string.IsNullOrEmpty(ContentRecordGuid)) {
                                                                                 csData.open(ContentName, "ccguid=" + DbController.encodeSQLText(ContentRecordGuid));
@@ -684,12 +684,12 @@ namespace Contensive.Processor.Controllers {
                                             case "scriptingmodule":
                                             case "scriptingmodules": {
                                                     result = false;
-                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.</P>";
+                                                    return_ErrorMessage += " Collection [" + CollectionName + "] includes a scripting module which is no longer supported. Move scripts to the code tab.";
                                                     return false;
                                                 }
                                             case "sharedstyle": {
                                                     result = false;
-                                                    return_ErrorMessage += "<P>Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.</P>";
+                                                    return_ErrorMessage += " Collection [" + CollectionName + "] includes a shared style which is no longer supported. Move styles to the default styles tab.";
                                                     return false;
                                                 }
                                             case "addon":
@@ -883,17 +883,18 @@ namespace Contensive.Processor.Controllers {
                                     recordId = csData.getInteger("id");
                                     foreach (XmlNode FieldNode in ContentNode.ChildNodes) {
                                         if (FieldNode.Name.ToLowerInvariant() == "field") {
+                                            //
                                             // todo optimize 
                                             bool IsFieldFound = false;
                                             string FieldNameLc = XmlController.getXMLAttribute(core, ref isFound, FieldNode, "name", "").ToLowerInvariant();
                                             CPContentBaseClass.FieldTypeIdEnum fieldTypeId = 0;
                                             int FieldLookupContentId = -1;
-                                            ContentFieldMetadataModel field = null;
+                                            ContentFieldMetadataModel fieldMetadata = null;
                                             foreach (var keyValuePair in metaData.fields) {
-                                                field = keyValuePair.Value;
-                                                if (field.nameLc == FieldNameLc) {
-                                                    fieldTypeId = field.fieldTypeId;
-                                                    FieldLookupContentId = field.lookupContentId;
+                                                fieldMetadata = keyValuePair.Value;
+                                                if (fieldMetadata.nameLc == FieldNameLc) {
+                                                    fieldTypeId = fieldMetadata.fieldTypeId;
+                                                    FieldLookupContentId = fieldMetadata.lookupContentId;
                                                     IsFieldFound = true;
                                                     break;
                                                 }
@@ -925,13 +926,45 @@ namespace Contensive.Processor.Controllers {
                                                                 csData.set(FieldNameLc, lookupContentMetadata.getRecordId(core, fieldValue));
                                                                 break;
                                                             }
-                                                            if (!string.IsNullOrEmpty(field.lookupList)) {
+                                                            if (!string.IsNullOrEmpty(fieldMetadata.lookupList)) {
                                                                 //
                                                                 // Lookup list
                                                                 csData.set(FieldNameLc, fieldValue);
                                                                 break;
                                                             }
                                                             csData.set(FieldNameLc, 0);
+                                                            break;
+                                                        }
+                                                    case CPContentBaseClass.FieldTypeIdEnum.ManyToMany: {
+                                                            //
+                                                            // -- many-to-many
+                                                            if (string.IsNullOrEmpty(fieldValue)) {
+                                                                //
+                                                                // -- no value,no record
+                                                                continue;
+                                                            }
+                                                            //
+                                                            // -- find secondary content (record in secondary content with matching guid
+                                                            using (var cs = core.cpParent.CSNew()) {
+                                                                string secondaryContentName = core.cpParent.Content.GetName(fieldMetadata.manyToManyContentId);
+                                                                if (cs.Open(secondaryContentName, "ccGuid=" + core.cpParent.Db.EncodeSQLText(fieldValue))) {
+                                                                    //
+                                                                    // -- find rule record
+                                                                    using (var csRule = core.cpParent.CSNew()) {
+                                                                        string ruleContent = core.cpParent.Content.GetName(fieldMetadata.manyToManyRuleContentId);
+                                                                        int secondaryRecordId = cs.GetInteger("id");
+                                                                        if (!csRule.Open(ruleContent, "(" + fieldMetadata.manyToManyRulePrimaryField + "=" + recordId + ")and(" + fieldMetadata.manyToManyRuleSecondaryField + "=" + secondaryRecordId + ")")) {
+                                                                            //
+                                                                            // -- rule record is missing, check the box
+                                                                            csRule.Close();
+                                                                            csRule.Insert(ruleContent);
+                                                                            csRule.SetField(fieldMetadata.manyToManyRulePrimaryField, recordId);
+                                                                            csRule.SetField(fieldMetadata.manyToManyRuleSecondaryField, secondaryRecordId);
+                                                                            csRule.Save();
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
                                                             break;
                                                         }
                                                     default: {

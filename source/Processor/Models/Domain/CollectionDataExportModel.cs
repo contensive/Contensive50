@@ -1,6 +1,9 @@
 ﻿
 namespace Contensive.Processor.Models.Domain {
-    public class CollectionDataRecordModel {
+    /// <summary>
+    /// A row in the Data-Record tab of a collection record. Represents one-or-more records to be exported from a content
+    /// </summary>
+    public class CollectionDataExportModel {
         /// <summary>
         /// The content for this export. if recordGuid and recordName are empty, export all records
         /// </summary>

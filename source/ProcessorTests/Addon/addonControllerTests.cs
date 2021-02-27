@@ -2,7 +2,6 @@
 using Contensive.BaseClasses;
 using Contensive.Models.Db;
 using Contensive.Processor;
-using Contensive.Processor.Controllers;
 using Contensive.Processor.Models.Domain;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ namespace Tests {
     //====================================================================================================
     //
     [TestClass()]
-    public class AddonControllerTests {
+    public class addonControllerTests {
         //
         private bool localPropertyToFoolCodacyStaticMethodRequirement;
         //
@@ -60,7 +59,7 @@ namespace Tests {
         //
         //====================================================================================================
         //
-        public void controllers_Addon_copy()  {
+        public void controllers_Addon_copy() {
             using (CPClass cp = new CPClass(testAppName)) {
                 // arrange
                 var addon = AddonModel.addDefault<AddonModel>(cp, ContentMetadataModel.getDefaultValueDict(cp.core, AddonModel.tableMetadata.contentName));

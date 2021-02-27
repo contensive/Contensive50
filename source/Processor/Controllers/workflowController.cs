@@ -42,7 +42,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// create sql criteria for all authoring control records related to a tablerecordkey
         /// </summary>
-        /// <param name="userId"></param>
+        /// <param name="dateTimeMockable"></param>
         /// <param name="tableRecordKey"></param>
         /// <returns></returns>
         public static string getAuthoringControlCriteria(string tableRecordKey, DateTime dateTimeMockable)

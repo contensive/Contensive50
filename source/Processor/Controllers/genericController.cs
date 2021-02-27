@@ -26,8 +26,8 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// returns true if first version is older than the second version
         /// </summary>
-        /// <param name="version"></param>
-        /// <param name="versionCompare"></param>
+        /// <param name="versionFirst"></param>
+        /// <param name="versionSecond"></param>
         /// <returns></returns>
         public static bool versionIsOlder(string versionFirst, string versionSecond) {
             try {
@@ -440,7 +440,7 @@ namespace Contensive.Processor.Controllers {
         ///       then remove everything to the right of any '['
         ///       call encodeAddonConstructorargument before parsing them together
         ///       call decodeAddonConstructorArgument after parsing them apart
-        ///       Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
+        ///       Arg0,Arg1,Arg2,Arg3,Name=Value Name=VAlue[Option1|Option2]
         ///       This routine is needed for all Arg, Name, Value, Option values
         /// </summary>
         /// <param name="EncodedArg"></param>
@@ -469,17 +469,58 @@ namespace Contensive.Processor.Controllers {
         /// return argument for separateUrl
         /// </summary>
         public class UrlDetailsClass {
+            /// <summary>
+            /// constructor
+            /// </summary>
             public UrlDetailsClass() {
                 pathSegments = new List<string>();
             }
+            /// <summary>
+            /// 'http://' or 'https://'
+            /// </summary>
             public string protocol { get; set; }
+            /// <summary>
+            /// The domain name
+            /// </summary>
             public string host { get; set; }
+            /// <summary>
+            /// the port
+            /// </summary>
             public string port { get; set; }
+            /// <summary>
+            /// The each of the path segments. An empty pathSegments is the path "/". Path segments are constructed with slashes before and after.
+            /// </summary>
             public List<String> pathSegments { get; set; }
+            /// <summary>
+            /// The rightmost segment of the path if not followed by a slash
+            /// </summary>
             public string filename { get; set; }
+            /// <summary>
+            /// query string
+            /// </summary>
             public string queryString { get; set; }
-            public string unixPath() { return String.Join("/", pathSegments); }
-            public string dosPath() { return String.Join("\\", pathSegments); }
+            /// <summary>
+            /// The path constructed from pathsegments with '/'
+            /// </summary>
+            /// <returns></returns>
+            public string unixPath {
+                get {
+                    string path = string.Join("/", pathSegments);
+                    if (string.IsNullOrEmpty(path)) { return "/"; }
+                    return "/" + path + "/";
+                }
+            }
+            /// <summary>
+            /// The path constructed from pathsegments with '\'
+            /// </summary>
+            /// <returns></returns>
+            public string dosPath {
+                get {
+                    string path = string.Join("\\", pathSegments);
+                    if (string.IsNullOrEmpty(path)) { return "\\"; }
+                    return "\\" + path + "\\";
+                }
+            }
         }
         //
         // ====================================================================================================
@@ -1030,13 +1071,13 @@ namespace Contensive.Processor.Controllers {
                     //
                 } else {
                     UrlDetailsClass urlDetails = splitUrl(url);
-                    string path = urlDetails.unixPath();
+                    string path = urlDetails.unixPath;
                     //splitUrl(Link, ref Protocol, ref Host, ref Path, ref Page, ref QueryString);
                     if (VirtualHosted) {
                         //
                         // Virtual hosted site, add VirualPath if it is not there
                         //
-                        if (strInstr(1, urlDetails.unixPath(), appRootPath, 1) == 0) {
+                        if (strInstr(1, urlDetails.unixPath, appRootPath, 1) == 0) {
                             if (path == "/") {
                                 path = appRootPath;
                             } else {
@@ -1163,7 +1204,7 @@ namespace Contensive.Processor.Controllers {
         /// <returns></returns>
         public static int? encodeIntegerNullable(object expression) {
             if (expression == null) { return null; }
-            if ((expression is string) &&(string.IsNullOrWhiteSpace((string)expression))){ return null; }
+            if ((expression is string) && (string.IsNullOrWhiteSpace((string)expression))) { return null; }
             return encodeInteger(expression);
         }
         //
@@ -1735,7 +1776,7 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// Encodes an argument in an Addon OptionString (QueryString) for all non-allowed characters
-        /// Arg0,Arg1,Arg2,Arg3,Name=Value&Name=VAlue[Option1|Option2]
+        /// Arg0,Arg1,Arg2,Arg3,Name=Value Name=VAlue[Option1|Option2]
         /// call this before parsing them together
         /// call decodeAddonOptionArgument after parsing them apart
         /// </summary>
@@ -1923,7 +1964,7 @@ namespace Contensive.Processor.Controllers {
         //
         //======================================================================================
         /// <summary>
-        /// Convert QS tag argument list (a=1&b=2 with NVA encoding) to a doc property compatible dictionary of strings
+        /// Convert QS tag argument list (a=1 b=2 with NVA encoding) to a doc property compatible dictionary of strings
         /// </summary>
         /// <param name="core"></param>
         /// <param name="ACArgumentString"></param>

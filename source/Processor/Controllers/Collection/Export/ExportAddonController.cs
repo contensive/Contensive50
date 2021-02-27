@@ -1,16 +1,23 @@
 ﻿
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using Microsoft.VisualBasic;
 using Contensive.BaseClasses;
-using Contensive.Models.Db;
+using Microsoft.VisualBasic;
+using System;
 
 namespace Contensive.Processor.Controllers {
+    /// <summary>
+    /// Export Addons to Collectionn file
+    /// </summary>
     public static class ExportAddonController {
         // 
         // ====================================================================================================
-
+        /// <summary>
+        /// return an addon node
+        /// </summary>
+        /// <param name="cp"></param>
+        /// <param name="addonid"></param>
+        /// <param name="Return_IncludeModuleGuidList"></param>
+        /// <param name="Return_IncludeSharedStyleGuidList"></param>
+        /// <returns></returns>
         public static string getAddonNode(CPBaseClass cp, int addonid, ref string Return_IncludeModuleGuidList, ref string Return_IncludeSharedStyleGuidList) {
             string result = "";
             try {
@@ -26,7 +33,7 @@ namespace Contensive.Processor.Controllers {
                         result += ExportController.getNode( "CopyText", CS.GetText("CopyText"));
                         // 
                         // DLL
-                        result += ExportController.getNode( "ActiveXProgramID", CS.GetText("objectprogramid"), true);
+                        //result += ExportController.getNode( "ActiveXProgramID", CS.GetText("objectprogramid"), true);
                         result += ExportController.getNode( "DotNetClass", CS.GetText("DotNetClass"));
                         // 
                         // Features
