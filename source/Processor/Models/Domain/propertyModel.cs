@@ -39,23 +39,18 @@ namespace Contensive.Processor.Models.Domain {
         /// <summary>
         /// constructor
         /// </summary>
-        /// <param name="cp"></param>
+        /// <param name="core"></param>
         /// <param name="propertyType"></param>
         /// <remarks></remarks>
         public PropertyModelClass(CoreController core, PropertyTypeEnum propertyType) {
             this.core = core;
             this.propertyType = propertyType;
-            switch (propertyType) {
-                case PropertyTypeEnum.visit:
-                    propertyKeyId = core.session.visit.id;
-                    break;
-                case PropertyTypeEnum.visitor:
-                    propertyKeyId = core.session.visitor.id;
-                    break;
-                default:
-                    propertyKeyId = core.session.user.id;
-                    break;
-            }
+            propertyKeyId = propertyType switch {
+                PropertyTypeEnum.visit => core.session.visit.id,
+                PropertyTypeEnum.visitor => core.session.visitor.id,
+                PropertyTypeEnum.user => core.session.user.id,
+                _ => core.session.user.id,
+            };
         }
         //
         //====================================================================================================
@@ -176,6 +171,7 @@ namespace Contensive.Processor.Models.Domain {
                 }
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                throw;
             }
         }
         //
@@ -196,8 +192,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get a property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public DateTime getDate(string propertyName) => encodeDate(getText(propertyName, encodeText(DateTime.MinValue), propertyKeyId));
         //
@@ -207,7 +201,6 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public DateTime getDate(string propertyName, DateTime defaultValue) => encodeDate(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
@@ -216,8 +209,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get a property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public double getNumber(string propertyName) => encodeNumber(getText(propertyName, encodeText(0), propertyKeyId));
         //
@@ -227,7 +218,6 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public double getNumber(string propertyName, double defaultValue) => encodeNumber(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
@@ -236,8 +226,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get a property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public bool getBoolean(string propertyName) => encodeBoolean(getText(propertyName, encodeText(false), propertyKeyId));
         //
@@ -247,7 +235,6 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public bool getBoolean(string propertyName, bool defaultValue) => encodeBoolean(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
@@ -256,8 +243,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get an integer property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public int getInteger(string propertyName) => encodeInteger(getText(propertyName, encodeText(0), propertyKeyId));
         //
@@ -267,7 +252,6 @@ namespace Contensive.Processor.Models.Domain {
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public int getInteger(string propertyName, int defaultValue) => encodeInteger(getText(propertyName, encodeText(defaultValue), propertyKeyId));
         //
@@ -276,8 +260,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get a string property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultValue"></param>
-        /// <param name="keyId"></param>
         /// <returns></returns>
         public string getText(string propertyName) => getText(propertyName, "", propertyKeyId);
         //
@@ -295,7 +277,6 @@ namespace Contensive.Processor.Models.Domain {
         /// get an object property
         /// </summary>
         /// <param name="propertyName"></param>
-        /// <param name="defaultObject"></param>
         /// <returns></returns>
         public T getObject<T>(string propertyName) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(getText(propertyName, string.Empty, propertyKeyId));
@@ -346,7 +327,10 @@ namespace Contensive.Processor.Models.Domain {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="keyId"></param>
         private void loadFromDb(int keyId) {
             try {
                 //
@@ -370,6 +354,7 @@ namespace Contensive.Processor.Models.Domain {
                 propertyCacheLoaded = true;
             } catch (Exception ex) {
                 LogController.logError(core, ex);
+                throw;
             }
         }
     }

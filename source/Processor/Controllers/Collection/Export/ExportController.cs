@@ -117,15 +117,26 @@ namespace Contensive.Processor.Controllers {
                         // -- first, create dataRecordList of records in the Collection's DataRecord tab
                         foreach (var dataRecord in Strings.Split(dataRecordCrlfList, Environment.NewLine).ToList()) {
                             if (string.IsNullOrEmpty(dataRecord)) {
+                                //
+                                // -- row is empty, skit pit
                                 continue;
                             }
                             string[] dataSplit = Strings.Split(dataRecord, ",");
                             CollectionDataExportModel dataRecordObj = new CollectionDataExportModel { contentName = dataSplit[0] };
                             dataRecordObjList.Add(dataRecordObj);
+                            if (dataSplit.Length.Equals(1)) {
+                                //
+                                // -- row is just contentName, exports the entire table
+                                continue;
+                            }
                             if (GenericController.isGuid(dataSplit[1])) {
+                                //
+                                // -- row is contentNae,Guid
                                 dataRecordObj.recordGuid = dataSplit[1];
                                 continue;
                             }
+                            //
+                            // -- row is contentName, recordName
                             dataRecordObj.recordName = dataSplit[1];
                         }
                     }

@@ -424,8 +424,21 @@ namespace Contensive.Processor.Controllers {
         /// <param name="sqlList"></param>
         public void insert(string tableName, NameValueCollection sqlList) {
             try {
-                if (sqlList.Count == 0) { return; }
-                string sql = "INSERT INTO " + tableName + "(" + sqlList.getNameList() + ")values(" + sqlList.getValueList() + ")";
+                if (sqlList.Count == 0) {
+                    throw new ArgumentException("Empty field list is not allowed for Db insert.");
+                }
+                if (string.IsNullOrEmpty(tableName)) {
+                    throw new ArgumentException("Blank table name is not allowed for Db insert.");
+                }
+                string nameList = sqlList.getNameList();
+                if (nameList.Contains(",,")) {
+                    throw new ArgumentException("Blank field names are not allowed for Db insert.");
+                }
+                string valueList = sqlList.getValueList();
+                if (nameList.Contains(",,")) {
+                    throw new ArgumentException("Blank values are not allowed for Db insert.");
+                }
+                string sql = "insert into " + tableName + "(" + nameList + ")values(" + valueList + ")";
                 core.db.executeNonQuery(sql);
             } catch (Exception ex) {
                 LogController.logError(core, new GenericException("Exception [" + ex.Message + "], inserting table [" + tableName + "], dataSourceName [" + dataSourceName + "]", ex));

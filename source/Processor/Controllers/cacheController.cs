@@ -110,7 +110,7 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// Initializes cache client
+        /// Initialize cache client
         /// </summary>
         /// <remarks></remarks>
         public CacheController(CoreController core) {
@@ -141,15 +141,13 @@ namespace Contensive.Processor.Controllers {
                 LogController.logError(core, ex, "Exception initializing remote cache, will continue with cache disabled.");
             }
         }
-
-
         //
         //========================================================================
         /// <summary>
         /// get an object of type TData from cache. If the cache misses or is invalidated, null object is returned
         /// </summary>
         /// <typeparam name="TData"></typeparam>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry</param>
         /// <returns></returns>
         public TData getObject<TData>(string key) {
             if (string.IsNullOrEmpty(key)) { return default; }
@@ -162,7 +160,7 @@ namespace Contensive.Processor.Controllers {
         /// get an object of type TData from cache. If the cache misses or is invalidated, null object is returned
         /// </summary>
         /// <typeparam name="TData"></typeparam>
-        /// <param name="keyHash"></param>
+        /// <param name="keyHash">The hashed key. Turn a Key (text name) to a has with createKeyHash().</param>
         /// <returns></returns>
         public TData getObject<TData>(CacheKeyHashClass keyHash) {
             try {
@@ -244,7 +242,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get an object from cache. If the cache misses or is invalidated, return ""
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <returns></returns>
         public string getText(string key) => getObject<string>(key) ?? "";
         //
@@ -252,7 +250,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get an object from cache. If the cache misses or is invalidated, return 0
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <returns></returns>
         public int getInteger(string key) => getObject<int>(key);
         //
@@ -260,7 +258,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get an object from cache. If the cache misses or is invalidated, return 0.0
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <returns></returns>
         public double getNumber(string key) => getObject<double>(key);
         //
@@ -268,7 +266,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get an object from cache. If the cache misses or is invalidated, return minDate
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <returns></returns>
         public DateTime getDate(string key) => getObject<DateTime>(key);
         //
@@ -276,7 +274,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get an object from cache. If the cache misses or is invalidated, return false
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <returns></returns>
         public bool getBoolean(string key) => getObject<bool>(key);
         //
@@ -284,7 +282,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// get a cache object from the cache. returns the cacheObject that wraps the object
         /// </summary>
-        /// <param name="keyHash"></param>
+        /// <param name="keyHash">The hashed key. Turn a Key (text name) to a has with createKeyHash().</param>
         /// <returns></returns>
         private CacheDocumentClass getCacheDocument(CacheKeyHashClass keyHash) {
             CacheDocumentClass result = null;
@@ -376,12 +374,12 @@ namespace Contensive.Processor.Controllers {
         //
         //====================================================================================================
         /// <summary>
-        /// save an object to cache, with invalidation date and dependentKeyList
+        /// save an object to cache, with invalidation date and dependency list
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="content"></param>
-        /// <param name="invalidationDate"></param>
-        /// <param name="dependentKeyHashList">Each tag should represent the source of data, and should be invalidated when that source changes.</param>
+        /// <param name="key">The text name for the cache entry.</param>
+        /// <param name="content">The object to be saved in the cache</param>
+        /// <param name="invalidationDate">The dateTime when the cache should automatically invalidate</param>
+        /// <param name="dependentKeyHashList">A list of hashed keys (text keys that have been hashed with createhashKey). If any of these keys are invalidated or updated, this object will be automatically invalidated.</param>
         /// <remarks></remarks>
         public void storeObject(string key, object content, DateTime invalidationDate, List<CacheKeyHashClass> dependentKeyHashList) {
             CacheKeyHashClass keyHash = createKeyHash(key);
@@ -389,7 +387,17 @@ namespace Contensive.Processor.Controllers {
         }
         //
         //====================================================================================================
-        //
+        /// <summary>
+        /// save an object to cache, with invalidation date and dependentKeyList
+        /// </summary>
+        /// <param name="key">The text name for the cache entry.</param>
+        /// <param name="content">The object to be saved in the cache</param>
+        /// <param name="invalidationDate">The dateTime when the cache should automatically invalidate</param>
+        /// <param name="dependentKeyList">A list of text keys.  
+        /// If any of these keys are invalidated or updated, this object will be automatically invalidated. 
+        /// In the AdminSite, each time a record is updated, the system invalidates an object named for the record's table, using createTableDependencyKey()
+        /// To make this object invalidate when any record in a table is updated in the admin site, add a tableDependencyKey for that table
+        /// </param>
         public void storeObject(string key, object content, DateTime invalidationDate, List<string> dependentKeyList) {
             CacheKeyHashClass keyHash = createKeyHash(key);
             List<CacheKeyHashClass> dependentKeyHashList = createKeyHashList(dependentKeyList);
@@ -400,10 +408,14 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save an object to cache, with invalidation date and dependentKeyList
         /// </summary>
-        /// <param name="keyHash"></param>
-        /// <param name="content"></param>
-        /// <param name="invalidationDate"></param>
-        /// <param name="dependentKeyHashList"></param>
+        /// <param name="keyHash">The hashed name for the cache entry. Use createKeyHash() to create a keyhash from a text key.</param>
+        /// <param name="content">The object to be saved in the cache</param>
+        /// <param name="invalidationDate">The dateTime when the cache should automatically invalidate</param>
+        /// <param name="dependentKeyHashList">A list of hashed keys.  
+        /// If any of these keys are invalidated or updated, this object will be automatically invalidated. 
+        /// In the AdminSite, each time a record is updated, the system invalidates an object named for the record's table, using createTableDependencyKey()
+        /// To make this object invalidate when any record in a table is updated in the admin site, add a tableDependencyKey for that table
+        /// </param>
         public void storeObject(CacheKeyHashClass keyHash, object content, DateTime invalidationDate, List<CacheKeyHashClass> dependentKeyHashList) {
             try {
                 var cacheDocument = new CacheDocumentClass(core.dateTimeNowMockable) {
@@ -422,7 +434,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// create a list of keyHash from a list of key
         /// </summary>
-        /// <param name="keyList"></param>
+        /// <param name="keyList">A list of keys that need to be converted to a list of KeyHash</param>
         /// <returns></returns>
         public List<CacheKeyHashClass> createKeyHashList(List<string> keyList) {
             var result = new List<CacheKeyHashClass>();
@@ -436,10 +448,9 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save a cache value, compatible with legacy method signature.
         /// </summary>
-        /// <param name="CP"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <param name="content"></param>
-        /// <param name="dependentKeyHashList">List of dependent keys.</param>
+        /// <param name="dependentKeyHashList">List of dependent keyHash (created with createKeyHash().</param>
         /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
         /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
         /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
@@ -448,6 +459,17 @@ namespace Contensive.Processor.Controllers {
             storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyHashList);
         }
         //
+        //====================================================================================================
+        /// <summary>
+        /// save a cache value, compatible with legacy method signature.
+        /// </summary>
+        /// <param name="key">The text name for the cache entry.</param>
+        /// <param name="content"></param>
+        /// <param name="dependentKeyList">List of dependent keys.</param>
+        /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
+        /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
+        /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
+        /// invalidates if any dependent key is invalid.</remarks>
         public void storeObject(string key, object content, List<string> dependentKeyList) {
             storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), dependentKeyList);
         }
@@ -456,11 +478,13 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save a cache value, compatible with legacy method signature.
         /// </summary>
-        /// <param name="CP"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <param name="content"></param>
-        /// <param name="dependantKey"></param>
-        /// <remarks></remarks>
+        /// <param name="dependantKey">a dependent key.</param>
+        /// <remarks>If a dependent key is invalidated, it's parent key is also invalid. 
+        /// ex - org/id/10 has primary contact person/id/99. if org/id/10 object includes person/id/99 object, then org/id/10 depends on person/id/99,
+        /// and "person/id/99" is a dependent key for "org/id/10". When "org/id/10" is read, it checks all its dependent keys (person/id/99) and
+        /// invalidates if any dependent key is invalid.</remarks>
         public void storeObject(string key, object content, string dependantKey) {
             storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { createKeyHash(dependantKey) });
         }
@@ -468,9 +492,8 @@ namespace Contensive.Processor.Controllers {
         //====================================================================================================
         /// <summary>
         /// save an object to cache, with invalidation date
-        /// 
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <param name="content"></param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
@@ -482,7 +505,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save an object to cache, for compatibility with existing site. Always use a key generated from createKey methods
         /// </summary>
-        /// <param name="key">key generated from createKey methods</param>
+        /// <param name="key">A text key</param>
         /// <param name="content"></param>
         public void storeObject(string key, object content) {
             storeObject(key, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { });
@@ -492,7 +515,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save an object to cache, for compatibility with existing site. Always use a key generated from createKey methods
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <param name="content"></param>
         public void storeObject(CacheKeyHashClass keyHash, object content) {
             storeObject(keyHash, content, core.dateTimeNowMockable.AddDays(invalidationDaysDefault), new List<CacheKeyHashClass> { });
@@ -570,7 +593,7 @@ namespace Contensive.Processor.Controllers {
         /// ex - image with id=10, guid={999}. The normal key="image/id/10", the alias Key="image/ccguid/{9999}"
         /// </summary>
         /// <param name="keyPtr"></param>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         public void storePtr(string keyPtr, string key) {
             CacheKeyHashClass keyPtrHash = createKeyHash(keyPtr);
             CacheKeyHashClass keyHash = createKeyHash(key);
@@ -597,7 +620,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// invalidate a key
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="key">The text name for the cache entry.</param>
         /// <param name="recursionLimit"></param>
         public void invalidate(string key) {
             invalidate(createKeyHash(key), 5);
@@ -848,7 +871,7 @@ namespace Contensive.Processor.Controllers {
         /// <summary>
         /// save object directly to cache.
         /// </summary>
-        /// <param name="keyHash"></param>
+        /// <param name="keyHash">The hashed key. Turn a Key (text name) to a has with createKeyHash().</param>
         /// <param name="cacheDocument">Either a string, a date, or a serializable object</param>
         /// <param name="invalidationDate"></param>
         /// <remarks></remarks>
